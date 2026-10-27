@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=4" />
+  <link rel="stylesheet" href="style.css?v=5" />
 </head>
 <body>
   <div class="app">
@@ -110,6 +110,7 @@
             </div>
             <div class="page-toolbar__right">
               <span class="count-pill" id="studentsCount">0 students</span>
+              <button class="btn btn--ghost" id="btnSeedStudents" title="Load the official class lists from the college registers">Load official list</button>
               <button class="btn btn--primary" id="btnAddStudent">+ Add Student</button>
             </div>
           </div>
@@ -120,7 +121,7 @@
                 <tbody id="studentsTableBody"></tbody>
               </table>
             </div>
-            <div class="empty-state" id="studentsEmpty"><h3>No students yet</h3><p>Click Add Student. Leave Reg. No blank for TMP-EOCNS/YY/####/GNS (or MID).</p></div>
+            <div class="empty-state" id="studentsEmpty"><h3>No students yet</h3><p>Click Add Student. Leave Reg. No blank for TMP-EOCNS/YY/####/GNS (or MID). Or use <strong>Load official list</strong> for the full class registers.</p></div>
           </div>
         </section>
         <section class="view" id="view-lecturers">
@@ -136,7 +137,51 @@
             <div class="empty-state" id="lecturersEmpty"><h3>No lecturers yet</h3><p>Click Add Lecturer to register staff and assign courses.</p></div>
           </div>
         </section>
-        <section class="view" id="view-hostel"><div class="empty-state"><h3>Hostel Attendance</h3><p>Coming next.</p></div></section>
+        <section class="view" id="view-hostel">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Upload the gate / biometric export (.xls / .xlsx) and generate the standard Hostel Absentees boarding-fee report.</p>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__header"><h3>1. Upload gate log</h3></div>
+            <div class="card__body">
+              <div id="hostelDropzone" class="dropzone" style="border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;cursor:pointer;background:var(--surface-2)">
+                <p style="margin:0 0 8px;font-weight:600">Drop the gate export here, or click to choose</p>
+                <p class="muted-note" style="margin:0">Required columns: Department, Name, No., Date/Time, Status, Location ID</p>
+                <input type="file" id="hostelFileInput" accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden />
+              </div>
+              <div id="hostelFileCheck" class="muted-note" style="margin-top:10px" hidden></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__header"><h3>2. Report settings</h3></div>
+            <div class="card__body">
+              <div class="form-grid">
+                <label class="field"><span class="field__label">Start date</span><input type="date" id="hostelStartDate" /></label>
+                <label class="field"><span class="field__label">End date</span><input type="date" id="hostelEndDate" /></label>
+                <label class="field"><span class="field__label">Rate per absent day (₦)</span><input type="number" id="hostelRate" value="15000" min="0" step="500" /></label>
+                <label class="field"><span class="field__label">Hostel 1 name (Location ID = 1)</span><input type="text" id="hostel1Name" value="Hostel 1" /></label>
+                <label class="field"><span class="field__label">Hostel 2 name (Location ID = 2)</span><input type="text" id="hostel2Name" value="Hostel 2" /></label>
+              </div>
+              <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+                <button type="button" class="btn btn--primary" id="btnGenerateHostel">Generate & download report</button>
+                <button type="button" class="btn btn--ghost" id="btnClearHostel">Clear</button>
+              </div>
+              <div id="hostelStatus" class="muted-note" style="margin-top:12px"></div>
+            </div>
+          </div>
+
+          <div class="card" id="hostelResults" hidden>
+            <div class="card__header"><h3>Preview — Absentees only</h3></div>
+            <div class="card__body" style="overflow-x:auto">
+              <div id="hostelSummary" class="muted-note" style="margin-bottom:10px"></div>
+              <table class="data-table" id="hostelPreviewTable"><thead></thead><tbody></tbody></table>
+            </div>
+          </div>
+        </section>
         <section class="view" id="view-sessions">
           <div class="page-toolbar">
             <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Create and manage academic sessions.</p></div>
@@ -218,6 +263,7 @@
     </div>
   </div>
 
-  <script src="app.js?v=4"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>
