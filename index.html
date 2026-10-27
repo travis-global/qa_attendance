@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=5" />
+  <link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
   <div class="app">
@@ -64,7 +64,6 @@
         </div>
         <div class="topbar__actions">
           <button class="icon-btn" id="themeToggle">🌓</button>
-          <button class="btn btn--ghost btn--sm" id="exportDbBtn">Backup</button>
         </div>
       </header>
       <main class="content" id="content">
@@ -200,7 +199,44 @@
         <section class="view" id="view-audit">
           <div class="card"><div class="card__header"><h3>Audit Trail</h3></div><div class="card__body" id="auditList"><p>No audit entries yet.</p></div></div>
         </section>
-        <section class="view" id="view-settings"><div class="empty-state"><h3>Settings</h3><p>Coming soon.</p></div></section>
+        <section class="view" id="view-settings">
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__header"><h3>QA Officer access</h3></div>
+            <div class="card__body">
+              <p class="muted-note" style="margin-top:0">Master student data is stored in the repository (<code>data/students.json</code>). Export and publish are only available after officer sign-in.</p>
+              <div id="qaAuthLoggedOut">
+                <div class="form-grid" style="max-width:360px">
+                  <label class="field field--full"><span class="field__label">Officer PIN</span><input type="password" id="qaPinInput" placeholder="Enter QA PIN" autocomplete="off" /></label>
+                </div>
+                <button type="button" class="btn btn--primary" id="btnQaLogin" style="margin-top:12px">Sign in as QA Officer</button>
+                <p id="qaAuthError" class="muted-note" style="color:#b91c1c;margin-top:8px" hidden></p>
+              </div>
+              <div id="qaAuthLoggedIn" hidden>
+                <p style="margin:0 0 12px"><span class="badge badge--green">Signed in</span> QA Officer session active on this device.</p>
+                <div style="display:flex;flex-wrap:wrap;gap:10px">
+                  <button type="button" class="btn btn--primary" id="btnExportStudents">Export students (JSON)</button>
+                  <button type="button" class="btn btn--ghost" id="btnPublishStudents">Publish students to repository</button>
+                  <button type="button" class="btn btn--ghost" id="btnQaLogout">Sign out</button>
+                </div>
+                <div id="qaPublishStatus" class="muted-note" style="margin-top:12px"></div>
+                <div id="qaTokenPanel" style="margin-top:16px" hidden>
+                  <label class="field field--full"><span class="field__label">GitHub fine-grained token (write access to this repo)</span>
+                    <input type="password" id="qaGithubToken" placeholder="github_pat_…" autocomplete="off" />
+                  </label>
+                  <p class="muted-note">Token is kept only in this browser session and is never saved into the repository.</p>
+                  <button type="button" class="btn btn--primary" id="btnConfirmPublish" style="margin-top:8px">Confirm publish</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__header"><h3>Data source</h3></div>
+            <div class="card__body">
+              <p class="muted-note" style="margin:0">Students load from <code>data/students.json</code> in the GitHub repository. Local edits stay on this device until a QA officer publishes them.</p>
+              <button type="button" class="btn btn--ghost" id="btnReloadFromRepo" style="margin-top:12px">Reload master list from repository</button>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -264,6 +300,6 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
