@@ -46,6 +46,7 @@ function showView(viewId) {
   if (viewId === "sessions") renderSessionsList();
   if (viewId === "dashboard") refreshDashboardStats();
   if (viewId === "audit") renderAuditLog();
+  if (viewId === "hostel") initHostelView();
 }
 document.querySelectorAll("[data-view]").forEach((el) => {
   el.addEventListener("click", (e) => { e.preventDefault(); showView(el.dataset.view); });
@@ -336,12 +337,14 @@ async function renderAuditLog() {
   if (!list.length) { container.innerHTML = "<p>No audit entries yet.</p>"; return; }
   container.innerHTML = list.map(entry => {
     const sourceLabel = entry.source === "official-letter" ? "<span class=\"badge badge--teal\" style=\"margin-left:6px\">Official Letter</span>" : "<span class=\"badge badge--muted\" style=\"margin-left:6px\">System</span>";
-    return "<div class=\"audit-item\"><div class=\"audit-item__ref\">" + escapeHtml(entry.ref) + "</div><div class=\"audit-item__body\"><div class=\"audit-item__action\"><span class=\"badge badge--" + (entry.action === "create" ? "green" : "amber") + "\">" + escapeHtml(entry.action) + "</span> <strong>" + escapeHtml(entry.entity) + "</strong>" + sourceLabel + "</div><div class=\"audit-item__reason\">" + escapeHtml(entry.reason || "-") + "</div><div class=\"audit-item__meta\">" + formatDate(entry.timestamp) + "</div></div></div>";
+    return "<div class=\"audit-item\"><div class=\"audit-item__ref\">" + escapeHtml(entry.ref) + "</div><div class=\"audit-item__body\"><div class=\"audit-item__action\"><span class=\"badge badge--" + (entry.action === "create" ? "green" : "amber") + "\">" + escapeHtml(entry.action) + "</span> <strong>" + escapeHtml(entry.entity) + "</strong>" + sourceLabel + "</div><div class=\"audit-item__reason\">" + escapeHtml(entry.reason || "-") + "</div><div class=\"audit-item__meta\">" + formatDate(entry.timestamp) + " · " + escapeHtml(entry.user || "System") + "</div></div></div>";
   }).join("");
 }
 async function refreshDashboardStats() {
   if (!db) return;
-  const [students, lecturers, sessions] = await Promise.all([getAll("students"), getAll("lecturers"), getAll("sessions")]);
+  const students = await getAll("students");
+  const lecturers = await getAll("lecturers");
+  const sessions = await getAll("sessions");
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set("statStudents", students.length || "0");
   set("statLecturers", lecturers.length || "0");
@@ -356,6 +359,400 @@ document.getElementById("exportDbBtn")?.addEventListener("click", async () => {
   a.download = "EOCNS_Backup_" + new Date().toISOString().slice(0, 10) + ".json";
   a.click();
 });
+
+// =========================================================
+// OFFICIAL STUDENT SEED (college registers)
+// =========================================================
+let OFFICIAL_STUDENTS = [];
+async function loadOfficialStudentsSeed() {
+  if (OFFICIAL_STUDENTS.length) return OFFICIAL_STUDENTS;
+  try {
+    const res = await fetch("seed-students.json?v=5");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    OFFICIAL_STUDENTS = await res.json();
+  } catch (e) {
+    console.warn("Could not load seed-students.json", e);
+    OFFICIAL_STUDENTS = [];
+  }
+  return OFFICIAL_STUDENTS;
+}
+
+async function seedOfficialStudents() {
+  if (!db) { alert("Database not ready yet."); return; }
+  await loadOfficialStudentsSeed();
+  if (!OFFICIAL_STUDENTS.length) {
+    alert("Could not load the official student list. Check that seed-students.json is on the site.");
+    return;
+  }
+  const existing = await getAll("students");
+  if (existing.length > 0) {
+    const ok = confirm(
+      "There are already " + existing.length + " students.\\n\\n" +
+      "Loading the official list will ADD any missing names (existing records stay).\\n\\nContinue?"
+    );
+    if (!ok) return;
+  }
+  const byReg = new Set(existing.map(s => (s.regNo || "").toUpperCase()));
+  const byName = new Set(existing.map(s => (s.name || "").toLowerCase().trim()));
+  let added = 0;
+  const now = new Date().toISOString();
+  for (const s of OFFICIAL_STUDENTS) {
+    const reg = (s.regNo || "").toUpperCase();
+    const nameKey = (s.name || "").toLowerCase().trim();
+    if (byReg.has(reg) || byName.has(nameKey)) continue;
+    const student = {
+      id: "stu_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+      name: s.name,
+      regNo: s.regNo,
+      programme: s.programme === "Midwifery" ? "Midwifery" : "Nursing",
+      level: String(s.level),
+      gender: "",
+      hostel: "",
+      status: "Active",
+      phone: "",
+      serial: s.serial,
+      createdAt: now,
+      updatedAt: now,
+    };
+    await put("students", student);
+    byReg.add(reg);
+    byName.add(nameKey);
+    added++;
+  }
+  if (added > 0) {
+    await writeAudit({
+      action: "create",
+      entity: "students",
+      entityId: "bulk-seed",
+      reason: "Loaded official class list (" + added + " new records)",
+      details: { added },
+    });
+  }
+  alert(added === 0
+    ? "All official students are already in the database."
+    : "Added " + added + " students from the official registers.");
+  await renderStudentsTable();
+  refreshDashboardStats();
+}
+
+// =========================================================
+// HOSTEL MODULE — gate log → boarding fee absentees report
+// =========================================================
+let hostelParsedRows = null;
+
+function initHostelView() {
+  const startEl = document.getElementById("hostelStartDate");
+  const endEl = document.getElementById("hostelEndDate");
+  if (startEl && !startEl.value) {
+    const today = new Date();
+    const first = new Date(today.getFullYear(), today.getMonth(), 1);
+    startEl.value = toInputDateHostel(first);
+    endEl.value = toInputDateHostel(today);
+  }
+}
+
+function toInputDateHostel(d) {
+  const pad = n => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+}
+
+function setHostelStatus(msg, kind) {
+  const el = document.getElementById("hostelStatus");
+  if (!el) return;
+  el.textContent = msg || "";
+  el.style.color = kind === "err" ? "#b91c1c" : kind === "ok" ? "#047857" : "";
+}
+
+function showHostelFileCheck(msg, kind) {
+  const el = document.getElementById("hostelFileCheck");
+  if (!el) return;
+  el.hidden = !msg;
+  el.textContent = msg || "";
+  el.style.color = kind === "err" ? "#b91c1c" : "#047857";
+}
+
+function handleHostelFile(file) {
+  setHostelStatus("", "");
+  const results = document.getElementById("hostelResults");
+  if (results) results.hidden = true;
+  showHostelFileCheck("Reading the file…", "ok");
+  const reader = new FileReader();
+  reader.onerror = () => showHostelFileCheck("Could not open that file.", "err");
+  reader.onload = (e) => {
+    try {
+      if (typeof XLSX === "undefined") {
+        showHostelFileCheck("Excel library failed to load. Refresh the page.", "err");
+        return;
+      }
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array", cellDates: true });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "", raw: true });
+      const validation = validateHostelHeaders(rows);
+      if (!validation.ok) {
+        hostelParsedRows = null;
+        showHostelFileCheck(validation.message, "err");
+        return;
+      }
+      hostelParsedRows = rows;
+      const count = countHostelStudents(rows, validation.headerIndex);
+      showHostelFileCheck('Ready — "' + file.name + '". About ' + count + " students found.", "ok");
+    } catch (err) {
+      console.error(err);
+      hostelParsedRows = null;
+      showHostelFileCheck("Could not read that file. Use the original gate export.", "err");
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function validateHostelHeaders(rows) {
+  const required = ["Department", "Name", "No.", "Date/Time", "Status", "Location ID"];
+  if (!rows.length) return { ok: false, message: "That file looks empty." };
+  const headerIndex = {};
+  rows[0].forEach((v, i) => {
+    const k = String(v).trim();
+    if (k) headerIndex[k] = i;
+  });
+  const missing = required.filter(c => !(c in headerIndex));
+  if (missing.length) {
+    return {
+      ok: false,
+      message: "Missing columns: " + missing.map(m => '"' + m + '"').join(", ") + ". Upload the original gate export.",
+    };
+  }
+  return { ok: true, headerIndex };
+}
+
+function countHostelStudents(rows, headerIndex) {
+  const nameCol = headerIndex["Name"];
+  const noCol = headerIndex["No."];
+  const seen = new Set();
+  for (let r = 1; r < rows.length; r++) {
+    const name = rows[r][nameCol];
+    const no = rows[r][noCol];
+    if (name && no !== "") seen.add(String(no).trim());
+  }
+  return seen.size;
+}
+
+function parseInputDateHostel(value) {
+  if (!value) return null;
+  const parts = value.split("-").map(Number);
+  if (parts.length < 3) return null;
+  return new Date(parts[0], parts[1] - 1, parts[2]);
+}
+
+function dateOnlyHostel(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function toDateKeyHostel(d) {
+  const pad = n => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+}
+
+function normalizeStudentIdHostel(raw) {
+  if (typeof raw === "number") return Number.isInteger(raw) ? String(raw) : String(raw);
+  return String(raw).trim();
+}
+
+function parseAttendanceDateHostel(raw) {
+  if (raw instanceof Date && !isNaN(raw)) return dateOnlyHostel(raw);
+  if (typeof raw === "number") {
+    const parsed = XLSX.SSF ? XLSX.SSF.parse_date_code(raw) : null;
+    if (parsed) return dateOnlyHostel(new Date(parsed.y, parsed.m - 1, parsed.d));
+    return null;
+  }
+  const text = String(raw).trim();
+  if (!text) return null;
+  const m = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})[, ]+(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)?$/i);
+  if (m) return dateOnlyHostel(new Date(Number(m[3]), Number(m[1]) - 1, Number(m[2])));
+  const generic = new Date(text);
+  if (!isNaN(generic)) return dateOnlyHostel(generic);
+  return null;
+}
+
+function computeHostelAttendance(rows, startDate, endDate, hostel1Name, hostel2Name) {
+  const headerIndex = {};
+  rows[0].forEach((v, i) => {
+    const k = String(v).trim();
+    if (k) headerIndex[k] = i;
+  });
+  const nameCol = headerIndex["Name"];
+  const noCol = headerIndex["No."];
+  const dateCol = headerIndex["Date/Time"];
+  const statusCol = headerIndex["Status"];
+  const locationCol = headerIndex["Location ID"];
+  const students = {};
+  const attendance = {};
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r];
+    const rawName = row[nameCol];
+    const studentIdRaw = row[noCol];
+    if (!rawName || studentIdRaw === "" || studentIdRaw == null) continue;
+    const name = String(rawName).trim();
+    const studentId = normalizeStudentIdHostel(studentIdRaw);
+    const locationRaw = String(row[locationCol] || "").trim();
+    let hostel = "Unknown";
+    if (locationRaw === "1") hostel = hostel1Name;
+    else if (locationRaw === "2") hostel = hostel2Name;
+    if (!(studentId in students)) {
+      students[studentId] = { name, hostel };
+      attendance[studentId] = new Set();
+    }
+    const rawDate = row[dateCol];
+    if (rawDate === "" || rawDate == null) continue;
+    const attendanceDate = parseAttendanceDateHostel(rawDate);
+    if (!attendanceDate) continue;
+    if (attendanceDate < startDate || attendanceDate > endDate) continue;
+    const status = String(row[statusCol] || "").trim().toUpperCase();
+    if (status === "C/IN") attendance[studentId].add(toDateKeyHostel(attendanceDate));
+  }
+  const dates = [];
+  const cursor = new Date(startDate);
+  while (cursor <= endDate) {
+    dates.push(new Date(cursor));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return { students, attendance, dates };
+}
+
+function ordinalSuffixHostel(n) {
+  const v = n % 100;
+  if (v >= 11 && v <= 13) return "th";
+  switch (n % 10) {
+    case 1: return "st";
+    case 2: return "nd";
+    case 3: return "rd";
+    default: return "th";
+  }
+}
+
+const MONTH_NAMES_HOSTEL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function buildDayHeadersHostel(dates) {
+  const months = new Set(dates.map(d => d.getMonth()));
+  const spansMonths = months.size > 1;
+  return dates.map(d => {
+    const label = d.getDate() + ordinalSuffixHostel(d.getDate());
+    return spansMonths ? label + " " + MONTH_NAMES_HOSTEL[d.getMonth()].slice(0, 3) : label;
+  });
+}
+
+function buildAbsenteeRowsHostel(students, attendance, dates, rate) {
+  const rows = [];
+  Object.keys(students).sort((a, b) => {
+    const na = students[a].name.toLowerCase();
+    const nb = students[b].name.toLowerCase();
+    return na < nb ? -1 : na > nb ? 1 : 0;
+  }).forEach(id => {
+    const present = attendance[id] || new Set();
+    const dayMarks = dates.map(d => present.has(toDateKeyHostel(d)) ? "" : "A");
+    const absentDays = dayMarks.filter(m => m === "A").length;
+    if (absentDays === 0) return;
+    rows.push({
+      id, name: students[id].name, hostel: students[id].hostel,
+      dayMarks, absentDays, fine: absentDays * rate,
+    });
+  });
+  return rows;
+}
+
+function formatNairaHostel(n) {
+  return "₦" + Math.round(n).toLocaleString("en-NG");
+}
+
+function buildOutputBaseNameHostel(startDate, endDate) {
+  const sameMonth = startDate.getMonth() === endDate.getMonth() && startDate.getFullYear() === endDate.getFullYear();
+  const startLabel = (startDate.getDate() + ordinalSuffixHostel(startDate.getDate())).toUpperCase();
+  const endLabel = (endDate.getDate() + ordinalSuffixHostel(endDate.getDate())).toUpperCase();
+  if (sameMonth) {
+    return "HOSTEL_ABSENTEES_" + startLabel + "_-_" + endLabel + "_" + MONTH_NAMES_HOSTEL[startDate.getMonth()].toUpperCase() + "_" + endDate.getFullYear();
+  }
+  return "HOSTEL_ABSENTEES_" + startLabel + "_" + MONTH_NAMES_HOSTEL[startDate.getMonth()].toUpperCase() + "_-_" + endLabel + "_" + MONTH_NAMES_HOSTEL[endDate.getMonth()].toUpperCase() + "_" + endDate.getFullYear();
+}
+
+function renderHostelPreview(absentees, dayHeaders, rate) {
+  const table = document.getElementById("hostelPreviewTable");
+  if (!table) return;
+  const thead = table.querySelector("thead");
+  const tbody = table.querySelector("tbody");
+  thead.innerHTML = "<tr><th>Name</th><th>Hostel</th>" + dayHeaders.map(h => "<th>" + escapeHtml(h) + "</th>").join("") + "<th>Days</th><th>Fine</th></tr>";
+  tbody.innerHTML = absentees.map(r => {
+    return "<tr><td>" + escapeHtml(r.name) + "</td><td>" + escapeHtml(r.hostel) + "</td>" +
+      r.dayMarks.map(m => '<td style="text-align:center">' + (m || "·") + "</td>").join("") +
+      "<td>" + r.absentDays + "</td><td>" + formatNairaHostel(r.fine) + "</td></tr>";
+  }).join("");
+  const totalFine = absentees.reduce((s, r) => s + r.fine, 0);
+  document.getElementById("hostelSummary").textContent =
+    absentees.length + " absentees · Rate ₦" + rate.toLocaleString("en-NG") + "/day · Total fine " + formatNairaHostel(totalFine);
+  document.getElementById("hostelResults").hidden = false;
+}
+
+function downloadHostelWorkbook(absentees, dayHeaders, filename) {
+  const header = ["Name", "Hostel"].concat(dayHeaders).concat(["Days Absent", "Total Fine (₦)"]);
+  const data = [header];
+  absentees.forEach(r => {
+    data.push([r.name, r.hostel].concat(r.dayMarks).concat([r.absentDays, r.fine]));
+  });
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Hostel Absentees");
+  XLSX.writeFile(wb, filename);
+}
+
+async function generateHostelReport() {
+  setHostelStatus("", "");
+  if (!hostelParsedRows) {
+    setHostelStatus("Please choose a valid attendance file first.", "err");
+    return;
+  }
+  const startDate = parseInputDateHostel(document.getElementById("hostelStartDate").value);
+  const endDate = parseInputDateHostel(document.getElementById("hostelEndDate").value);
+  if (!startDate || !endDate) {
+    setHostelStatus("Please set both a start date and an end date.", "err");
+    return;
+  }
+  if (endDate < startDate) {
+    setHostelStatus("End date cannot be before start date.", "err");
+    return;
+  }
+  const rate = Number(document.getElementById("hostelRate").value);
+  if (!Number.isFinite(rate) || rate < 0) {
+    setHostelStatus("Enter a valid rate per absent day.", "err");
+    return;
+  }
+  const hostel1Name = (document.getElementById("hostel1Name").value || "Hostel 1").trim();
+  const hostel2Name = (document.getElementById("hostel2Name").value || "Hostel 2").trim();
+  const btn = document.getElementById("btnGenerateHostel");
+  btn.disabled = true;
+  setHostelStatus("Working…", "");
+  try {
+    const result = computeHostelAttendance(hostelParsedRows, startDate, endDate, hostel1Name, hostel2Name);
+    if (Object.keys(result.students).length === 0) {
+      setHostelStatus("No students found in this date range.", "err");
+      return;
+    }
+    const absentees = buildAbsenteeRowsHostel(result.students, result.attendance, result.dates, rate);
+    if (absentees.length === 0) {
+      setHostelStatus("Nobody was absent in this date range — nothing to report.", "err");
+      return;
+    }
+    const dayHeaders = buildDayHeadersHostel(result.dates);
+    renderHostelPreview(absentees, dayHeaders, rate);
+    const baseName = buildOutputBaseNameHostel(startDate, endDate);
+    downloadHostelWorkbook(absentees, dayHeaders, baseName + ".xlsx");
+    setHostelStatus('Done — "' + baseName + '.xlsx" downloaded.', "ok");
+  } catch (err) {
+    console.error(err);
+    setHostelStatus("Something went wrong while building the report.", "err");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+
 openDB().then(() => {
   console.log("EOCNS Attendance System ready");
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
@@ -376,6 +773,31 @@ openDB().then(() => {
   document.getElementById("btnAddSession")?.addEventListener("click", () => openSessionForm());
   document.getElementById("sessionForm")?.addEventListener("submit", saveSession);
   document.getElementById("sessionModalBackdrop")?.addEventListener("click", () => { document.getElementById("sessionModal").hidden = true; });
+
+  document.getElementById("btnSeedStudents")?.addEventListener("click", seedOfficialStudents);
+
+  const hostelDropzone = document.getElementById("hostelDropzone");
+  const hostelFileInput = document.getElementById("hostelFileInput");
+  hostelDropzone?.addEventListener("click", () => hostelFileInput?.click());
+  hostelDropzone?.addEventListener("dragover", (e) => { e.preventDefault(); hostelDropzone.classList.add("is-dragover"); });
+  hostelDropzone?.addEventListener("dragleave", () => hostelDropzone.classList.remove("is-dragover"));
+  hostelDropzone?.addEventListener("drop", (e) => {
+    e.preventDefault();
+    hostelDropzone.classList.remove("is-dragover");
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleHostelFile(e.dataTransfer.files[0]);
+  });
+  hostelFileInput?.addEventListener("change", () => {
+    if (hostelFileInput.files && hostelFileInput.files[0]) handleHostelFile(hostelFileInput.files[0]);
+  });
+  document.getElementById("btnGenerateHostel")?.addEventListener("click", generateHostelReport);
+  document.getElementById("btnClearHostel")?.addEventListener("click", () => {
+    hostelParsedRows = null;
+    if (hostelFileInput) hostelFileInput.value = "";
+    showHostelFileCheck("", "");
+    setHostelStatus("", "");
+    const results = document.getElementById("hostelResults");
+    if (results) results.hidden = true;
+  });
 }).catch(err => {
   console.error(err);
   alert("Could not initialise the local database.");

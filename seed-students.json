@@ -1,1 +1,2618 @@
-[]
+[
+  {
+    "serial": "1",
+    "name": "Divine Chinecherem Adoke",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0001/GNS"
+  },
+  {
+    "serial": "2",
+    "name": "Nnachi Anya Nnachi",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0002/GNS"
+  },
+  {
+    "serial": "3",
+    "name": "Emmanuel Chijioke Chukwu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0003/GNS"
+  },
+  {
+    "serial": "4",
+    "name": "Sarah Onyinyechi Ohaji",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0004/GNS"
+  },
+  {
+    "serial": "5",
+    "name": "Blessing Osinachi Samuel",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0005/GNS"
+  },
+  {
+    "serial": "6",
+    "name": "Precious Chioma Iganga",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0006/GNS"
+  },
+  {
+    "serial": "7",
+    "name": "Peace Chibusomma Ani",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0007/GNS"
+  },
+  {
+    "serial": "8",
+    "name": "Chicheta Sarah Nworie",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0008/GNS"
+  },
+  {
+    "serial": "9",
+    "name": "Ifunanya Vivian Ogbonna",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0009/GNS"
+  },
+  {
+    "serial": "10",
+    "name": "Amarachi Esther Ogharu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0010/GNS"
+  },
+  {
+    "serial": "11",
+    "name": "Chiamaka Maryann Nwaobodo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0011/GNS"
+  },
+  {
+    "serial": "12",
+    "name": "Deborah Chioma Egwuatu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0012/GNS"
+  },
+  {
+    "serial": "13",
+    "name": "Precious Kosisochukwu Agbo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0013/GNS"
+  },
+  {
+    "serial": "14",
+    "name": "Chisom Precious Okoli",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0014/GNS"
+  },
+  {
+    "serial": "15",
+    "name": "Blessing Ekunyi Eze",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0015/GNS"
+  },
+  {
+    "serial": "16",
+    "name": "Miracle Ifunanya Uche",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0016/GNS"
+  },
+  {
+    "serial": "17",
+    "name": "Precious Nmesoma Philip",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0017/GNS"
+  },
+  {
+    "serial": "18",
+    "name": "Chiamaka Bliss Nwachukwu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0018/GNS"
+  },
+  {
+    "serial": "19",
+    "name": "Sharon Chinonso Onwuka",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0019/GNS"
+  },
+  {
+    "serial": "20",
+    "name": "Ukamaka Ebere Eze",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0020/GNS"
+  },
+  {
+    "serial": "21",
+    "name": "Chidera Divine Iteshi",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0021/GNS"
+  },
+  {
+    "serial": "22",
+    "name": "Cynthia Nmesoma Odo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0022/GNS"
+  },
+  {
+    "serial": "23",
+    "name": "Perpetua Chioma Maduka",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0023/GNS"
+  },
+  {
+    "serial": "24",
+    "name": "Chinenye Success Igwe",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0024/GNS"
+  },
+  {
+    "serial": "25",
+    "name": "Precious Owora Ikwor",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0025/GNS"
+  },
+  {
+    "serial": "26",
+    "name": "Abigail Akachukwu Nwonyi",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0026/GNS"
+  },
+  {
+    "serial": "27",
+    "name": "Chisom Loveth Okorouneke",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0027/GNS"
+  },
+  {
+    "serial": "28",
+    "name": "Ebube Nice Okwor",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0028/GNS"
+  },
+  {
+    "serial": "29",
+    "name": "Pretty Mmesoma Okoro",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0029/GNS"
+  },
+  {
+    "serial": "30",
+    "name": "Juliet Chukwuma Anyalagu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0030/GNS"
+  },
+  {
+    "serial": "31",
+    "name": "Chioma Confidence Omoha",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0031/GNS"
+  },
+  {
+    "serial": "32",
+    "name": "Gift Chiamaka Igboke",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0032/GNS"
+  },
+  {
+    "serial": "33",
+    "name": "Chiamaka Treasure Offor",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0033/GNS"
+  },
+  {
+    "serial": "34",
+    "name": "Trinitas Chioma Dike",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0034/GNS"
+  },
+  {
+    "serial": "35",
+    "name": "Ezinwanne Claudia Welibe",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0035/GNS"
+  },
+  {
+    "serial": "36",
+    "name": "Chisom Anulika Udeh",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0036/GNS"
+  },
+  {
+    "serial": "37",
+    "name": "Amarachi Chijioke",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0037/GNS"
+  },
+  {
+    "serial": "38",
+    "name": "Chidiebube Deborah Ugah",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0038/GNS"
+  },
+  {
+    "serial": "39",
+    "name": "Amaka Godness Israel",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0039/GNS"
+  },
+  {
+    "serial": "40",
+    "name": "Rejoice Eteng Ubi",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0040/GNS"
+  },
+  {
+    "serial": "41",
+    "name": "Favour Eteng Ubi",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0041/GNS"
+  },
+  {
+    "serial": "42",
+    "name": "Samuel Emeka",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0042/GNS"
+  },
+  {
+    "serial": "43",
+    "name": "Adaeze Esther Benjamin",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0043/GNS"
+  },
+  {
+    "serial": "44",
+    "name": "Victory Nzubechi Ezenwa",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0044/GNS"
+  },
+  {
+    "serial": "45",
+    "name": "Udochukwu Gift Chiemezie",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0045/GNS"
+  },
+  {
+    "serial": "46",
+    "name": "Deborah Chat John",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0046/GNS"
+  },
+  {
+    "serial": "47",
+    "name": "Chioma Christiana Nwagbo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0047/GNS"
+  },
+  {
+    "serial": "48",
+    "name": "Precious Ogechi Eze",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0048/GNS"
+  },
+  {
+    "serial": "49",
+    "name": "Princess Chinemerem Duke",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0049/GNS"
+  },
+  {
+    "serial": "50",
+    "name": "Angela Chisom Nwaji",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0050/GNS"
+  },
+  {
+    "serial": "51",
+    "name": "Makuochukwu Christiana Onyenuma",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0051/GNS"
+  },
+  {
+    "serial": "52",
+    "name": "Favour Ugomma Arua",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0052/GNS"
+  },
+  {
+    "serial": "53",
+    "name": "Stella Chubiyojo James",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0053/GNS"
+  },
+  {
+    "serial": "54",
+    "name": "Miracle Oluebube Nwankwo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0054/GNS"
+  },
+  {
+    "serial": "55",
+    "name": "Ogechi Preciousrita Ugwunta",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0055/GNS"
+  },
+  {
+    "serial": "56",
+    "name": "Eja Treasure Samuel",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0056/GNS"
+  },
+  {
+    "serial": "57",
+    "name": "Nmachi Nwali",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0057/GNS"
+  },
+  {
+    "serial": "58",
+    "name": "Ukamaka Favour Ugochukwu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0058/GNS"
+  },
+  {
+    "serial": "59",
+    "name": "Favour Munachimso Ezeike",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0059/GNS"
+  },
+  {
+    "serial": "60",
+    "name": "Anita Ifunanya Nnaemeka",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0060/GNS"
+  },
+  {
+    "serial": "61",
+    "name": "Chioma Chukwu Agu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0061/GNS"
+  },
+  {
+    "serial": "62",
+    "name": "Curtis Onyedikachi Ezeoke",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0062/GNS"
+  },
+  {
+    "serial": "63",
+    "name": "Blessing Ifesinachi Chukwu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0063/GNS"
+  },
+  {
+    "serial": "64",
+    "name": "Benita Chinyere Ezeokoli",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0064/GNS"
+  },
+  {
+    "serial": "65",
+    "name": "Anne Helen Njoku",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0065/GNS"
+  },
+  {
+    "serial": "66",
+    "name": "Vivian Ogunne Arua",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0066/GNS"
+  },
+  {
+    "serial": "67",
+    "name": "Amaka Gift Emeka",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0067/GNS"
+  },
+  {
+    "serial": "68",
+    "name": "Francisca Onyinyechi Akpede",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0068/GNS"
+  },
+  {
+    "serial": "69",
+    "name": "Udochukwu Peace Akuru",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0069/GNS"
+  },
+  {
+    "serial": "70",
+    "name": "Shulamite Modestus Nzubechi",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0070/GNS"
+  },
+  {
+    "serial": "71",
+    "name": "Christabel Mmesoma Louis",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0071/GNS"
+  },
+  {
+    "serial": "72",
+    "name": "Emmanuel Chinaemerem Ihekwoaba",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0072/GNS"
+  },
+  {
+    "serial": "73",
+    "name": "Immaculata Chiamaka Enyenwa",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0073/GNS"
+  },
+  {
+    "serial": "74",
+    "name": "Raphael Ebubechukwu Ugwu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0074/GNS"
+  },
+  {
+    "serial": "75",
+    "name": "Emmanuel Akachukwu Idika",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0075/GNS"
+  },
+  {
+    "serial": "76",
+    "name": "Udokanma Osuagwu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0076/GNS"
+  },
+  {
+    "serial": "77",
+    "name": "Joseph Chisomaga Ihekwoaba",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0077/GNS"
+  },
+  {
+    "serial": "78",
+    "name": "Chidiebube Jennifer Charles",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0078/GNS"
+  },
+  {
+    "serial": "79",
+    "name": "Marycynthia Chiziterem Mkpuma",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0079/GNS"
+  },
+  {
+    "serial": "80",
+    "name": "Promise Nzubechi Orih",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0080/GNS"
+  },
+  {
+    "serial": "81",
+    "name": "Favour Ezinne Nwakpa",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0081/GNS"
+  },
+  {
+    "serial": "82",
+    "name": "Priscilla Faith Nweke",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0082/GNS"
+  },
+  {
+    "serial": "83",
+    "name": "Loveth Ifebuche Agbo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0083/GNS"
+  },
+  {
+    "serial": "84",
+    "name": "Nnedinma Miracle Chima",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0084/GNS"
+  },
+  {
+    "serial": "85",
+    "name": "Deborah Oluwakemi Adesanya",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0085/GNS"
+  },
+  {
+    "serial": "86",
+    "name": "Oluebube Cynthia Nwafor",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0086/GNS"
+  },
+  {
+    "serial": "87",
+    "name": "Oluchi Precious Okonkwo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0087/GNS"
+  },
+  {
+    "serial": "88",
+    "name": "Amarachi Juliet Anusi",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0088/GNS"
+  },
+  {
+    "serial": "89",
+    "name": "Clinton Ekuma Otu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0089/GNS"
+  },
+  {
+    "serial": "90",
+    "name": "Chiemelie Joy Chinyereugo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0090/GNS"
+  },
+  {
+    "serial": "91",
+    "name": "Augustina Ogochukwu Ilochi",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0091/GNS"
+  },
+  {
+    "serial": "92",
+    "name": "Chinaza Abigail Ugbo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0092/GNS"
+  },
+  {
+    "serial": "93",
+    "name": "Chisom Martha Mgbuga",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0093/GNS"
+  },
+  {
+    "serial": "94",
+    "name": "Abigail Oka Ojong",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0094/GNS"
+  },
+  {
+    "serial": "95",
+    "name": "Ifunanya Gift Chukwu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0095/GNS"
+  },
+  {
+    "serial": "96",
+    "name": "Chinenye Eunice Ocho",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0096/GNS"
+  },
+  {
+    "serial": "97",
+    "name": "Philomina Ola Akani",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0097/GNS"
+  },
+  {
+    "serial": "98",
+    "name": "Chidiogo Caroline Ileagu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0098/GNS"
+  },
+  {
+    "serial": "99",
+    "name": "Chioma Godswill Chibueze",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0099/GNS"
+  },
+  {
+    "serial": "100",
+    "name": "Cordelia Mmesoma Nwabuisi",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0100/GNS"
+  },
+  {
+    "serial": "101",
+    "name": "Ogechi Annastecia Orogwu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0101/GNS"
+  },
+  {
+    "serial": "102",
+    "name": "Anthonia Amaka Chukwu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0102/GNS"
+  },
+  {
+    "serial": "103",
+    "name": "Miracle Uchechukwu Asomba",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0103/GNS"
+  },
+  {
+    "serial": "104",
+    "name": "Chinenye Annastecia Okafor",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0104/GNS"
+  },
+  {
+    "serial": "105",
+    "name": "Mmesoma Rubeka Nwogbu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0105/GNS"
+  },
+  {
+    "serial": "106",
+    "name": "Blessing Chinasa Obayi",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0106/GNS"
+  },
+  {
+    "serial": "107",
+    "name": "Jane Chidimma Onwuka",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0107/GNS"
+  },
+  {
+    "serial": "108",
+    "name": "Salomie Kamsiyochukwu Ugwunta",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0108/GNS"
+  },
+  {
+    "serial": "109",
+    "name": "Peace Chisom Okolo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0109/GNS"
+  },
+  {
+    "serial": "110",
+    "name": "Nkechinyere Ude Irem",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0110/GNS"
+  },
+  {
+    "serial": "111",
+    "name": "Precious Amarachi Oko-Uche",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0111/GNS"
+  },
+  {
+    "serial": "112",
+    "name": "Chiamaka Jenny Israel",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0112/GNS"
+  },
+  {
+    "serial": "113",
+    "name": "Victory Chiamaka Ndubuisi",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0113/GNS"
+  },
+  {
+    "serial": "114",
+    "name": "Destiny Ifeyinwa Nnamani",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0114/GNS"
+  },
+  {
+    "serial": "115",
+    "name": "Favour Omobewaji Taiwo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0115/GNS"
+  },
+  {
+    "serial": "116",
+    "name": "Chidimma Precious Ntoka",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0116/GNS"
+  },
+  {
+    "serial": "117",
+    "name": "Chioma Pauline Anibueze",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0117/GNS"
+  },
+  {
+    "serial": "118",
+    "name": "Pavelina Oluchukwu James",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0118/GNS"
+  },
+  {
+    "serial": "119",
+    "name": "Victory Chidera Ndubueze",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0119/GNS"
+  },
+  {
+    "serial": "120",
+    "name": "Noheemot Oluwafunmi Soneye",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0120/GNS"
+  },
+  {
+    "serial": "121",
+    "name": "Ogechi Blessing Anyairo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0121/GNS"
+  },
+  {
+    "serial": "122",
+    "name": "Chioma Francisca Oluga",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0122/GNS"
+  },
+  {
+    "serial": "123",
+    "name": "Somkene Abigail Amuzie",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0123/GNS"
+  },
+  {
+    "serial": "124",
+    "name": "Goodness Chinaecherem Anaeto",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0124/GNS"
+  },
+  {
+    "serial": "125",
+    "name": "Favour Nkeiruka Onah",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0125/GNS"
+  },
+  {
+    "serial": "126",
+    "name": "Nnabuike Goodluck Ozokonkwo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0126/GNS"
+  },
+  {
+    "serial": "127",
+    "name": "Chinecherem Alexandra Ma",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0127/GNS"
+  },
+  {
+    "serial": "128",
+    "name": "Lucy Chinenye Nwachukwu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0128/GNS"
+  },
+  {
+    "serial": "129",
+    "name": "Kasarachi Rejoice Vincent",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0129/GNS"
+  },
+  {
+    "serial": "130",
+    "name": "Onyinyechi Mary Benjamin",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0130/GNS"
+  },
+  {
+    "serial": "131",
+    "name": "Jennifer Chiamaka Nwufoh",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0131/GNS"
+  },
+  {
+    "serial": "132",
+    "name": "Tochukwu Salvation Ogba",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0132/GNS"
+  },
+  {
+    "serial": "133",
+    "name": "Nelson Igwe Eleke",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0133/GNS"
+  },
+  {
+    "serial": "134",
+    "name": "Great Chika Eze",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0134/GNS"
+  },
+  {
+    "serial": "135",
+    "name": "Blessing Ezinne Chukwu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0135/GNS"
+  },
+  {
+    "serial": "136",
+    "name": "Ugochi Miracle Celestine",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0136/GNS"
+  },
+  {
+    "serial": "137",
+    "name": "Ugonna Clara Simon",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0137/GNS"
+  },
+  {
+    "serial": "138",
+    "name": "Odinakachukwu Hannah Eze",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0138/GNS"
+  },
+  {
+    "serial": "139",
+    "name": "Gloria Chidimma Ejimbe",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0139/GNS"
+  },
+  {
+    "serial": "140",
+    "name": "Francisca Mmerichukwu Ofodile",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0140/GNS"
+  },
+  {
+    "serial": "141",
+    "name": "Rejoice Olamma Chika",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0141/GNS"
+  },
+  {
+    "serial": "142",
+    "name": "Chidimma Mercy John",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0142/GNS"
+  },
+  {
+    "serial": "143",
+    "name": "Precious Chidimma Omenihu",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0143/GNS"
+  },
+  {
+    "serial": "144",
+    "name": "Chidera Precious Ome",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0144/GNS"
+  },
+  {
+    "serial": "145",
+    "name": "Clementina Chisom Opara",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0145/GNS"
+  },
+  {
+    "serial": "146",
+    "name": "Oluebube Dominica Usulor",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0146/GNS"
+  },
+  {
+    "serial": "147",
+    "name": "Prisca Ulumma Oko",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0147/GNS"
+  },
+  {
+    "serial": "148",
+    "name": "Blessing Eje Obasi",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0148/GNS"
+  },
+  {
+    "serial": "149",
+    "name": "Maureen Nmanna Oko",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0149/GNS"
+  },
+  {
+    "serial": "150",
+    "name": "Chioma Jessica Ezumah",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0150/GNS"
+  },
+  {
+    "serial": "151",
+    "name": "Faith Chidera Idoko",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0151/GNS"
+  },
+  {
+    "serial": "152",
+    "name": "Chidera Gloria Enyigwe",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0152/GNS"
+  },
+  {
+    "serial": "153",
+    "name": "Emmanuella Ebubechi Sunday",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0153/GNS"
+  },
+  {
+    "serial": "154",
+    "name": "Chukwuma Innocent Aghaegbuna",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0154/GNS"
+  },
+  {
+    "serial": "155",
+    "name": "Melody Chiamaka Ogeome",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0155/GNS"
+  },
+  {
+    "serial": "156",
+    "name": "Harmony Ginikanwa Nwaneri",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0156/GNS"
+  },
+  {
+    "serial": "157",
+    "name": "Lebechi Lilian Nwancho",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0157/GNS"
+  },
+  {
+    "serial": "158",
+    "name": "Ogochukwu Kennedy Okafor",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0158/GNS"
+  },
+  {
+    "serial": "159",
+    "name": "Joy Chioma Onwo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0159/GNS"
+  },
+  {
+    "serial": "160",
+    "name": "Confidence Ogba",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0160/GNS"
+  },
+  {
+    "serial": "161",
+    "name": "Jacinta Chioma Igwe",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0161/GNS"
+  },
+  {
+    "serial": "162",
+    "name": "Favour Chioma Nzewi",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0162/GNS"
+  },
+  {
+    "serial": "163",
+    "name": "Oluebube Sharon Demian",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0163/GNS"
+  },
+  {
+    "serial": "164",
+    "name": "Emmanuella Chinyere Chukwunonyerem",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0164/GNS"
+  },
+  {
+    "serial": "165",
+    "name": "Henry Chidera Igwe-Nomeh",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0165/GNS"
+  },
+  {
+    "serial": "166",
+    "name": "Emmanuel Ugochukwu Ogbonna",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0166/GNS"
+  },
+  {
+    "serial": "167",
+    "name": "Chinweotito Loveline Mbanuzo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0167/GNS"
+  },
+  {
+    "serial": "168",
+    "name": "Divine Chinecherem Ignatius",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0168/GNS"
+  },
+  {
+    "serial": "169",
+    "name": "Kosarachi Icha Ogeh",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0169/GNS"
+  },
+  {
+    "serial": "170",
+    "name": "Linda Nkechinyere Okowkwo",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/100/0170/GNS"
+  },
+  {
+    "serial": "1",
+    "name": "Amarachukwu Maryjane Chukwuemeka",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0001/GNS"
+  },
+  {
+    "serial": "2",
+    "name": "Euphemia Chisimdi Obinka",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0002/GNS"
+  },
+  {
+    "serial": "3",
+    "name": "Chidera Helen Oko",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0003/GNS"
+  },
+  {
+    "serial": "4",
+    "name": "Lois Lala Peter",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0004/GNS"
+  },
+  {
+    "serial": "5",
+    "name": "Gift Akor Eneh",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0005/GNS"
+  },
+  {
+    "serial": "6",
+    "name": "Henrietta Ujunwa Ochigbo",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0006/GNS"
+  },
+  {
+    "serial": "7",
+    "name": "Juliana Omasirichi Odum",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0007/GNS"
+  },
+  {
+    "serial": "8",
+    "name": "Sandra Nneoma Okeh",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0008/GNS"
+  },
+  {
+    "serial": "9",
+    "name": "Oluebube Daniella Duru",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0009/GNS"
+  },
+  {
+    "serial": "10",
+    "name": "Kosisoachukwu Divinefavour Anusionwu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0010/GNS"
+  },
+  {
+    "serial": "11",
+    "name": "Ngozi Emeoha",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0011/GNS"
+  },
+  {
+    "serial": "12",
+    "name": "Chidera Benedine Nwachukwu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0012/GNS"
+  },
+  {
+    "serial": "13",
+    "name": "Gladys Nwamaka Igboke",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0013/GNS"
+  },
+  {
+    "serial": "14",
+    "name": "Esther Chisom Ituma",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0014/GNS"
+  },
+  {
+    "serial": "15",
+    "name": "Ozioma Lynda Onuwa",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0015/GNS"
+  },
+  {
+    "serial": "16",
+    "name": "Promise Chinedum Ibe",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0016/GNS"
+  },
+  {
+    "serial": "17",
+    "name": "Miracle Nneoma Ekoyo",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0017/GNS"
+  },
+  {
+    "serial": "18",
+    "name": "Blessing Chinasa Stanley",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0018/GNS"
+  },
+  {
+    "serial": "19",
+    "name": "Odochi Ogbu Chukwu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0019/GNS"
+  },
+  {
+    "serial": "20",
+    "name": "Miracle Chinedu Chika",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0020/GNS"
+  },
+  {
+    "serial": "21",
+    "name": "Ifechukwu Marycynthia Okoye",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0021/GNS"
+  },
+  {
+    "serial": "22",
+    "name": "Chukwuebuka Kasie Okeke",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0022/GNS"
+  },
+  {
+    "serial": "23",
+    "name": "Fortunate Nnabuchi Nwani",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0023/GNS"
+  },
+  {
+    "serial": "24",
+    "name": "Annabel Kosarachi Aliozor",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0024/GNS"
+  },
+  {
+    "serial": "25",
+    "name": "Promise Mmesoma Obiemenzie",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0025/GNS"
+  },
+  {
+    "serial": "26",
+    "name": "Precious Ogayi Onah",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0026/GNS"
+  },
+  {
+    "serial": "27",
+    "name": "Daberechi Rebecca Okoroafor",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0027/GNS"
+  },
+  {
+    "serial": "28",
+    "name": "Peace Chinemerem Anaga",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0028/GNS"
+  },
+  {
+    "serial": "29",
+    "name": "Esther Joy Chibueze",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0029/GNS"
+  },
+  {
+    "serial": "30",
+    "name": "Favour Chidera Chibueze",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0030/GNS"
+  },
+  {
+    "serial": "31",
+    "name": "Onyinyechi Annastecia Chilaka",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0031/GNS"
+  },
+  {
+    "serial": "32",
+    "name": "Chidera Princess Nwachukwu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0032/GNS"
+  },
+  {
+    "serial": "33",
+    "name": "Divinepeace Umeh",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0033/GNS"
+  },
+  {
+    "serial": "34",
+    "name": "David Ugwechi Uchendu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0034/GNS"
+  },
+  {
+    "serial": "35",
+    "name": "Blessing Chinenye Kelechi",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0035/GNS"
+  },
+  {
+    "serial": "36",
+    "name": "Chinyere Precious Ezugwu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0036/GNS"
+  },
+  {
+    "serial": "37",
+    "name": "Onyinyechi Miracle Igwilo",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0037/GNS"
+  },
+  {
+    "serial": "38",
+    "name": "Miracle Chinonyerem Uzobuonyi",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0038/GNS"
+  },
+  {
+    "serial": "39",
+    "name": "Stephanie Oluebube Nwankwo",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0039/GNS"
+  },
+  {
+    "serial": "40",
+    "name": "Blessing Marycynthia Nwoye",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0040/GNS"
+  },
+  {
+    "serial": "41",
+    "name": "Mary FearGod Ituma",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0041/GNS"
+  },
+  {
+    "serial": "42",
+    "name": "Benedicta Okpor Ogeh",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0042/GNS"
+  },
+  {
+    "serial": "43",
+    "name": "Goodluck Chimamanda Chijioke",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0043/GNS"
+  },
+  {
+    "serial": "44",
+    "name": "Amarachi Josephine Alo-Onyebuchi",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0044/GNS"
+  },
+  {
+    "serial": "45",
+    "name": "Oghenekome Christiana Idoro",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0045/GNS"
+  },
+  {
+    "serial": "46",
+    "name": "Kelechi Glory Simon",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0046/GNS"
+  },
+  {
+    "serial": "47",
+    "name": "Victor Ifeanyichukwu Eke",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0047/GNS"
+  },
+  {
+    "serial": "48",
+    "name": "Silvalyne Chidera Ugorji",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0048/GNS"
+  },
+  {
+    "serial": "49",
+    "name": "Paschaline Onyinyechi Nnaji",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0049/GNS"
+  },
+  {
+    "serial": "50",
+    "name": "Fortunate Ogba Omeh",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0050/GNS"
+  },
+  {
+    "serial": "51",
+    "name": "Munachimso Precious Ezekiel",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0051/GNS"
+  },
+  {
+    "serial": "52",
+    "name": "Marycynthia Mmesoma Umenwaka",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0052/GNS"
+  },
+  {
+    "serial": "53",
+    "name": "Blessing Ngozi Okpara",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0053/GNS"
+  },
+  {
+    "serial": "54",
+    "name": "Faith Ossai",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0054/GNS"
+  },
+  {
+    "serial": "55",
+    "name": "Victory Orie Ukaegbu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0055/GNS"
+  },
+  {
+    "serial": "56",
+    "name": "Joycey Munachimso Okechukwu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0056/GNS"
+  },
+  {
+    "serial": "57",
+    "name": "Treasure Chimara Ekene",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0057/GNS"
+  },
+  {
+    "serial": "58",
+    "name": "Chukwudumebi Daniella Okafor",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0058/GNS"
+  },
+  {
+    "serial": "59",
+    "name": "Orie Ajaude",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0059/GNS"
+  },
+  {
+    "serial": "60",
+    "name": "Favour Ifunanya Ozioko",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0060/GNS"
+  },
+  {
+    "serial": "61",
+    "name": "Thelma Dumebi Ugwumba",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0061/GNS"
+  },
+  {
+    "serial": "62",
+    "name": "Israel Akachukwu Prince Martins",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0062/GNS"
+  },
+  {
+    "serial": "63",
+    "name": "Loveth Sopuruchukwu Okolo",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0063/GNS"
+  },
+  {
+    "serial": "64",
+    "name": "Chiemerie Jovita Enem",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0064/GNS"
+  },
+  {
+    "serial": "65",
+    "name": "Onyinye Favour Egeonu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0065/GNS"
+  },
+  {
+    "serial": "66",
+    "name": "Marvellous Chimdumeji Ikpor",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0066/GNS"
+  },
+  {
+    "serial": "67",
+    "name": "Favour Chiamaka Nwaorgu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0067/GNS"
+  },
+  {
+    "serial": "68",
+    "name": "Chinemerem Benjamin Ajaegbu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0068/GNS"
+  },
+  {
+    "serial": "69",
+    "name": "Favour Adamma Eni",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0069/GNS"
+  },
+  {
+    "serial": "70",
+    "name": "Chison Francisca Chikwendu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0070/GNS"
+  },
+  {
+    "serial": "71",
+    "name": "Ifesinachi Juliet Barnabas",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0071/GNS"
+  },
+  {
+    "serial": "72",
+    "name": "Wonderful Nmesoma Vasco",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0072/GNS"
+  },
+  {
+    "serial": "73",
+    "name": "Rosemary Ngozi Ayogu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0073/GNS"
+  },
+  {
+    "serial": "74",
+    "name": "Happiness Ifeoma Chima",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0074/GNS"
+  },
+  {
+    "serial": "75",
+    "name": "Joseph Chiedozi Igwe-Nomeh",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0075/GNS"
+  },
+  {
+    "serial": "76",
+    "name": "Rosemary Chinazaakpere Okoye",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0076/GNS"
+  },
+  {
+    "serial": "77",
+    "name": "Lucy Kosirisoichi Nnabugo",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0077/GNS"
+  },
+  {
+    "serial": "78",
+    "name": "Angela Chisom Chinenye",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0078/GNS"
+  },
+  {
+    "serial": "79",
+    "name": "Mary Anya Agwu",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0079/GNS"
+  },
+  {
+    "serial": "80",
+    "name": "Ijeoma Gift Njoku",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0080/GNS"
+  },
+  {
+    "serial": "81",
+    "name": "Jennifer Tobechi Okoro",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0081/GNS"
+  },
+  {
+    "serial": "82",
+    "name": "Emmanuel Onyedikachi Amakaeze",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0082/GNS"
+  },
+  {
+    "serial": "83",
+    "name": "Hannah Nwanyioma Nwibo",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0083/GNS"
+  },
+  {
+    "serial": "84",
+    "name": "David Ognugua Okoro",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0084/GNS"
+  },
+  {
+    "serial": "85",
+    "name": "Emmanuel Ituma",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/200/0085/GNS"
+  },
+  {
+    "serial": "1",
+    "name": "Winner Ifeoma Joseph",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0001/MID"
+  },
+  {
+    "serial": "2",
+    "name": "Chisom Favour Udeh",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0002/MID"
+  },
+  {
+    "serial": "3",
+    "name": "Chiamaka Precious Onwe",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0003/MID"
+  },
+  {
+    "serial": "4",
+    "name": "Onyinyechi Miracle Nduka",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0004/MID"
+  },
+  {
+    "serial": "5",
+    "name": "Ozioma Faith Udeh",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0005/MID"
+  },
+  {
+    "serial": "6",
+    "name": "Chinelo Glory Orji",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0006/MID"
+  },
+  {
+    "serial": "7",
+    "name": "Chioma Gladys Okeoma",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0007/MID"
+  },
+  {
+    "serial": "8",
+    "name": "Chioma Blessing Chinedu",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0008/MID"
+  },
+  {
+    "serial": "9",
+    "name": "Ogochukwu Judith Esiaka",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0009/MID"
+  },
+  {
+    "serial": "10",
+    "name": "Grace Mmesoma Okafor",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0010/MID"
+  },
+  {
+    "serial": "11",
+    "name": "Oluchi Philomina Nwafor",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0011/MID"
+  },
+  {
+    "serial": "12",
+    "name": "Annastecia Promise Otuonye",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0012/MID"
+  },
+  {
+    "serial": "13",
+    "name": "Chidimma Esther Okechukwu",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0013/MID"
+  },
+  {
+    "serial": "14",
+    "name": "Sarah Ifunanya Chukwma",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0014/MID"
+  },
+  {
+    "serial": "15",
+    "name": "Blessing Ngozi Nwigbo",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0015/MID"
+  },
+  {
+    "serial": "16",
+    "name": "Stephanie Nneoma Ojimba",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0016/MID"
+  },
+  {
+    "serial": "17",
+    "name": "Blessing Ngozi Ali",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0017/MID"
+  },
+  {
+    "serial": "18",
+    "name": "Fatima Adaeze Haruna",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0018/MID"
+  },
+  {
+    "serial": "19",
+    "name": "Chinecherem Dominic Usuio",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0019/MID"
+  },
+  {
+    "serial": "20",
+    "name": "Chizoba Assumpta Ikeme",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0020/MID"
+  },
+  {
+    "serial": "21",
+    "name": "Precious Chiamaka Nwogidi",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0021/MID"
+  },
+  {
+    "serial": "22",
+    "name": "Chinenye Cynthia Omeh",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0022/MID"
+  },
+  {
+    "serial": "23",
+    "name": "Promise Amaka Ikechukwu",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0023/MID"
+  },
+  {
+    "serial": "24",
+    "name": "Rechael Chidiogo Chibuzor",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0024/MID"
+  },
+  {
+    "serial": "25",
+    "name": "Blessing Chidere Izukanma",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0025/MID"
+  },
+  {
+    "serial": "26",
+    "name": "Portia Miracle Godson",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0026/MID"
+  },
+  {
+    "serial": "27",
+    "name": "Promise Chinasa Aneh",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0027/MID"
+  },
+  {
+    "serial": "28",
+    "name": "Charity Charis Ajah",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0028/MID"
+  },
+  {
+    "serial": "29",
+    "name": "Emmanuel Chinemerem Onyebuchi",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0029/MID"
+  },
+  {
+    "serial": "30",
+    "name": "Success Onyinyechi Nwankwo",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0030/MID"
+  },
+  {
+    "serial": "31",
+    "name": "Precious Ogochukwu Chukwuma",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0031/MID"
+  },
+  {
+    "serial": "32",
+    "name": "Amarachi Nwuguru Okeh",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0032/MID"
+  },
+  {
+    "serial": "33",
+    "name": "John Janet Otaka",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0033/MID"
+  },
+  {
+    "serial": "34",
+    "name": "Amarachi Precious Obioha",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0034/MID"
+  },
+  {
+    "serial": "35",
+    "name": "Chinedu Francis Ekwe",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0035/MID"
+  },
+  {
+    "serial": "36",
+    "name": "Success Ifeoma Ofmat",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0036/MID"
+  },
+  {
+    "serial": "37",
+    "name": "Emmanuel Chiemeka Obinka",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0037/MID"
+  },
+  {
+    "serial": "38",
+    "name": "Angela Ezinne Igwe",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0038/MID"
+  },
+  {
+    "serial": "39",
+    "name": "Joy Onyekachi Ucha",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0039/MID"
+  },
+  {
+    "serial": "40",
+    "name": "Precious Chinwendu Uzoma",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0040/MID"
+  },
+  {
+    "serial": "41",
+    "name": "Joy Adaobi Ifeanyi",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0041/MID"
+  },
+  {
+    "serial": "42",
+    "name": "Mary Chisom Ugwu",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0042/MID"
+  },
+  {
+    "serial": "43",
+    "name": "Queen Ojonoda Dibiagwu",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0043/MID"
+  },
+  {
+    "serial": "44",
+    "name": "Eunice Chinagorom Nwankwo",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0044/MID"
+  },
+  {
+    "serial": "45",
+    "name": "Chinemerem Deborah Okpuru",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0045/MID"
+  },
+  {
+    "serial": "46",
+    "name": "Uchenna Ozo Arua",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0046/MID"
+  },
+  {
+    "serial": "47",
+    "name": "Makuochukwu Divine-Gift Obasi",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0047/MID"
+  },
+  {
+    "serial": "48",
+    "name": "Ngozi Virginia Aloh",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0048/MID"
+  },
+  {
+    "serial": "49",
+    "name": "Esther Chidalu Michael",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0049/MID"
+  },
+  {
+    "serial": "50",
+    "name": "Precious Mmesoma Ezeehukwu",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0050/MID"
+  },
+  {
+    "serial": "51",
+    "name": "Favour Chizaram Awuzie",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0051/MID"
+  },
+  {
+    "serial": "52",
+    "name": "Peace Chidera Agu",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0052/MID"
+  },
+  {
+    "serial": "53",
+    "name": "Amarachukwu Judith Chijioke",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0053/MID"
+  },
+  {
+    "serial": "54",
+    "name": "Cynthia Chizaram Eze",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0054/MID"
+  },
+  {
+    "serial": "55",
+    "name": "Chiamaka Grace Okoro",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0055/MID"
+  },
+  {
+    "serial": "56",
+    "name": "Christabel Ginika Okwor",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0056/MID"
+  },
+  {
+    "serial": "57",
+    "name": "Mmesoma Emmanuella Okeke",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0057/MID"
+  },
+  {
+    "serial": "58",
+    "name": "Jennifer Chinecherem Emeka",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0058/MID"
+  },
+  {
+    "serial": "59",
+    "name": "Chinaza Misharck Ikenna",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0059/MID"
+  },
+  {
+    "serial": "60",
+    "name": "John Chukwu Ube",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0060/MID"
+  },
+  {
+    "serial": "61",
+    "name": "Uchechi Glory Emeka",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0061/MID"
+  },
+  {
+    "serial": "62",
+    "name": "Daniella Chiwendu Obiahu",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0062/MID"
+  },
+  {
+    "serial": "63",
+    "name": "Chinemerem Precious Onyebuchi",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0063/MID"
+  },
+  {
+    "serial": "64",
+    "name": "Miracle Chioma Egbe",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0064/MID"
+  },
+  {
+    "serial": "65",
+    "name": "Chisimdi Joy Aruma",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0065/MID"
+  },
+  {
+    "serial": "66",
+    "name": "Gideon Ugah Odoh",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0066/MID"
+  },
+  {
+    "serial": "67",
+    "name": "Chidubem Okoli",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0067/MID"
+  },
+  {
+    "serial": "68",
+    "name": "Ujunwa Victory Nwanonyelum",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0068/MID"
+  },
+  {
+    "serial": "69",
+    "name": "Chioma Favour Onuoha",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0069/MID"
+  },
+  {
+    "serial": "70",
+    "name": "Rita Ebubechi Egbere",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0070/MID"
+  },
+  {
+    "serial": "71",
+    "name": "Blessing Nnenna Nwankwo",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0071/MID"
+  },
+  {
+    "serial": "72",
+    "name": "Ifedirichukwu Christopher Ezeabia",
+    "programme": "Midwifery",
+    "level": 200,
+    "code": "MID",
+    "regNo": "EOCNS/200/0072/MID"
+  }
+]
