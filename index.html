@@ -1,1 +1,227 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EOCNS Attendance System · Eastern Oak College of Nursing Sciences</title>
+  <meta name="description" content="Comprehensive Hostel, Lecturer & Student Attendance and Quality Assurance System for Eastern Oak College of Nursing Sciences." />
+  <link rel="icon" href="https://www.easternoak.org/images/Eastern-OAK-logo-201.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__brand">
+        <img src="https://www.easternoak.org/images/Eastern-OAK-logo-201.png" alt="Eastern Oak crest" class="sidebar__logo" />
+        <div class="sidebar__brand-text">
+          <span class="sidebar__name">EOCNS</span>
+          <span class="sidebar__tag">Attendance System</span>
+        </div>
+      </div>
+      <nav class="sidebar__nav">
+        <div class="nav-section">
+          <p class="nav-section__label">Overview</p>
+          <a href="#" class="nav-item active" data-view="dashboard">Dashboard</a>
+        </div>
+        <div class="nav-section">
+          <p class="nav-section__label">Core Systems</p>
+          <a href="#" class="nav-item" data-view="students">Students</a>
+          <a href="#" class="nav-item" data-view="lecturers">Lecturers</a>
+          <a href="#" class="nav-item" data-view="hostel">Hostel</a>
+          <a href="#" class="nav-item" data-view="sessions">Sessions</a>
+        </div>
+        <div class="nav-section">
+          <p class="nav-section__label">Quality Assurance</p>
+          <a href="#" class="nav-item" data-view="qa-daily">Daily QA</a>
+          <a href="#" class="nav-item" data-view="qa-weekly">Weekly QA</a>
+          <a href="#" class="nav-item" data-view="qa-monthly">Monthly QA</a>
+        </div>
+        <div class="nav-section">
+          <p class="nav-section__label">System</p>
+          <a href="#" class="nav-item" data-view="reports">Reports & Export</a>
+          <a href="#" class="nav-item" data-view="audit">Audit Log</a>
+          <a href="#" class="nav-item" data-view="settings">Settings</a>
+        </div>
+      </nav>
+      <div class="sidebar__footer">
+        <div class="user-chip" id="userChip">
+          <div class="user-chip__avatar">QA</div>
+          <div class="user-chip__info">
+            <span class="user-chip__name">QA Officer</span>
+            <span class="user-chip__role">Full Access</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <div class="main-wrap">
+      <header class="topbar">
+        <button class="icon-btn sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar__title">
+          <h1 id="pageTitle">Dashboard</h1>
+          <p id="pageSubtitle">Eastern Oak College of Nursing Sciences</p>
+        </div>
+        <div class="topbar__actions">
+          <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">🌓</button>
+          <button class="btn btn--ghost btn--sm" id="exportDbBtn">Backup</button>
+        </div>
+      </header>
+      <main class="content" id="content">
+        <section class="view active" id="view-dashboard">
+          <div class="hero-card">
+            <div class="hero-card__content">
+              <p class="hero-card__eyebrow">Welcome back</p>
+              <h2 class="hero-card__title">EOCNS Attendance & QA System</h2>
+              <p class="hero-card__lead">One place for hostel, class attendance, lecturers and quality assurance.</p>
+            </div>
+            <div class="hero-card__crest">
+              <img src="https://www.easternoak.org/images/Eastern-OAK-logo-201.png" alt="Eastern Oak crest" />
+            </div>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-card__icon teal">👥</div><div class="stat-card__body"><span class="stat-card__value" id="statStudents">0</span><span class="stat-card__label">Registered Students</span></div></div>
+            <div class="stat-card"><div class="stat-card__icon indigo">🎓</div><div class="stat-card__body"><span class="stat-card__value" id="statLecturers">0</span><span class="stat-card__label">Lecturers</span></div></div>
+            <div class="stat-card"><div class="stat-card__icon amber">🏠</div><div class="stat-card__body"><span class="stat-card__value" id="statHostels">—</span><span class="stat-card__label">Hostels</span></div></div>
+            <div class="stat-card"><div class="stat-card__icon rose">📅</div><div class="stat-card__body"><span class="stat-card__value" id="statSessions">0</span><span class="stat-card__label">Active Sessions</span></div></div>
+          </div>
+          <div class="grid-2">
+            <div class="card"><div class="card__header"><h3>Quick Actions</h3></div><div class="card__body quick-actions">
+              <button class="action-btn" data-goto="students"><span class="action-btn__icon">+</span><span>Add Student</span></button>
+              <button class="action-btn" data-goto="hostel"><span class="action-btn__icon">⌂</span><span>Hostel Report</span></button>
+              <button class="action-btn" data-goto="qa-daily"><span class="action-btn__icon">◎</span><span>Daily QA</span></button>
+              <button class="action-btn" data-goto="sessions"><span class="action-btn__icon">◫</span><span>New Session</span></button>
+            </div></div>
+            <div class="card"><div class="card__header"><h3>System Status</h3></div><div class="card__body">
+              <div class="status-list">
+                <div class="status-item"><span class="status-dot good"></span><span>Local database ready</span></div>
+                <div class="status-item"><span class="status-dot good"></span><span>All data stays on this device</span></div>
+                <div class="status-item"><span class="status-dot muted"></span><span>No active session selected</span></div>
+              </div>
+            </div></div>
+          </div>
+        </section>
+        <section class="view" id="view-students">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <div class="search-box"><input type="search" id="studentSearch" placeholder="Search name or reg. no…" /></div>
+              <select id="filterProgramme" class="select"><option value="">All Programmes</option><option value="Nursing">Nursing</option><option value="Midwifery">Midwifery</option></select>
+              <select id="filterLevel" class="select"><option value="">All Levels</option><option value="100">100 Level</option><option value="200">200 Level</option><option value="300">300 Level</option></select>
+            </div>
+            <div class="page-toolbar__right">
+              <span class="count-pill" id="studentsCount">0 students</span>
+              <button class="btn btn--primary" id="btnAddStudent">+ Add Student</button>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Name</th><th>Reg. No</th><th>Programme</th><th>Level</th><th>Hostel</th><th>Status</th><th></th></tr></thead>
+                <tbody id="studentsTableBody"></tbody>
+              </table>
+            </div>
+            <div class="empty-state" id="studentsEmpty"><h3>No students yet</h3><p>Click Add Student. Leave Reg. No blank for TMP-EOCNS/YY/####/GNS (or MID).</p></div>
+          </div>
+        </section>
+        <section class="view" id="view-lecturers">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left"><div class="search-box"><input type="search" id="lecturerSearch" placeholder="Search lecturer or staff ID…" /></div></div>
+            <div class="page-toolbar__right">
+              <span class="count-pill" id="lecturersCount">0 lecturers</span>
+              <button class="btn btn--primary" id="btnAddLecturer">+ Add Lecturer</button>
+            </div>
+          </div>
+          <div class="table-card">
+            <table class="data-table"><thead><tr><th>Name</th><th>Staff ID</th><th>Courses</th><th>Phone</th><th>Status</th><th></th></tr></thead><tbody id="lecturersTableBody"></tbody></table>
+            <div class="empty-state" id="lecturersEmpty"><h3>No lecturers yet</h3><p>Click Add Lecturer to register staff and assign courses.</p></div>
+          </div>
+        </section>
+        <section class="view" id="view-hostel"><div class="empty-state"><h3>Hostel Attendance</h3><p>Coming next — gate log to boarding fee reports.</p></div></section>
+        <section class="view" id="view-sessions">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Create and manage academic sessions, programmes and levels.</p></div>
+            <div class="page-toolbar__right">
+              <span class="count-pill" id="sessionsCount">0 sessions</span>
+              <button class="btn btn--primary" id="btnAddSession">+ New Session</button>
+            </div>
+          </div>
+          <div id="sessionsList"></div>
+          <div class="empty-state" id="sessionsEmpty"><h3>No sessions yet</h3><p>Create the first academic session.</p></div>
+        </section>
+        <section class="view" id="view-qa-daily"><div class="empty-state"><h3>Daily QA</h3><p>Coming soon.</p></div></section>
+        <section class="view" id="view-qa-weekly"><div class="empty-state"><h3>Weekly QA</h3><p>Coming soon.</p></div></section>
+        <section class="view" id="view-qa-monthly"><div class="empty-state"><h3>Monthly QA</h3><p>Coming soon.</p></div></section>
+        <section class="view" id="view-reports"><div class="empty-state"><h3>Reports & Export</h3><p>Coming soon.</p></div></section>
+        <section class="view" id="view-audit">
+          <div class="card"><div class="card__header"><h3>Audit Trail</h3></div><div class="card__body" id="auditList"><p>No audit entries yet.</p></div></div>
+        </section>
+        <section class="view" id="view-settings"><div class="empty-state"><h3>Settings</h3><p>Coming soon.</p></div></section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Student Modal -->
+  <div class="modal" id="studentModal" hidden>
+    <div class="modal__backdrop" id="studentModalBackdrop"></div>
+    <div class="modal__dialog">
+      <div class="modal__header"><h3 id="studentModalTitle">Add Student</h3><button class="icon-btn" id="btnCancelStudent" type="button">×</button></div>
+      <form id="studentForm" class="modal__body">
+        <input type="hidden" id="studentId" />
+        <div class="form-grid">
+          <label class="field field--full"><span class="field__label">Full Name <span class="req">*</span></span><input type="text" id="studentName" required /></label>
+          <label class="field"><span class="field__label">Registration Number</span><input type="text" id="studentRegNo" placeholder="Leave blank for TMP-EOCNS/YY/####/CODE" /><span class="field__hint">Leave empty to auto-assign temporary number.</span></label>
+          <label class="field"><span class="field__label">Programme</span><select id="studentProgramme"><option value="">— Select —</option><option value="Nursing">Nursing</option><option value="Midwifery">Midwifery</option></select></label>
+          <label class="field"><span class="field__label">Level</span><select id="studentLevel"><option value="">— Select —</option><option value="100">100 Level</option><option value="200">200 Level</option><option value="300">300 Level</option></select></label>
+          <label class="field"><span class="field__label">Gender</span><select id="studentGender"><option value="">— Select —</option><option value="Female">Female</option><option value="Male">Male</option></select></label>
+          <label class="field"><span class="field__label">Hostel</span><input type="text" id="studentHostel" /></label>
+          <label class="field"><span class="field__label">Status</span><select id="studentStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></label>
+          <label class="field"><span class="field__label">Phone</span><input type="tel" id="studentPhone" /></label>
+          <label class="field field--full" id="auditReasonGroup" hidden><span class="field__label">Reason for change <span class="req">*</span></span><textarea id="auditReason" rows="2"></textarea></label>
+          <label class="field field--full" id="auditRefGroup" hidden><span class="field__label">Official Reference Number <span class="req">*</span></span><input type="text" id="auditRef" placeholder="e.g. REF/EOCNS/QA/0042" /><span class="field__hint">From the approved letter that authorised this change.</span></label>
+        </div>
+        <div class="modal__footer"><button type="button" class="btn btn--ghost" id="btnCancelStudent2">Cancel</button><button type="submit" class="btn btn--primary">Save Student</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lecturer Modal -->
+  <div class="modal" id="lecturerModal" hidden>
+    <div class="modal__backdrop" id="lecturerModalBackdrop"></div>
+    <div class="modal__dialog">
+      <div class="modal__header"><h3 id="lecturerModalTitle">Add Lecturer</h3><button class="icon-btn" type="button" onclick="document.getElementById('lecturerModal').hidden=true">×</button></div>
+      <form id="lecturerForm" class="modal__body">
+        <div class="form-grid">
+          <label class="field field--full"><span class="field__label">Full Name <span class="req">*</span></span><input type="text" id="lecturerName" required /></label>
+          <label class="field"><span class="field__label">Staff ID</span><input type="text" id="lecturerStaffId" /></label>
+          <label class="field"><span class="field__label">Phone</span><input type="tel" id="lecturerPhone" /></label>
+          <label class="field field--full"><span class="field__label">Courses (comma separated)</span><input type="text" id="lecturerCourses" placeholder="e.g. Anatomy, Physiology" /></label>
+          <label class="field"><span class="field__label">Status</span><select id="lecturerStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></label>
+        </div>
+        <div class="modal__footer"><button type="button" class="btn btn--ghost" onclick="document.getElementById('lecturerModal').hidden=true">Cancel</button><button type="submit" class="btn btn--primary">Save Lecturer</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Session Modal -->
+  <div class="modal" id="sessionModal" hidden>
+    <div class="modal__backdrop" id="sessionModalBackdrop"></div>
+    <div class="modal__dialog">
+      <div class="modal__header"><h3 id="sessionModalTitle">New Academic Session</h3><button class="icon-btn" type="button" onclick="document.getElementById('sessionModal').hidden=true">×</button></div>
+      <form id="sessionForm" class="modal__body">
+        <div class="form-grid">
+          <label class="field field--full"><span class="field__label">Session Name <span class="req">*</span></span><input type="text" id="sessionName" required placeholder="e.g. 2025/2026 Academic Session" /></label>
+          <label class="field"><span class="field__label">Start Date</span><input type="date" id="sessionStart" /></label>
+          <label class="field"><span class="field__label">End Date</span><input type="date" id="sessionEnd" /></label>
+          <label class="field field--full"><span class="field__label">Programmes</span><select id="sessionProgrammes" multiple size="3"><option value="Nursing">Nursing</option><option value="Midwifery">Midwifery</option></select></label>
+          <label class="field field--full"><span class="field__label">Levels</span><div><label><input type="checkbox" name="sessionLevel" value="100"> 100</label> <label><input type="checkbox" name="sessionLevel" value="200"> 200</label> <label><input type="checkbox" name="sessionLevel" value="300"> 300</label></div></label>
+          <label class="field"><span class="field__label">Status</span><select id="sessionStatus"><option value="Active">Active</option><option value="Completed">Completed</option><option value="Planned">Planned</option></select></label>
+        </div>
+        <div class="modal__footer"><button type="button" class="btn btn--ghost" onclick="document.getElementById('sessionModal').hidden=true">Cancel</button><button type="submit" class="btn btn--primary">Save Session</button></div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
