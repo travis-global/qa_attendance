@@ -27,19 +27,19 @@
     dashboard: { title: "Dashboard", subtitle: "Eastern Oak College of Nursing Sciences" },
     students: { title: "Students", subtitle: "Master student registry" },
     lecturers: { title: "Lecturers", subtitle: "Staff & course assignments" },
-    hostel: { title: "Hostel Attendance", subtitle: "Gate log → boarding fee reports" },
-    sessions: { title: "Academic Sessions", subtitle: "Programmes, levels & timetables" },
-    "qa-daily": { title: "Daily QA", subtitle: "Lecture compliance — today" },
+    hostel: { title: "Hostel Attendance", subtitle: "Gate log to boarding fee reports" },
+    sessions: { title: "Academic Sessions", subtitle: "Programmes, levels and timetables" },
+    "qa-daily": { title: "Daily QA", subtitle: "Lecture compliance" },
     "qa-weekly": { title: "Weekly QA", subtitle: "Weekly teaching compliance" },
     "qa-monthly": { title: "Monthly QA", subtitle: "Full monthly quality assurance" },
-    reports: { title: "Reports & Export", subtitle: "Attendance sheets, PDFs & CSV" },
-    audit: { title: "Audit Log", subtitle: "Every change with REF/EOCNS/QA/…" },
-    settings: { title: "Settings", subtitle: "Roles, letterhead & system preferences" },
+    reports: { title: "Reports and Export", subtitle: "Attendance sheets, PDFs and CSV" },
+    audit: { title: "Audit Log", subtitle: "Every change with REF/EOCNS/QA" },
+    settings: { title: "Settings", subtitle: "Roles, letterhead and system preferences" },
   };
 
   function showView(viewId) {
     document.querySelectorAll(".nav-item").forEach((el) => el.classList.toggle("active", el.dataset.view === viewId));
-    document.querySelectorAll(".view").forEach((el) => el.classList.toggle("active", el.id === `view-${viewId}`));
+    document.querySelectorAll(".view").forEach((el) => el.classList.toggle("active", el.id === "view-" + viewId));
     const meta = titles[viewId] || { title: "EOCNS", subtitle: "" };
     const titleEl = document.getElementById("pageTitle");
     const subEl = document.getElementById("pageSubtitle");
@@ -93,8 +93,8 @@
     });
   }
 
-  function tx(storeName, mode = "readonly") {
-    return db.transaction(storeName, mode).objectStore(storeName);
+  function tx(storeName, mode) {
+    return db.transaction(storeName, mode || "readonly").objectStore(storeName);
   }
   function getAll(storeName) {
     return new Promise((resolve, reject) => {
@@ -124,16 +124,22 @@
     });
   }
 
-  async function writeAudit({ action, entity, entityId, reason, details = {}, externalRef = null }) {
-    let ref = (externalRef || "").trim();
+  async function writeAudit(opts) {
+    let ref = (opts.externalRef || "").trim();
     if (!ref) {
       const num = await nextRefNumber();
-      ref = `REF/EOCNS/QA/${String(num).padStart(4, "0")}`;
+      ref = "REF/EOCNS/QA/" + String(num).padStart(4, "0");
     }
     const entry = {
-      ref, action, entity, entityId, reason: reason || "",
-      details, timestamp: new Date().toISOString(), user: "QA Officer",
-      source: externalRef ? "official-letter" : "system",
+      ref: ref,
+      action: opts.action,
+      entity: opts.entity,
+      entityId: opts.entityId,
+      reason: opts.reason || "",
+      details: opts.details || {},
+      timestamp: new Date().toISOString(),
+      user: "QA Officer",
+      source: opts.externalRef ? "official-letter" : "system",
     };
     await put("audit", entry);
     return ref;
@@ -147,8 +153,8 @@
     const year = String(new Date().getFullYear()).slice(-2);
     const code = getProgrammeCode(programme);
     const students = await getAll("students");
-    const prefix = `TMP-EOCNS/${year}/`;
-    const suffix = `/${code}`;
+    const prefix = "TMP-EOCNS/" + year + "/";
+    const suffix = "/" + code;
     let maxNum = 0;
     for (const s of students) {
       const reg = s.regNo || "";
@@ -157,7 +163,7 @@
         if (!isNaN(num) && num > maxNum) maxNum = num;
       }
     }
-    return `TMP-EOCNS/${year}/${String(Math.min(maxNum + 1, 1000)).padStart(4, "0")}/${code}`;
+    return "TMP-EOCNS/" + year + "/" + String(Math.min(maxNum + 1, 1000)).padStart(4, "0") + "/" + code;
   }
 
   function generateId(prefix) {
@@ -165,11 +171,12 @@
   }
 
   function escapeHtml(str) {
-    return String(str ?? "").replace(/[&<>"']/g, c => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;" }[c]));
+    const map = { "&": "&" + "amp;", "<": "&" + "lt;", ">": "&" + "gt;", '"': "&" + "quot;", "'": "&#39;" };
+    return String(str ?? "").replace(/[&<>"']/g, c => map[c]);
   }
 
   function formatDate(iso) {
-    if (!iso) return "—";
+    if (!iso) return "-";
     return new Date(iso).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
   }
 
@@ -197,20 +204,19 @@
     if (empty) empty.hidden = true;
     tbody.innerHTML = list.map(s => {
       const isTemp = !s.regNo || String(s.regNo).startsWith("TMP-EOCNS/");
-      return `<tr data-id="${s.id}">
-        <td><div class="cell-main">${escapeHtml(s.name)}</div>${s.gender ? `<div class="cell-sub">${escapeHtml(s.gender)}</div>` : ""}</td>
-        <td><span class="badge ${isTemp ? "badge--amber" : "badge--teal"}">${escapeHtml(s.regNo || "—")}</span>${isTemp ? `<div class="cell-sub">Temporary</div>` : ""}</td>
-        <td>${escapeHtml(s.programme || "—")}</td>
-        <td>${s.level ? s.level + " Level" : "—"}</td>
-        <td>${escapeHtml(s.hostel || "—")}</td>
-        <td><span class="badge ${s.status === "Active" ? "badge--green" : "badge--muted"}">${escapeHtml(s.status || "Active")}</span></td>
-        <td class="actions-cell"><button class="icon-btn-sm" data-action="edit" data-id="${s.id}" title="Edit">✎</button></td>
-      </tr>`;
+      return "<tr data-id=\"" + s.id + "\">" +
+        "<td><div class=\"cell-main\">" + escapeHtml(s.name) + "</div>" + (s.gender ? "<div class=\"cell-sub\">" + escapeHtml(s.gender) + "</div>" : "") + "</td>" +
+        "<td><span class=\"badge " + (isTemp ? "badge--amber" : "badge--teal") + "\">" + escapeHtml(s.regNo || "-") + "</span>" + (isTemp ? "<div class=\"cell-sub\">Temporary</div>" : "") + "</td>" +
+        "<td>" + escapeHtml(s.programme || "-") + "</td>" +
+        "<td>" + (s.level ? s.level + " Level" : "-") + "</td>" +
+        "<td>" + escapeHtml(s.hostel || "-") + "</td>" +
+        "<td><span class=\"badge " + (s.status === "Active" ? "badge--green" : "badge--muted") + "\">" + escapeHtml(s.status || "Active") + "</span></td>" +
+        "<td class=\"actions-cell\"><button class=\"icon-btn-sm\" data-action=\"edit\" data-id=\"" + s.id + "\" title=\"Edit\">Edit</button></td></tr>";
     }).join("");
     tbody.querySelectorAll("[data-action=edit]").forEach(btn => btn.addEventListener("click", () => openStudentForm(btn.dataset.id)));
   }
 
-  function openStudentForm(id = null) {
+  function openStudentForm(id) {
     const modal = document.getElementById("studentModal");
     const form = document.getElementById("studentForm");
     form.reset();
@@ -268,18 +274,18 @@
     }
     if (!regNo) regNo = await generateTempRegNo(programme);
     const conflict = studentsCache.find(s => s.regNo === regNo && s.id !== id);
-    if (conflict) { alert(`Registration number "${regNo}" is already used by ${conflict.name}.`); return; }
+    if (conflict) { alert("Registration number \"" + regNo + "\" is already used by " + conflict.name); return; }
 
     const now = new Date().toISOString();
     let student;
     if (id) {
       const existing = studentsCache.find(s => s.id === id);
-      student = { ...existing, name, regNo, programme, level: level ? Number(level) : null, gender, hostel, status, phone, updatedAt: now };
-      await writeAudit({ action: "update", entity: "students", entityId: id, reason, details: { before: existing, after: student }, externalRef: officialRef });
+      student = Object.assign({}, existing, { name: name, regNo: regNo, programme: programme, level: level ? Number(level) : null, gender: gender, hostel: hostel, status: status, phone: phone, updatedAt: now });
+      await writeAudit({ action: "update", entity: "students", entityId: id, reason: reason, details: { before: existing, after: student }, externalRef: officialRef });
       await put("students", student);
     } else {
-      student = { id: generateId("stu"), name, regNo, programme, level: level ? Number(level) : null, gender, hostel, status, phone, createdAt: now, updatedAt: now };
-      await writeAudit({ action: "create", entity: "students", entityId: student.id, reason: "New student registration", details: { student } });
+      student = { id: generateId("stu"), name: name, regNo: regNo, programme: programme, level: level ? Number(level) : null, gender: gender, hostel: hostel, status: status, phone: phone, createdAt: now, updatedAt: now };
+      await writeAudit({ action: "create", entity: "students", entityId: student.id, reason: "New student registration", details: { student: student } });
       await put("students", student);
     }
     closeStudentForm();
@@ -306,13 +312,13 @@
     if (countEl) countEl.textContent = list.length + " lecturer" + (list.length !== 1 ? "s" : "");
     if (list.length === 0) { tbody.innerHTML = ""; if (empty) empty.hidden = false; return; }
     if (empty) empty.hidden = true;
-    tbody.innerHTML = list.map(l => `
-      <tr><td><div class="cell-main">${escapeHtml(l.name)}</div></td>
-      <td>${escapeHtml(l.staffId || "—")}</td>
-      <td>${escapeHtml((l.courses || []).join(", ") || "—")}</td>
-      <td>${escapeHtml(l.phone || "—")}</td>
-      <td><span class="badge ${l.status === "Active" ? "badge--green" : "badge--muted"}">${escapeHtml(l.status || "Active")}</span></td>
-      <td></td></tr>`).join("");
+    tbody.innerHTML = list.map(l => {
+      return "<tr><td><div class=\"cell-main\">" + escapeHtml(l.name) + "</div></td>" +
+        "<td>" + escapeHtml(l.staffId || "-") + "</td>" +
+        "<td>" + escapeHtml((l.courses || []).join(", ") || "-") + "</td>" +
+        "<td>" + escapeHtml(l.phone || "-") + "</td>" +
+        "<td><span class=\"badge " + (l.status === "Active" ? "badge--green" : "badge--muted") + "\">" + escapeHtml(l.status || "Active") + "</span></td><td></td></tr>";
+    }).join("");
   }
 
   function openLecturerForm() {
@@ -331,8 +337,8 @@
     const courses = document.getElementById("lecturerCourses").value.split(",").map(c => c.trim()).filter(Boolean);
     const status = document.getElementById("lecturerStatus").value || "Active";
     const now = new Date().toISOString();
-    const lec = { id: generateId("lec"), name, staffId, phone, courses, status, createdAt: now, updatedAt: now };
-    await writeAudit({ action: "create", entity: "lecturers", entityId: lec.id, reason: "New lecturer registration", details: { lec } });
+    const lec = { id: generateId("lec"), name: name, staffId: staffId, phone: phone, courses: courses, status: status, createdAt: now, updatedAt: now };
+    await writeAudit({ action: "create", entity: "lecturers", entityId: lec.id, reason: "New lecturer registration", details: { lec: lec } });
     await put("lecturers", lec);
     document.getElementById("lecturerModal").hidden = true;
     await renderLecturersTable();
@@ -352,14 +358,12 @@
     }
     if (empty) empty.hidden = true;
     if (container) {
-      container.innerHTML = sessions.map(s => `
-        <div class="card" style="margin-bottom:12px">
-          <div class="card__body">
-            <strong>${escapeHtml(s.name)}</strong>
-            <div class="cell-sub">${escapeHtml((s.programmes || []).join(", "))} · Levels: ${(s.levels || []).join(", ") || "—"}</div>
-            <span class="badge ${s.status === "Active" ? "badge--green" : "badge--muted"}">${escapeHtml(s.status)}</span>
-          </div>
-        </div>`).join("");
+      container.innerHTML = sessions.map(s => {
+        return "<div class=\"card\" style=\"margin-bottom:12px\"><div class=\"card__body\">" +
+          "<strong>" + escapeHtml(s.name) + "</strong>" +
+          "<div class=\"cell-sub\">" + escapeHtml((s.programmes || []).join(", ")) + " · Levels: " + ((s.levels || []).join(", ") || "-") + "</div>" +
+          "<span class=\"badge " + (s.status === "Active" ? "badge--green" : "badge--muted") + "\">" + escapeHtml(s.status) + "</span></div></div>";
+      }).join("");
     }
   }
 
@@ -381,8 +385,8 @@
     const programmes = Array.from(progSelect.selectedOptions).map(o => o.value);
     const levels = Array.from(document.querySelectorAll('input[name="sessionLevel"]:checked')).map(cb => Number(cb.value));
     const now = new Date().toISOString();
-    const session = { id: generateId("ses"), name, startDate: startDate || null, endDate: endDate || null, programmes, levels, status, createdAt: now, updatedAt: now };
-    await writeAudit({ action: "create", entity: "sessions", entityId: session.id, reason: "New academic session", details: { session } });
+    const session = { id: generateId("ses"), name: name, startDate: startDate || null, endDate: endDate || null, programmes: programmes, levels: levels, status: status, createdAt: now, updatedAt: now };
+    await writeAudit({ action: "create", entity: "sessions", entityId: session.id, reason: "New academic session", details: { session: session } });
     await put("sessions", session);
     document.getElementById("sessionModal").hidden = true;
     await renderSessionsList();
@@ -395,24 +399,19 @@
     const container = document.getElementById("auditList");
     if (!container) return;
     if (!list.length) {
-      container.innerHTML = `<p>No audit entries yet. Every create / update will appear here with a REF/EOCNS/QA/ number.</p>`;
+      container.innerHTML = "<p>No audit entries yet. Every create / update will appear here with a REF/EOCNS/QA/ number.</p>";
       return;
     }
     container.innerHTML = list.map(entry => {
       const sourceLabel = entry.source === "official-letter"
-        ? `<span class="badge badge--teal" style="margin-left:6px">Official Letter</span>`
-        : `<span class="badge badge--muted" style="margin-left:6px">System</span>`;
-      return `<div class="audit-item">
-        <div class="audit-item__ref">${escapeHtml(entry.ref)}</div>
-        <div class="audit-item__body">
-          <div class="audit-item__action">
-            <span class="badge badge--${entry.action === "create" ? "green" : "amber"}">${escapeHtml(entry.action)}</span>
-            <strong>${escapeHtml(entry.entity)}</strong>${sourceLabel}
-          </div>
-          <div class="audit-item__reason">${escapeHtml(entry.reason || "—")}</div>
-          <div class="audit-item__meta">${formatDate(entry.timestamp)} · ${escapeHtml(entry.user || "System")}</div>
-        </div>
-      </div>`;
+        ? "<span class=\"badge badge--teal\" style=\"margin-left:6px\">Official Letter</span>"
+        : "<span class=\"badge badge--muted\" style=\"margin-left:6px\">System</span>";
+      return "<div class=\"audit-item\"><div class=\"audit-item__ref\">" + escapeHtml(entry.ref) + "</div>" +
+        "<div class=\"audit-item__body\"><div class=\"audit-item__action\">" +
+        "<span class=\"badge badge--" + (entry.action === "create" ? "green" : "amber") + "\">" + escapeHtml(entry.action) + "</span> " +
+        "<strong>" + escapeHtml(entry.entity) + "</strong>" + sourceLabel + "</div>" +
+        "<div class=\"audit-item__reason\">" + escapeHtml(entry.reason || "-") + "</div>" +
+        "<div class=\"audit-item__meta\">" + formatDate(entry.timestamp) + " · " + escapeHtml(entry.user || "System") + "</div></div></div>";
     }).join("");
   }
 
@@ -442,7 +441,7 @@
   });
 
   openDB().then(() => {
-    console.log("%cEOCNS Attendance System", "color:#0d9488;font-weight:700");
+    console.log("EOCNS Attendance System ready");
     refreshDashboardStats();
     document.getElementById("btnAddStudent")?.addEventListener("click", () => openStudentForm());
     document.getElementById("studentForm")?.addEventListener("submit", saveStudent);
