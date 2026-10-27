@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
   <div class="app">
@@ -325,17 +325,17 @@
               <div id="qaAuthLoggedIn" hidden>
                 <p style="margin:0 0 12px"><span class="badge badge--green">Signed in</span> QA Officer session active on this device.</p>
                 <div style="display:flex;flex-wrap:wrap;gap:10px">
-                  <button type="button" class="btn btn--primary" id="btnExportStudents">Export students (JSON)</button>
-                  <button type="button" class="btn btn--ghost" id="btnPublishStudents">Publish students to repository</button>
+                  <button type="button" class="btn btn--primary" id="btnExportStudents">Export snapshot (JSON)</button>
+                  <button type="button" class="btn btn--primary" id="btnPublishAll">Publish all data to repository</button>
                   <button type="button" class="btn btn--ghost" id="btnQaLogout">Sign out</button>
                 </div>
                 <div id="qaPublishStatus" class="muted-note" style="margin-top:12px"></div>
                 <div id="qaTokenPanel" style="margin-top:16px" hidden>
-                  <label class="field field--full"><span class="field__label">GitHub fine-grained token (write access to this repo)</span>
+                  <label class="field field--full"><span class="field__label">GitHub fine-grained token (Contents: Read and write on this repo)</span>
                     <input type="password" id="qaGithubToken" placeholder="github_pat_…" autocomplete="off" />
                   </label>
-                  <p class="muted-note">Token is kept only in this browser session and is never saved into the repository.</p>
-                  <button type="button" class="btn btn--primary" id="btnConfirmPublish" style="margin-top:8px">Confirm publish</button>
+                  <p class="muted-note">Publishes students, lecturers, sessions, QA logs and audit trail to <code>data/*.json</code>. Token stays in this browser session only.</p>
+                  <button type="button" class="btn btn--primary" id="btnConfirmPublish" style="margin-top:8px">Confirm publish all</button>
                 </div>
               </div>
             </div>
@@ -343,8 +343,8 @@
           <div class="card">
             <div class="card__header"><h3>Data source</h3></div>
             <div class="card__body">
-              <p class="muted-note" style="margin:0">Students load from <code>data/students.json</code> in the GitHub repository. Local edits stay on this device until a QA officer publishes them.</p>
-              <button type="button" class="btn btn--ghost" id="btnReloadFromRepo" style="margin-top:12px">Reload master list from repository</button>
+              <p class="muted-note" style="margin:0">All master data and logs load from <code>data/*.json</code> in the repository (students, lecturers, sessions, QA entries, audit). The browser only keeps a working cache and session keys. Publish after changes so nothing is lost.</p>
+              <button type="button" class="btn btn--ghost" id="btnReloadFromRepo" style="margin-top:12px">Reload all data from repository</button>
             </div>
           </div>
         </section>
@@ -454,6 +454,6 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>

@@ -367,7 +367,7 @@ let OFFICIAL_STUDENTS = [];
 async function loadOfficialStudentsSeed() {
   if (OFFICIAL_STUDENTS.length) return OFFICIAL_STUDENTS;
   try {
-    const res = await fetch("data/students.json?v=6");
+    const res = await fetch("data/students.json?v=8");
     if (!res.ok) throw new Error("HTTP " + res.status);
     OFFICIAL_STUDENTS = await res.json();
   } catch (e) {
@@ -755,7 +755,7 @@ async function generateHostelReport() {
 
 openDB().then(async () => {
   console.log("EOCNS Attendance System ready");
-  try { await hydrateStudentsFromRepoIfEmpty(); } catch (e) { console.warn(e); }
+  try { await hydrateAllFromRepoIfEmpty(); } catch (e) { console.warn(e); }
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
   refreshDashboardStats();
   initQaOfficerUI();
@@ -827,8 +827,16 @@ openDB().then(async () => {
 // Master list: data/students.json in the repository
 // =========================================================
 const QA_PIN_KEY = "eocns-qa-session";
-// Default PIN for first use — change in Settings later if needed
 const QA_DEFAULT_PIN = "EOCNS-QA";
+const REPO_OWNER = "travis-global";
+const REPO_NAME = "qa_attendance";
+const DATA_FILES = {
+  students: "data/students.json",
+  lecturers: "data/lecturers.json",
+  sessions: "data/sessions.json",
+  qa_entries: "data/qa_entries.json",
+  audit: "data/audit.json",
+};
 
 function isQaOfficer() {
   try { return sessionStorage.getItem(QA_PIN_KEY) === "1"; } catch (_) { return false; }
@@ -868,173 +876,220 @@ function initQaOfficerUI() {
     const panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = true;
   });
-  document.getElementById("btnExportStudents")?.addEventListener("click", exportStudentsJson);
-  document.getElementById("btnPublishStudents")?.addEventListener("click", () => {
+  document.getElementById("btnExportStudents")?.addEventListener("click", exportFullSnapshot);
+  document.getElementById("btnPublishAll")?.addEventListener("click", () => {
     if (!isQaOfficer()) return;
     const panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = false;
   });
-  document.getElementById("btnConfirmPublish")?.addEventListener("click", publishStudentsToRepo);
+  document.getElementById("btnConfirmPublish")?.addEventListener("click", publishAllToRepo);
   document.getElementById("btnReloadFromRepo")?.addEventListener("click", async () => {
-    await reloadStudentsFromRepo(true);
+    await reloadAllFromRepo(true);
   });
 }
 
-async function hydrateStudentsFromRepoIfEmpty() {
-  const existing = await getAll("students");
-  if (existing.length > 0) return;
-  await reloadStudentsFromRepo(false);
+async function fetchRepoJson(path) {
+  const res = await fetch(path + "?v=" + Date.now(), { cache: "no-store" });
+  if (!res.ok) throw new Error("HTTP " + res.status + " for " + path);
+  return res.json();
 }
 
-async function reloadStudentsFromRepo(force) {
-  await loadOfficialStudentsSeed();
-  if (!OFFICIAL_STUDENTS.length) {
-    if (force) alert("Could not load data/students.json from the repository.");
-    return;
+async function clearStore(storeName) {
+  return new Promise((resolve, reject) => {
+    const t = db.transaction(storeName, "readwrite");
+    t.objectStore(storeName).clear();
+    t.oncomplete = () => resolve();
+    t.onerror = () => reject(t.error);
+  });
+}
+
+async function putMany(storeName, rows) {
+  for (const row of rows) {
+    await put(storeName, row);
   }
-  const existing = await getAll("students");
-  if (existing.length && force) {
-    const ok = confirm("Replace local student records with the repository master list (" + OFFICIAL_STUDENTS.length + " names)?");
-    if (!ok) return;
-    // clear students store
-    await new Promise((resolve, reject) => {
-      const t = db.transaction("students", "readwrite");
-      t.objectStore("students").clear();
-      t.oncomplete = () => resolve();
-      t.onerror = () => reject(t.error);
-    });
-  }
-  const byName = new Set();
-  let added = 0;
+}
+
+function shapeStudentsForRepo(students) {
+  return students.slice().sort((a, b) => String(a.name).localeCompare(String(b.name))).map(s => ({
+    serial: s.serial || "",
+    name: s.name,
+    programme: s.programme === "Midwifery" ? "Midwifery" : "General Nursing",
+    level: Number(s.level) || (s.programme === "Midwifery" ? 200 : 100),
+    code: s.programme === "Midwifery" ? "MID" : "GNS",
+    regNo: s.regNo || "",
+    hostel: s.hostel || "",
+    status: s.status || "Active",
+    gender: s.gender || "",
+    phone: s.phone || "",
+    id: s.id || "",
+  }));
+}
+
+function studentFromRepo(s) {
   const now = new Date().toISOString();
-  for (const s of OFFICIAL_STUDENTS) {
-    const nameKey = (s.name || "").toLowerCase().trim();
-    if (byName.has(nameKey)) continue;
-    byName.add(nameKey);
-    await put("students", {
-      id: "stu_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
-      name: s.name,
-      regNo: s.regNo || "",
-      programme: s.programme === "Midwifery" ? "Midwifery" : "Nursing",
-      level: String(s.level || ""),
-      gender: "",
-      hostel: "",
-      status: "Active",
-      phone: "",
-      serial: s.serial || "",
-      createdAt: now,
-      updatedAt: now,
-    });
-    added++;
-  }
-  if (force || added) {
-    await writeAudit({
-      action: "create",
-      entity: "students",
-      entityId: "repo-hydrate",
-      reason: "Loaded master list from data/students.json (" + added + " records)",
-      details: { added },
-    });
-  }
-  await renderStudentsTable();
-  refreshDashboardStats();
-  if (force) alert("Loaded " + added + " students from the repository.");
+  return {
+    id: s.id || ("stu_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7)),
+    name: s.name,
+    regNo: s.regNo || "",
+    programme: s.programme === "Midwifery" ? "Midwifery" : "Nursing",
+    level: String(s.level || ""),
+    gender: s.gender || "",
+    hostel: s.hostel || "",
+    status: s.status || "Active",
+    phone: s.phone || "",
+    serial: s.serial || "",
+    createdAt: s.createdAt || now,
+    updatedAt: s.updatedAt || now,
+  };
 }
 
-async function exportStudentsJson() {
+async function hydrateAllFromRepoIfEmpty() {
+  const students = await getAll("students");
+  if (students.length === 0) {
+    try {
+      const rows = await fetchRepoJson(DATA_FILES.students);
+      if (Array.isArray(rows) && rows.length) {
+        for (const s of rows) await put("students", studentFromRepo(s));
+      }
+    } catch (e) { console.warn("students hydrate", e); }
+  }
+  for (const [store, path] of [
+    ["lecturers", DATA_FILES.lecturers],
+    ["sessions", DATA_FILES.sessions],
+    ["qa_entries", DATA_FILES.qa_entries],
+    ["audit", DATA_FILES.audit],
+  ]) {
+    try {
+      const existing = await getAll(store);
+      if (existing.length) continue;
+      const rows = await fetchRepoJson(path);
+      if (Array.isArray(rows) && rows.length) await putMany(store, rows);
+    } catch (e) { console.warn(store + " hydrate", e); }
+  }
+}
+
+async function reloadAllFromRepo(force) {
+  if (force && !confirm("Replace ALL local data (students, lecturers, sessions, QA logs, audit) with the repository files?")) return;
+  const status = document.getElementById("qaPublishStatus");
+  if (status) status.textContent = "Reloading from repository…";
+  try {
+    for (const store of ["students", "lecturers", "sessions", "qa_entries", "audit"]) {
+      await clearStore(store);
+    }
+    const studentRows = await fetchRepoJson(DATA_FILES.students);
+    if (Array.isArray(studentRows)) {
+      for (const s of studentRows) await put("students", studentFromRepo(s));
+    }
+    for (const [store, path] of [
+      ["lecturers", DATA_FILES.lecturers],
+      ["sessions", DATA_FILES.sessions],
+      ["qa_entries", DATA_FILES.qa_entries],
+      ["audit", DATA_FILES.audit],
+    ]) {
+      try {
+        const rows = await fetchRepoJson(path);
+        if (Array.isArray(rows)) await putMany(store, rows);
+      } catch (e) { console.warn(path, e); }
+    }
+    // keep OFFICIAL_STUDENTS in sync for seed button
+    try {
+      OFFICIAL_STUDENTS = Array.isArray(studentRows) ? studentRows : [];
+    } catch (_) {}
+    await renderStudentsTable();
+    await renderLecturersTable();
+    await renderSessionsList();
+    await renderAuditLog();
+    refreshDashboardStats();
+    if (status) status.textContent = "Reloaded all data from the repository.";
+    if (force) alert("Local cache replaced with repository data.");
+  } catch (err) {
+    console.error(err);
+    if (status) status.textContent = "Reload failed: " + (err.message || String(err));
+    if (force) alert("Reload failed: " + (err.message || String(err)));
+  }
+}
+
+async function exportFullSnapshot() {
   if (!isQaOfficer()) {
     alert("Sign in as QA Officer in Settings to export.");
     return;
   }
-  const students = await getAll("students");
   const payload = {
     exportedAt: new Date().toISOString(),
     source: "EOCNS Attendance System",
-    count: students.length,
-    students: students.map(s => ({
-      name: s.name,
-      regNo: s.regNo,
-      programme: s.programme,
-      level: s.level,
-      serial: s.serial || "",
-      hostel: s.hostel || "",
-      status: s.status || "Active",
-    })),
+    students: await getAll("students"),
+    lecturers: await getAll("lecturers"),
+    sessions: await getAll("sessions"),
+    qa_entries: await getAll("qa_entries"),
+    audit: await getAll("audit"),
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "EOCNS_Students_" + new Date().toISOString().slice(0, 10) + ".json";
+  a.download = "EOCNS_FullSnapshot_" + new Date().toISOString().slice(0, 10) + ".json";
   a.click();
 }
 
-async function buildRepoStudentsPayload() {
-  const students = await getAll("students");
-  // Shape matches seed / official list for stable round-trip
-  return students
-    .slice()
-    .sort((a, b) => String(a.name).localeCompare(String(b.name)))
-    .map(s => ({
-      serial: s.serial || "",
-      name: s.name,
-      programme: s.programme === "Midwifery" ? "Midwifery" : "General Nursing",
-      level: Number(s.level) || (s.programme === "Midwifery" ? 200 : 100),
-      code: s.programme === "Midwifery" ? "MID" : "GNS",
-      regNo: s.regNo || "",
-    }));
+async function githubPutFile(token, path, contentText, message) {
+  const url = "https://api.github.com/repos/" + REPO_OWNER + "/" + REPO_NAME + "/contents/" + path;
+  let sha = null;
+  const getRes = await fetch(url, {
+    headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" },
+  });
+  if (getRes.ok) {
+    const meta = await getRes.json();
+    sha = meta.sha;
+  }
+  const body = {
+    message: message,
+    content: btoa(unescape(encodeURIComponent(contentText))),
+    branch: "main",
+  };
+  if (sha) body.sha = sha;
+  const putRes = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: "Bearer " + token,
+      Accept: "application/vnd.github+json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  if (!putRes.ok) {
+    const errText = await putRes.text();
+    throw new Error(path + " → " + putRes.status + " " + errText.slice(0, 180));
+  }
+  return putRes.json();
 }
 
-async function publishStudentsToRepo() {
+async function publishAllToRepo() {
   if (!isQaOfficer()) return;
   const token = (document.getElementById("qaGithubToken")?.value || "").trim();
   const status = document.getElementById("qaPublishStatus");
   if (!token) {
-    if (status) status.textContent = "Paste a fine-grained token with Contents: Read and write on this repository.";
+    if (status) status.textContent = "Paste a fine-grained token with Contents: Read and write.";
     return;
   }
-  if (status) status.textContent = "Publishing to data/students.json…";
+  if (status) status.textContent = "Publishing all data files…";
   try {
-    const payload = await buildRepoStudentsPayload();
-    const content = JSON.stringify(payload, null, 2);
-    const owner = "travis-global";
-    const repo = "qa_attendance";
-    const path = "data/students.json";
-    // Get current SHA if file exists
-    let sha = null;
-    const getRes = await fetch("https://api.github.com/repos/" + owner + "/" + repo + "/contents/" + path, {
-      headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" },
-    });
-    if (getRes.ok) {
-      const meta = await getRes.json();
-      sha = meta.sha;
-    }
-    const body = {
-      message: "Update master student list (" + payload.length + " records) via EOCNS QA System",
-      content: btoa(unescape(encodeURIComponent(content))),
-      branch: "main",
-    };
-    if (sha) body.sha = sha;
-    const putRes = await fetch("https://api.github.com/repos/" + owner + "/" + repo + "/contents/" + path, {
-      method: "PUT",
-      headers: {
-        Authorization: "Bearer " + token,
-        Accept: "application/vnd.github+json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    if (!putRes.ok) {
-      const errText = await putRes.text();
-      throw new Error("GitHub API " + putRes.status + ": " + errText.slice(0, 200));
-    }
-    await writeAudit({
-      action: "update",
-      entity: "students",
-      entityId: "repo-publish",
-      reason: "Published " + payload.length + " students to data/students.json",
-      details: { count: payload.length },
-    });
-    if (status) status.textContent = "Published " + payload.length + " students to the repository.";
+    const students = shapeStudentsForRepo(await getAll("students"));
+    const lecturers = await getAll("lecturers");
+    const sessions = await getAll("sessions");
+    const qa_entries = await getAll("qa_entries");
+    const audit = await getAll("audit");
+
+    await githubPutFile(token, DATA_FILES.students, JSON.stringify(students, null, 2),
+      "Update students (" + students.length + ") via EOCNS QA System");
+    await githubPutFile(token, DATA_FILES.lecturers, JSON.stringify(lecturers, null, 2),
+      "Update lecturers (" + lecturers.length + ") via EOCNS QA System");
+    await githubPutFile(token, DATA_FILES.sessions, JSON.stringify(sessions, null, 2),
+      "Update sessions (" + sessions.length + ") via EOCNS QA System");
+    await githubPutFile(token, DATA_FILES.qa_entries, JSON.stringify(qa_entries, null, 2),
+      "Update QA entries (" + qa_entries.length + ") via EOCNS QA System");
+    await githubPutFile(token, DATA_FILES.audit, JSON.stringify(audit, null, 2),
+      "Update audit log (" + audit.length + ") via EOCNS QA System");
+
+    if (status) status.textContent = "Published students, lecturers, sessions, QA logs and audit to the repository.";
     const panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = true;
     if (document.getElementById("qaGithubToken")) document.getElementById("qaGithubToken").value = "";
@@ -1044,8 +1099,7 @@ async function publishStudentsToRepo() {
   }
 }
 
-
-
+// Keep legacy seed loader pointing at repo students file
 // =========================================================
 // QA LECTURE COMPLIANCE (Daily / Weekly / Monthly)
 // =========================================================
