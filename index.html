@@ -4,12 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>EOCNS Attendance System · Eastern Oak College of Nursing Sciences</title>
-  <meta name="description" content="Comprehensive Hostel, Lecturer & Student Attendance and Quality Assurance System for Eastern Oak College of Nursing Sciences." />
   <link rel="icon" href="https://www.easternoak.org/images/Eastern-OAK-logo-201.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css?v=4" />
 </head>
 <body>
   <div class="app">
@@ -47,7 +46,7 @@
         </div>
       </nav>
       <div class="sidebar__footer">
-        <div class="user-chip" id="userChip">
+        <div class="user-chip">
           <div class="user-chip__avatar">QA</div>
           <div class="user-chip__info">
             <span class="user-chip__name">QA Officer</span>
@@ -58,13 +57,13 @@
     </aside>
     <div class="main-wrap">
       <header class="topbar">
-        <button class="icon-btn sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+        <button class="icon-btn sidebar-toggle" id="sidebarToggle">☰</button>
         <div class="topbar__title">
           <h1 id="pageTitle">Dashboard</h1>
           <p id="pageSubtitle">Eastern Oak College of Nursing Sciences</p>
         </div>
         <div class="topbar__actions">
-          <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">🌓</button>
+          <button class="icon-btn" id="themeToggle">🌓</button>
           <button class="btn btn--ghost btn--sm" id="exportDbBtn">Backup</button>
         </div>
       </header>
@@ -137,10 +136,10 @@
             <div class="empty-state" id="lecturersEmpty"><h3>No lecturers yet</h3><p>Click Add Lecturer to register staff and assign courses.</p></div>
           </div>
         </section>
-        <section class="view" id="view-hostel"><div class="empty-state"><h3>Hostel Attendance</h3><p>Coming next — gate log to boarding fee reports.</p></div></section>
+        <section class="view" id="view-hostel"><div class="empty-state"><h3>Hostel Attendance</h3><p>Coming next.</p></div></section>
         <section class="view" id="view-sessions">
           <div class="page-toolbar">
-            <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Create and manage academic sessions, programmes and levels.</p></div>
+            <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Create and manage academic sessions.</p></div>
             <div class="page-toolbar__right">
               <span class="count-pill" id="sessionsCount">0 sessions</span>
               <button class="btn btn--primary" id="btnAddSession">+ New Session</button>
@@ -169,15 +168,15 @@
         <input type="hidden" id="studentId" />
         <div class="form-grid">
           <label class="field field--full"><span class="field__label">Full Name <span class="req">*</span></span><input type="text" id="studentName" required /></label>
-          <label class="field"><span class="field__label">Registration Number</span><input type="text" id="studentRegNo" placeholder="Leave blank for TMP-EOCNS/YY/####/CODE" /><span class="field__hint">Leave empty to auto-assign temporary number.</span></label>
+          <label class="field"><span class="field__label">Registration Number</span><input type="text" id="studentRegNo" placeholder="Leave blank for TMP-EOCNS/YY/####/CODE" /></label>
           <label class="field"><span class="field__label">Programme</span><select id="studentProgramme"><option value="">— Select —</option><option value="Nursing">Nursing</option><option value="Midwifery">Midwifery</option></select></label>
-          <label class="field"><span class="field__label">Level</span><select id="studentLevel"><option value="">— Select —</option><option value="100">100 Level</option><option value="200">200 Level</option><option value="300">300 Level</option></select></label>
-          <label class="field"><span class="field__label">Gender</span><select id="studentGender"><option value="">— Select —</option><option value="Female">Female</option><option value="Male">Male</option></select></label>
+          <label class="field"><span class="field__label">Level</span><select id="studentLevel"><option value="">— Select —</option><option value="100">100</option><option value="200">200</option><option value="300">300</option></select></label>
+          <label class="field"><span class="field__label">Gender</span><select id="studentGender"><option value="">—</option><option value="Female">Female</option><option value="Male">Male</option></select></label>
           <label class="field"><span class="field__label">Hostel</span><input type="text" id="studentHostel" /></label>
           <label class="field"><span class="field__label">Status</span><select id="studentStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></label>
           <label class="field"><span class="field__label">Phone</span><input type="tel" id="studentPhone" /></label>
           <label class="field field--full" id="auditReasonGroup" hidden><span class="field__label">Reason for change <span class="req">*</span></span><textarea id="auditReason" rows="2"></textarea></label>
-          <label class="field field--full" id="auditRefGroup" hidden><span class="field__label">Official Reference Number <span class="req">*</span></span><input type="text" id="auditRef" placeholder="e.g. REF/EOCNS/QA/0042" /><span class="field__hint">From the approved letter that authorised this change.</span></label>
+          <label class="field field--full" id="auditRefGroup" hidden><span class="field__label">Official Reference Number <span class="req">*</span></span><input type="text" id="auditRef" placeholder="REF/EOCNS/QA/0042" /></label>
         </div>
         <div class="modal__footer"><button type="button" class="btn btn--ghost" id="btnCancelStudent2">Cancel</button><button type="submit" class="btn btn--primary">Save Student</button></div>
       </form>
@@ -193,7 +192,7 @@
           <label class="field field--full"><span class="field__label">Full Name <span class="req">*</span></span><input type="text" id="lecturerName" required /></label>
           <label class="field"><span class="field__label">Staff ID</span><input type="text" id="lecturerStaffId" /></label>
           <label class="field"><span class="field__label">Phone</span><input type="tel" id="lecturerPhone" /></label>
-          <label class="field field--full"><span class="field__label">Courses (comma separated)</span><input type="text" id="lecturerCourses" placeholder="e.g. Anatomy, Physiology" /></label>
+          <label class="field field--full"><span class="field__label">Courses (comma separated)</span><input type="text" id="lecturerCourses" /></label>
           <label class="field"><span class="field__label">Status</span><select id="lecturerStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></label>
         </div>
         <div class="modal__footer"><button type="button" class="btn btn--ghost" onclick="document.getElementById('lecturerModal').hidden=true">Cancel</button><button type="submit" class="btn btn--primary">Save Lecturer</button></div>
@@ -207,7 +206,7 @@
       <div class="modal__header"><h3 id="sessionModalTitle">New Academic Session</h3><button class="icon-btn" type="button" onclick="document.getElementById('sessionModal').hidden=true">×</button></div>
       <form id="sessionForm" class="modal__body">
         <div class="form-grid">
-          <label class="field field--full"><span class="field__label">Session Name <span class="req">*</span></span><input type="text" id="sessionName" required placeholder="e.g. 2025/2026 Academic Session" /></label>
+          <label class="field field--full"><span class="field__label">Session Name <span class="req">*</span></span><input type="text" id="sessionName" required /></label>
           <label class="field"><span class="field__label">Start Date</span><input type="date" id="sessionStart" /></label>
           <label class="field"><span class="field__label">End Date</span><input type="date" id="sessionEnd" /></label>
           <label class="field field--full"><span class="field__label">Programmes</span><select id="sessionProgrammes" multiple size="3"><option value="Nursing">Nursing</option><option value="Midwifery">Midwifery</option></select></label>
@@ -219,6 +218,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
