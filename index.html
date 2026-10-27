@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=6" />
+  <link rel="stylesheet" href="style.css?v=7" />
 </head>
 <body>
   <div class="app">
@@ -192,9 +192,120 @@
           <div id="sessionsList"></div>
           <div class="empty-state" id="sessionsEmpty"><h3>No sessions yet</h3><p>Create the first academic session.</p></div>
         </section>
-        <section class="view" id="view-qa-daily"><div class="empty-state"><h3>Daily QA</h3><p>Coming soon.</p></div></section>
-        <section class="view" id="view-qa-weekly"><div class="empty-state"><h3>Weekly QA</h3><p>Coming soon.</p></div></section>
-        <section class="view" id="view-qa-monthly"><div class="empty-state"><h3>Monthly QA</h3><p>Coming soon.</p></div></section>
+                <section class="view" id="view-qa-daily">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Log lectures held or missed for a given day — feeds weekly and monthly compliance.</p>
+            </div>
+            <div class="page-toolbar__right">
+              <button class="btn btn--primary" id="btnAddQaEntry">+ Log lecture</button>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__body">
+              <div class="form-grid">
+                <label class="field"><span class="field__label">Date</span><input type="date" id="qaDailyDate" /></label>
+                <label class="field"><span class="field__label">Class</span>
+                  <select id="qaDailyClass">
+                    <option value="100_nursing">100 Level Nursing</option>
+                    <option value="200_nursing">200 Level Nursing</option>
+                    <option value="200_midwifery">200 Level Midwifery</option>
+                  </select>
+                </label>
+                <label class="field"><span class="field__label">&nbsp;</span>
+                  <button type="button" class="btn btn--ghost" id="btnFilterQaDaily">Show day</button>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__header"><h3>Entries for selected day</h3></div>
+            <div class="card__body" style="overflow-x:auto">
+              <table class="data-table">
+                <thead><tr><th>Course</th><th>Lecturer</th><th>Status</th><th>Duration</th><th>Remark</th><th></th></tr></thead>
+                <tbody id="qaDailyTableBody"></tbody>
+              </table>
+              <div class="empty-state" id="qaDailyEmpty"><h3>No entries</h3><p>Click + Log lecture to record compliance for this day.</p></div>
+            </div>
+          </div>
+        </section>
+                <section class="view" id="view-qa-weekly">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Weekly teaching compliance summary from daily logs.</p>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__body">
+              <div class="form-grid">
+                <label class="field"><span class="field__label">Week starting (Monday)</span><input type="date" id="qaWeekStart" /></label>
+                <label class="field"><span class="field__label">Class</span>
+                  <select id="qaWeekClass">
+                    <option value="100_nursing">100 Level Nursing</option>
+                    <option value="200_nursing">200 Level Nursing</option>
+                    <option value="200_midwifery">200 Level Midwifery</option>
+                    <option value="">All classes</option>
+                  </select>
+                </label>
+                <label class="field"><span class="field__label">&nbsp;</span>
+                  <button type="button" class="btn btn--primary" id="btnBuildWeeklyQa">Build weekly report</button>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div id="qaWeeklySummary" class="stats-grid" style="margin-bottom:16px" hidden></div>
+          <div class="card" id="qaWeeklyCard" hidden>
+            <div class="card__header"><h3>Weekly breakdown</h3></div>
+            <div class="card__body" style="overflow-x:auto">
+              <table class="data-table">
+                <thead><tr><th>Date</th><th>Course</th><th>Lecturer</th><th>Status</th><th>Duration</th></tr></thead>
+                <tbody id="qaWeeklyTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+                <section class="view" id="view-qa-monthly">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Full monthly quality assurance — compliance rates by course and lecturer.</p>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__body">
+              <div class="form-grid">
+                <label class="field"><span class="field__label">Month</span><input type="month" id="qaMonthInput" /></label>
+                <label class="field"><span class="field__label">Class</span>
+                  <select id="qaMonthClass">
+                    <option value="100_nursing">100 Level Nursing</option>
+                    <option value="200_nursing">200 Level Nursing</option>
+                    <option value="200_midwifery">200 Level Midwifery</option>
+                    <option value="">All classes</option>
+                  </select>
+                </label>
+                <label class="field"><span class="field__label">&nbsp;</span>
+                  <button type="button" class="btn btn--primary" id="btnBuildMonthlyQa">Build monthly report</button>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div id="qaMonthlySummary" class="stats-grid" style="margin-bottom:16px" hidden></div>
+          <div class="grid-2" id="qaMonthlyDetail" hidden>
+            <div class="card">
+              <div class="card__header"><h3>By course</h3></div>
+              <div class="card__body" style="overflow-x:auto">
+                <table class="data-table"><thead><tr><th>Course</th><th>Held</th><th>Missed</th><th>Rate</th></tr></thead>
+                <tbody id="qaMonthCourseBody"></tbody></table>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card__header"><h3>By lecturer</h3></div>
+              <div class="card__body" style="overflow-x:auto">
+                <table class="data-table"><thead><tr><th>Lecturer</th><th>Held</th><th>Missed</th><th>Rate</th></tr></thead>
+                <tbody id="qaMonthLecBody"></tbody></table>
+              </div>
+            </div>
+          </div>
+        </section>
         <section class="view" id="view-reports"><div class="empty-state"><h3>Reports & Export</h3><p>Coming soon.</p></div></section>
         <section class="view" id="view-audit">
           <div class="card"><div class="card__header"><h3>Audit Trail</h3></div><div class="card__body" id="auditList"><p>No audit entries yet.</p></div></div>
@@ -299,7 +410,50 @@
     </div>
   </div>
 
+  
+  <div class="modal" id="qaEntryModal" hidden>
+    <div class="modal__backdrop" id="qaEntryModalBackdrop"></div>
+    <div class="modal__dialog">
+      <div class="modal__header"><h3 id="qaEntryModalTitle">Log lecture</h3><button class="icon-btn" type="button" id="btnCancelQaEntry">×</button></div>
+      <form id="qaEntryForm" class="modal__body">
+        <input type="hidden" id="qaEntryId" />
+        <div class="form-grid">
+          <label class="field"><span class="field__label">Date <span class="req">*</span></span><input type="date" id="qaEntryDate" required /></label>
+          <label class="field"><span class="field__label">Class <span class="req">*</span></span>
+            <select id="qaEntryClass" required>
+              <option value="100_nursing">100 Level Nursing</option>
+              <option value="200_nursing">200 Level Nursing</option>
+              <option value="200_midwifery">200 Level Midwifery</option>
+            </select>
+          </label>
+          <label class="field field--full"><span class="field__label">Course code / name <span class="req">*</span></span>
+            <input type="text" id="qaEntryCourse" list="qaCourseList" required placeholder="e.g. NUS 121 — Human Anatomy II" />
+            <datalist id="qaCourseList"></datalist>
+          </label>
+          <label class="field field--full"><span class="field__label">Lecturer <span class="req">*</span></span>
+            <input type="text" id="qaEntryLecturer" list="qaLecturerList" required />
+            <datalist id="qaLecturerList"></datalist>
+          </label>
+          <label class="field"><span class="field__label">Status <span class="req">*</span></span>
+            <select id="qaEntryStatus" required>
+              <option value="Held">Held</option>
+              <option value="Missed">Missed</option>
+              <option value="Partial">Partial</option>
+              <option value="Rescheduled">Rescheduled</option>
+            </select>
+          </label>
+          <label class="field"><span class="field__label">Duration (minutes)</span><input type="number" id="qaEntryDuration" min="0" step="5" placeholder="60" /></label>
+          <label class="field field--full"><span class="field__label">Remark</span><textarea id="qaEntryRemark" rows="2"></textarea></label>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" id="btnCancelQaEntry2">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

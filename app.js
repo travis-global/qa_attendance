@@ -47,6 +47,9 @@ function showView(viewId) {
   if (viewId === "dashboard") refreshDashboardStats();
   if (viewId === "audit") renderAuditLog();
   if (viewId === "hostel") initHostelView();
+  if (viewId === "qa-daily") renderQaDaily();
+  if (viewId === "qa-weekly") initQaWeeklyView();
+  if (viewId === "qa-monthly") initQaMonthlyView();
 }
 document.querySelectorAll("[data-view]").forEach((el) => {
   el.addEventListener("click", (e) => { e.preventDefault(); showView(el.dataset.view); });
@@ -55,7 +58,7 @@ document.querySelectorAll("[data-goto]").forEach((el) => {
   el.addEventListener("click", () => showView(el.dataset.goto));
 });
 const DB_NAME = "eocns_attendance";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 let db = null;
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -75,6 +78,11 @@ function openDB() {
         audit.createIndex("ref", "ref", { unique: true });
       }
       if (!database.objectStoreNames.contains("meta")) database.createObjectStore("meta", { keyPath: "key" });
+      if (!database.objectStoreNames.contains("qa_entries")) {
+        const qa = database.createObjectStore("qa_entries", { keyPath: "id" });
+        qa.createIndex("date", "date", { unique: false });
+        qa.createIndex("classKey", "classKey", { unique: false });
+      }
     };
   });
 }
@@ -792,6 +800,23 @@ openDB().then(async () => {
     const results = document.getElementById("hostelResults");
     if (results) results.hidden = true;
   });
+
+  // QA module
+  seedQaDatalists();
+  const todayStr = (() => { const d = new Date(); return d.toISOString().slice(0, 10); })();
+  if (document.getElementById("qaDailyDate") && !document.getElementById("qaDailyDate").value) {
+    document.getElementById("qaDailyDate").value = todayStr;
+  }
+  document.getElementById("btnAddQaEntry")?.addEventListener("click", () => openQaEntryForm());
+  document.getElementById("qaEntryForm")?.addEventListener("submit", saveQaEntry);
+  document.getElementById("btnCancelQaEntry")?.addEventListener("click", closeQaEntryForm);
+  document.getElementById("btnCancelQaEntry2")?.addEventListener("click", closeQaEntryForm);
+  document.getElementById("qaEntryModalBackdrop")?.addEventListener("click", closeQaEntryForm);
+  document.getElementById("btnFilterQaDaily")?.addEventListener("click", renderQaDaily);
+  document.getElementById("qaDailyDate")?.addEventListener("change", renderQaDaily);
+  document.getElementById("qaDailyClass")?.addEventListener("change", renderQaDaily);
+  document.getElementById("btnBuildWeeklyQa")?.addEventListener("click", buildWeeklyQaReport);
+  document.getElementById("btnBuildMonthlyQa")?.addEventListener("click", buildMonthlyQaReport);
 }).catch(err => {
   console.error(err);
   alert("Could not initialise the local database.");
@@ -1017,6 +1042,249 @@ async function publishStudentsToRepo() {
     console.error(err);
     if (status) status.textContent = "Publish failed: " + (err.message || String(err));
   }
+}
+
+
+
+// =========================================================
+// QA LECTURE COMPLIANCE (Daily / Weekly / Monthly)
+// =========================================================
+const QA_COURSES = [
+  "NUS 121 — Human Anatomy II", "NUS 122 — Human Physiology II", "NUS 124 — Human Nutrition",
+  "NUR 125 — Pharmacology I", "NUR 121 — Foundations Of Nursing II", "NUR 122 — Primary Health Care (PHC) I",
+  "EED 126 — Intro. To Entrepreneurship", "PRAC — Practicum", "PSY — Developmental Psychology",
+  "FNS 201 — Fundamentals of Nursing IV", "MSN 201 — Medical Surgical Nursing III",
+  "RH 201 — Reproductive Health II", "PHARM 201 — Pharmacology III", "CH 201 — Community Health I",
+  "RES 201 — Research and Statistics", "MWP 201 — Midwifery Practice", "CM 201 — Community Midwifery",
+  "INF 201 — Infant I", "ANP 201 — Anatomy and Physiology", "TUT — Tutorial"
+];
+const QA_LECTURERS_SEED = [
+  "Mr. John Agbo", "Dr. Jacinta Obinma", "Mrs. Anthonia Arua", "Mrs. Beatrice Ojinkama",
+  "Dr. Ogbuinya Eda", "Ms. Theresa Ezeude", "Mrs. Patience Ekeh", "Dr. Eugene Otu",
+  "Dr. Perpetual Eze", "Mr. Obasi Chukwu", "Dr. Aaron Nwedu", "Mr. Sabastine",
+  "Mrs. Onovo Beatrice", "Mrs. Jennifer Amrasawore", "Barr. Mrs. Chukwu Felicia",
+  "Ms. Udu Divine-Favour", "Ms. Mbah Anthonet Ezzineamaka", "Ms. Aneke Uchechukwu",
+  "Mr. Simon Udu", "Mr. Sunday Taiwo"
+];
+
+function seedQaDatalists() {
+  const cl = document.getElementById("qaCourseList");
+  const ll = document.getElementById("qaLecturerList");
+  if (cl) cl.innerHTML = QA_COURSES.map(c => "<option value=\"" + escapeHtml(c) + "\"></option>").join("");
+  if (ll) ll.innerHTML = QA_LECTURERS_SEED.map(c => "<option value=\"" + escapeHtml(c) + "\"></option>").join("");
+}
+
+async function getQaEntries() {
+  try { return await getAll("qa_entries"); }
+  catch (_) { return []; }
+}
+
+function openQaEntryForm(id) {
+  const modal = document.getElementById("qaEntryModal");
+  if (!modal) return;
+  document.getElementById("qaEntryForm").reset();
+  document.getElementById("qaEntryId").value = "";
+  const dailyDate = document.getElementById("qaDailyDate")?.value;
+  const dailyClass = document.getElementById("qaDailyClass")?.value;
+  if (dailyDate) document.getElementById("qaEntryDate").value = dailyDate;
+  else document.getElementById("qaEntryDate").value = new Date().toISOString().slice(0, 10);
+  if (dailyClass) document.getElementById("qaEntryClass").value = dailyClass;
+  document.getElementById("qaEntryModalTitle").textContent = id ? "Edit lecture log" : "Log lecture";
+  seedQaDatalists();
+  modal.hidden = false;
+  document.getElementById("qaEntryCourse")?.focus();
+}
+
+function closeQaEntryForm() {
+  const modal = document.getElementById("qaEntryModal");
+  if (modal) modal.hidden = true;
+}
+
+async function saveQaEntry(e) {
+  e.preventDefault();
+  const id = document.getElementById("qaEntryId").value || null;
+  const date = document.getElementById("qaEntryDate").value;
+  const classKey = document.getElementById("qaEntryClass").value;
+  const course = document.getElementById("qaEntryCourse").value.trim();
+  const lecturer = document.getElementById("qaEntryLecturer").value.trim();
+  const status = document.getElementById("qaEntryStatus").value;
+  const duration = Number(document.getElementById("qaEntryDuration").value) || null;
+  const remark = document.getElementById("qaEntryRemark").value.trim();
+  if (!date || !course || !lecturer) {
+    alert("Date, course and lecturer are required.");
+    return;
+  }
+  const now = new Date().toISOString();
+  const entry = {
+    id: id || ("qa_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
+    date, classKey, course, lecturer, status, duration, remark,
+    createdAt: now, updatedAt: now,
+  };
+  await put("qa_entries", entry);
+  await writeAudit({
+    action: id ? "update" : "create",
+    entity: "qa_entries",
+    entityId: entry.id,
+    reason: status + " — " + course + " (" + date + ")",
+    details: { entry },
+  });
+  closeQaEntryForm();
+  await renderQaDaily();
+}
+
+async function deleteQaEntry(id) {
+  if (!confirm("Delete this QA entry?")) return;
+  await new Promise((resolve, reject) => {
+    const t = db.transaction("qa_entries", "readwrite");
+    t.objectStore("qa_entries").delete(id);
+    t.oncomplete = () => resolve();
+    t.onerror = () => reject(t.error);
+  });
+  await writeAudit({ action: "update", entity: "qa_entries", entityId: id, reason: "Deleted QA entry", details: {} });
+  await renderQaDaily();
+}
+
+async function renderQaDaily() {
+  const dateEl = document.getElementById("qaDailyDate");
+  const classEl = document.getElementById("qaDailyClass");
+  if (!dateEl) return;
+  if (!dateEl.value) dateEl.value = new Date().toISOString().slice(0, 10);
+  const date = dateEl.value;
+  const classKey = classEl?.value || "";
+  let list = await getQaEntries();
+  list = list.filter(e => e.date === date && (!classKey || e.classKey === classKey));
+  list.sort((a, b) => (a.course || "").localeCompare(b.course || ""));
+  const tbody = document.getElementById("qaDailyTableBody");
+  const empty = document.getElementById("qaDailyEmpty");
+  if (!tbody) return;
+  if (!list.length) {
+    tbody.innerHTML = "";
+    if (empty) empty.hidden = false;
+    return;
+  }
+  if (empty) empty.hidden = true;
+  tbody.innerHTML = list.map(e => {
+    const badge = e.status === "Held" ? "badge--green" : e.status === "Missed" ? "badge--amber" : "badge--muted";
+    return "<tr><td>" + escapeHtml(e.course) + "</td><td>" + escapeHtml(e.lecturer) + "</td>" +
+      "<td><span class=\"badge " + badge + "\">" + escapeHtml(e.status) + "</span></td>" +
+      "<td>" + (e.duration != null ? e.duration + " min" : "—") + "</td>" +
+      "<td>" + escapeHtml(e.remark || "—") + "</td>" +
+      "<td class=\"actions-cell\"><button class=\"icon-btn-sm\" data-del-qa=\"" + e.id + "\">Del</button></td></tr>";
+  }).join("");
+  tbody.querySelectorAll("[data-del-qa]").forEach(btn => {
+    btn.addEventListener("click", () => deleteQaEntry(btn.getAttribute("data-del-qa")));
+  });
+}
+
+function mondayOf(d) {
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const day = x.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  x.setDate(x.getDate() + diff);
+  return x;
+}
+
+function initQaWeeklyView() {
+  const el = document.getElementById("qaWeekStart");
+  if (el && !el.value) {
+    const mon = mondayOf(new Date());
+    el.value = mon.toISOString().slice(0, 10);
+  }
+}
+
+function initQaMonthlyView() {
+  const el = document.getElementById("qaMonthInput");
+  if (el && !el.value) {
+    const d = new Date();
+    el.value = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+  }
+}
+
+async function buildWeeklyQaReport() {
+  const startVal = document.getElementById("qaWeekStart")?.value;
+  if (!startVal) { alert("Pick the week start date."); return; }
+  const start = new Date(startVal + "T00:00:00");
+  const dates = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    dates.push(d.toISOString().slice(0, 10));
+  }
+  const classKey = document.getElementById("qaWeekClass")?.value || "";
+  let list = await getQaEntries();
+  list = list.filter(e => dates.includes(e.date) && (!classKey || e.classKey === classKey));
+  list.sort((a, b) => (a.date + a.course).localeCompare(b.date + b.course));
+  const held = list.filter(e => e.status === "Held" || e.status === "Partial").length;
+  const missed = list.filter(e => e.status === "Missed").length;
+  const total = list.length;
+  const rate = total ? Math.round((held / total) * 100) : 0;
+  const summary = document.getElementById("qaWeeklySummary");
+  if (summary) {
+    summary.hidden = false;
+    summary.innerHTML =
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + total + "</span><span class=\"stat-card__label\">Logged</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + held + "</span><span class=\"stat-card__label\">Held / Partial</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + missed + "</span><span class=\"stat-card__label\">Missed</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + rate + "%</span><span class=\"stat-card__label\">Compliance</span></div></div>";
+  }
+  const card = document.getElementById("qaWeeklyCard");
+  const tbody = document.getElementById("qaWeeklyTableBody");
+  if (card) card.hidden = false;
+  if (tbody) {
+    tbody.innerHTML = list.length ? list.map(e => {
+      const badge = e.status === "Held" ? "badge--green" : e.status === "Missed" ? "badge--amber" : "badge--muted";
+      return "<tr><td>" + escapeHtml(e.date) + "</td><td>" + escapeHtml(e.course) + "</td><td>" + escapeHtml(e.lecturer) +
+        "</td><td><span class=\"badge " + badge + "\">" + escapeHtml(e.status) + "</span></td><td>" +
+        (e.duration != null ? e.duration + " min" : "—") + "</td></tr>";
+    }).join("") : "<tr><td colspan=\"5\">No entries for this week.</td></tr>";
+  }
+}
+
+async function buildMonthlyQaReport() {
+  const monthVal = document.getElementById("qaMonthInput")?.value;
+  if (!monthVal) { alert("Pick a month."); return; }
+  const classKey = document.getElementById("qaMonthClass")?.value || "";
+  let list = await getQaEntries();
+  list = list.filter(e => (e.date || "").startsWith(monthVal) && (!classKey || e.classKey === classKey));
+  const held = list.filter(e => e.status === "Held" || e.status === "Partial").length;
+  const missed = list.filter(e => e.status === "Missed").length;
+  const total = list.length;
+  const rate = total ? Math.round((held / total) * 100) : 0;
+  const summary = document.getElementById("qaMonthlySummary");
+  if (summary) {
+    summary.hidden = false;
+    summary.innerHTML =
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + total + "</span><span class=\"stat-card__label\">Logged</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + held + "</span><span class=\"stat-card__label\">Held / Partial</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + missed + "</span><span class=\"stat-card__label\">Missed</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + rate + "%</span><span class=\"stat-card__label\">Compliance</span></div></div>";
+  }
+  function aggregate(keyFn) {
+    const map = {};
+    list.forEach(e => {
+      const k = keyFn(e) || "—";
+      if (!map[k]) map[k] = { held: 0, missed: 0 };
+      if (e.status === "Missed") map[k].missed++;
+      else if (e.status === "Held" || e.status === "Partial") map[k].held++;
+    });
+    return Object.keys(map).sort().map(k => {
+      const h = map[k].held, m = map[k].missed, t = h + m;
+      const r = t ? Math.round((h / t) * 100) : 0;
+      return { name: k, held: h, missed: m, rate: r };
+    });
+  }
+  const byCourse = aggregate(e => e.course);
+  const byLec = aggregate(e => e.lecturer);
+  const detail = document.getElementById("qaMonthlyDetail");
+  if (detail) detail.hidden = false;
+  const cb = document.getElementById("qaMonthCourseBody");
+  const lb = document.getElementById("qaMonthLecBody");
+  if (cb) cb.innerHTML = byCourse.length ? byCourse.map(r =>
+    "<tr><td>" + escapeHtml(r.name) + "</td><td>" + r.held + "</td><td>" + r.missed + "</td><td>" + r.rate + "%</td></tr>"
+  ).join("") : "<tr><td colspan=\"4\">No data.</td></tr>";
+  if (lb) lb.innerHTML = byLec.length ? byLec.map(r =>
+    "<tr><td>" + escapeHtml(r.name) + "</td><td>" + r.held + "</td><td>" + r.missed + "</td><td>" + r.rate + "%</td></tr>"
+  ).join("") : "<tr><td colspan=\"4\">No data.</td></tr>";
 }
 
 
