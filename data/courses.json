@@ -1,5 +1,96 @@
 [
   {
+    "code": "ANP 201",
+    "name": "Anatomy and Physiology",
+    "classKeys": [
+      "200_midwifery"
+    ]
+  },
+  {
+    "code": "CH 201",
+    "name": "Community Health I",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "CM 201",
+    "name": "Community Midwifery",
+    "classKeys": [
+      "200_midwifery"
+    ]
+  },
+  {
+    "code": "CMWP 201",
+    "name": "Complicated Midwifery",
+    "classKeys": [
+      "200_midwifery"
+    ]
+  },
+  {
+    "code": "EED 126",
+    "name": "Intro. to Entrepreneurship",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "FNS 201",
+    "name": "Fundamentals of Nursing IV",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "INF 201",
+    "name": "Infant I",
+    "classKeys": [
+      "200_midwifery"
+    ]
+  },
+  {
+    "code": "MID 221",
+    "name": "Fundamentals of Midwifery",
+    "classKeys": [
+      "200_midwifery"
+    ]
+  },
+  {
+    "code": "MSN 201",
+    "name": "Medical Surgical Nursing III",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "NMW 201",
+    "name": "Normal Midwifery",
+    "classKeys": [
+      "200_midwifery"
+    ]
+  },
+  {
+    "code": "NUR 121",
+    "name": "Foundations of Nursing II",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUR 122",
+    "name": "Primary Health Care I",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUR 125",
+    "name": "Pharmacology I",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
     "code": "NUS 121",
     "name": "Human Anatomy II",
     "classKeys": [
@@ -21,83 +112,8 @@
     ]
   },
   {
-    "code": "NUR 125",
-    "name": "Pharmacology I",
-    "classKeys": [
-      "100_nursing"
-    ]
-  },
-  {
-    "code": "NUR 121",
-    "name": "Foundations of Nursing II",
-    "classKeys": [
-      "100_nursing"
-    ]
-  },
-  {
-    "code": "NUR 122",
-    "name": "Primary Health Care I",
-    "classKeys": [
-      "100_nursing"
-    ]
-  },
-  {
-    "code": "EED 126",
-    "name": "Intro. to Entrepreneurship",
-    "classKeys": [
-      "100_nursing"
-    ]
-  },
-  {
-    "code": "PSY",
-    "name": "Psychology",
-    "classKeys": [
-      "100_nursing"
-    ]
-  },
-  {
-    "code": "PRAC",
-    "name": "Practicum",
-    "classKeys": [
-      "100_nursing",
-      "200_nursing",
-      "200_midwifery"
-    ]
-  },
-  {
-    "code": "TUT",
-    "name": "Tutorial",
-    "classKeys": [
-      "100_nursing",
-      "200_nursing",
-      "200_midwifery"
-    ]
-  },
-  {
-    "code": "ECA",
-    "name": "ECA",
-    "classKeys": [
-      "100_nursing",
-      "200_nursing"
-    ]
-  },
-  {
-    "code": "FNS 201",
-    "name": "Fundamentals of Nursing IV",
-    "classKeys": [
-      "200_nursing"
-    ]
-  },
-  {
-    "code": "POL 201",
-    "name": "Politics and Government",
-    "classKeys": [
-      "200_nursing"
-    ]
-  },
-  {
-    "code": "RH 201",
-    "name": "Reproductive Health II",
+    "code": "NUT 201",
+    "name": "Nutrition",
     "classKeys": [
       "200_nursing"
     ]
@@ -110,15 +126,38 @@
     ]
   },
   {
-    "code": "CH 201",
-    "name": "Community Health I",
+    "code": "PHARM 202",
+    "name": "Pharmacology II",
+    "classKeys": [
+      "200_midwifery"
+    ]
+  },
+  {
+    "code": "POL 201",
+    "name": "Politics and Government",
     "classKeys": [
       "200_nursing"
     ]
   },
   {
-    "code": "MSN 201",
-    "name": "Medical Surgical Nursing III",
+    "code": "PRAC",
+    "name": "Practicum",
+    "classKeys": [
+      "100_nursing",
+      "200_nursing",
+      "200_midwifery"
+    ]
+  },
+  {
+    "code": "PSY",
+    "name": "Psychology",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "PWS 201",
+    "name": "Professional Writing & Seminar",
     "classKeys": [
       "200_nursing"
     ]
@@ -131,15 +170,8 @@
     ]
   },
   {
-    "code": "PWS 201",
-    "name": "Professional Writing & Seminar",
-    "classKeys": [
-      "200_nursing"
-    ]
-  },
-  {
-    "code": "NUT 201",
-    "name": "Nutrition",
+    "code": "RH 201",
+    "name": "Reproductive Health II",
     "classKeys": [
       "200_nursing"
     ]
@@ -152,51 +184,11 @@
     ]
   },
   {
-    "code": "PHARM 202",
-    "name": "Pharmacology II",
+    "code": "TUT",
+    "name": "Tutorial",
     "classKeys": [
-      "200_midwifery"
-    ]
-  },
-  {
-    "code": "NMW 201",
-    "name": "Normal Midwifery",
-    "classKeys": [
-      "200_midwifery"
-    ]
-  },
-  {
-    "code": "ANP 201",
-    "name": "Anatomy and Physiology",
-    "classKeys": [
-      "200_midwifery"
-    ]
-  },
-  {
-    "code": "MID 221",
-    "name": "Fundamentals of Midwifery",
-    "classKeys": [
-      "200_midwifery"
-    ]
-  },
-  {
-    "code": "CMWP 201",
-    "name": "Complicated Midwifery",
-    "classKeys": [
-      "200_midwifery"
-    ]
-  },
-  {
-    "code": "CM 201",
-    "name": "Community Midwifery",
-    "classKeys": [
-      "200_midwifery"
-    ]
-  },
-  {
-    "code": "INF 201",
-    "name": "Infant I",
-    "classKeys": [
+      "100_nursing",
+      "200_nursing",
       "200_midwifery"
     ]
   }
