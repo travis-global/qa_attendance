@@ -50,7 +50,7 @@ function showView(viewId) {
   if (viewId === "qa-daily") renderQaDaily();
   if (viewId === "qa-weekly") initQaWeeklyView();
   if (viewId === "qa-monthly") initQaMonthlyView();
-  if (viewId === "settings") { renderProgrammesLevels(); renderCoursesTable(); }
+  if (viewId === "settings") { renderProgrammesLevels(); renderCoursesTable(); renderTimetableEditor(); }
   if (viewId === "reports") renderReportsView();
   if (viewId === "attendance") { fillProgrammeLevelSelects(); if (document.getElementById("attSheetDate") && !document.getElementById("attSheetDate").value) document.getElementById("attSheetDate").value = new Date().toISOString().slice(0, 10); }
   if (viewId === "audit") renderAuditLog();
@@ -626,14 +626,37 @@ async function renderAuditLog() {
     }).join("") + "</tbody></table>";
 }
 async function refreshDashboardStats() {
-  if (!db) return;
-  const students = await getAll("students");
-  const lecturers = await getAll("lecturers");
-  const sessions = await getAll("sessions");
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  set("statStudents", students.length || "0");
-  set("statLecturers", lecturers.length || "0");
-  set("statSessions", sessions.filter(s => s.status === "Active").length || "0");
+  try {
+    var students = await getAll("students");
+    var lecturers = await getAll("lecturers");
+    var sessions = await getAll("sessions");
+    var qa = await getAll("qa_entries");
+    var att = await getAll("attendance");
+    var courses = await getAll("courses");
+    var activeStudents = students.filter(function(s) { return !s.status || s.status === "Active"; }).length;
+    var activeSessions = sessions.filter(function(s) { return s.status === "Active"; }).length;
+    var set = function(id, n) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = String(n);
+    };
+    set("statStudents", activeStudents);
+    set("statLecturers", lecturers.length);
+    set("statSessions", activeSessions);
+    set("statQaLogs", qa.length);
+    set("statAttendance", att.length);
+    set("statCourses", courses.length);
+    set("statHostels", "2");
+    // status items
+    var statusBox = document.querySelector(".status-list") || document.getElementById("dashboardStatus");
+    // hero status line if present
+    var sessLabel = document.getElementById("dashActiveSession");
+    if (sessLabel) {
+      var a = sessions.find(function(s) { return s.status === "Active"; });
+      sessLabel.textContent = a ? a.name : "No active session";
+    }
+  } catch (e) {
+    console.warn("dashboard stats", e);
+  }
 }
 
 
@@ -1239,6 +1262,74 @@ async function addCoursePrompt() {
   if (typeof seedQaDatalists === "function") seedQaDatalists();
 }
 
+
+var WEEKDAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+async function renderTimetableEditor() {
+  await ensureTimetables();
+  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+  var tt = TIMETABLES_CACHE[key] || { class_name: key, slots: [] };
+  if (!tt.slots) tt.slots = [];
+  TIMETABLES_CACHE[key] = tt;
+  var tbody = document.getElementById("timetableSlotsBody");
+  if (!tbody) return;
+  if (!tt.slots.length) {
+    tbody.innerHTML = "<tr><td colspan=\"6\">No slots — add one.</td></tr>";
+    return;
+  }
+  tbody.innerHTML = tt.slots.map(function(s, idx) {
+    return "<tr>" +
+      "<td><input type=\"number\" min=\"0\" max=\"6\" data-tt-field=\"weekday\" data-tt-i=\"" + idx + "\" value=\"" + (s.weekday != null ? s.weekday : 0) + "\" style=\"width:56px\" /></td>" +
+      "<td><input type=\"text\" data-tt-field=\"code\" data-tt-i=\"" + idx + "\" value=\"" + escapeHtml(s.code || "") + "\" style=\"min-width:90px\" /></td>" +
+      "<td><input type=\"text\" data-tt-field=\"start\" data-tt-i=\"" + idx + "\" value=\"" + escapeHtml(s.start || "") + "\" style=\"width:80px\" /></td>" +
+      "<td><input type=\"text\" data-tt-field=\"end\" data-tt-i=\"" + idx + "\" value=\"" + escapeHtml(s.end || "") + "\" style=\"width:80px\" /></td>" +
+      "<td><input type=\"number\" min=\"0\" step=\"0.5\" data-tt-field=\"hours\" data-tt-i=\"" + idx + "\" value=\"" + (s.hours != null ? s.hours : 1) + "\" style=\"width:64px\" /></td>" +
+      "<td class=\"qa-edit-only\"><button type=\"button\" class=\"icon-btn-sm\" data-tt-del=\"" + idx + "\">Del</button></td></tr>";
+  }).join("");
+  tbody.querySelectorAll("[data-tt-field]").forEach(function(inp) {
+    inp.addEventListener("change", function() {
+      var i = Number(inp.getAttribute("data-tt-i"));
+      var f = inp.getAttribute("data-tt-field");
+      var key2 = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+      if (!TIMETABLES_CACHE[key2]) TIMETABLES_CACHE[key2] = { slots: [] };
+      var slot = TIMETABLES_CACHE[key2].slots[i];
+      if (!slot) return;
+      if (f === "weekday" || f === "hours") slot[f] = Number(inp.value);
+      else slot[f] = inp.value.trim();
+    });
+  });
+  tbody.querySelectorAll("[data-tt-del]").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      if (!isQaOfficer()) return;
+      var key2 = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+      var i = Number(btn.getAttribute("data-tt-del"));
+      TIMETABLES_CACHE[key2].slots.splice(i, 1);
+      renderTimetableEditor();
+    });
+  });
+}
+function addTimetableSlot() {
+  if (!isQaOfficer()) return;
+  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+  if (!TIMETABLES_CACHE) TIMETABLES_CACHE = {};
+  if (!TIMETABLES_CACHE[key]) TIMETABLES_CACHE[key] = { class_name: key, slots: [] };
+  TIMETABLES_CACHE[key].slots.push({ weekday: 0, code: "", start: "08:00", end: "10:00", hours: 2 });
+  renderTimetableEditor();
+}
+async function saveTimetableLocal() {
+  if (!isQaOfficer()) return;
+  // values already bound on change; ensure read all inputs once more
+  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+  await writeAudit({ action: "update", entity: "timetables", entityId: key, reason: "Timetable edited for " + key });
+  alert("Timetable saved in this browser. Click Publish all data to write data/timetables.json via the worker.");
+}
+function printSingleLectureReport(entry) {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to print."); return; }
+  if (!entry) return;
+  window.__lastReportEntries = [entry];
+  printLectureReport();
+}
+
 })();
   if (document.getElementById("qaDailyDate") && !document.getElementById("qaDailyDate").value) {
     document.getElementById("qaDailyDate").value = todayStr;
@@ -1263,6 +1354,9 @@ async function addCoursePrompt() {
   document.getElementById("btnSaveAttendance")?.addEventListener("click", saveAttendanceSheet);
   document.getElementById("btnPrintAttendance")?.addEventListener("click", printAttendanceSheet);
   document.getElementById("btnAddCourse")?.addEventListener("click", addCoursePrompt);
+  document.getElementById("btnAddTimetableSlot")?.addEventListener("click", addTimetableSlot);
+  document.getElementById("btnSaveTimetable")?.addEventListener("click", saveTimetableLocal);
+  document.getElementById("ttClassKey")?.addEventListener("change", renderTimetableEditor);
   document.getElementById("btnDownloadAudit")?.addEventListener("click", downloadAuditJson);
 }).catch(err => {
   console.error(err);
@@ -1542,7 +1636,9 @@ async function publishAllToRepo() {
     if (status) status.textContent = "Incorrect officer PIN.";
     return;
   }
-  try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config); } catch (_) {}
+  try {
+    APP_CONFIG = await fetchRepoJson(DATA_FILES.config + "?t=" + Date.now());
+  } catch (_) {}
   var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
   if (!workerUrl) {
     if (status) status.textContent = "Set publishWorkerUrl in data/config.json to your Cloudflare Worker URL, then reload.";
@@ -1563,8 +1659,8 @@ async function publishAllToRepo() {
     if (TIMETABLES_CACHE) files[DATA_FILES.timetables] = JSON.stringify(TIMETABLES_CACHE, null, 2);
     files[DATA_FILES.attendance] = JSON.stringify(await getAll("attendance"), null, 2);
 
-    var headers = { "Content-Type": "application/json" };
     var key = (APP_CONFIG.publishWorkerKey || "").trim();
+    var headers = { "Content-Type": "application/json" };
     if (key) headers["X-EOCNS-Key"] = key;
 
     var res = await fetch(workerUrl.replace(/\/$/, ""), {
@@ -1572,13 +1668,18 @@ async function publishAllToRepo() {
       headers: headers,
       body: JSON.stringify({
         message: "Update master data via EOCNS QA System",
+        publishKey: key,
         files: files
       })
     });
     var body = {};
     try { body = await res.json(); } catch (_) {}
     if (!res.ok) {
-      throw new Error(body.error || ("Worker HTTP " + res.status));
+      var msg = body.error || ("Worker HTTP " + res.status);
+      if (res.status === 401) {
+        msg += " — On your PC run: cd cloudflare-worker && npx wrangler secret put PUBLISH_KEY  (use exactly the publishWorkerKey from data/config.json), then npx wrangler deploy";
+      }
+      throw new Error(msg);
     }
     if (status) status.textContent = "Published via worker: " + ((body.updated && body.updated.join(", ")) || "ok");
     var panel = document.getElementById("qaTokenPanel");
@@ -1858,8 +1959,11 @@ async function renderQaDaily() {
     var badge = status === "Held" ? "badge--green" : status === "Missed" ? "badge--amber" : "badge--muted";
     var lecturer = ent ? (ent.lecturer || "—") : "—";
     var mins = ent && ent.duration != null ? ent.duration : "—";
+    var reportBtn = (ent && ent.id && isQaOfficer())
+      ? (' <button type="button" class="icon-btn-sm" data-report-qa="' + escapeHtml(ent.id) + '">Report</button>')
+      : "";
     var editCell = isQaOfficer()
-      ? ('<td class="qa-edit-only"><button type="button" class="icon-btn-sm" data-log-slot="' + escapeHtml(slot.code) + '|' + escapeHtml(slot.start) + '">Log</button></td>')
+      ? ('<td class="qa-edit-only"><button type="button" class="icon-btn-sm" data-log-slot="' + escapeHtml(slot.code) + '|' + escapeHtml(slot.start) + '">Log</button>' + reportBtn + '</td>')
       : '<td class="qa-edit-only"></td>';
     return "<tr><td>" + escapeHtml(slot.start + "–" + slot.end) + "</td><td>" + escapeHtml(courseName(slot.code)) +
       "</td><td>" + slot.hours + "</td><td><span class=\"badge " + badge + "\">" + escapeHtml(status) + "</span></td><td>" +
@@ -1890,6 +1994,14 @@ async function renderQaDaily() {
       document.getElementById("qaEntryCourse").value = courseName(parts[0]);
       document.getElementById("qaEntryDate").value = date;
       document.getElementById("qaEntryClass").value = classKey;
+    });
+  });
+  tbody.querySelectorAll("[data-report-qa]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      var id = btn.getAttribute("data-report-qa");
+      var all = await getQaEntries();
+      var entry = all.find(function(x) { return x.id === id; });
+      if (entry) printSingleLectureReport(entry);
     });
   });
   if (stats) {
@@ -2183,6 +2295,74 @@ async function addCoursePrompt() {
   await writeAudit({ action: "create", entity: "courses", entityId: code.trim(), reason: "New course " + code });
   await renderCoursesTable();
   if (typeof seedQaDatalists === "function") seedQaDatalists();
+}
+
+
+var WEEKDAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+async function renderTimetableEditor() {
+  await ensureTimetables();
+  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+  var tt = TIMETABLES_CACHE[key] || { class_name: key, slots: [] };
+  if (!tt.slots) tt.slots = [];
+  TIMETABLES_CACHE[key] = tt;
+  var tbody = document.getElementById("timetableSlotsBody");
+  if (!tbody) return;
+  if (!tt.slots.length) {
+    tbody.innerHTML = "<tr><td colspan=\"6\">No slots — add one.</td></tr>";
+    return;
+  }
+  tbody.innerHTML = tt.slots.map(function(s, idx) {
+    return "<tr>" +
+      "<td><input type=\"number\" min=\"0\" max=\"6\" data-tt-field=\"weekday\" data-tt-i=\"" + idx + "\" value=\"" + (s.weekday != null ? s.weekday : 0) + "\" style=\"width:56px\" /></td>" +
+      "<td><input type=\"text\" data-tt-field=\"code\" data-tt-i=\"" + idx + "\" value=\"" + escapeHtml(s.code || "") + "\" style=\"min-width:90px\" /></td>" +
+      "<td><input type=\"text\" data-tt-field=\"start\" data-tt-i=\"" + idx + "\" value=\"" + escapeHtml(s.start || "") + "\" style=\"width:80px\" /></td>" +
+      "<td><input type=\"text\" data-tt-field=\"end\" data-tt-i=\"" + idx + "\" value=\"" + escapeHtml(s.end || "") + "\" style=\"width:80px\" /></td>" +
+      "<td><input type=\"number\" min=\"0\" step=\"0.5\" data-tt-field=\"hours\" data-tt-i=\"" + idx + "\" value=\"" + (s.hours != null ? s.hours : 1) + "\" style=\"width:64px\" /></td>" +
+      "<td class=\"qa-edit-only\"><button type=\"button\" class=\"icon-btn-sm\" data-tt-del=\"" + idx + "\">Del</button></td></tr>";
+  }).join("");
+  tbody.querySelectorAll("[data-tt-field]").forEach(function(inp) {
+    inp.addEventListener("change", function() {
+      var i = Number(inp.getAttribute("data-tt-i"));
+      var f = inp.getAttribute("data-tt-field");
+      var key2 = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+      if (!TIMETABLES_CACHE[key2]) TIMETABLES_CACHE[key2] = { slots: [] };
+      var slot = TIMETABLES_CACHE[key2].slots[i];
+      if (!slot) return;
+      if (f === "weekday" || f === "hours") slot[f] = Number(inp.value);
+      else slot[f] = inp.value.trim();
+    });
+  });
+  tbody.querySelectorAll("[data-tt-del]").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      if (!isQaOfficer()) return;
+      var key2 = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+      var i = Number(btn.getAttribute("data-tt-del"));
+      TIMETABLES_CACHE[key2].slots.splice(i, 1);
+      renderTimetableEditor();
+    });
+  });
+}
+function addTimetableSlot() {
+  if (!isQaOfficer()) return;
+  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+  if (!TIMETABLES_CACHE) TIMETABLES_CACHE = {};
+  if (!TIMETABLES_CACHE[key]) TIMETABLES_CACHE[key] = { class_name: key, slots: [] };
+  TIMETABLES_CACHE[key].slots.push({ weekday: 0, code: "", start: "08:00", end: "10:00", hours: 2 });
+  renderTimetableEditor();
+}
+async function saveTimetableLocal() {
+  if (!isQaOfficer()) return;
+  // values already bound on change; ensure read all inputs once more
+  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+  await writeAudit({ action: "update", entity: "timetables", entityId: key, reason: "Timetable edited for " + key });
+  alert("Timetable saved in this browser. Click Publish all data to write data/timetables.json via the worker.");
+}
+function printSingleLectureReport(entry) {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to print."); return; }
+  if (!entry) return;
+  window.__lastReportEntries = [entry];
+  printLectureReport();
 }
 
 })();

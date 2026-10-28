@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=14" />
+  <link rel="stylesheet" href="style.css?v=15" />
 </head>
 <body class="role-viewer">
   <div class="app">
@@ -79,11 +79,13 @@
               <img src="https://www.easternoak.org/images/Eastern-OAK-logo-201.png" alt="Eastern Oak crest" />
             </div>
           </div>
-          <div class="stats-grid">
-            <div class="stat-card"><div class="stat-card__icon teal">👥</div><div class="stat-card__body"><span class="stat-card__value" id="statStudents">0</span><span class="stat-card__label">Registered Students</span></div></div>
+                    <div class="stats-grid">
+            <div class="stat-card"><div class="stat-card__icon teal">👥</div><div class="stat-card__body"><span class="stat-card__value" id="statStudents">0</span><span class="stat-card__label">Active students</span></div></div>
             <div class="stat-card"><div class="stat-card__icon indigo">🎓</div><div class="stat-card__body"><span class="stat-card__value" id="statLecturers">0</span><span class="stat-card__label">Lecturers</span></div></div>
-            <div class="stat-card"><div class="stat-card__icon amber">🏠</div><div class="stat-card__body"><span class="stat-card__value" id="statHostels">—</span><span class="stat-card__label">Hostels</span></div></div>
-            <div class="stat-card"><div class="stat-card__icon rose">📅</div><div class="stat-card__body"><span class="stat-card__value" id="statSessions">0</span><span class="stat-card__label">Active Sessions</span></div></div>
+            <div class="stat-card"><div class="stat-card__icon amber">📝</div><div class="stat-card__body"><span class="stat-card__value" id="statQaLogs">0</span><span class="stat-card__label">Lecture logs</span></div></div>
+            <div class="stat-card"><div class="stat-card__icon rose">📅</div><div class="stat-card__body"><span class="stat-card__value" id="statSessions">0</span><span class="stat-card__label">Active sessions</span></div></div>
+            <div class="stat-card"><div class="stat-card__icon teal">✅</div><div class="stat-card__body"><span class="stat-card__value" id="statAttendance">0</span><span class="stat-card__label">Attendance sheets</span></div></div>
+            <div class="stat-card"><div class="stat-card__icon indigo">📚</div><div class="stat-card__body"><span class="stat-card__value" id="statCourses">0</span><span class="stat-card__label">Courses</span></div></div>
           </div>
           <div class="grid-2">
             <div class="card"><div class="card__header"><h3>Quick Actions</h3></div><div class="card__body quick-actions">
@@ -198,8 +200,8 @@
             <div class="page-toolbar__left">
               <p class="muted-note" style="margin:0">Timetable slots for the day — mark each as delivered or missed (same workflow as the college QA analyser).</p>
             </div>
-            <div class="page-toolbar__right qa-edit-only">
-              <button class="btn btn--ghost" id="btnAddQaEntry">+ Extra lecture (not on timetable)</button>
+            <div class="page-toolbar__right" style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn--ghost qa-edit-only" id="btnAddQaEntry">+ Extra lecture</button>
             </div>
           </div>
           <div class="card" style="margin-bottom:16px">
@@ -247,7 +249,7 @@
             </div>
             <div class="card__body" style="overflow-x:auto">
               <table class="data-table">
-                <thead><tr><th>Time</th><th>Course</th><th>Hrs</th><th>Status</th><th>Lecturer</th><th>Actual mins</th><th class="qa-edit-only"></th></tr></thead>
+                <thead><tr><th>Time</th><th>Course</th><th>Hrs</th><th>Status</th><th>Lecturer</th><th>Actual mins</th><th class="qa-edit-only">Actions</th></tr></thead>
                 <tbody id="qaDailyTableBody"></tbody>
               </table>
               <div class="empty-state" id="qaDailyEmpty"><h3>Pick a date and class</h3><p>Then click Load day board to see timetable slots.</p></div>
@@ -502,7 +504,27 @@
             <div class="card__body" style="overflow-x:auto">
               <table class="data-table"><thead><tr><th>Code</th><th>Title</th><th class="qa-edit-only"></th></tr></thead>
               <tbody id="coursesTableBody"></tbody></table>
-              <p class="muted-note">Timetables live in <code>data/timetables.json</code> (class → weekday slots). Publish after course changes.</p>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px" id="timetableEditor">
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+              <h3 style="margin:0">Timetable editor</h3>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <select id="ttClassKey" class="qa-edit-only">
+                  <option value="100_nursing">100 Level Nursing</option>
+                  <option value="200_nursing">200 Level Nursing</option>
+                  <option value="200_midwifery">200 Level Midwifery</option>
+                </select>
+                <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnAddTimetableSlot">+ Slot</button>
+                <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnSaveTimetable">Save timetable</button>
+              </div>
+            </div>
+            <div class="card__body" style="overflow-x:auto">
+              <table class="data-table">
+                <thead><tr><th>Weekday</th><th>Code</th><th>Start</th><th>End</th><th>Hours</th><th class="qa-edit-only"></th></tr></thead>
+                <tbody id="timetableSlotsBody"></tbody>
+              </table>
+              <p class="muted-note">Weekday: 0=Mon … 4=Fri. Save stores in memory then Publish to write <code>data/timetables.json</code>.</p>
             </div>
           </div>
         </section>
@@ -627,6 +649,6 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=14"></script>
+  <script src="app.js?v=15"></script>
 </body>
 </html>

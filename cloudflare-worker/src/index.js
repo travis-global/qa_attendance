@@ -91,17 +91,6 @@ export default {
       });
     }
 
-    // Optional shared key (Worker secret PUBLISH_KEY)
-    if (env.PUBLISH_KEY) {
-      const key = request.headers.get("X-EOCNS-Key") || "";
-      if (key !== env.PUBLISH_KEY) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
-          status: 401,
-          headers: { ...cors, "Content-Type": "application/json" },
-        });
-      }
-    }
-
     let payload;
     try {
       payload = await request.json();
@@ -110,6 +99,26 @@ export default {
         status: 400,
         headers: { ...cors, "Content-Type": "application/json" },
       });
+    }
+
+    // Optional shared key (Worker secret PUBLISH_KEY) — header or body.publishKey
+    if (env.PUBLISH_KEY) {
+      const key =
+        request.headers.get("X-EOCNS-Key") ||
+        (payload && payload.publishKey) ||
+        "";
+      if (key !== env.PUBLISH_KEY) {
+        return new Response(
+          JSON.stringify({
+            error:
+              "Unauthorized: PUBLISH_KEY mismatch. Re-run: npx wrangler secret put PUBLISH_KEY and set the same value in data/config.json publishWorkerKey",
+          }),
+          {
+            status: 401,
+            headers: { ...cors, "Content-Type": "application/json" },
+          }
+        );
+      }
     }
 
     const files = payload && payload.files;
