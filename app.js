@@ -1153,251 +1153,35 @@ openDB().then(async () => {
 
   // QA module
   seedQaDatalists();
-  const todayStr = (() => { const d = new Date(); return d.toISOString().slice(0, 10); 
-async function buildAttendanceSheet() {
-  await loadStudents();
-  await fillProgrammeLevelSelects();
-  var prog = (document.getElementById("attProgramme") && document.getElementById("attProgramme").value) || "";
-  var level = (document.getElementById("attLevel") && document.getElementById("attLevel").value) || "";
-  var date = (document.getElementById("attSheetDate") && document.getElementById("attSheetDate").value) || new Date().toISOString().slice(0, 10);
-  var course = (document.getElementById("attCourseLabel") && document.getElementById("attCourseLabel").value.trim()) || "";
-  var list = studentsCache.filter(function(s) {
-    if (s.status && s.status !== "Active") return false;
-    if (prog && String(s.programme || "") !== prog) return false;
-    if (level && String(s.level || "") !== String(level)) return false;
-    return true;
-  }).sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
-
-  // Load existing marks for this sheet key
-  var sheetKey = [date, prog, level, course].join("|");
-  var existing = (await getAll("attendance")).find(function(r) { return r.sheetKey === sheetKey; });
-  var marks = (existing && existing.marks) || {};
-
-  var title = document.getElementById("attendanceSheetTitle");
-  if (title) title.textContent = "Attendance — " + (prog || "All programmes") + " · Level " + (level || "all") + " · " + date;
-  var body = document.getElementById("attendanceSheetBody");
-  if (!body) return;
-  if (!list.length) {
-    body.innerHTML = "<div class=\"empty-state\"><h3>No students</h3><p>No active students match these filters.</p></div>";
-    return;
-  }
-  window.__attSheetMeta = { sheetKey: sheetKey, date: date, programme: prog, level: level, course: course, studentIds: list.map(function(s) { return s.id; }) };
-  var rows = list.map(function(s, i) {
-    var m = marks[s.id] || "";
-    var pChecked = m === "P" ? " checked" : "";
-    var aChecked = m === "A" ? " checked" : "";
-    return "<tr data-stu=\"" + s.id + "\"><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
-      "</td><td>" + escapeHtml(s.programme || "") + "</td><td>" + escapeHtml(String(s.level || "")) +
-      "</td><td class=\"qa-edit-only\"><input type=\"radio\" name=\"att-" + s.id + "\" value=\"P\"" + pChecked + " /></td>" +
-      "<td class=\"qa-edit-only\"><input type=\"radio\" name=\"att-" + s.id + "\" value=\"A\"" + aChecked + " /></td>" +
-      "<td></td></tr>";
-  }).join("");
-  body.innerHTML = "<div class=\"print-report\" id=\"attendancePrintRoot\">" +
-    "<h1>EOCNS Class Attendance Sheet</h1>" +
-    "<div class=\"sub\">" + escapeHtml(course || "General") + " · " + escapeHtml(date) + " · " + list.length + " students</div>" +
-    "<table><thead><tr><th>#</th><th>Name</th><th>Reg No</th><th>Programme</th><th>Level</th><th>P</th><th>A</th><th>Signature</th></tr></thead><tbody>" +
-    rows + "</tbody></table>" +
-    "<p style=\"margin-top:24px;font-size:0.85rem\">Lecturer: ______________________ &nbsp;&nbsp; Date: " + escapeHtml(date) + "</p>" +
-    "</div>";
-}
-async function saveAttendanceSheet() {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to save attendance."); return; }
-  var meta = window.__attSheetMeta;
-  if (!meta) { alert("Build a sheet first."); return; }
-  var marks = {};
-  (meta.studentIds || []).forEach(function(id) {
-    var el = document.querySelector('input[name="att-' + id + '"]:checked');
-    if (el) marks[id] = el.value;
-  });
-  var now = new Date().toISOString();
-  var all = await getAll("attendance");
-  var prev = all.find(function(r) { return r.sheetKey === meta.sheetKey; });
-  var rec = {
-    id: prev ? prev.id : ("att_" + Date.now().toString(36)),
-    sheetKey: meta.sheetKey,
-    date: meta.date,
-    programme: meta.programme,
-    level: meta.level,
-    course: meta.course,
-    marks: marks,
-    updatedAt: now,
-    createdAt: prev ? prev.createdAt : now
-  };
-  await put("attendance", rec);
-  await writeAudit({ action: prev ? "update" : "create", entity: "attendance", entityId: rec.id, reason: "Class attendance saved", details: { date: meta.date, course: meta.course, count: Object.keys(marks).length } });
-  alert("Attendance saved for " + meta.date + (meta.course ? " · " + meta.course : "") + ". Publish to repository when ready.");
-}
-
-function printAttendanceSheet() {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to print/export sheets."); return; }
-  window.print();
-}
-function printLectureReport() {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to print reports."); return; }
-  var entries = window.__lastReportEntries || [];
-  if (!entries.length) { alert("Build a filtered report first."); return; }
-  var w = window.open("", "_blank");
-  if (!w) { alert("Allow pop-ups to print."); return; }
-  var blocks = entries.map(function(e, i) {
-    return "<div style=\"margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid #ccc\">" +
-      "<h2 style=\"color:#1B3A6B;font-size:1.05rem;margin:0 0 6px\">" + (i + 1) + ". " + (e.course || "Course") + "</h2>" +
-      "<table><tr><td><b>Date</b></td><td>" + (e.date || "") + "</td><td><b>Class</b></td><td>" + (e.classKey || "") + "</td></tr>" +
-      "<tr><td><b>Lecturer</b></td><td>" + (e.lecturer || "") + "</td><td><b>Time</b></td><td>" + [e.start, e.end].filter(Boolean).join(" – ") + "</td></tr>" +
-      "<tr><td><b>Status</b></td><td>" + (e.status || "") + "</td><td><b>Duration</b></td><td>" + (e.duration != null ? e.duration + " min" : "") + "</td></tr>" +
-      "<tr><td><b>Topic</b></td><td colspan=\"3\">" + (e.topic || "—") + "</td></tr>" +
-      "<tr><td><b>Objectives</b></td><td colspan=\"3\">" + (e.objectives || "—") + "</td></tr>" +
-      "<tr><td><b>Summary</b></td><td colspan=\"3\">" + (e.lectureSummary || "—") + "</td></tr>" +
-      "<tr><td><b>Assignment</b></td><td colspan=\"3\">" + (e.assignment || "—") + "</td></tr>" +
-      "<tr><td><b>Remarks</b></td><td colspan=\"3\">" + (e.remark || "—") + "</td></tr>" +
-      "<tr><td><b>Absent</b></td><td colspan=\"3\">" + (Array.isArray(e.absent) ? e.absent.join(", ") : (e.absent || "—")) + "</td></tr>" +
-      "</table></div>";
-  }).join("");
-  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Lecture Report</title><style>" +
-    "body{font-family:Georgia,serif;color:#1a1a2e;padding:28px;max-width:860px;margin:0 auto}" +
-    "h1{color:#1B3A6B;text-align:center;margin-bottom:4px}" +
-    ".sub{text-align:center;color:#555;margin-bottom:20px;font-size:13px}" +
-    "table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}" +
-    "td{border:1px solid #bbb;padding:5px 8px;vertical-align:top}" +
-    "@media print{body{padding:0}}</style></head><body>" +
-    "<h1>EOCNS Lecture Report</h1><div class=\"sub\">Quality Assurance · " + entries.length + " lecture log(s) · " + new Date().toLocaleString() + "</div>" +
-    blocks + "</body></html>");
-  w.document.close();
-  w.focus();
-  setTimeout(function() { w.print(); }, 300);
-}
-async function downloadAuditJson() {
-  if (!isQaOfficer()) return;
-  var list = await getAll("audit");
-  downloadJsonReport("EOCNS_Audit_" + new Date().toISOString().slice(0, 10) + ".json", { exportedAt: new Date().toISOString(), entries: list });
-}
-
-
-async function renderCoursesTable() {
-  COURSES_CACHE = await getAll("courses");
-  var tbody = document.getElementById("coursesTableBody");
-  if (!tbody) return;
-  tbody.innerHTML = COURSES_CACHE.length ? COURSES_CACHE.map(function(c) {
-    var del = isQaOfficer() ? ('<button type="button" class="icon-btn-sm" data-del-course="' + escapeHtml(c.code) + '">Del</button>') : "";
-    return "<tr><td>" + escapeHtml(c.code) + "</td><td>" + escapeHtml(c.name || "") + "</td><td class=\"qa-edit-only\">" + del + "</td></tr>";
-  }).join("") : "<tr><td colspan=\"3\">No courses yet</td></tr>";
-  tbody.querySelectorAll("[data-del-course]").forEach(function(btn) {
-    btn.addEventListener("click", async function() {
-      if (!isQaOfficer()) return;
-      if (!confirm("Remove course " + btn.getAttribute("data-del-course") + "?")) return;
-      await del("courses", btn.getAttribute("data-del-course"));
-      await writeAudit({ action: "delete", entity: "courses", entityId: btn.getAttribute("data-del-course"), reason: "Course removed" });
-      await renderCoursesTable();
-      seedQaDatalists && seedQaDatalists();
-    });
-  });
-}
-async function addCoursePrompt() {
-  if (!isQaOfficer()) return;
-  var code = prompt("Course code (e.g. NUS 121)");
-  if (!code) return;
-  var name = prompt("Course title", "") || "";
-  await put("courses", { code: code.trim(), name: name.trim(), classKeys: [] });
-  await writeAudit({ action: "create", entity: "courses", entityId: code.trim(), reason: "New course " + code });
-  await renderCoursesTable();
-  if (typeof seedQaDatalists === "function") seedQaDatalists();
-}
-
-
-var WEEKDAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-async function renderTimetableEditor() {
-  await ensureTimetables();
-  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
-  var tt = TIMETABLES_CACHE[key] || { class_name: key, slots: [] };
-  if (!tt.slots) tt.slots = [];
-  TIMETABLES_CACHE[key] = tt;
-  var tbody = document.getElementById("timetableSlotsBody");
-  if (!tbody) return;
-  if (!tt.slots.length) {
-    tbody.innerHTML = "<tr><td colspan=\"6\">No slots — add one.</td></tr>";
-    return;
-  }
-  tbody.innerHTML = tt.slots.map(function(s, idx) {
-    return "<tr>" +
-      "<td><input type=\"number\" min=\"0\" max=\"6\" data-tt-field=\"weekday\" data-tt-i=\"" + idx + "\" value=\"" + (s.weekday != null ? s.weekday : 0) + "\" style=\"width:56px\" /></td>" +
-      "<td><input type=\"text\" data-tt-field=\"code\" data-tt-i=\"" + idx + "\" value=\"" + escapeHtml(s.code || "") + "\" style=\"min-width:90px\" /></td>" +
-      "<td><input type=\"text\" data-tt-field=\"start\" data-tt-i=\"" + idx + "\" value=\"" + escapeHtml(s.start || "") + "\" style=\"width:80px\" /></td>" +
-      "<td><input type=\"text\" data-tt-field=\"end\" data-tt-i=\"" + idx + "\" value=\"" + escapeHtml(s.end || "") + "\" style=\"width:80px\" /></td>" +
-      "<td><input type=\"number\" min=\"0\" step=\"0.5\" data-tt-field=\"hours\" data-tt-i=\"" + idx + "\" value=\"" + (s.hours != null ? s.hours : 1) + "\" style=\"width:64px\" /></td>" +
-      "<td class=\"qa-edit-only\"><button type=\"button\" class=\"icon-btn-sm\" data-tt-del=\"" + idx + "\">Del</button></td></tr>";
-  }).join("");
-  tbody.querySelectorAll("[data-tt-field]").forEach(function(inp) {
-    inp.addEventListener("change", function() {
-      var i = Number(inp.getAttribute("data-tt-i"));
-      var f = inp.getAttribute("data-tt-field");
-      var key2 = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
-      if (!TIMETABLES_CACHE[key2]) TIMETABLES_CACHE[key2] = { slots: [] };
-      var slot = TIMETABLES_CACHE[key2].slots[i];
-      if (!slot) return;
-      if (f === "weekday" || f === "hours") slot[f] = Number(inp.value);
-      else slot[f] = inp.value.trim();
-    });
-  });
-  tbody.querySelectorAll("[data-tt-del]").forEach(function(btn) {
-    btn.addEventListener("click", function() {
-      if (!isQaOfficer()) return;
-      var key2 = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
-      var i = Number(btn.getAttribute("data-tt-del"));
-      TIMETABLES_CACHE[key2].slots.splice(i, 1);
-      renderTimetableEditor();
-    });
-  });
-}
-function addTimetableSlot() {
-  if (!isQaOfficer()) return;
-  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
-  if (!TIMETABLES_CACHE) TIMETABLES_CACHE = {};
-  if (!TIMETABLES_CACHE[key]) TIMETABLES_CACHE[key] = { class_name: key, slots: [] };
-  TIMETABLES_CACHE[key].slots.push({ weekday: 0, code: "", start: "08:00", end: "10:00", hours: 2 });
-  renderTimetableEditor();
-}
-async function saveTimetableLocal() {
-  if (!isQaOfficer()) return;
-  // values already bound on change; ensure read all inputs once more
-  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
-  await writeAudit({ action: "update", entity: "timetables", entityId: key, reason: "Timetable edited for " + key });
-  alert("Timetable saved in this browser. Click Publish all data to write data/timetables.json via the worker.");
-}
-function printSingleLectureReport(entry) {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to print."); return; }
-  if (!entry) return;
-  window.__lastReportEntries = [entry];
-  printLectureReport();
-}
-
-})();
+  const todayStr = (function() { var d = new Date(); return d.toISOString().slice(0, 10); })();
   if (document.getElementById("qaDailyDate") && !document.getElementById("qaDailyDate").value) {
     document.getElementById("qaDailyDate").value = todayStr;
   }
-  document.getElementById("btnAddQaEntry")?.addEventListener("click", () => openQaEntryForm());
-  document.getElementById("qaEntryForm")?.addEventListener("submit", saveQaEntry);
-  document.getElementById("btnCancelQaEntry")?.addEventListener("click", closeQaEntryForm);
-  document.getElementById("btnCancelQaEntry2")?.addEventListener("click", closeQaEntryForm);
-  document.getElementById("qaEntryModalBackdrop")?.addEventListener("click", closeQaEntryForm);
-  document.getElementById("btnFilterQaDaily")?.addEventListener("click", renderQaDaily);
-  document.getElementById("qaDailyDate")?.addEventListener("change", renderQaDaily);
-  document.getElementById("qaDailyClass")?.addEventListener("change", renderQaDaily);
-  document.getElementById("btnBuildWeeklyQa")?.addEventListener("click", buildWeeklyQaReport);
-  document.getElementById("btnBuildMonthlyQa")?.addEventListener("click", buildMonthlyQaReport);
-  document.getElementById("btnAddProgramme")?.addEventListener("click", addProgrammePrompt);
-  document.getElementById("btnAddLevel")?.addEventListener("click", addLevelPrompt);
-  document.getElementById("btnFilterReports")?.addEventListener("click", renderReportsView);
-  document.getElementById("btnExportLectureLogs")?.addEventListener("click", exportLectureLogs);
-  document.getElementById("btnDownloadFilteredReports")?.addEventListener("click", exportLectureLogs);
-  document.getElementById("btnPrintLectureReport")?.addEventListener("click", printLectureReport);
-  document.getElementById("btnBuildAttendance")?.addEventListener("click", buildAttendanceSheet);
-  document.getElementById("btnSaveAttendance")?.addEventListener("click", saveAttendanceSheet);
-  document.getElementById("btnPrintAttendance")?.addEventListener("click", printAttendanceSheet);
-  document.getElementById("btnAddCourse")?.addEventListener("click", addCoursePrompt);
-  document.getElementById("btnAddTimetableSlot")?.addEventListener("click", addTimetableSlot);
-  document.getElementById("btnSaveTimetable")?.addEventListener("click", saveTimetableLocal);
-  document.getElementById("ttClassKey")?.addEventListener("change", renderTimetableEditor);
-  document.getElementById("btnDownloadAudit")?.addEventListener("click", downloadAuditJson);
+  document.getElementById("btnAddQaEntry") && document.getElementById("btnAddQaEntry").addEventListener("click", function() { openQaEntryForm(); });
+  document.getElementById("qaEntryForm") && document.getElementById("qaEntryForm").addEventListener("submit", saveQaEntry);
+  document.getElementById("btnCancelQaEntry") && document.getElementById("btnCancelQaEntry").addEventListener("click", closeQaEntryForm);
+  document.getElementById("btnCancelQaEntry2") && document.getElementById("btnCancelQaEntry2").addEventListener("click", closeQaEntryForm);
+  document.getElementById("qaEntryModalBackdrop") && document.getElementById("qaEntryModalBackdrop").addEventListener("click", closeQaEntryForm);
+  document.getElementById("btnFilterQaDaily") && document.getElementById("btnFilterQaDaily").addEventListener("click", renderQaDaily);
+  document.getElementById("qaDailyDate") && document.getElementById("qaDailyDate").addEventListener("change", renderQaDaily);
+  document.getElementById("qaDailyClass") && document.getElementById("qaDailyClass").addEventListener("change", renderQaDaily);
+  document.getElementById("btnBuildWeeklyQa") && document.getElementById("btnBuildWeeklyQa").addEventListener("click", buildWeeklyQaReport);
+  document.getElementById("btnBuildMonthlyQa") && document.getElementById("btnBuildMonthlyQa").addEventListener("click", buildMonthlyQaReport);
+  document.getElementById("btnAddProgramme") && document.getElementById("btnAddProgramme").addEventListener("click", addProgrammePrompt);
+  document.getElementById("btnAddLevel") && document.getElementById("btnAddLevel").addEventListener("click", addLevelPrompt);
+  document.getElementById("btnFilterReports") && document.getElementById("btnFilterReports").addEventListener("click", renderReportsView);
+  document.getElementById("btnExportLectureLogs") && document.getElementById("btnExportLectureLogs").addEventListener("click", exportLectureLogs);
+  document.getElementById("btnDownloadFilteredReports") && document.getElementById("btnDownloadFilteredReports").addEventListener("click", exportLectureLogs);
+  document.getElementById("btnPrintLectureReport") && document.getElementById("btnPrintLectureReport").addEventListener("click", printLectureReport);
+  document.getElementById("btnBuildAttendance") && document.getElementById("btnBuildAttendance").addEventListener("click", buildAttendanceSheet);
+  document.getElementById("btnSaveAttendance") && document.getElementById("btnSaveAttendance").addEventListener("click", saveAttendanceSheet);
+  document.getElementById("btnPrintAttendance") && document.getElementById("btnPrintAttendance").addEventListener("click", printAttendanceSheet);
+  document.getElementById("btnAddCourse") && document.getElementById("btnAddCourse").addEventListener("click", addCoursePrompt);
+  document.getElementById("btnAddTimetableSlot") && document.getElementById("btnAddTimetableSlot").addEventListener("click", addTimetableSlot);
+  document.getElementById("btnSaveTimetable") && document.getElementById("btnSaveTimetable").addEventListener("click", saveTimetableLocal);
+  document.getElementById("ttClassKey") && document.getElementById("ttClassKey").addEventListener("change", renderTimetableEditor);
+  document.getElementById("btnDownloadAudit") && document.getElementById("btnDownloadAudit").addEventListener("click", downloadAuditJson);
+
   } catch (bootErr) {
     console.error("post-db boot", bootErr);
     alert("App loaded the database but a startup step failed.\n\nCause: " + (bootErr && bootErr.message ? bootErr.message : String(bootErr)) + "\n\nCheck the browser console (F12) for details. You can still try Settings → Publish after reload.");
@@ -2436,6 +2220,35 @@ function printSingleLectureReport(entry) {
   if (!entry) return;
   window.__lastReportEntries = [entry];
   printLectureReport();
+}
+
+
+async function saveAttendanceSheet() {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to save attendance."); return; }
+  var meta = window.__attSheetMeta;
+  if (!meta) { alert("Build a sheet first."); return; }
+  var marks = {};
+  (meta.studentIds || []).forEach(function(id) {
+    var el = document.querySelector('input[name="att-' + id + '"]:checked');
+    if (el) marks[id] = el.value;
+  });
+  var now = new Date().toISOString();
+  var all = await getAll("attendance");
+  var prev = all.find(function(r) { return r.sheetKey === meta.sheetKey; });
+  var rec = {
+    id: prev ? prev.id : ("att_" + Date.now().toString(36)),
+    sheetKey: meta.sheetKey,
+    date: meta.date,
+    programme: meta.programme,
+    level: meta.level,
+    course: meta.course,
+    marks: marks,
+    updatedAt: now,
+    createdAt: prev ? prev.createdAt : now
+  };
+  await put("attendance", rec);
+  await writeAudit({ action: prev ? "update" : "create", entity: "attendance", entityId: rec.id, reason: "Class attendance saved", details: { date: meta.date, course: meta.course, count: Object.keys(marks).length } });
+  alert("Attendance saved. Publish to repository when ready.");
 }
 
 })();
