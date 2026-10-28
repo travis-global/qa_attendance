@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "lec_mvrzl49lolixb",
+    "name": "Jane Doe",
+    "staffId": "001",
+    "phone": "",
+    "courses": [
+      "History"
+    ],
+    "status": "Active",
+    "createdAt": "2026-10-28T10:43:41.145Z",
+    "updatedAt": "2026-10-28T10:43:41.145Z"
+  }
+]
