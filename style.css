@@ -1024,3 +1024,30 @@ body.role-officer th.qa-edit-only { display: table-cell; }
   color: inherit;
 }
 .icon-btn-sm:hover { background: var(--surface-2, #f1f5f9); }
+
+
+@media print {
+  body * { visibility: hidden; }
+  #attendanceSheetCard, #attendanceSheetCard *,
+  #printReportRoot, #printReportRoot * {
+    visibility: visible;
+  }
+  #attendanceSheetCard, #printReportRoot {
+    position: absolute; left: 0; top: 0; width: 100%;
+    background: white; color: #111;
+  }
+  .sidebar, .topbar, .page-toolbar, .nav-item, .btn { display: none !important; }
+}
+.print-report {
+  font-family: Georgia, "Times New Roman", serif;
+  color: #1a1a2e;
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.print-report h1 { font-size: 1.4rem; text-align: center; margin: 0 0 4px; color: #1B3A6B; }
+.print-report .sub { text-align: center; font-size: 0.85rem; color: #555; margin-bottom: 16px; }
+.print-report table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.print-report th, .print-report td { border: 1px solid #999; padding: 6px 8px; text-align: left; }
+.print-report th { background: #1B3A6B; color: #fff; }
+.print-report .section-title { margin: 18px 0 8px; font-size: 1rem; color: #1B3A6B; border-left: 4px solid #B8860B; padding-left: 8px; }

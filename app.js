@@ -52,6 +52,8 @@ function showView(viewId) {
   if (viewId === "qa-monthly") initQaMonthlyView();
   if (viewId === "settings") renderProgrammesLevels();
   if (viewId === "reports") renderReportsView();
+  if (viewId === "attendance") { fillProgrammeLevelSelects(); if (document.getElementById("attSheetDate") && !document.getElementById("attSheetDate").value) document.getElementById("attSheetDate").value = new Date().toISOString().slice(0, 10); }
+  if (viewId === "audit") renderAuditLog();
 }
 document.querySelectorAll("[data-view]").forEach((el) => {
   el.addEventListener("click", (e) => { e.preventDefault(); showView(el.dataset.view); });
@@ -469,7 +471,7 @@ async function fillProgrammeLevelSelects() {
     var v = l.value != null ? l.value : l.name;
     return '<option value="' + escapeHtml(String(v)) + '">' + escapeHtml(l.name) + "</option>";
   }).join("");
-  ["studentProgramme", "filterProgramme", "bulkProgramme"].forEach(function(id) {
+  ["studentProgramme", "filterProgramme", "bulkProgramme", "attProgramme"].forEach(function(id) {
     var el = document.getElementById(id);
     if (!el) return;
     var cur = el.value;
@@ -477,7 +479,7 @@ async function fillProgrammeLevelSelects() {
     el.innerHTML = first + progOpts;
     if (cur) el.value = cur;
   });
-  ["studentLevel", "filterLevel", "bulkLevel"].forEach(function(id) {
+  ["studentLevel", "filterLevel", "bulkLevel", "attLevel"].forEach(function(id) {
     var el = document.getElementById(id);
     if (!el) return;
     var cur = el.value;
@@ -594,15 +596,29 @@ async function deleteSession(id) {
   refreshDashboardStats();
 }
 async function renderAuditLog() {
-  const list = await getAll("audit");
-  list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  const container = document.getElementById("auditList");
-  if (!container) return;
-  if (!list.length) { container.innerHTML = "<p>No audit entries yet.</p>"; return; }
-  container.innerHTML = list.map(entry => {
-    const sourceLabel = entry.source === "official-letter" ? "<span class=\"badge badge--teal\" style=\"margin-left:6px\">Official Letter</span>" : "<span class=\"badge badge--muted\" style=\"margin-left:6px\">System</span>";
-    return "<div class=\"audit-item\"><div class=\"audit-item__ref\">" + escapeHtml(entry.ref) + "</div><div class=\"audit-item__body\"><div class=\"audit-item__action\"><span class=\"badge badge--" + (entry.action === "create" ? "green" : "amber") + "\">" + escapeHtml(entry.action) + "</span> <strong>" + escapeHtml(entry.entity) + "</strong>" + sourceLabel + "</div><div class=\"audit-item__reason\">" + escapeHtml(entry.reason || "-") + "</div><div class=\"audit-item__meta\">" + formatDate(entry.timestamp) + " · " + escapeHtml(entry.user || "System") + "</div></div></div>";
-  }).join("");
+  var denied = document.getElementById("auditDeniedCard");
+  var officer = document.getElementById("auditOfficerCard");
+  if (!isQaOfficer()) {
+    if (denied) denied.hidden = false;
+    if (officer) officer.hidden = true;
+    return;
+  }
+  if (denied) denied.hidden = true;
+  if (officer) officer.hidden = false;
+  var list = await getAll("audit");
+  list.sort(function(a, b) { return String(b.at || b.createdAt || "").localeCompare(String(a.at || a.createdAt || "")); });
+  var el = document.getElementById("auditList");
+  if (!el) return;
+  if (!list.length) {
+    el.innerHTML = "<p class=\"muted-note\">No audit entries yet.</p>";
+    return;
+  }
+  el.innerHTML = "<table class=\"data-table\"><thead><tr><th>When</th><th>Action</th><th>Entity</th><th>Reason / REF</th><th>By</th></tr></thead><tbody>" +
+    list.slice(0, 200).map(function(a) {
+      return "<tr><td>" + escapeHtml((a.at || a.createdAt || "").slice(0, 19).replace("T", " ")) +
+        "</td><td>" + escapeHtml(a.action || "") + "</td><td>" + escapeHtml((a.entity || "") + " " + (a.entityId || "")) +
+        "</td><td>" + escapeHtml(a.reason || a.externalRef || "—") + "</td><td>" + escapeHtml(a.officer || "QA") + "</td></tr>";
+    }).join("") + "</tbody></table>";
 }
 async function refreshDashboardStats() {
   if (!db) return;
@@ -1069,7 +1085,74 @@ openDB().then(async () => {
 
   // QA module
   seedQaDatalists();
-  const todayStr = (() => { const d = new Date(); return d.toISOString().slice(0, 10); })();
+  const todayStr = (() => { const d = new Date(); return d.toISOString().slice(0, 10); 
+async function buildAttendanceSheet() {
+  await loadStudents();
+  await fillProgrammeLevelSelects();
+  var prog = (document.getElementById("attProgramme") && document.getElementById("attProgramme").value) || "";
+  var level = (document.getElementById("attLevel") && document.getElementById("attLevel").value) || "";
+  var date = (document.getElementById("attSheetDate") && document.getElementById("attSheetDate").value) || new Date().toISOString().slice(0, 10);
+  var course = (document.getElementById("attCourseLabel") && document.getElementById("attCourseLabel").value.trim()) || "";
+  var list = studentsCache.filter(function(s) {
+    if (s.status && s.status !== "Active") return false;
+    if (prog && String(s.programme || "") !== prog) return false;
+    if (level && String(s.level || "") !== String(level)) return false;
+    return true;
+  }).sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
+  var title = document.getElementById("attendanceSheetTitle");
+  if (title) title.textContent = "Attendance — " + (prog || "All programmes") + " · Level " + (level || "all") + " · " + date;
+  var body = document.getElementById("attendanceSheetBody");
+  if (!body) return;
+  if (!list.length) {
+    body.innerHTML = "<div class=\"empty-state\"><h3>No students</h3><p>No active students match these filters.</p></div>";
+    return;
+  }
+  var rows = list.map(function(s, i) {
+    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
+      "</td><td>" + escapeHtml(s.programme || "") + "</td><td>" + escapeHtml(String(s.level || "")) +
+      "</td><td style=\"width:48px\"></td><td style=\"width:48px\"></td><td style=\"width:120px\"></td></tr>";
+  }).join("");
+  body.innerHTML = "<div class=\"print-report\" id=\"attendancePrintRoot\">" +
+    "<h1>EOCNS Class Attendance Sheet</h1>" +
+    "<div class=\"sub\">" + escapeHtml(course || "General") + " · " + escapeHtml(date) + " · " + list.length + " students</div>" +
+    "<table><thead><tr><th>#</th><th>Name</th><th>Reg No</th><th>Programme</th><th>Level</th><th>P</th><th>A</th><th>Signature</th></tr></thead><tbody>" +
+    rows + "</tbody></table>" +
+    "<p style=\"margin-top:24px;font-size:0.85rem\">Lecturer: ______________________ &nbsp;&nbsp; Date: " + escapeHtml(date) + "</p>" +
+    "</div>";
+}
+function printAttendanceSheet() {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to print/export sheets."); return; }
+  window.print();
+}
+function printLectureReport() {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to print reports."); return; }
+  var entries = window.__lastReportEntries || [];
+  if (!entries.length) { alert("Build a filtered report first."); return; }
+  var w = window.open("", "_blank");
+  if (!w) { alert("Allow pop-ups to print."); return; }
+  var rows = entries.map(function(e) {
+    return "<tr><td>" + (e.date || "") + "</td><td>" + (e.course || "") + "</td><td>" + (e.lecturer || "") +
+      "</td><td>" + [e.start, e.end].filter(Boolean).join("–") + "</td><td>" + (e.status || "") +
+      "</td><td>" + (e.topic || "") + "</td><td>" + (Array.isArray(e.absent) ? e.absent.join(", ") : "") + "</td></tr>";
+  }).join("");
+  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Lecture Report</title><style>" +
+    "body{font-family:Georgia,serif;color:#1a1a2e;padding:24px} h1{color:#1B3A6B;text-align:center}" +
+    "table{width:100%;border-collapse:collapse;font-size:12px} th,td{border:1px solid #999;padding:6px;text-align:left}" +
+    "th{background:#1B3A6B;color:#fff} .sub{text-align:center;color:#555;margin-bottom:16px}</style></head><body>" +
+    "<h1>EOCNS Lecture Report</h1><div class=\"sub\">Master log · " + entries.length + " entries · " + new Date().toLocaleString() + "</div>" +
+    "<table><thead><tr><th>Date</th><th>Course</th><th>Lecturer</th><th>Time</th><th>Status</th><th>Topic</th><th>Absent</th></tr></thead><tbody>" +
+    rows + "</tbody></table></body></html>");
+  w.document.close();
+  w.focus();
+  w.print();
+}
+async function downloadAuditJson() {
+  if (!isQaOfficer()) return;
+  var list = await getAll("audit");
+  downloadJsonReport("EOCNS_Audit_" + new Date().toISOString().slice(0, 10) + ".json", { exportedAt: new Date().toISOString(), entries: list });
+}
+
+})();
   if (document.getElementById("qaDailyDate") && !document.getElementById("qaDailyDate").value) {
     document.getElementById("qaDailyDate").value = todayStr;
   }
@@ -1088,6 +1171,10 @@ openDB().then(async () => {
   document.getElementById("btnFilterReports")?.addEventListener("click", renderReportsView);
   document.getElementById("btnExportLectureLogs")?.addEventListener("click", exportLectureLogs);
   document.getElementById("btnDownloadFilteredReports")?.addEventListener("click", exportLectureLogs);
+  document.getElementById("btnPrintLectureReport")?.addEventListener("click", printLectureReport);
+  document.getElementById("btnBuildAttendance")?.addEventListener("click", buildAttendanceSheet);
+  document.getElementById("btnPrintAttendance")?.addEventListener("click", printAttendanceSheet);
+  document.getElementById("btnDownloadAudit")?.addEventListener("click", downloadAuditJson);
 }).catch(err => {
   console.error(err);
   alert("Could not initialise the local database.");
@@ -1132,6 +1219,7 @@ function setQaOfficer(on) {
   document.body.classList.toggle("role-officer", !!on);
   document.body.classList.toggle("role-viewer", !on);
   updateQaOfficerUI();
+  try { renderAuditLog(); } catch (_) {}
 }
 
 function updateQaOfficerUI() {
@@ -1363,12 +1451,16 @@ async function publishAllToRepo() {
     if (status) status.textContent = "Incorrect officer PIN.";
     return;
   }
-  try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config); } catch (_) {}
-  var token = (APP_CONFIG && APP_CONFIG.githubToken) || "";
+  var tokenEl = document.getElementById("qaSessionToken");
+  var token = (tokenEl && tokenEl.value.trim()) || "";
+  try {
+    if (!token) token = sessionStorage.getItem("eocns-publish-token") || "";
+  } catch (_) {}
   if (!token) {
-    if (status) status.textContent = "No githubToken in data/config.json. Add a fine-grained PAT with Contents write, then reload.";
+    if (status) status.textContent = "Paste a fine-grained token for this session (Contents: Read and write). It is not stored in the repository.";
     return;
   }
+  try { sessionStorage.setItem("eocns-publish-token", token); } catch (_) {}
   if (status) status.textContent = "Publishing all data files…";
   try {
     var students = shapeStudentsForRepo(await getAll("students"));
@@ -1381,11 +1473,11 @@ async function publishAllToRepo() {
     await githubPutFile(token, DATA_FILES.levels, JSON.stringify(await getAll("levels"), null, 2), "Update levels via EOCNS");
     await githubPutFile(token, DATA_FILES.courses, JSON.stringify(await getAll("courses"), null, 2), "Update courses via EOCNS");
     if (TIMETABLES_CACHE) await githubPutFile(token, DATA_FILES.timetables, JSON.stringify(TIMETABLES_CACHE, null, 2), "Update timetables via EOCNS");
-    // never rewrite config from browser (protects token / pin source of truth in repo)
     if (status) status.textContent = "Published all master data, QA logs and audit to the repository.";
     var panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = true;
     if (document.getElementById("qaPublishPin")) document.getElementById("qaPublishPin").value = "";
+    if (tokenEl) tokenEl.value = "";
   } catch (err) {
     console.error(err);
     if (status) status.textContent = "Publish failed: " + (err.message || String(err));
@@ -1888,5 +1980,72 @@ async function buildMonthlyQaReport() {
   };
 }
 
+
+
+async function buildAttendanceSheet() {
+  await loadStudents();
+  await fillProgrammeLevelSelects();
+  var prog = (document.getElementById("attProgramme") && document.getElementById("attProgramme").value) || "";
+  var level = (document.getElementById("attLevel") && document.getElementById("attLevel").value) || "";
+  var date = (document.getElementById("attSheetDate") && document.getElementById("attSheetDate").value) || new Date().toISOString().slice(0, 10);
+  var course = (document.getElementById("attCourseLabel") && document.getElementById("attCourseLabel").value.trim()) || "";
+  var list = studentsCache.filter(function(s) {
+    if (s.status && s.status !== "Active") return false;
+    if (prog && String(s.programme || "") !== prog) return false;
+    if (level && String(s.level || "") !== String(level)) return false;
+    return true;
+  }).sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
+  var title = document.getElementById("attendanceSheetTitle");
+  if (title) title.textContent = "Attendance — " + (prog || "All programmes") + " · Level " + (level || "all") + " · " + date;
+  var body = document.getElementById("attendanceSheetBody");
+  if (!body) return;
+  if (!list.length) {
+    body.innerHTML = "<div class=\"empty-state\"><h3>No students</h3><p>No active students match these filters.</p></div>";
+    return;
+  }
+  var rows = list.map(function(s, i) {
+    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
+      "</td><td>" + escapeHtml(s.programme || "") + "</td><td>" + escapeHtml(String(s.level || "")) +
+      "</td><td style=\"width:48px\"></td><td style=\"width:48px\"></td><td style=\"width:120px\"></td></tr>";
+  }).join("");
+  body.innerHTML = "<div class=\"print-report\" id=\"attendancePrintRoot\">" +
+    "<h1>EOCNS Class Attendance Sheet</h1>" +
+    "<div class=\"sub\">" + escapeHtml(course || "General") + " · " + escapeHtml(date) + " · " + list.length + " students</div>" +
+    "<table><thead><tr><th>#</th><th>Name</th><th>Reg No</th><th>Programme</th><th>Level</th><th>P</th><th>A</th><th>Signature</th></tr></thead><tbody>" +
+    rows + "</tbody></table>" +
+    "<p style=\"margin-top:24px;font-size:0.85rem\">Lecturer: ______________________ &nbsp;&nbsp; Date: " + escapeHtml(date) + "</p>" +
+    "</div>";
+}
+function printAttendanceSheet() {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to print/export sheets."); return; }
+  window.print();
+}
+function printLectureReport() {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to print reports."); return; }
+  var entries = window.__lastReportEntries || [];
+  if (!entries.length) { alert("Build a filtered report first."); return; }
+  var w = window.open("", "_blank");
+  if (!w) { alert("Allow pop-ups to print."); return; }
+  var rows = entries.map(function(e) {
+    return "<tr><td>" + (e.date || "") + "</td><td>" + (e.course || "") + "</td><td>" + (e.lecturer || "") +
+      "</td><td>" + [e.start, e.end].filter(Boolean).join("–") + "</td><td>" + (e.status || "") +
+      "</td><td>" + (e.topic || "") + "</td><td>" + (Array.isArray(e.absent) ? e.absent.join(", ") : "") + "</td></tr>";
+  }).join("");
+  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Lecture Report</title><style>" +
+    "body{font-family:Georgia,serif;color:#1a1a2e;padding:24px} h1{color:#1B3A6B;text-align:center}" +
+    "table{width:100%;border-collapse:collapse;font-size:12px} th,td{border:1px solid #999;padding:6px;text-align:left}" +
+    "th{background:#1B3A6B;color:#fff} .sub{text-align:center;color:#555;margin-bottom:16px}</style></head><body>" +
+    "<h1>EOCNS Lecture Report</h1><div class=\"sub\">Master log · " + entries.length + " entries · " + new Date().toLocaleString() + "</div>" +
+    "<table><thead><tr><th>Date</th><th>Course</th><th>Lecturer</th><th>Time</th><th>Status</th><th>Topic</th><th>Absent</th></tr></thead><tbody>" +
+    rows + "</tbody></table></body></html>");
+  w.document.close();
+  w.focus();
+  w.print();
+}
+async function downloadAuditJson() {
+  if (!isQaOfficer()) return;
+  var list = await getAll("audit");
+  downloadJsonReport("EOCNS_Audit_" + new Date().toISOString().slice(0, 10) + ".json", { exportedAt: new Date().toISOString(), entries: list });
+}
 
 })();

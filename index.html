@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=11" />
+  <link rel="stylesheet" href="style.css?v=12" />
 </head>
 <body class="role-viewer">
   <div class="app">
@@ -30,6 +30,7 @@
           <a href="#" class="nav-item" data-view="students">Students</a>
           <a href="#" class="nav-item" data-view="lecturers">Lecturers</a>
           <a href="#" class="nav-item" data-view="hostel">Hostel</a>
+          <a href="#" class="nav-item" data-view="attendance">Attendance sheets</a>
           <a href="#" class="nav-item" data-view="sessions">Sessions</a>
         </div>
         <div class="nav-section">
@@ -350,6 +351,37 @@
             </div>
           </div>
         </section>
+        
+        <section class="view" id="view-attendance">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Printable class attendance sheets from the student master (programme + level).</p>
+            </div>
+            <div class="page-toolbar__right">
+              <button type="button" class="btn btn--ghost qa-edit-only" id="btnPrintAttendance">⬇ / Print sheet</button>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__body">
+              <div class="form-grid">
+                <label class="field"><span class="field__label">Programme</span><select id="attProgramme"><option value="">All</option></select></label>
+                <label class="field"><span class="field__label">Level</span><select id="attLevel"><option value="">All</option></select></label>
+                <label class="field"><span class="field__label">Sheet date</span><input type="date" id="attSheetDate" /></label>
+                <label class="field"><span class="field__label">Course / activity</span><input type="text" id="attCourseLabel" placeholder="e.g. NUS 121" /></label>
+                <label class="field"><span class="field__label">&nbsp;</span>
+                  <button type="button" class="btn btn--primary" id="btnBuildAttendance">Build sheet</button>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="card" id="attendanceSheetCard">
+            <div class="card__header"><h3 id="attendanceSheetTitle">Attendance sheet</h3></div>
+            <div class="card__body" style="overflow-x:auto" id="attendanceSheetBody">
+              <div class="empty-state"><h3>Choose filters</h3><p>Select programme / level and build a printable sheet.</p></div>
+            </div>
+          </div>
+        </section>
+
         <section class="view" id="view-reports">
           <div class="page-toolbar">
             <div class="page-toolbar__left">
@@ -381,7 +413,8 @@
           <div class="card">
             <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
               <h3 style="margin:0">Lecture log master</h3>
-              <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadFilteredReports">⬇ Download filtered</button>
+              <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadFilteredReports">⬇ JSON</button>
+              <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnPrintLectureReport">Print / PDF</button>
             </div>
             <div class="card__body" style="overflow-x:auto">
               <table class="data-table">
@@ -393,7 +426,19 @@
           </div>
         </section>
         <section class="view" id="view-audit">
-          <div class="card"><div class="card__header"><h3>Audit Trail</h3></div><div class="card__body" id="auditList"><p>No audit entries yet.</p></div></div>
+          <div class="card" id="auditDeniedCard">
+            <div class="card__body" style="text-align:center;padding:40px 20px">
+              <h3 style="margin:0 0 8px">Access not granted</h3>
+              <p class="muted-note" style="margin:0">The audit trail is restricted to authenticated QA officers. Sign in under Settings to view access logs.</p>
+            </div>
+          </div>
+          <div class="card" id="auditOfficerCard" hidden>
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+              <h3 style="margin:0">Audit Trail</h3>
+              <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadAudit">⬇ Download</button>
+            </div>
+            <div class="card__body" id="auditList"><p>No audit entries yet.</p></div>
+          </div>
         </section>
                 <section class="view" id="view-settings">
           <div class="card" style="margin-bottom:16px">
@@ -416,9 +461,12 @@
                 </div>
                 <div id="qaPublishStatus" class="muted-note" style="margin-top:12px"></div>
                 <div id="qaTokenPanel" style="margin-top:16px" hidden>
-                  <p class="muted-note">Publishing uses the repository token stored in <code>data/config.json</code>. Re-enter your officer PIN to confirm.</p>
+                  <p class="muted-note">GitHub Secrets cannot be read from a static GitHub Pages app. After PIN check, paste a fine-grained token for this browser session only (not saved to the repository).</p>
                   <label class="field field--full"><span class="field__label">Confirm officer PIN</span>
                     <input type="password" id="qaPublishPin" placeholder="Officer PIN" autocomplete="off" />
+                  </label>
+                  <label class="field field--full"><span class="field__label">Session publish token</span>
+                    <input type="password" id="qaSessionToken" placeholder="github_pat_… (session only)" autocomplete="off" />
                   </label>
                   <button type="button" class="btn btn--primary" id="btnConfirmPublish" style="margin-top:8px">Confirm publish all</button>
                 </div>
@@ -570,6 +618,6 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=11"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>

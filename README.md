@@ -3,16 +3,14 @@
 Live: https://travis-global.github.io/qa_attendance/
 
 ## Roles
-- **Viewer (anyone):** read-only
-- **QA Officer:** edit, log lectures, download reports, publish to repo  
-  PIN is in `data/config.json` (`qaPin`). Change it in the repo and reload.
+- **Viewer:** all screens read-only. Audit shows **Access not granted**.
+- **QA Officer (PIN in `data/config.json`):** edit, log, download, print, publish.
 
-## Persistence (`data/`)
-students, lecturers, sessions, programmes, levels, courses, timetables, qa_entries, audit, config
+## Publish & GitHub Secrets
+GitHub Actions **secrets are not readable from static GitHub Pages JavaScript**.  
+Publish flow: sign in with PIN → paste fine-grained token for **this browser session only** → token is never written into the repository.
 
-## QA workflow (matches college analysers)
-- **Daily:** timetable slots for the day → Log Held/Missed/Partial → day rate + download
-- **Weekly:** scheduled vs delivered vs missed by course, day-by-day, compliance %, download
-- **Monthly:** course + lecturer rates against timetable, download
+## Modules
+Dashboard · Students (bulk move) · Lecturers · Hostel boarding-fee · Attendance sheets · Sessions · Daily/Weekly/Monthly QA · Reports (JSON + Print/PDF) · Audit (officer only) · Settings
 
-Hard-refresh: Ctrl+Shift+R
+Hard-refresh after deploys: Ctrl+Shift+R
