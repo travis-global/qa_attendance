@@ -51,6 +51,7 @@ function showView(viewId) {
   if (viewId === "qa-weekly") initQaWeeklyView();
   if (viewId === "qa-monthly") initQaMonthlyView();
   if (viewId === "settings") renderProgrammesLevels();
+  if (viewId === "reports") renderReportsView();
 }
 document.querySelectorAll("[data-view]").forEach((el) => {
   el.addEventListener("click", (e) => { e.preventDefault(); showView(el.dataset.view); });
@@ -1084,6 +1085,9 @@ openDB().then(async () => {
   document.getElementById("btnBuildMonthlyQa")?.addEventListener("click", buildMonthlyQaReport);
   document.getElementById("btnAddProgramme")?.addEventListener("click", addProgrammePrompt);
   document.getElementById("btnAddLevel")?.addEventListener("click", addLevelPrompt);
+  document.getElementById("btnFilterReports")?.addEventListener("click", renderReportsView);
+  document.getElementById("btnExportLectureLogs")?.addEventListener("click", exportLectureLogs);
+  document.getElementById("btnDownloadFilteredReports")?.addEventListener("click", exportLectureLogs);
 }).catch(err => {
   console.error(err);
   alert("Could not initialise the local database.");
@@ -1353,39 +1357,35 @@ async function githubPutFile(token, path, contentText, message) {
 
 async function publishAllToRepo() {
   if (!isQaOfficer()) return;
-  const token = (document.getElementById("qaGithubToken")?.value || "").trim();
-  const status = document.getElementById("qaPublishStatus");
+  var pin = (document.getElementById("qaPublishPin") && document.getElementById("qaPublishPin").value || "").trim();
+  var status = document.getElementById("qaPublishStatus");
+  if (!pin || pin !== (APP_CONFIG.qaPin || "EOCNS-QA")) {
+    if (status) status.textContent = "Incorrect officer PIN.";
+    return;
+  }
+  try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config); } catch (_) {}
+  var token = (APP_CONFIG && APP_CONFIG.githubToken) || "";
   if (!token) {
-    if (status) status.textContent = "Paste a fine-grained token with Contents: Read and write.";
+    if (status) status.textContent = "No githubToken in data/config.json. Add a fine-grained PAT with Contents write, then reload.";
     return;
   }
   if (status) status.textContent = "Publishing all data files…";
   try {
-    const students = shapeStudentsForRepo(await getAll("students"));
-    const lecturers = await getAll("lecturers");
-    const sessions = await getAll("sessions");
-    const qa_entries = await getAll("qa_entries");
-    const audit = await getAll("audit");
-
-    await githubPutFile(token, DATA_FILES.students, JSON.stringify(students, null, 2),
-      "Update students (" + students.length + ") via EOCNS QA System");
-    await githubPutFile(token, DATA_FILES.lecturers, JSON.stringify(lecturers, null, 2),
-      "Update lecturers (" + lecturers.length + ") via EOCNS QA System");
-    await githubPutFile(token, DATA_FILES.sessions, JSON.stringify(sessions, null, 2),
-      "Update sessions (" + sessions.length + ") via EOCNS QA System");
-    await githubPutFile(token, DATA_FILES.qa_entries, JSON.stringify(qa_entries, null, 2),
-      "Update QA entries (" + qa_entries.length + ") via EOCNS QA System");
-    await githubPutFile(token, DATA_FILES.audit, JSON.stringify(audit, null, 2),
-      "Update audit log (" + audit.length + ") via EOCNS QA System");
+    var students = shapeStudentsForRepo(await getAll("students"));
+    await githubPutFile(token, DATA_FILES.students, JSON.stringify(students, null, 2), "Update students (" + students.length + ") via EOCNS QA System");
+    await githubPutFile(token, DATA_FILES.lecturers, JSON.stringify(await getAll("lecturers"), null, 2), "Update lecturers via EOCNS");
+    await githubPutFile(token, DATA_FILES.sessions, JSON.stringify(await getAll("sessions"), null, 2), "Update sessions via EOCNS");
+    await githubPutFile(token, DATA_FILES.qa_entries, JSON.stringify(await getAll("qa_entries"), null, 2), "Update QA entries via EOCNS");
+    await githubPutFile(token, DATA_FILES.audit, JSON.stringify(await getAll("audit"), null, 2), "Update audit log via EOCNS");
     await githubPutFile(token, DATA_FILES.programmes, JSON.stringify(await getAll("programmes"), null, 2), "Update programmes via EOCNS");
     await githubPutFile(token, DATA_FILES.levels, JSON.stringify(await getAll("levels"), null, 2), "Update levels via EOCNS");
     await githubPutFile(token, DATA_FILES.courses, JSON.stringify(await getAll("courses"), null, 2), "Update courses via EOCNS");
     if (TIMETABLES_CACHE) await githubPutFile(token, DATA_FILES.timetables, JSON.stringify(TIMETABLES_CACHE, null, 2), "Update timetables via EOCNS");
-    if (APP_CONFIG) await githubPutFile(token, DATA_FILES.config, JSON.stringify(APP_CONFIG, null, 2), "Update config via EOCNS");
+    // never rewrite config from browser (protects token / pin source of truth in repo)
     if (status) status.textContent = "Published all master data, QA logs and audit to the repository.";
-    const panel = document.getElementById("qaTokenPanel");
+    var panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = true;
-    if (document.getElementById("qaGithubToken")) document.getElementById("qaGithubToken").value = "";
+    if (document.getElementById("qaPublishPin")) document.getElementById("qaPublishPin").value = "";
   } catch (err) {
     console.error(err);
     if (status) status.textContent = "Publish failed: " + (err.message || String(err));
@@ -1450,33 +1450,60 @@ function closeQaEntryForm() {
 
 async function saveQaEntry(e) {
   e.preventDefault();
-  const id = document.getElementById("qaEntryId").value || null;
-  const date = document.getElementById("qaEntryDate").value;
-  const classKey = document.getElementById("qaEntryClass").value;
-  const course = document.getElementById("qaEntryCourse").value.trim();
-  const lecturer = document.getElementById("qaEntryLecturer").value.trim();
-  const status = document.getElementById("qaEntryStatus").value;
-  const duration = Number(document.getElementById("qaEntryDuration").value) || null;
-  const remark = document.getElementById("qaEntryRemark").value.trim();
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to log lectures."); return; }
+  var id = document.getElementById("qaEntryId").value || null;
+  var date = document.getElementById("qaEntryDate").value;
+  var classKey = document.getElementById("qaEntryClass").value;
+  var course = document.getElementById("qaEntryCourse").value.trim();
+  var lecturer = document.getElementById("qaEntryLecturer").value.trim();
+  var status = document.getElementById("qaEntryStatus").value;
+  var duration = Number(document.getElementById("qaEntryDuration").value) || null;
+  var start = (document.getElementById("qaEntryStart") && document.getElementById("qaEntryStart").value.trim()) || "";
+  var end = (document.getElementById("qaEntryEnd") && document.getElementById("qaEntryEnd").value.trim()) || "";
+  var topic = (document.getElementById("qaEntryTopic") && document.getElementById("qaEntryTopic").value.trim()) || "";
+  var objectives = (document.getElementById("qaEntryObjectives") && document.getElementById("qaEntryObjectives").value.trim()) || "";
+  var summary = (document.getElementById("qaEntrySummary") && document.getElementById("qaEntrySummary").value.trim()) || "";
+  var assignment = (document.getElementById("qaEntryAssignment") && document.getElementById("qaEntryAssignment").value.trim()) || "";
+  var remark = (document.getElementById("qaEntryRemark") && document.getElementById("qaEntryRemark").value.trim()) || "";
+  var absentRaw = (document.getElementById("qaEntryAbsent") && document.getElementById("qaEntryAbsent").value.trim()) || "";
+  var absent = absentRaw ? absentRaw.split(/[,;\n]+/).map(function(s) { return s.trim(); }).filter(Boolean) : [];
   if (!date || !course || !lecturer) {
     alert("Date, course and lecturer are required.");
     return;
   }
-  const now = new Date().toISOString();
-  const entry = {
+  var now = new Date().toISOString();
+  var entry = {
     id: id || ("qa_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
-    date, classKey, course, lecturer, status, duration, remark,
-    createdAt: now, updatedAt: now,
+    date: date,
+    classKey: classKey,
+    course: course,
+    lecturer: lecturer,
+    status: status,
+    duration: duration,
+    start: start,
+    end: end,
+    topic: topic,
+    objectives: objectives,
+    lectureSummary: summary,
+    assignment: assignment,
+    remark: remark,
+    absent: absent,
+    updatedAt: now
   };
+  if (!id) entry.createdAt = now;
+  else {
+    var existing = (await getQaEntries()).find(function(x) { return x.id === id; });
+    if (existing && existing.createdAt) entry.createdAt = existing.createdAt;
+  }
   await put("qa_entries", entry);
   await writeAudit({
     action: id ? "update" : "create",
     entity: "qa_entries",
     entityId: entry.id,
-    reason: status + " — " + course + " (" + date + ")",
-    details: { entry },
+    reason: id ? "Lecture log updated" : "Lecture logged",
+    details: { date: date, course: course, status: status, classKey: classKey }
   });
-  closeQaEntryForm();
+  document.getElementById("qaEntryModal").hidden = true;
   await renderQaDaily();
 }
 
@@ -1518,6 +1545,49 @@ function downloadJsonReport(filename, payload) {
 function parseExcludeDates(text) {
   return new Set((text || "").split(",").map(function(s) { return s.trim(); }).filter(Boolean));
 }
+
+async function renderReportsView() {
+  var from = (document.getElementById("reportFrom") && document.getElementById("reportFrom").value) || "";
+  var to = (document.getElementById("reportTo") && document.getElementById("reportTo").value) || "";
+  var classKey = (document.getElementById("reportClass") && document.getElementById("reportClass").value) || "";
+  var entries = await getQaEntries();
+  entries = entries.filter(function(e) {
+    if (from && e.date < from) return false;
+    if (to && e.date > to) return false;
+    if (classKey && e.classKey !== classKey) return false;
+    return true;
+  });
+  entries.sort(function(a, b) { return (b.date || "").localeCompare(a.date || ""); });
+  var tbody = document.getElementById("reportsTableBody");
+  var empty = document.getElementById("reportsEmpty");
+  if (!tbody) return;
+  if (!entries.length) {
+    tbody.innerHTML = "";
+    if (empty) empty.hidden = false;
+    return;
+  }
+  if (empty) empty.hidden = true;
+  tbody.innerHTML = entries.map(function(e) {
+    var time = [e.start, e.end].filter(Boolean).join("–") || "—";
+    var absent = Array.isArray(e.absent) ? e.absent.join(", ") : (e.absent || "—");
+    return "<tr><td>" + escapeHtml(e.date || "") + "</td><td>" + escapeHtml(e.classKey || "") +
+      "</td><td>" + escapeHtml(e.course || "") + "</td><td>" + escapeHtml(e.lecturer || "") +
+      "</td><td>" + escapeHtml(time) + "</td><td>" + escapeHtml(e.status || "") +
+      "</td><td>" + escapeHtml(e.topic || "—") + "</td><td>" + escapeHtml(absent || "—") + "</td></tr>";
+  }).join("");
+  window.__lastReportEntries = entries;
+}
+async function exportLectureLogs() {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to export."); return; }
+  var entries = window.__lastReportEntries || await getQaEntries();
+  downloadJsonReport("EOCNS_LectureLogs_" + new Date().toISOString().slice(0, 10) + ".json", {
+    exportedAt: new Date().toISOString(),
+    source: "EOCNS master QA entries",
+    count: entries.length,
+    entries: entries
+  });
+}
+
 async function renderProgrammesLevels() {
   PROGRAMMES_CACHE = await getAll("programmes");
   LEVELS_CACHE = await getAll("levels");
@@ -1666,17 +1736,19 @@ function initQaMonthlyView() {
 
 async function buildWeeklyQaReport() {
   var startVal = document.getElementById("qaWeekStart") && document.getElementById("qaWeekStart").value;
-  if (!startVal) { alert("Pick the week start date."); return; }
+  var endVal = document.getElementById("qaWeekEnd") && document.getElementById("qaWeekEnd").value;
+  if (!startVal || !endVal) { alert("Pick both start and end dates."); return; }
+  if (endVal < startVal) { alert("End date must be on or after start date."); return; }
   var classKey = (document.getElementById("qaWeekClass") && document.getElementById("qaWeekClass").value) || "100_nursing";
   var excluded = parseExcludeDates(document.getElementById("qaWeekExclude") && document.getElementById("qaWeekExclude").value);
-  var start = new Date(startVal + "T12:00:00");
   var schoolDays = [];
-  for (var i = 0; i < 7; i++) {
-    var d = new Date(start); d.setDate(start.getDate() + i);
-    var iso = d.toISOString().slice(0, 10);
-    if (d.getDay() === 0 || d.getDay() === 6) continue;
-    if (excluded.has(iso)) continue;
-    schoolDays.push(iso);
+  var cur = new Date(startVal + "T12:00:00");
+  var end = new Date(endVal + "T12:00:00");
+  while (cur <= end) {
+    var iso = cur.toISOString().slice(0, 10);
+    var dow = cur.getDay();
+    if (dow !== 0 && dow !== 6 && !excluded.has(iso)) schoolDays.push(iso);
+    cur.setDate(cur.getDate() + 1);
   }
   var tts = await ensureTimetables();
   var tt = tts[classKey] || { slots: [] };
@@ -1739,7 +1811,10 @@ async function buildWeeklyQaReport() {
   if (tbody) tbody.innerHTML = dayRows.join("") || "<tr><td colspan=\"6\">No school days.</td></tr>";
   var dl = document.getElementById("btnDownloadWeeklyQa");
   if (dl) dl.onclick = function() {
-    downloadJsonReport("QA_Weekly_" + startVal + "_" + classKey + ".json", { weekStart: startVal, classKey: classKey, schoolDays: schoolDays, totals: { scheduled: totS, delivered: totD, missed: totM, rate: rate }, courseRows: courseRows, entries: entries });
+    downloadJsonReport("QA_Weekly_" + startVal + "_to_" + endVal + "_" + classKey + ".json", {
+      startDate: startVal, endDate: endVal, classKey: classKey, schoolDays: schoolDays,
+      totals: { scheduled: totS, delivered: totD, missed: totM, rate: rate }, courseRows: courseRows, entries: entries
+    });
   };
 }
 

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=10" />
+  <link rel="stylesheet" href="style.css?v=11" />
 </head>
 <body class="role-viewer">
   <div class="app">
@@ -262,7 +262,8 @@
           <div class="card" style="margin-bottom:16px">
             <div class="card__body">
               <div class="form-grid">
-                <label class="field"><span class="field__label">Week starting (Monday)</span><input type="date" id="qaWeekStart" /></label>
+                <label class="field"><span class="field__label">Start date</span><input type="date" id="qaWeekStart" /></label>
+                <label class="field"><span class="field__label">End date</span><input type="date" id="qaWeekEnd" /></label>
                 <label class="field"><span class="field__label">Class</span>
                   <select id="qaWeekClass">
                     <option value="100_nursing">100 Level Nursing</option>
@@ -349,7 +350,48 @@
             </div>
           </div>
         </section>
-        <section class="view" id="view-reports"><div class="empty-state"><h3>Reports & Export</h3><p>Coming soon.</p></div></section>
+        <section class="view" id="view-reports">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Lecture logs from the master sheet (QA entries) — same fields as the college lecture report form.</p>
+            </div>
+            <div class="page-toolbar__right qa-edit-only">
+              <button type="button" class="btn btn--ghost" id="btnExportLectureLogs">⬇ Export lecture logs JSON</button>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__body">
+              <div class="form-grid">
+                <label class="field"><span class="field__label">From</span><input type="date" id="reportFrom" /></label>
+                <label class="field"><span class="field__label">To</span><input type="date" id="reportTo" /></label>
+                <label class="field"><span class="field__label">Class</span>
+                  <select id="reportClass">
+                    <option value="">All classes</option>
+                    <option value="100_nursing">100 Level Nursing</option>
+                    <option value="200_nursing">200 Level Nursing</option>
+                    <option value="200_midwifery">200 Level Midwifery</option>
+                  </select>
+                </label>
+                <label class="field"><span class="field__label">&nbsp;</span>
+                  <button type="button" class="btn btn--primary" id="btnFilterReports">Show logs</button>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
+              <h3 style="margin:0">Lecture log master</h3>
+              <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadFilteredReports">⬇ Download filtered</button>
+            </div>
+            <div class="card__body" style="overflow-x:auto">
+              <table class="data-table">
+                <thead><tr><th>Date</th><th>Class</th><th>Course</th><th>Lecturer</th><th>Time</th><th>Status</th><th>Topic</th><th>Absent</th></tr></thead>
+                <tbody id="reportsTableBody"></tbody>
+              </table>
+              <div class="empty-state" id="reportsEmpty"><h3>No logs in range</h3><p>Log lectures under Daily QA. Data is stored in the master QA entries sheet.</p></div>
+            </div>
+          </div>
+        </section>
         <section class="view" id="view-audit">
           <div class="card"><div class="card__header"><h3>Audit Trail</h3></div><div class="card__body" id="auditList"><p>No audit entries yet.</p></div></div>
         </section>
@@ -374,10 +416,10 @@
                 </div>
                 <div id="qaPublishStatus" class="muted-note" style="margin-top:12px"></div>
                 <div id="qaTokenPanel" style="margin-top:16px" hidden>
-                  <label class="field field--full"><span class="field__label">GitHub fine-grained token (Contents: Read and write)</span>
-                    <input type="password" id="qaGithubToken" placeholder="github_pat_…" autocomplete="off" />
+                  <p class="muted-note">Publishing uses the repository token stored in <code>data/config.json</code>. Re-enter your officer PIN to confirm.</p>
+                  <label class="field field--full"><span class="field__label">Confirm officer PIN</span>
+                    <input type="password" id="qaPublishPin" placeholder="Officer PIN" autocomplete="off" />
                   </label>
-                  <p class="muted-note">Publishes all <code>data/*.json</code> files. Token stays in this browser session only.</p>
                   <button type="button" class="btn btn--primary" id="btnConfirmPublish" style="margin-top:8px">Confirm publish all</button>
                 </div>
               </div>
@@ -499,6 +541,8 @@
             <input type="text" id="qaEntryLecturer" list="qaLecturerList" required />
             <datalist id="qaLecturerList"></datalist>
           </label>
+          <label class="field"><span class="field__label">Start time</span><input type="text" id="qaEntryStart" placeholder="e.g. 8:00 AM" /></label>
+          <label class="field"><span class="field__label">End time</span><input type="text" id="qaEntryEnd" placeholder="e.g. 10:00 AM" /></label>
           <label class="field"><span class="field__label">Status <span class="req">*</span></span>
             <select id="qaEntryStatus" required>
               <option value="Held">Held</option>
@@ -508,7 +552,14 @@
             </select>
           </label>
           <label class="field"><span class="field__label">Duration (minutes)</span><input type="number" id="qaEntryDuration" min="0" step="5" placeholder="60" /></label>
-          <label class="field field--full"><span class="field__label">Remark</span><textarea id="qaEntryRemark" rows="2"></textarea></label>
+          <label class="field field--full"><span class="field__label">Topic</span><input type="text" id="qaEntryTopic" placeholder="Lecture topic" /></label>
+          <label class="field field--full"><span class="field__label">Learning objectives</span><textarea id="qaEntryObjectives" rows="2" placeholder="Separate with period or semicolon"></textarea></label>
+          <label class="field field--full"><span class="field__label">Lecture summary</span><textarea id="qaEntrySummary" rows="3" placeholder="What was covered…"></textarea></label>
+          <label class="field"><span class="field__label">Assignment</span><textarea id="qaEntryAssignment" rows="2" placeholder="e.g. No assignment was given."></textarea></label>
+          <label class="field"><span class="field__label">Remarks</span><textarea id="qaEntryRemark" rows="2" placeholder="Class participation, notes…"></textarea></label>
+          <label class="field field--full"><span class="field__label">Absent students (serials or names, comma-separated)</span>
+            <textarea id="qaEntryAbsent" rows="2" placeholder="e.g. 3, 7, 12 or paste names"></textarea>
+          </label>
         </div>
         <div class="modal__footer">
           <button type="button" class="btn btn--ghost" id="btnCancelQaEntry2">Cancel</button>
@@ -519,6 +570,6 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=10"></script>
+  <script src="app.js?v=11"></script>
 </body>
 </html>

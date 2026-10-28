@@ -1,5 +1,7 @@
 {
   "qaPin": "EOCNS-QA",
-  "qaPinNote": "Change this value and commit to update the QA officer password. Only SHA/session lives in the browser.",
+  "qaPinNote": "Officer password. Change and commit to update.",
+  "githubToken": "",
+  "githubTokenNote": "Fine-grained PAT with Contents: Read and write on travis-global/qa_attendance. Leave empty until provided. Never commit a public fork with a live token.",
   "institution": "Eastern Oak College of Nursing Sciences"
 }
