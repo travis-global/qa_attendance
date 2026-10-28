@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "id": "qa_mvs6v3xxasxs",
+    "date": "2026-10-28",
+    "classKey": "100_nursing",
+    "course": "INF 201 — Infant I",
+    "lecturer": "Mrs. Anthonia Arua",
+    "status": "Held",
+    "duration": null,
+    "start": "",
+    "end": "",
+    "topic": "",
+    "objectives": "",
+    "lectureSummary": "",
+    "assignment": "",
+    "remark": "",
+    "absent": [],
+    "updatedAt": "2026-10-28T14:07:24.597Z",
+    "createdAt": "2026-10-28T14:07:24.597Z"
+  }
+]
