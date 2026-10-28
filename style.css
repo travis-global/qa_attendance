@@ -1051,3 +1051,9 @@ body.role-officer th.qa-edit-only { display: table-cell; }
 .print-report th, .print-report td { border: 1px solid #999; padding: 6px 8px; text-align: left; }
 .print-report th { background: #1B3A6B; color: #fff; }
 .print-report .section-title { margin: 18px 0 8px; font-size: 1rem; color: #1B3A6B; border-left: 4px solid #B8860B; padding-left: 8px; }
+
+.dirty-banner {
+  position: sticky; top: 0; z-index: 1000;
+  background: #92400e; color: #fff;
+  padding: 10px 16px; font-size: 0.875rem; text-align: center;
+}

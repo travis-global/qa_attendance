@@ -52,7 +52,7 @@ function showView(viewId) {
   if (viewId === "qa-monthly") initQaMonthlyView();
   if (viewId === "settings") { renderProgrammesLevels(); renderCoursesTable(); renderTimetableEditor(); }
   if (viewId === "reports") renderReportsView();
-  if (viewId === "attendance") { fillProgrammeLevelSelects(); if (document.getElementById("attSheetDate") && !document.getElementById("attSheetDate").value) document.getElementById("attSheetDate").value = new Date().toISOString().slice(0, 10); }
+  if (viewId === "attendance") { fillProgrammeLevelSelects(); }
   if (viewId === "audit") renderAuditLog();
 }
 document.querySelectorAll("[data-view]").forEach((el) => {
@@ -61,6 +61,29 @@ document.querySelectorAll("[data-view]").forEach((el) => {
 document.querySelectorAll("[data-goto]").forEach((el) => {
   el.addEventListener("click", () => showView(el.dataset.goto));
 });
+
+var EOCNS_DIRTY = false;
+function markDirty(reason) {
+  EOCNS_DIRTY = true;
+  try {
+    var el = document.getElementById("dirtyBanner");
+    if (el) { el.hidden = false; el.textContent = "Unsaved local changes" + (reason ? " (" + reason + ")" : "") + " — Publish to repository in Settings before you leave, or you may lose work on another device."; }
+  } catch (_) {}
+}
+function clearDirty() {
+  EOCNS_DIRTY = false;
+  try {
+    var el = document.getElementById("dirtyBanner");
+    if (el) el.hidden = true;
+  } catch (_) {}
+}
+window.addEventListener("beforeunload", function(e) {
+  if (!EOCNS_DIRTY) return;
+  e.preventDefault();
+  e.returnValue = "You have changes that are not published to the repository. Leave anyway?";
+  return e.returnValue;
+});
+
 const DB_NAME = "eocns_attendance";
 const DB_VERSION = 5;
 let db = null;
@@ -399,6 +422,7 @@ async function saveStudent(e) {
     await put("students", student);
   }
   closeStudentForm();
+  markDirty();
   await renderStudentsTable();
   refreshDashboardStats();
 }
@@ -493,6 +517,7 @@ async function saveLecturer(e) {
   }
   await put("lecturers", lec);
   document.getElementById("lecturerModal").hidden = true;
+  markDirty();
   await renderLecturersTable();
   refreshDashboardStats();
 }
@@ -628,6 +653,7 @@ async function saveSession(e) {
   }
   await put("sessions", sess);
   document.getElementById("sessionModal").hidden = true;
+  markDirty();
   await renderSessionsList();
   refreshDashboardStats();
 }
@@ -1181,6 +1207,10 @@ openDB().then(async () => {
   document.getElementById("btnSaveTimetable") && document.getElementById("btnSaveTimetable").addEventListener("click", saveTimetableLocal);
   document.getElementById("ttClassKey") && document.getElementById("ttClassKey").addEventListener("change", renderTimetableEditor);
   document.getElementById("btnDownloadAudit") && document.getElementById("btnDownloadAudit").addEventListener("click", downloadAuditJson);
+  document.getElementById("qaEntryStart") && document.getElementById("qaEntryStart").addEventListener("change", calcQaDurationMinutes);
+  document.getElementById("qaEntryEnd") && document.getElementById("qaEntryEnd").addEventListener("change", calcQaDurationMinutes);
+  document.getElementById("qaEntryStart") && document.getElementById("qaEntryStart").addEventListener("input", calcQaDurationMinutes);
+  document.getElementById("qaEntryEnd") && document.getElementById("qaEntryEnd").addEventListener("input", calcQaDurationMinutes);
 
   } catch (bootErr) {
     console.error("post-db boot", bootErr);
@@ -1521,6 +1551,7 @@ async function publishAllToRepo() {
       }
       throw new Error(msg);
     }
+    clearDirty();
     if (status) status.textContent = "Published via worker: " + ((body.updated && body.updated.join(", ")) || "ok");
     var panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = true;
@@ -1570,33 +1601,118 @@ const QA_LECTURERS_SEED = [
   "Mr. Simon Udu", "Mr. Sunday Taiwo"
 ];
 
-function seedQaDatalists() {
-  const cl = document.getElementById("qaCourseList");
-  const ll = document.getElementById("qaLecturerList");
-  if (cl) cl.innerHTML = QA_COURSES.map(c => "<option value=\"" + escapeHtml(c) + "\"></option>").join("");
-  if (ll) ll.innerHTML = QA_LECTURERS_SEED.map(c => "<option value=\"" + escapeHtml(c) + "\"></option>").join("");
+async function seedQaDatalists() {
+  try {
+    COURSES_CACHE = await getAll("courses");
+  } catch (_) { COURSES_CACHE = COURSES_CACHE || []; }
+  try {
+    await loadLecturers();
+  } catch (_) {}
+  var courseSel = document.getElementById("qaEntryCourse");
+  var lecSel = document.getElementById("qaEntryLecturer");
+  if (courseSel) {
+    var cur = courseSel.value;
+    var opts = '<option value="">— Select course —</option>';
+    (COURSES_CACHE || []).slice().sort(function(a, b) { return String(a.code).localeCompare(String(b.code)); }).forEach(function(c) {
+      var label = c.code + (c.name ? (" — " + c.name) : "");
+      opts += '<option value="' + escapeHtml(label) + '">' + escapeHtml(label) + '</option>';
+    });
+    courseSel.innerHTML = opts;
+    if (cur) courseSel.value = cur;
+  }
+  if (lecSel) {
+    var curL = lecSel.value;
+    var optsL = '<option value="">— Select lecturer —</option>';
+    (lecturersCache || []).filter(function(l) { return !l.status || l.status === "Active"; })
+      .slice().sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); })
+      .forEach(function(l) {
+        optsL += '<option value="' + escapeHtml(l.name) + '">' + escapeHtml(l.name) + (l.staffId ? (" (" + escapeHtml(l.staffId) + ")") : "") + '</option>';
+      });
+    lecSel.innerHTML = optsL;
+    if (curL) lecSel.value = curL;
+  }
+  // legacy datalists if present
+  var dlC = document.getElementById("qaCourseList");
+  var dlL = document.getElementById("qaLecturerList");
+  if (dlC) {
+    dlC.innerHTML = (COURSES_CACHE || []).map(function(c) {
+      return '<option value="' + escapeHtml(c.code + (c.name ? (" — " + c.name) : "")) + '">';
+    }).join("");
+  }
+  if (dlL) {
+    dlL.innerHTML = (lecturersCache || []).map(function(l) {
+      return '<option value="' + escapeHtml(l.name) + '">';
+    }).join("");
+  }
 }
+function calcQaDurationMinutes() {
+  var s = document.getElementById("qaEntryStart") && document.getElementById("qaEntryStart").value;
+  var e = document.getElementById("qaEntryEnd") && document.getElementById("qaEntryEnd").value;
+  var out = document.getElementById("qaEntryDuration");
+  if (!out) return;
+  if (!s || !e) { out.value = ""; return; }
+  var ps = s.split(":").map(Number);
+  var pe = e.split(":").map(Number);
+  var startM = ps[0] * 60 + (ps[1] || 0);
+  var endM = pe[0] * 60 + (pe[1] || 0);
+  var diff = endM - startM;
+  if (diff < 0) diff += 24 * 60; // overnight rare
+  out.value = String(diff);
+}
+
 
 async function getQaEntries() {
   try { return await getAll("qa_entries"); }
   catch (_) { return []; }
 }
 
-function openQaEntryForm(id) {
+async function openQaEntryForm(id) {
   if (!isQaOfficer()) { alert("Sign in as QA Officer to log lectures."); return; }
-  const modal = document.getElementById("qaEntryModal");
-  if (!modal) return;
-  document.getElementById("qaEntryForm").reset();
-  document.getElementById("qaEntryId").value = "";
-  const dailyDate = document.getElementById("qaDailyDate")?.value;
-  const dailyClass = document.getElementById("qaDailyClass")?.value;
-  if (dailyDate) document.getElementById("qaEntryDate").value = dailyDate;
-  else document.getElementById("qaEntryDate").value = new Date().toISOString().slice(0, 10);
+  await seedQaDatalists();
+  var form = document.getElementById("qaEntryForm");
+  if (form) form.reset();
+  document.getElementById("qaEntryId").value = id || "";
+  var dailyDate = document.getElementById("qaDailyDate") && document.getElementById("qaDailyDate").value;
+  var dailyClass = document.getElementById("qaDailyClass") && document.getElementById("qaDailyClass").value;
+  document.getElementById("qaEntryDate").value = dailyDate || new Date().toISOString().slice(0, 10);
   if (dailyClass) document.getElementById("qaEntryClass").value = dailyClass;
   document.getElementById("qaEntryModalTitle").textContent = id ? "Edit lecture log" : "Log lecture";
-  seedQaDatalists();
-  modal.hidden = false;
-  document.getElementById("qaEntryCourse")?.focus();
+  if (id) {
+    var entries = await getQaEntries();
+    var ent = entries.find(function(x) { return x.id === id; });
+    if (ent) {
+      document.getElementById("qaEntryDate").value = ent.date || "";
+      document.getElementById("qaEntryClass").value = ent.classKey || "";
+      await seedQaDatalists();
+      // course/lecturer as option values
+      var courseSel = document.getElementById("qaEntryCourse");
+      var lecSel = document.getElementById("qaEntryLecturer");
+      if (courseSel && ent.course) {
+        if (![].some.call(courseSel.options, function(o) { return o.value === ent.course; })) {
+          var o = document.createElement("option"); o.value = ent.course; o.textContent = ent.course; courseSel.appendChild(o);
+        }
+        courseSel.value = ent.course;
+      }
+      if (lecSel && ent.lecturer) {
+        if (![].some.call(lecSel.options, function(o) { return o.value === ent.lecturer; })) {
+          var o2 = document.createElement("option"); o2.value = ent.lecturer; o2.textContent = ent.lecturer; lecSel.appendChild(o2);
+        }
+        lecSel.value = ent.lecturer;
+      }
+      document.getElementById("qaEntryStart").value = ent.start || "";
+      document.getElementById("qaEntryEnd").value = ent.end || "";
+      document.getElementById("qaEntryStatus").value = ent.status || "Held";
+      document.getElementById("qaEntryDuration").value = ent.duration != null ? ent.duration : "";
+      if (document.getElementById("qaEntryTopic")) document.getElementById("qaEntryTopic").value = ent.topic || "";
+      if (document.getElementById("qaEntryObjectives")) document.getElementById("qaEntryObjectives").value = ent.objectives || "";
+      if (document.getElementById("qaEntrySummary")) document.getElementById("qaEntrySummary").value = ent.lectureSummary || "";
+      if (document.getElementById("qaEntryAssignment")) document.getElementById("qaEntryAssignment").value = ent.assignment || "";
+      if (document.getElementById("qaEntryRemark")) document.getElementById("qaEntryRemark").value = ent.remark || "";
+      if (document.getElementById("qaEntryAbsent")) document.getElementById("qaEntryAbsent").value = Array.isArray(ent.absent) ? ent.absent.join(", ") : (ent.absent || "");
+      calcQaDurationMinutes();
+    }
+  }
+  document.getElementById("qaEntryModal").hidden = false;
 }
 
 function closeQaEntryForm() {
@@ -1607,15 +1723,16 @@ function closeQaEntryForm() {
 async function saveQaEntry(e) {
   e.preventDefault();
   if (!isQaOfficer()) { alert("Sign in as QA Officer to log lectures."); return; }
+  calcQaDurationMinutes();
   var id = document.getElementById("qaEntryId").value || null;
   var date = document.getElementById("qaEntryDate").value;
   var classKey = document.getElementById("qaEntryClass").value;
   var course = document.getElementById("qaEntryCourse").value.trim();
   var lecturer = document.getElementById("qaEntryLecturer").value.trim();
   var status = document.getElementById("qaEntryStatus").value;
+  var start = (document.getElementById("qaEntryStart") && document.getElementById("qaEntryStart").value) || "";
+  var end = (document.getElementById("qaEntryEnd") && document.getElementById("qaEntryEnd").value) || "";
   var duration = Number(document.getElementById("qaEntryDuration").value) || null;
-  var start = (document.getElementById("qaEntryStart") && document.getElementById("qaEntryStart").value.trim()) || "";
-  var end = (document.getElementById("qaEntryEnd") && document.getElementById("qaEntryEnd").value.trim()) || "";
   var topic = (document.getElementById("qaEntryTopic") && document.getElementById("qaEntryTopic").value.trim()) || "";
   var objectives = (document.getElementById("qaEntryObjectives") && document.getElementById("qaEntryObjectives").value.trim()) || "";
   var summary = (document.getElementById("qaEntrySummary") && document.getElementById("qaEntrySummary").value.trim()) || "";
@@ -1623,28 +1740,16 @@ async function saveQaEntry(e) {
   var remark = (document.getElementById("qaEntryRemark") && document.getElementById("qaEntryRemark").value.trim()) || "";
   var absentRaw = (document.getElementById("qaEntryAbsent") && document.getElementById("qaEntryAbsent").value.trim()) || "";
   var absent = absentRaw ? absentRaw.split(/[,;\n]+/).map(function(s) { return s.trim(); }).filter(Boolean) : [];
-  if (!date || !course || !lecturer) {
-    alert("Date, course and lecturer are required.");
+  if (!date || !course || !lecturer || !start || !end) {
+    alert("Date, course, lecturer, start time and end time are required.");
     return;
   }
   var now = new Date().toISOString();
   var entry = {
     id: id || ("qa_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
-    date: date,
-    classKey: classKey,
-    course: course,
-    lecturer: lecturer,
-    status: status,
-    duration: duration,
-    start: start,
-    end: end,
-    topic: topic,
-    objectives: objectives,
-    lectureSummary: summary,
-    assignment: assignment,
-    remark: remark,
-    absent: absent,
-    updatedAt: now
+    date: date, classKey: classKey, course: course, lecturer: lecturer, status: status,
+    duration: duration, start: start, end: end, topic: topic, objectives: objectives,
+    lectureSummary: summary, assignment: assignment, remark: remark, absent: absent, updatedAt: now
   };
   if (!id) entry.createdAt = now;
   else {
@@ -1652,13 +1757,8 @@ async function saveQaEntry(e) {
     if (existing && existing.createdAt) entry.createdAt = existing.createdAt;
   }
   await put("qa_entries", entry);
-  await writeAudit({
-    action: id ? "update" : "create",
-    entity: "qa_entries",
-    entityId: entry.id,
-    reason: id ? "Lecture log updated" : "Lecture logged",
-    details: { date: date, course: course, status: status, classKey: classKey }
-  });
+  await writeAudit({ action: id ? "update" : "create", entity: "qa_entries", entityId: entry.id, reason: id ? "Lecture log updated" : "Lecture logged", details: { date: date, course: course, status: status, classKey: classKey } });
+  markDirty("lecture log");
   document.getElementById("qaEntryModal").hidden = true;
   await renderQaDaily();
 }
@@ -1845,12 +1945,30 @@ async function renderQaDaily() {
   if (empty) empty.hidden = true;
   tbody.innerHTML = rows.join("");
   tbody.querySelectorAll("[data-log-slot]").forEach(function(btn) {
-    btn.addEventListener("click", function() {
+    btn.addEventListener("click", async function() {
       var parts = btn.getAttribute("data-log-slot").split("|");
-      openQaEntryForm(null);
-      document.getElementById("qaEntryCourse").value = courseName(parts[0]);
+      await openQaEntryForm(null);
       document.getElementById("qaEntryDate").value = date;
       document.getElementById("qaEntryClass").value = classKey;
+      var label = courseName(parts[0]);
+      var courseSel = document.getElementById("qaEntryCourse");
+      if (courseSel) {
+        var found = false;
+        for (var i = 0; i < courseSel.options.length; i++) {
+          if (courseSel.options[i].value.indexOf(parts[0]) === 0 || courseSel.options[i].value === label) {
+            courseSel.selectedIndex = i; found = true; break;
+          }
+        }
+        if (!found) {
+          var o = document.createElement("option"); o.value = label; o.textContent = label; courseSel.appendChild(o); courseSel.value = label;
+        }
+      }
+      if (parts[1] && document.getElementById("qaEntryStart")) {
+        // timetable may be HH:MM already
+        var st = parts[1];
+        if (/^\d{1,2}:\d{2}$/.test(st)) document.getElementById("qaEntryStart").value = st.length === 4 ? ("0" + st) : st;
+      }
+      calcQaDurationMinutes();
     });
   });
   tbody.querySelectorAll("[data-report-qa]").forEach(function(btn) {
@@ -2062,33 +2180,46 @@ async function buildAttendanceSheet() {
   await fillProgrammeLevelSelects();
   var prog = (document.getElementById("attProgramme") && document.getElementById("attProgramme").value) || "";
   var level = (document.getElementById("attLevel") && document.getElementById("attLevel").value) || "";
-  var date = (document.getElementById("attSheetDate") && document.getElementById("attSheetDate").value) || new Date().toISOString().slice(0, 10);
-  var course = (document.getElementById("attCourseLabel") && document.getElementById("attCourseLabel").value.trim()) || "";
+  if (!prog || !level) {
+    alert("Select both programme and level to build the sheet.");
+    return;
+  }
   var list = studentsCache.filter(function(s) {
     if (s.status && s.status !== "Active") return false;
-    if (prog && String(s.programme || "") !== prog) return false;
-    if (level && String(s.level || "") !== String(level)) return false;
+    if (String(s.programme || "") !== prog) return false;
+    if (String(s.level || "") !== String(level)) return false;
     return true;
   }).sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
+
+  var sheetKey = [prog, level].join("|");
+  var existing = (await getAll("attendance")).find(function(r) { return r.sheetKey === sheetKey; });
+  var marks = (existing && existing.marks) || {};
+
   var title = document.getElementById("attendanceSheetTitle");
-  if (title) title.textContent = "Attendance — " + (prog || "All programmes") + " · Level " + (level || "all") + " · " + date;
+  if (title) title.textContent = "Attendance sheet — " + prog + " · Level " + level;
   var body = document.getElementById("attendanceSheetBody");
   if (!body) return;
   if (!list.length) {
-    body.innerHTML = "<div class=\"empty-state\"><h3>No students</h3><p>No active students match these filters.</p></div>";
+    body.innerHTML = "<div class=\"empty-state\"><h3>No students</h3><p>No active students in this programme and level.</p></div>";
     return;
   }
+  window.__attSheetMeta = { sheetKey: sheetKey, programme: prog, level: level, studentIds: list.map(function(s) { return s.id; }) };
   var rows = list.map(function(s, i) {
-    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
-      "</td><td>" + escapeHtml(s.programme || "") + "</td><td>" + escapeHtml(String(s.level || "")) +
-      "</td><td style=\"width:48px\"></td><td style=\"width:48px\"></td><td style=\"width:120px\"></td></tr>";
+    var m = marks[s.id] || "";
+    var pChecked = m === "P" ? " checked" : "";
+    var aChecked = m === "A" ? " checked" : "";
+    return "<tr data-stu=\"" + s.id + "\"><td style=\"text-align:center\">" + (i + 1) + "</td><td>" + escapeHtml(s.name) +
+      "</td><td>" + escapeHtml(s.regNo || "") + "</td>" +
+      "<td class=\"qa-edit-only\" style=\"text-align:center\"><input type=\"radio\" name=\"att-" + s.id + "\" value=\"P\"" + pChecked + " /></td>" +
+      "<td class=\"qa-edit-only\" style=\"text-align:center\"><input type=\"radio\" name=\"att-" + s.id + "\" value=\"A\"" + aChecked + " /></td>" +
+      "<td></td></tr>";
   }).join("");
   body.innerHTML = "<div class=\"print-report\" id=\"attendancePrintRoot\">" +
     "<h1>EOCNS Class Attendance Sheet</h1>" +
-    "<div class=\"sub\">" + escapeHtml(course || "General") + " · " + escapeHtml(date) + " · " + list.length + " students</div>" +
-    "<table><thead><tr><th>#</th><th>Name</th><th>Reg No</th><th>Programme</th><th>Level</th><th>P</th><th>A</th><th>Signature</th></tr></thead><tbody>" +
+    "<div class=\"sub\">" + escapeHtml(prog) + " · Level " + escapeHtml(String(level)) + " · " + list.length + " students</div>" +
+    "<table><thead><tr><th style=\"width:48px\">S/N</th><th>Full Name</th><th>Reg. No</th><th style=\"width:48px\">P</th><th style=\"width:48px\">A</th><th style=\"width:140px\">Signature</th></tr></thead><tbody>" +
     rows + "</tbody></table>" +
-    "<p style=\"margin-top:24px;font-size:0.85rem\">Lecturer: ______________________ &nbsp;&nbsp; Date: " + escapeHtml(date) + "</p>" +
+    "<p style=\"margin-top:24px;font-size:0.85rem\">Lecturer: ______________________ &nbsp;&nbsp; Date: ______________</p>" +
     "</div>";
 }
 function printAttendanceSheet() {
@@ -2248,6 +2379,7 @@ async function saveAttendanceSheet() {
   };
   await put("attendance", rec);
   await writeAudit({ action: prev ? "update" : "create", entity: "attendance", entityId: rec.id, reason: "Class attendance saved", details: { date: meta.date, course: meta.course, count: Object.keys(marks).length } });
+  markDirty("attendance");
   alert("Attendance saved. Publish to repository when ready.");
 }
 

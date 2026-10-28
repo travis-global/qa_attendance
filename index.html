@@ -8,9 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=18" />
+  <link rel="stylesheet" href="style.css?v=19" />
 </head>
 <body class="role-viewer">
+  <div id="dirtyBanner" class="dirty-banner" hidden role="status"></div>
   <div class="app">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar__brand">
@@ -116,10 +117,25 @@
               <button class="btn btn--primary" id="btnAddStudent" class="btn btn--primary qa-edit-only">+ Add Student</button>
             </div>
           </div>
+          
+          <div class="card qa-edit-only" id="studentBulkBar" style="margin-bottom:12px">
+            <div class="card__body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+              <label class="field" style="margin:0"><span class="field__label">Move selected to programme</span>
+                <select id="bulkProgramme"><option value="">— Programme —</option></select>
+              </label>
+              <label class="field" style="margin:0"><span class="field__label">Move selected to level</span>
+                <select id="bulkLevel"><option value="">— Level —</option></select>
+              </label>
+              <button type="button" class="btn btn--primary" id="btnBulkMove">Apply move / upgrade</button>
+              <button type="button" class="btn btn--ghost" id="btnBulkDeactivate">Remove from active group</button>
+              <span class="muted-note" id="bulkSelectedCount">0 selected</span>
+            </div>
+          </div>
+
           <div class="table-card">
             <div class="table-scroll">
               <table class="data-table">
-                <thead><tr><th>Name</th><th>Reg. No</th><th>Programme</th><th>Level</th><th>Hostel</th><th>Status</th><th></th></tr></thead>
+                <thead><tr><th class="qa-edit-only"><input type="checkbox" id="selectAllStudents" title="Select all visible" /></th><th>Name</th><th>Reg. No</th><th>Programme</th><th>Level</th><th>Hostel</th><th>Status</th><th></th></tr></thead>
                 <tbody id="studentsTableBody"></tbody>
               </table>
             </div>
@@ -223,25 +239,7 @@
           </div>
           <div id="qaDailyStats" class="stats-grid" style="margin-bottom:16px" hidden></div>
           
-          <div class="card qa-edit-only" id="studentBulkBar" style="margin-bottom:12px">
-            <div class="card__body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
-              <label class="field" style="margin:0"><span class="field__label">Filter programme</span>
-                <select id="filterProgramme"><option value="">All programmes</option></select>
-              </label>
-              <label class="field" style="margin:0"><span class="field__label">Filter level</span>
-                <select id="filterLevel"><option value="">All levels</option></select>
-              </label>
-              <label class="field" style="margin:0"><span class="field__label">Move selected to programme</span>
-                <select id="bulkProgramme"><option value="">— Programme —</option></select>
-              </label>
-              <label class="field" style="margin:0"><span class="field__label">Move selected to level</span>
-                <select id="bulkLevel"><option value="">— Level —</option></select>
-              </label>
-              <button type="button" class="btn btn--primary" id="btnBulkMove">Apply move / upgrade</button>
-              <button type="button" class="btn btn--ghost" id="btnBulkDeactivate">Remove from active group</button>
-              <span class="muted-note" id="bulkSelectedCount">0 selected</span>
-            </div>
-          </div>
+          
 <div class="card">
             <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
               <h3 style="margin:0">Scheduled vs logged</h3>
@@ -367,14 +365,13 @@
           <div class="card" style="margin-bottom:16px">
             <div class="card__body">
               <div class="form-grid">
-                <label class="field"><span class="field__label">Programme</span><select id="attProgramme"><option value="">All</option></select></label>
-                <label class="field"><span class="field__label">Level</span><select id="attLevel"><option value="">All</option></select></label>
-                <label class="field"><span class="field__label">Sheet date</span><input type="date" id="attSheetDate" /></label>
-                <label class="field"><span class="field__label">Course / activity</span><input type="text" id="attCourseLabel" placeholder="e.g. NUS 121" /></label>
+                <label class="field"><span class="field__label">Programme <span class="req">*</span></span><select id="attProgramme"><option value="">— Select —</option></select></label>
+                <label class="field"><span class="field__label">Level <span class="req">*</span></span><select id="attLevel"><option value="">— Select —</option></select></label>
                 <label class="field"><span class="field__label">&nbsp;</span>
                   <button type="button" class="btn btn--primary" id="btnBuildAttendance">Build sheet</button>
                 </label>
               </div>
+              <p class="muted-note" style="margin:12px 0 0">Sheet lists S/N, full name and registration number for the selected programme and level. Mark Present (P) or Absent (A) when logging; print for paper use.</p>
             </div>
           </div>
           <div class="card" id="attendanceSheetCard">
@@ -612,16 +609,18 @@
               <option value="200_midwifery">200 Level Midwifery</option>
             </select>
           </label>
-          <label class="field field--full"><span class="field__label">Course code / name <span class="req">*</span></span>
-            <input type="text" id="qaEntryCourse" list="qaCourseList" required placeholder="e.g. NUS 121 — Human Anatomy II" />
-            <datalist id="qaCourseList"></datalist>
+          <label class="field field--full"><span class="field__label">Course <span class="req">*</span></span>
+            <select id="qaEntryCourse" required>
+              <option value="">— Select course —</option>
+            </select>
           </label>
           <label class="field field--full"><span class="field__label">Lecturer <span class="req">*</span></span>
-            <input type="text" id="qaEntryLecturer" list="qaLecturerList" required />
-            <datalist id="qaLecturerList"></datalist>
+            <select id="qaEntryLecturer" required>
+              <option value="">— Select lecturer —</option>
+            </select>
           </label>
-          <label class="field"><span class="field__label">Start time</span><input type="text" id="qaEntryStart" placeholder="e.g. 8:00 AM" /></label>
-          <label class="field"><span class="field__label">End time</span><input type="text" id="qaEntryEnd" placeholder="e.g. 10:00 AM" /></label>
+          <label class="field"><span class="field__label">Start time <span class="req">*</span></span><input type="time" id="qaEntryStart" required /></label>
+          <label class="field"><span class="field__label">End time <span class="req">*</span></span><input type="time" id="qaEntryEnd" required /></label>
           <label class="field"><span class="field__label">Status <span class="req">*</span></span>
             <select id="qaEntryStatus" required>
               <option value="Held">Held</option>
@@ -630,7 +629,9 @@
               <option value="Rescheduled">Rescheduled</option>
             </select>
           </label>
-          <label class="field"><span class="field__label">Duration (minutes)</span><input type="number" id="qaEntryDuration" min="0" step="5" placeholder="60" /></label>
+          <label class="field"><span class="field__label">Duration (minutes)</span>
+            <input type="number" id="qaEntryDuration" readonly tabindex="-1" placeholder="Auto from start–end" title="Calculated from start and end time" />
+          </label>
           <label class="field field--full"><span class="field__label">Topic</span><input type="text" id="qaEntryTopic" placeholder="Lecture topic" /></label>
           <label class="field field--full"><span class="field__label">Learning objectives</span><textarea id="qaEntryObjectives" rows="2" placeholder="Separate with period or semicolon"></textarea></label>
           <label class="field field--full"><span class="field__label">Lecture summary</span><textarea id="qaEntrySummary" rows="3" placeholder="What was covered…"></textarea></label>
@@ -649,6 +650,6 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=18"></script>
+  <script src="app.js?v=19"></script>
 </body>
 </html>
