@@ -17,6 +17,7 @@ const ALLOWED_PATHS = new Set([
   "data/courses.json",
   "data/timetables.json",
   "data/attendance.json",
+  "data/hostel_runs.json",
 ]);
 
 function corsHeaders(origin) {

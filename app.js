@@ -25,6 +25,7 @@ const titles = {
   lecturers: { title: "Lecturers", subtitle: "Staff & course assignments" },
   hostel: { title: "Hostel Attendance", subtitle: "Gate log to boarding fee reports" },
   sessions: { title: "Academic Sessions", subtitle: "Programmes, levels and timetables" },
+  "timetable-board": { title: "Timetable board", subtitle: "Weekly teaching grid" },
   "qa-daily": { title: "Daily QA", subtitle: "Lecture compliance" },
   "qa-weekly": { title: "Weekly QA", subtitle: "Weekly teaching compliance" },
   "qa-monthly": { title: "Monthly QA", subtitle: "Full monthly quality assurance" },
@@ -46,7 +47,8 @@ function showView(viewId) {
   if (viewId === "sessions") renderSessionsList();
   if (viewId === "dashboard") refreshDashboardStats();
   if (viewId === "audit") renderAuditLog();
-  if (viewId === "hostel") initHostelView();
+  if (viewId === "hostel") { initHostelView(); renderHostelRoster(); }
+  if (viewId === "timetable-board") renderTimetableBoard();
   if (viewId === "qa-daily") renderQaDaily();
   if (viewId === "qa-weekly") initQaWeeklyView();
   if (viewId === "qa-monthly") initQaMonthlyView();
@@ -85,7 +87,7 @@ window.addEventListener("beforeunload", function(e) {
 });
 
 const DB_NAME = "eocns_attendance";
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 let db = null;
 
 async function resetLocalDatabase() {
@@ -152,6 +154,9 @@ function openDB() {
           const att = database.createObjectStore("attendance", { keyPath: "id" });
           att.createIndex("date", "date", { unique: false });
           att.createIndex("classKey", "classKey", { unique: false });
+        }
+        if (!database.objectStoreNames.contains("hostel_runs")) {
+          database.createObjectStore("hostel_runs", { keyPath: "id" });
         }
       } catch (upgradeErr) {
         console.error("onupgradeneeded", upgradeErr);
@@ -938,7 +943,7 @@ function parseAttendanceDateHostel(raw) {
   return null;
 }
 
-function computeHostelAttendance(rows, startDate, endDate, hostel1Name, hostel2Name) {
+async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, hostel2Name) {
   const headerIndex = {};
   rows[0].forEach((v, i) => {
     const k = String(v).trim();
@@ -948,7 +953,26 @@ function computeHostelAttendance(rows, startDate, endDate, hostel1Name, hostel2N
   const noCol = headerIndex["No."];
   const dateCol = headerIndex["Date/Time"];
   const statusCol = headerIndex["Status"];
-  const locationCol = headerIndex["Location ID"];
+  // Location ID intentionally ignored for hostel placement (machine mixes 1/2).
+  const master = await getAll("students");
+  function normName(n) {
+    return String(n || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  }
+  const byNo = {};
+  const byName = {};
+  master.forEach(function(s) {
+    if (s.serial) byNo[String(s.serial).trim()] = s;
+    if (s.regNo) byNo[String(s.regNo).trim().toUpperCase()] = s;
+    const nn = normName(s.name);
+    if (nn) byName[nn] = s;
+  });
+  function resolveMaster(name, studentId) {
+    if (studentId && byNo[String(studentId).trim()]) return byNo[String(studentId).trim()];
+    if (studentId && byNo[String(studentId).trim().toUpperCase()]) return byNo[String(studentId).trim().toUpperCase()];
+    const nn = normName(name);
+    if (nn && byName[nn]) return byName[nn];
+    return null;
+  }
   const students = {};
   const attendance = {};
   for (let r = 1; r < rows.length; r++) {
@@ -958,12 +982,22 @@ function computeHostelAttendance(rows, startDate, endDate, hostel1Name, hostel2N
     if (!rawName || studentIdRaw === "" || studentIdRaw == null) continue;
     const name = String(rawName).trim();
     const studentId = normalizeStudentIdHostel(studentIdRaw);
-    const locationRaw = String(row[locationCol] || "").trim();
-    let hostel = "Unknown";
-    if (locationRaw === "1") hostel = hostel1Name;
-    else if (locationRaw === "2") hostel = hostel2Name;
+    const masterStu = resolveMaster(name, studentId);
+    // Hostel ALWAYS from master list when known
+    let hostel = "Unassigned (set on Students master)";
+    if (masterStu && masterStu.hostel) hostel = masterStu.hostel;
+    else if (masterStu) hostel = "Unassigned (set on Students master)";
+    // Do not use machine Location ID for hostel name
     if (!(studentId in students)) {
-      students[studentId] = { name, hostel };
+      students[studentId] = {
+        name: masterStu ? masterStu.name : name,
+        hostel: hostel,
+        regNo: masterStu ? (masterStu.regNo || "") : "",
+        programme: masterStu ? (masterStu.programme || "") : "",
+        level: masterStu ? (masterStu.level || "") : "",
+        masterId: masterStu ? masterStu.id : null,
+        matched: !!masterStu
+      };
       attendance[studentId] = new Set();
     }
     const rawDate = row[dateCol];
@@ -1007,20 +1041,28 @@ function buildDayHeadersHostel(dates) {
 
 function buildAbsenteeRowsHostel(students, attendance, dates, rate) {
   const rows = [];
-  Object.keys(students).sort((a, b) => {
-    const na = students[a].name.toLowerCase();
-    const nb = students[b].name.toLowerCase();
-    return na < nb ? -1 : na > nb ? 1 : 0;
-  }).forEach(id => {
+  Object.keys(students).forEach(function(id) {
+    const meta = students[id];
     const present = attendance[id] || new Set();
-    const dayMarks = dates.map(d => present.has(toDateKeyHostel(d)) ? "" : "A");
-    const absentDays = dayMarks.filter(m => m === "A").length;
+    const dayMarks = dates.map(function(d) {
+      const key = toDateKeyHostel(d);
+      return present.has(key) ? "✓" : "";
+    });
+    const absentDays = dayMarks.filter(function(m) { return !m; }).length;
     if (absentDays === 0) return;
     rows.push({
-      id, name: students[id].name, hostel: students[id].hostel,
-      dayMarks, absentDays, fine: absentDays * rate,
+      id: id,
+      name: meta.name,
+      hostel: meta.hostel,
+      regNo: meta.regNo || "",
+      programme: meta.programme || "",
+      level: meta.level || "",
+      dayMarks: dayMarks,
+      absentDays: absentDays,
+      fine: absentDays * rate
     });
   });
+  rows.sort(function(a, b) { return a.name.localeCompare(b.name); });
   return rows;
 }
 
@@ -1068,52 +1110,47 @@ function downloadHostelWorkbook(absentees, dayHeaders, filename) {
 }
 
 async function generateHostelReport() {
-  setHostelStatus("", "");
+  const statusEl = document.getElementById("hostelStatus");
   if (!hostelParsedRows) {
-    setHostelStatus("Please choose a valid attendance file first.", "err");
+    setHostelStatus("Upload a gate export first.", "error");
     return;
   }
   const startDate = parseInputDateHostel(document.getElementById("hostelStartDate").value);
   const endDate = parseInputDateHostel(document.getElementById("hostelEndDate").value);
-  if (!startDate || !endDate) {
-    setHostelStatus("Please set both a start date and an end date.", "err");
+  if (!startDate || !endDate || endDate < startDate) {
+    setHostelStatus("Choose a valid start and end date.", "error");
     return;
   }
-  if (endDate < startDate) {
-    setHostelStatus("End date cannot be before start date.", "err");
-    return;
-  }
-  const rate = Number(document.getElementById("hostelRate").value);
-  if (!Number.isFinite(rate) || rate < 0) {
-    setHostelStatus("Enter a valid rate per absent day.", "err");
-    return;
-  }
-  const hostel1Name = (document.getElementById("hostel1Name").value || "Hostel 1").trim();
-  const hostel2Name = (document.getElementById("hostel2Name").value || "Hostel 2").trim();
-  const btn = document.getElementById("btnGenerateHostel");
-  btn.disabled = true;
-  setHostelStatus("Working…", "");
+  const rate = Number(document.getElementById("hostelRate").value) || 0;
+  const hostel1Name = (document.getElementById("hostel1Name") && document.getElementById("hostel1Name").value) || "Hostel 1";
+  const hostel2Name = (document.getElementById("hostel2Name") && document.getElementById("hostel2Name").value) || "Hostel 2";
   try {
-    const result = computeHostelAttendance(hostelParsedRows, startDate, endDate, hostel1Name, hostel2Name);
-    if (Object.keys(result.students).length === 0) {
-      setHostelStatus("No students found in this date range.", "err");
-      return;
-    }
-    const absentees = buildAbsenteeRowsHostel(result.students, result.attendance, result.dates, rate);
-    if (absentees.length === 0) {
-      setHostelStatus("Nobody was absent in this date range — nothing to report.", "err");
-      return;
-    }
+    const result = await computeHostelAttendance(hostelParsedRows, startDate, endDate, hostel1Name, hostel2Name);
     const dayHeaders = buildDayHeadersHostel(result.dates);
+    const absentees = buildAbsenteeRowsHostel(result.students, result.attendance, result.dates, rate);
     renderHostelPreview(absentees, dayHeaders, rate);
-    const baseName = buildOutputBaseNameHostel(startDate, endDate);
-    downloadHostelWorkbook(absentees, dayHeaders, baseName + ".xlsx");
-    setHostelStatus('Done — "' + baseName + '.xlsx" downloaded.', "ok");
+    window.__lastHostelReport = { absentees: absentees, dayHeaders: dayHeaders, rate: rate, startDate: startDate, endDate: endDate, students: result.students, dates: result.dates };
+    // Persist run for audit trail (snapshot of hostel at report time)
+    const run = {
+      id: "hr_" + Date.now().toString(36),
+      createdAt: new Date().toISOString(),
+      start: toDateKeyHostel(startDate),
+      end: toDateKeyHostel(endDate),
+      rate: rate,
+      absenteeCount: absentees.length,
+      totalFine: absentees.reduce(function(s, r) { return s + r.fine; }, 0),
+      rows: absentees.map(function(r) {
+        return { name: r.name, hostel: r.hostel, regNo: r.regNo || "", absentDays: r.absentDays, fine: r.fine, programme: r.programme || "", level: r.level || "" };
+      }),
+      note: "Hostel labels taken from student master at generation time. Machine Location ID ignored."
+    };
+    await put("hostel_runs", run);
+    markDirty("hostel report");
+    setHostelStatus("Report ready · " + absentees.length + " absentees · master hostels used · saved locally (Publish to keep).", "ok");
+    renderProfessionalHostelPreview(absentees, dayHeaders, rate, startDate, endDate);
   } catch (err) {
     console.error(err);
-    setHostelStatus("Something went wrong while building the report.", "err");
-  } finally {
-    btn.disabled = false;
+    setHostelStatus("Failed: " + (err.message || String(err)), "error");
   }
 }
 
@@ -1179,7 +1216,364 @@ openDB().then(async () => {
 
   // QA module
   seedQaDatalists();
-  const todayStr = (function() { var d = new Date(); return d.toISOString().slice(0, 10); })();
+  const todayStr = (function() { var d = new Date(); return d.toISOString().slice(0, 10); 
+async function renderHostelRoster() {
+  await loadStudents();
+  await fillProgrammeLevelSelects();
+  // map roster selects
+  var pf = document.getElementById("hostelRosterProgramme");
+  var lf = document.getElementById("hostelRosterLevel");
+  if (pf && pf.options.length <= 1) {
+    var ap = document.getElementById("attProgramme");
+    if (ap) pf.innerHTML = ap.innerHTML;
+  }
+  if (lf && lf.options.length <= 1) {
+    var al = document.getElementById("attLevel");
+    if (al) lf.innerHTML = al.innerHTML;
+  }
+  var hostelF = (document.getElementById("hostelRosterFilter") && document.getElementById("hostelRosterFilter").value) || "";
+  var prog = (pf && pf.value) || "";
+  var level = (lf && lf.value) || "";
+  var list = studentsCache.filter(function(s) {
+    if (s.status && s.status !== "Active") return false;
+    if (prog && String(s.programme || "") !== prog) return false;
+    if (level && String(s.level || "") !== String(level)) return false;
+    var h = (s.hostel || "").trim();
+    if (hostelF === "__unset") return !h;
+    if (hostelF) return h === hostelF;
+    return true;
+  }).sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
+  var body = document.getElementById("hostelRosterBody");
+  if (!body) return;
+  body.innerHTML = list.length ? list.map(function(s) {
+    return "<tr><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") + "</td><td>" + escapeHtml(s.programme || "") +
+      "</td><td>" + escapeHtml(String(s.level || "")) + "</td><td><strong>" + escapeHtml(s.hostel || "—") + "</strong></td></tr>";
+  }).join("") : "<tr><td colspan=\"5\">No students match.</td></tr>";
+}
+
+function svgPie(slices, size) {
+  size = size || 160;
+  var total = slices.reduce(function(s, x) { return s + x.value; }, 0) || 1;
+  var cx = size / 2, cy = size / 2, r = size / 2 - 4;
+  var angle = -Math.PI / 2;
+  var paths = [];
+  slices.forEach(function(sl) {
+    var a = (sl.value / total) * Math.PI * 2;
+    var x1 = cx + r * Math.cos(angle);
+    var y1 = cy + r * Math.sin(angle);
+    angle += a;
+    var x2 = cx + r * Math.cos(angle);
+    var y2 = cy + r * Math.sin(angle);
+    var large = a > Math.PI ? 1 : 0;
+    paths.push('<path d="M ' + cx + ' ' + cy + ' L ' + x1 + ' ' + y1 + ' A ' + r + ' ' + r + ' 0 ' + large + ' 1 ' + x2 + ' ' + y2 + ' Z" fill="' + sl.color + '"><title>' + sl.label + ': ' + sl.value + '</title></path>');
+  });
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' + paths.join("") + '</svg>';
+}
+
+function svgBars(items, width, height) {
+  width = width || 320; height = height || 140;
+  var max = Math.max.apply(null, items.map(function(i) { return i.value; }).concat([1]));
+  var gap = 8;
+  var barW = (width - gap * (items.length + 1)) / items.length;
+  var bars = items.map(function(it, i) {
+    var h = Math.round((it.value / max) * (height - 28));
+    var x = gap + i * (barW + gap);
+    var y = height - 20 - h;
+    return '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + h + '" fill="' + (it.color || "#0d9488") + '" rx="3"/>' +
+      '<text x="' + (x + barW / 2) + '" y="' + (height - 6) + '" text-anchor="middle" font-size="10" fill="#334">' + it.label + '</text>' +
+      '<text x="' + (x + barW / 2) + '" y="' + (y - 4) + '" text-anchor="middle" font-size="10" fill="#111">' + it.value + '</text>';
+  }).join("");
+  return '<svg width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '">' + bars + '</svg>';
+}
+
+function renderProfessionalHostelPreview(absentees, dayHeaders, rate, startDate, endDate) {
+  var host = document.getElementById("hostelResults");
+  if (!host) return;
+  var byHostel = {};
+  absentees.forEach(function(r) {
+    byHostel[r.hostel] = byHostel[r.hostel] || { count: 0, fine: 0 };
+    byHostel[r.hostel].count += 1;
+    byHostel[r.hostel].fine += r.fine;
+  });
+  var totalFine = absentees.reduce(function(s, r) { return s + r.fine; }, 0);
+  var colors = ["#0d9488", "#1d4ed8", "#b45309", "#be123c", "#6d28d9"];
+  var pieSlices = Object.keys(byHostel).map(function(k, i) {
+    return { label: k, value: byHostel[k].count, color: colors[i % colors.length] };
+  });
+  var barItems = Object.keys(byHostel).map(function(k, i) {
+    return { label: k.replace("Hostel ", "H"), value: Math.round(byHostel[k].fine), color: colors[i % colors.length] };
+  });
+  var period = toDateKeyHostel(startDate) + " → " + toDateKeyHostel(endDate);
+  var summaryHtml =
+    '<div class="pro-report" style="margin-top:16px">' +
+    '<h3 style="margin:0 0 8px">Executive summary — Hostel boarding fee</h3>' +
+    '<p style="margin:0 0 12px;line-height:1.5">Period <strong>' + period + '</strong>. Rate <strong>' + formatNairaHostel(rate) + '</strong> per absent night. ' +
+    '<strong>' + absentees.length + '</strong> students incurred charges totalling <strong>' + formatNairaHostel(totalFine) + '</strong>. ' +
+    'Hostel labels are taken from the <em>student master list</em> (not the biometric machine), so mixed Location IDs do not mis-assign students.</p>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin-bottom:16px">' +
+    '<div><div class="muted-note">Absentees by hostel</div>' + svgPie(pieSlices, 150) + '</div>' +
+    '<div><div class="muted-note">Fines by hostel (₦)</div>' + svgBars(barItems, 280, 130) + '</div></div>' +
+    '<button type="button" class="btn btn--primary" id="btnPrintHostelPack">Print professional hostel pack</button>' +
+    '</div>';
+  var existing = host.querySelector(".pro-report");
+  if (existing) existing.remove();
+  host.insertAdjacentHTML("beforeend", summaryHtml);
+  document.getElementById("btnPrintHostelPack") && document.getElementById("btnPrintHostelPack").addEventListener("click", function() {
+    printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, endDate, pieSlices, barItems);
+  });
+}
+
+function printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, endDate, pieSlices, barItems) {
+  var totalFine = absentees.reduce(function(s, r) { return s + r.fine; }, 0);
+  var period = toDateKeyHostel(startDate) + " to " + toDateKeyHostel(endDate);
+  var rows = absentees.map(function(r, i) {
+    return "<tr><td>" + (i + 1) + "</td><td>" + r.name + "</td><td>" + (r.regNo || "") + "</td><td>" + r.hostel +
+      "</td><td>" + r.absentDays + "</td><td>" + formatNairaHostel(r.fine) + "</td></tr>";
+  }).join("");
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Hostel Boarding Fee Report</title><style>" +
+    "body{font-family:Georgia,'Times New Roman',serif;color:#111;padding:28px;max-width:900px;margin:0 auto}" +
+    "h1{color:#1B3A6B;text-align:center;margin-bottom:4px;font-size:1.35rem}" +
+    ".sub{text-align:center;color:#555;margin-bottom:20px;font-size:13px}" +
+    "h2{color:#1B3A6B;font-size:1.05rem;border-bottom:2px solid #1B3A6B;padding-bottom:4px;margin-top:28px}" +
+    "table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}" +
+    "th{background:#1B3A6B;color:#fff;padding:7px 8px;text-align:left} td{border:1px solid #ccc;padding:6px 8px}" +
+    "tr:nth-child(even) td{background:#f5f7fb}" +
+    ".kpi{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}" +
+    ".kpi div{flex:1;min-width:120px;background:#f0f9f8;border:1px solid #99e6df;border-radius:8px;padding:12px;text-align:center}" +
+    ".kpi strong{display:block;font-size:1.25rem;color:#0f766e}" +
+    "p.narrative{line-height:1.55;font-size:13px}" +
+    "@media print{body{padding:12px}}</style></head><body>" +
+    "<h1>Eastern Oak College of Nursing Sciences</h1>" +
+    "<div class=\"sub\">Hostel Boarding Fee / Absentee Report · Official QA Pack</div>" +
+    "<h2>1. Executive summary</h2>" +
+    "<p class=\"narrative\">This report covers <strong>" + period + "</strong> at a charge of <strong>" + formatNairaHostel(rate) +
+    "</strong> per absent night. <strong>" + absentees.length + "</strong> students were absent on one or more nights, generating a combined liability of <strong>" +
+    formatNairaHostel(totalFine) + "</strong>. Hostel placement is resolved exclusively from the college student master register so that biometric Location ID errors cannot mis-assign a resident to the wrong hostel. Historical published runs remain unchanged if a student is later moved between hostels.</p>" +
+    "<div class=\"kpi\"><div><strong>" + absentees.length + "</strong>Absentees</div>" +
+    "<div><strong>" + formatNairaHostel(totalFine) + "</strong>Total due</div>" +
+    "<div><strong>" + formatNairaHostel(rate) + "</strong>Daily rate</div></div>" +
+    "<h2>2. Distribution</h2>" +
+    "<div style=\"display:flex;gap:24px;flex-wrap:wrap;align-items:center\">" + svgPie(pieSlices, 160) + svgBars(barItems, 300, 140) + "</div>" +
+    "<h2>3. Student liability schedule</h2>" +
+    "<table><thead><tr><th>#</th><th>Name</th><th>Reg. No</th><th>Hostel (master)</th><th>Days</th><th>Amount</th></tr></thead><tbody>" +
+    rows + "</tbody></table>" +
+    "<h2>4. Certification</h2>" +
+    "<p class=\"narrative\">Prepared via the EOCNS QA Attendance System. Machine Location ID was not used for hostel classification.</p>" +
+    "<p style=\"margin-top:36px\">QA Officer: ______________________ &nbsp;&nbsp; Date: ______________</p>" +
+    "</body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 350);
+}
+
+async function printFullQaPack() {
+  var entries = window.__lastReportEntries;
+  if (!entries || !entries.length) {
+    // build from filters
+    await renderReportsView();
+    entries = window.__lastReportEntries || [];
+  }
+  if (!entries.length) { alert("No lecture logs in the selected range. Set From/To and filter first."); return; }
+  var held = entries.filter(function(e) { return e.status === "Held"; }).length;
+  var missed = entries.filter(function(e) { return e.status === "Missed"; }).length;
+  var partial = entries.filter(function(e) { return e.status === "Partial"; }).length;
+  var other = entries.length - held - missed - partial;
+  var pie = [
+    { label: "Held", value: held, color: "#0d9488" },
+    { label: "Missed", value: missed, color: "#be123c" },
+    { label: "Partial", value: partial, color: "#b45309" },
+    { label: "Other", value: other, color: "#64748b" }
+  ].filter(function(x) { return x.value > 0; });
+  var byCourse = {};
+  entries.forEach(function(e) {
+    var c = e.course || "Unknown";
+    byCourse[c] = byCourse[c] || { held: 0, total: 0 };
+    byCourse[c].total += 1;
+    if (e.status === "Held") byCourse[c].held += 1;
+  });
+  var bars = Object.keys(byCourse).slice(0, 8).map(function(c) {
+    return { label: c.slice(0, 8), value: byCourse[c].held, color: "#1d4ed8" };
+  });
+  var compliance = entries.length ? Math.round((held / entries.length) * 100) : 0;
+  var blocks = entries.map(function(e, i) {
+    return "<tr><td>" + (i + 1) + "</td><td>" + (e.date || "") + "</td><td>" + (e.course || "") + "</td><td>" + (e.lecturer || "") +
+      "</td><td>" + (e.status || "") + "</td><td>" + (e.topic || "—") + "</td></tr>";
+  }).join("");
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>EOCNS QA Lecture Compliance Pack</title><style>" +
+    "body{font-family:Georgia,serif;color:#111;padding:28px;max-width:920px;margin:0 auto}" +
+    "h1{color:#1B3A6B;text-align:center;font-size:1.35rem;margin-bottom:4px}" +
+    ".sub{text-align:center;color:#555;margin-bottom:18px;font-size:13px}" +
+    "h2{color:#1B3A6B;font-size:1.05rem;border-bottom:2px solid #1B3A6B;padding-bottom:4px;margin-top:26px}" +
+    "table{width:100%;border-collapse:collapse;font-size:12px} th{background:#1B3A6B;color:#fff;padding:7px} td{border:1px solid #ccc;padding:6px}" +
+    "tr:nth-child(even) td{background:#f5f7fb} p{line-height:1.55;font-size:13px}" +
+    ".kpi{display:flex;gap:10px;flex-wrap:wrap}.kpi div{flex:1;min-width:110px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px;text-align:center}" +
+    ".kpi strong{display:block;font-size:1.2rem;color:#1d4ed8}" +
+    "</style></head><body>" +
+    "<h1>Eastern Oak College of Nursing Sciences</h1>" +
+    "<div class=\"sub\">Quality Assurance · Lecture Compliance Pack</div>" +
+    "<h2>1. Executive summary</h2>" +
+    "<p>This pack consolidates <strong>" + entries.length + "</strong> lecture log entries. Delivery compliance (status Held) stands at <strong>" +
+    compliance + "%</strong> (" + held + " held, " + missed + " missed, " + partial + " partial). Charts below summarise status mix and held sessions by course. Detailed logs follow for audit and filing.</p>" +
+    "<div class=\"kpi\"><div><strong>" + entries.length + "</strong>Logs</div><div><strong>" + compliance + "%</strong>Held rate</div>" +
+    "<div><strong>" + missed + "</strong>Missed</div></div>" +
+    "<h2>2. Status mix & course delivery</h2>" +
+    "<div style=\"display:flex;gap:20px;flex-wrap:wrap;align-items:center\">" + svgPie(pie, 150) + svgBars(bars, 320, 140) + "</div>" +
+    "<h2>3. Lecture log register</h2>" +
+    "<table><thead><tr><th>#</th><th>Date</th><th>Course</th><th>Lecturer</th><th>Status</th><th>Topic</th></tr></thead><tbody>" +
+    blocks + "</tbody></table>" +
+    "<h2>4. Certification</h2><p>Generated by the EOCNS QA Attendance System for internal quality review.</p>" +
+    "<p style=\"margin-top:32px\">QA Officer: ______________________ &nbsp;&nbsp; Date: ______________</p>" +
+    "</body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 350);
+}
+
+async function renderTimetableBoard() {
+  await ensureTimetables();
+  var key = (document.getElementById("ttBoardClass") && document.getElementById("ttBoardClass").value) || "100_nursing";
+  var tt = TIMETABLES_CACHE[key] || { slots: [] };
+  var days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+  var byDay = { 0: [], 1: [], 2: [], 3: [], 4: [] };
+  (tt.slots || []).forEach(function(s) {
+    var d = Number(s.weekday);
+    if (byDay[d]) byDay[d].push(s);
+  });
+  var cols = days.map(function(name, d) {
+    var cells = (byDay[d] || []).map(function(s) {
+      return '<button type="button" class="tt-slot" data-tt-code="' + escapeHtml(s.code || "") + '" data-tt-start="' + escapeHtml(s.start || "") + '">' +
+        '<strong>' + escapeHtml(s.code || "?") + '</strong><span>' + escapeHtml((s.start || "") + "–" + (s.end || "")) + '</span></button>';
+    }).join("") || '<span class="muted-note">—</span>';
+    return '<div class="tt-col"><div class="tt-col-h">' + name + '</div>' + cells + '</div>';
+  }).join("");
+  var board = document.getElementById("timetableBoard");
+  if (board) board.innerHTML = '<div class="card__body"><div class="tt-grid">' + cols + '</div></div>';
+  board && board.querySelectorAll(".tt-slot").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!isQaOfficer()) { alert("Sign in as QA Officer to log from the board."); return; }
+      await openQaEntryForm(null);
+      document.getElementById("qaEntryClass").value = key;
+      var code = btn.getAttribute("data-tt-code");
+      var start = btn.getAttribute("data-tt-start");
+      var courseSel = document.getElementById("qaEntryCourse");
+      if (courseSel && code) {
+        for (var i = 0; i < courseSel.options.length; i++) {
+          if (courseSel.options[i].value.indexOf(code) === 0) { courseSel.selectedIndex = i; break; }
+        }
+      }
+      if (start && document.getElementById("qaEntryStart")) document.getElementById("qaEntryStart").value = start.length === 4 ? ("0" + start) : start;
+      calcQaDurationMinutes();
+    });
+  });
+}
+
+async function importStudentsCsv(file) {
+  if (!isQaOfficer()) return;
+  var text = await file.text();
+  var lines = text.split(/\r?\n/).filter(function(l) { return l.trim(); });
+  if (lines.length < 2) { alert("CSV needs a header row and data."); return; }
+  function splitCsv(line) {
+    var out = [], cur = "", q = false;
+    for (var i = 0; i < line.length; i++) {
+      var ch = line[i];
+      if (ch === '"') { q = !q; continue; }
+      if (ch === "," && !q) { out.push(cur.trim()); cur = ""; continue; }
+      cur += ch;
+    }
+    out.push(cur.trim());
+    return out;
+  }
+  var headers = splitCsv(lines[0]).map(function(h) { return h.toLowerCase(); });
+  var idx = function(names) {
+    for (var i = 0; i < names.length; i++) {
+      var j = headers.indexOf(names[i]);
+      if (j >= 0) return j;
+    }
+    return -1;
+  };
+  var iName = idx(["name", "full name", "names of students", "student name"]);
+  var iReg = idx(["regno", "reg no", "reg. no", "registration number", "reg"]);
+  var iProg = idx(["programme", "program", "department"]);
+  var iLevel = idx(["level"]);
+  var iHostel = idx(["hostel"]);
+  if (iName < 0) { alert("CSV must include a Name column."); return; }
+  var added = 0;
+  for (var r = 1; r < lines.length; r++) {
+    var cols = splitCsv(lines[r]);
+    var name = cols[iName];
+    if (!name) continue;
+    var rec = {
+      id: "stu_" + Date.now().toString(36) + r,
+      name: name,
+      regNo: iReg >= 0 ? (cols[iReg] || "") : "",
+      programme: iProg >= 0 ? (cols[iProg] || "") : "",
+      level: iLevel >= 0 ? (cols[iLevel] || "") : "",
+      hostel: iHostel >= 0 ? (cols[iHostel] || "") : "",
+      status: "Active",
+      gender: "",
+      phone: "",
+      createdAt: new Date().toISOString()
+    };
+    await put("students", rec);
+    added++;
+  }
+  await writeAudit({ action: "create", entity: "students", entityId: "csv_import", reason: "Imported " + added + " students from CSV" });
+  markDirty("student import");
+  await renderStudentsTable();
+  alert("Imported " + added + " students. Publish when ready.");
+}
+
+async function exportFullSnapshot() {
+  if (!isQaOfficer()) return;
+  var snap = {
+    exportedAt: new Date().toISOString(),
+    students: shapeStudentsForRepo(await getAll("students")),
+    lecturers: await getAll("lecturers"),
+    sessions: await getAll("sessions"),
+    qa_entries: await getAll("qa_entries"),
+    audit: await getAll("audit"),
+    programmes: await getAll("programmes"),
+    levels: await getAll("levels"),
+    courses: await getAll("courses"),
+    attendance: await getAll("attendance"),
+    hostel_runs: await getAll("hostel_runs"),
+    timetables: TIMETABLES_CACHE || {}
+  };
+  downloadJsonReport("EOCNS_Snapshot_" + new Date().toISOString().slice(0, 10) + ".json", snap);
+}
+
+async function importFullSnapshot(file) {
+  if (!isQaOfficer()) return;
+  if (!confirm("Import snapshot? This overwrites local master data with the file contents. Publish afterwards to update the repository.")) return;
+  var snap = JSON.parse(await file.text());
+  async function replaceStore(name, rows) {
+    var existing = await getAll(name);
+    for (var i = 0; i < existing.length; i++) {
+      var key = existing[i].id != null ? existing[i].id : (existing[i].code != null ? existing[i].code : existing[i].key);
+      if (key != null) await del(name, key);
+    }
+    for (var j = 0; j < (rows || []).length; j++) await put(name, rows[j]);
+  }
+  if (snap.students) await replaceStore("students", snap.students.map(studentFromRepo));
+  if (snap.lecturers) await replaceStore("lecturers", snap.lecturers);
+  if (snap.sessions) await replaceStore("sessions", snap.sessions);
+  if (snap.qa_entries) await replaceStore("qa_entries", snap.qa_entries);
+  if (snap.programmes) await replaceStore("programmes", snap.programmes);
+  if (snap.levels) await replaceStore("levels", snap.levels);
+  if (snap.courses) await replaceStore("courses", snap.courses);
+  if (snap.attendance) await replaceStore("attendance", snap.attendance);
+  if (snap.hostel_runs) await replaceStore("hostel_runs", snap.hostel_runs);
+  if (snap.timetables) TIMETABLES_CACHE = snap.timetables;
+  markDirty("snapshot import");
+  await renderStudentsTable();
+  refreshDashboardStats();
+  alert("Snapshot loaded into this browser. Publish to repository to make it permanent.");
+}
+
+
+})();
   if (document.getElementById("qaDailyDate") && !document.getElementById("qaDailyDate").value) {
     document.getElementById("qaDailyDate").value = todayStr;
   }
@@ -1207,6 +1601,27 @@ openDB().then(async () => {
   document.getElementById("btnSaveTimetable") && document.getElementById("btnSaveTimetable").addEventListener("click", saveTimetableLocal);
   document.getElementById("ttClassKey") && document.getElementById("ttClassKey").addEventListener("change", renderTimetableEditor);
   document.getElementById("btnDownloadAudit") && document.getElementById("btnDownloadAudit").addEventListener("click", downloadAuditJson);
+  document.getElementById("btnPrintFullQaPack") && document.getElementById("btnPrintFullQaPack").addEventListener("click", printFullQaPack);
+  document.getElementById("btnExportSnapshot") && document.getElementById("btnExportSnapshot").addEventListener("click", exportFullSnapshot);
+  document.getElementById("btnImportSnapshot") && document.getElementById("btnImportSnapshot").addEventListener("click", function() {
+    document.getElementById("snapshotFileInput") && document.getElementById("snapshotFileInput").click();
+  });
+  document.getElementById("snapshotFileInput") && document.getElementById("snapshotFileInput").addEventListener("change", function(e) {
+    if (e.target.files && e.target.files[0]) importFullSnapshot(e.target.files[0]);
+    e.target.value = "";
+  });
+  document.getElementById("btnImportStudentsCsv") && document.getElementById("btnImportStudentsCsv").addEventListener("click", function() {
+    document.getElementById("studentsCsvInput") && document.getElementById("studentsCsvInput").click();
+  });
+  document.getElementById("studentsCsvInput") && document.getElementById("studentsCsvInput").addEventListener("change", function(e) {
+    if (e.target.files && e.target.files[0]) importStudentsCsv(e.target.files[0]);
+    e.target.value = "";
+  });
+  document.getElementById("btnRefreshHostelRoster") && document.getElementById("btnRefreshHostelRoster").addEventListener("click", renderHostelRoster);
+  document.getElementById("hostelRosterFilter") && document.getElementById("hostelRosterFilter").addEventListener("change", renderHostelRoster);
+  document.getElementById("hostelRosterProgramme") && document.getElementById("hostelRosterProgramme").addEventListener("change", renderHostelRoster);
+  document.getElementById("hostelRosterLevel") && document.getElementById("hostelRosterLevel").addEventListener("change", renderHostelRoster);
+  document.getElementById("btnRenderTtBoard") && document.getElementById("btnRenderTtBoard").addEventListener("click", renderTimetableBoard);
   document.getElementById("qaEntryStart") && document.getElementById("qaEntryStart").addEventListener("change", calcQaDurationMinutes);
   document.getElementById("qaEntryEnd") && document.getElementById("qaEntryEnd").addEventListener("change", calcQaDurationMinutes);
   document.getElementById("qaEntryStart") && document.getElementById("qaEntryStart").addEventListener("input", calcQaDurationMinutes);
@@ -1252,6 +1667,7 @@ const DATA_FILES = {
   courses: "data/courses.json",
   timetables: "data/timetables.json",
   attendance: "data/attendance.json",
+  hostel_runs: "data/hostel_runs.json",
   config: "data/config.json",
 };
 let APP_CONFIG = { qaPin: "EOCNS-QA" };
@@ -1389,6 +1805,7 @@ async function hydrateAllFromRepoIfEmpty() {
     ["levels", DATA_FILES.levels],
     ["courses", DATA_FILES.courses],
     ["attendance", DATA_FILES.attendance],
+    ["hostel_runs", DATA_FILES.hostel_runs],
   ]) {
     try {
       const existing = await getAll(store);
@@ -1528,6 +1945,7 @@ async function publishAllToRepo() {
     files[DATA_FILES.courses] = JSON.stringify(await getAll("courses"), null, 2);
     if (TIMETABLES_CACHE) files[DATA_FILES.timetables] = JSON.stringify(TIMETABLES_CACHE, null, 2);
     files[DATA_FILES.attendance] = JSON.stringify(await getAll("attendance"), null, 2);
+    files[DATA_FILES.hostel_runs] = JSON.stringify(await getAll("hostel_runs"), null, 2);
 
     var key = (APP_CONFIG.publishWorkerKey || "").trim();
     var headers = { "Content-Type": "application/json" };
@@ -2406,5 +2824,362 @@ async function saveAttendanceSheet() {
   markDirty("attendance");
   alert("Attendance saved. Publish to repository when ready.");
 }
+
+
+async function renderHostelRoster() {
+  await loadStudents();
+  await fillProgrammeLevelSelects();
+  // map roster selects
+  var pf = document.getElementById("hostelRosterProgramme");
+  var lf = document.getElementById("hostelRosterLevel");
+  if (pf && pf.options.length <= 1) {
+    var ap = document.getElementById("attProgramme");
+    if (ap) pf.innerHTML = ap.innerHTML;
+  }
+  if (lf && lf.options.length <= 1) {
+    var al = document.getElementById("attLevel");
+    if (al) lf.innerHTML = al.innerHTML;
+  }
+  var hostelF = (document.getElementById("hostelRosterFilter") && document.getElementById("hostelRosterFilter").value) || "";
+  var prog = (pf && pf.value) || "";
+  var level = (lf && lf.value) || "";
+  var list = studentsCache.filter(function(s) {
+    if (s.status && s.status !== "Active") return false;
+    if (prog && String(s.programme || "") !== prog) return false;
+    if (level && String(s.level || "") !== String(level)) return false;
+    var h = (s.hostel || "").trim();
+    if (hostelF === "__unset") return !h;
+    if (hostelF) return h === hostelF;
+    return true;
+  }).sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
+  var body = document.getElementById("hostelRosterBody");
+  if (!body) return;
+  body.innerHTML = list.length ? list.map(function(s) {
+    return "<tr><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") + "</td><td>" + escapeHtml(s.programme || "") +
+      "</td><td>" + escapeHtml(String(s.level || "")) + "</td><td><strong>" + escapeHtml(s.hostel || "—") + "</strong></td></tr>";
+  }).join("") : "<tr><td colspan=\"5\">No students match.</td></tr>";
+}
+
+function svgPie(slices, size) {
+  size = size || 160;
+  var total = slices.reduce(function(s, x) { return s + x.value; }, 0) || 1;
+  var cx = size / 2, cy = size / 2, r = size / 2 - 4;
+  var angle = -Math.PI / 2;
+  var paths = [];
+  slices.forEach(function(sl) {
+    var a = (sl.value / total) * Math.PI * 2;
+    var x1 = cx + r * Math.cos(angle);
+    var y1 = cy + r * Math.sin(angle);
+    angle += a;
+    var x2 = cx + r * Math.cos(angle);
+    var y2 = cy + r * Math.sin(angle);
+    var large = a > Math.PI ? 1 : 0;
+    paths.push('<path d="M ' + cx + ' ' + cy + ' L ' + x1 + ' ' + y1 + ' A ' + r + ' ' + r + ' 0 ' + large + ' 1 ' + x2 + ' ' + y2 + ' Z" fill="' + sl.color + '"><title>' + sl.label + ': ' + sl.value + '</title></path>');
+  });
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' + paths.join("") + '</svg>';
+}
+
+function svgBars(items, width, height) {
+  width = width || 320; height = height || 140;
+  var max = Math.max.apply(null, items.map(function(i) { return i.value; }).concat([1]));
+  var gap = 8;
+  var barW = (width - gap * (items.length + 1)) / items.length;
+  var bars = items.map(function(it, i) {
+    var h = Math.round((it.value / max) * (height - 28));
+    var x = gap + i * (barW + gap);
+    var y = height - 20 - h;
+    return '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + h + '" fill="' + (it.color || "#0d9488") + '" rx="3"/>' +
+      '<text x="' + (x + barW / 2) + '" y="' + (height - 6) + '" text-anchor="middle" font-size="10" fill="#334">' + it.label + '</text>' +
+      '<text x="' + (x + barW / 2) + '" y="' + (y - 4) + '" text-anchor="middle" font-size="10" fill="#111">' + it.value + '</text>';
+  }).join("");
+  return '<svg width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '">' + bars + '</svg>';
+}
+
+function renderProfessionalHostelPreview(absentees, dayHeaders, rate, startDate, endDate) {
+  var host = document.getElementById("hostelResults");
+  if (!host) return;
+  var byHostel = {};
+  absentees.forEach(function(r) {
+    byHostel[r.hostel] = byHostel[r.hostel] || { count: 0, fine: 0 };
+    byHostel[r.hostel].count += 1;
+    byHostel[r.hostel].fine += r.fine;
+  });
+  var totalFine = absentees.reduce(function(s, r) { return s + r.fine; }, 0);
+  var colors = ["#0d9488", "#1d4ed8", "#b45309", "#be123c", "#6d28d9"];
+  var pieSlices = Object.keys(byHostel).map(function(k, i) {
+    return { label: k, value: byHostel[k].count, color: colors[i % colors.length] };
+  });
+  var barItems = Object.keys(byHostel).map(function(k, i) {
+    return { label: k.replace("Hostel ", "H"), value: Math.round(byHostel[k].fine), color: colors[i % colors.length] };
+  });
+  var period = toDateKeyHostel(startDate) + " → " + toDateKeyHostel(endDate);
+  var summaryHtml =
+    '<div class="pro-report" style="margin-top:16px">' +
+    '<h3 style="margin:0 0 8px">Executive summary — Hostel boarding fee</h3>' +
+    '<p style="margin:0 0 12px;line-height:1.5">Period <strong>' + period + '</strong>. Rate <strong>' + formatNairaHostel(rate) + '</strong> per absent night. ' +
+    '<strong>' + absentees.length + '</strong> students incurred charges totalling <strong>' + formatNairaHostel(totalFine) + '</strong>. ' +
+    'Hostel labels are taken from the <em>student master list</em> (not the biometric machine), so mixed Location IDs do not mis-assign students.</p>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin-bottom:16px">' +
+    '<div><div class="muted-note">Absentees by hostel</div>' + svgPie(pieSlices, 150) + '</div>' +
+    '<div><div class="muted-note">Fines by hostel (₦)</div>' + svgBars(barItems, 280, 130) + '</div></div>' +
+    '<button type="button" class="btn btn--primary" id="btnPrintHostelPack">Print professional hostel pack</button>' +
+    '</div>';
+  var existing = host.querySelector(".pro-report");
+  if (existing) existing.remove();
+  host.insertAdjacentHTML("beforeend", summaryHtml);
+  document.getElementById("btnPrintHostelPack") && document.getElementById("btnPrintHostelPack").addEventListener("click", function() {
+    printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, endDate, pieSlices, barItems);
+  });
+}
+
+function printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, endDate, pieSlices, barItems) {
+  var totalFine = absentees.reduce(function(s, r) { return s + r.fine; }, 0);
+  var period = toDateKeyHostel(startDate) + " to " + toDateKeyHostel(endDate);
+  var rows = absentees.map(function(r, i) {
+    return "<tr><td>" + (i + 1) + "</td><td>" + r.name + "</td><td>" + (r.regNo || "") + "</td><td>" + r.hostel +
+      "</td><td>" + r.absentDays + "</td><td>" + formatNairaHostel(r.fine) + "</td></tr>";
+  }).join("");
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Hostel Boarding Fee Report</title><style>" +
+    "body{font-family:Georgia,'Times New Roman',serif;color:#111;padding:28px;max-width:900px;margin:0 auto}" +
+    "h1{color:#1B3A6B;text-align:center;margin-bottom:4px;font-size:1.35rem}" +
+    ".sub{text-align:center;color:#555;margin-bottom:20px;font-size:13px}" +
+    "h2{color:#1B3A6B;font-size:1.05rem;border-bottom:2px solid #1B3A6B;padding-bottom:4px;margin-top:28px}" +
+    "table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}" +
+    "th{background:#1B3A6B;color:#fff;padding:7px 8px;text-align:left} td{border:1px solid #ccc;padding:6px 8px}" +
+    "tr:nth-child(even) td{background:#f5f7fb}" +
+    ".kpi{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}" +
+    ".kpi div{flex:1;min-width:120px;background:#f0f9f8;border:1px solid #99e6df;border-radius:8px;padding:12px;text-align:center}" +
+    ".kpi strong{display:block;font-size:1.25rem;color:#0f766e}" +
+    "p.narrative{line-height:1.55;font-size:13px}" +
+    "@media print{body{padding:12px}}</style></head><body>" +
+    "<h1>Eastern Oak College of Nursing Sciences</h1>" +
+    "<div class=\"sub\">Hostel Boarding Fee / Absentee Report · Official QA Pack</div>" +
+    "<h2>1. Executive summary</h2>" +
+    "<p class=\"narrative\">This report covers <strong>" + period + "</strong> at a charge of <strong>" + formatNairaHostel(rate) +
+    "</strong> per absent night. <strong>" + absentees.length + "</strong> students were absent on one or more nights, generating a combined liability of <strong>" +
+    formatNairaHostel(totalFine) + "</strong>. Hostel placement is resolved exclusively from the college student master register so that biometric Location ID errors cannot mis-assign a resident to the wrong hostel. Historical published runs remain unchanged if a student is later moved between hostels.</p>" +
+    "<div class=\"kpi\"><div><strong>" + absentees.length + "</strong>Absentees</div>" +
+    "<div><strong>" + formatNairaHostel(totalFine) + "</strong>Total due</div>" +
+    "<div><strong>" + formatNairaHostel(rate) + "</strong>Daily rate</div></div>" +
+    "<h2>2. Distribution</h2>" +
+    "<div style=\"display:flex;gap:24px;flex-wrap:wrap;align-items:center\">" + svgPie(pieSlices, 160) + svgBars(barItems, 300, 140) + "</div>" +
+    "<h2>3. Student liability schedule</h2>" +
+    "<table><thead><tr><th>#</th><th>Name</th><th>Reg. No</th><th>Hostel (master)</th><th>Days</th><th>Amount</th></tr></thead><tbody>" +
+    rows + "</tbody></table>" +
+    "<h2>4. Certification</h2>" +
+    "<p class=\"narrative\">Prepared via the EOCNS QA Attendance System. Machine Location ID was not used for hostel classification.</p>" +
+    "<p style=\"margin-top:36px\">QA Officer: ______________________ &nbsp;&nbsp; Date: ______________</p>" +
+    "</body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 350);
+}
+
+async function printFullQaPack() {
+  var entries = window.__lastReportEntries;
+  if (!entries || !entries.length) {
+    // build from filters
+    await renderReportsView();
+    entries = window.__lastReportEntries || [];
+  }
+  if (!entries.length) { alert("No lecture logs in the selected range. Set From/To and filter first."); return; }
+  var held = entries.filter(function(e) { return e.status === "Held"; }).length;
+  var missed = entries.filter(function(e) { return e.status === "Missed"; }).length;
+  var partial = entries.filter(function(e) { return e.status === "Partial"; }).length;
+  var other = entries.length - held - missed - partial;
+  var pie = [
+    { label: "Held", value: held, color: "#0d9488" },
+    { label: "Missed", value: missed, color: "#be123c" },
+    { label: "Partial", value: partial, color: "#b45309" },
+    { label: "Other", value: other, color: "#64748b" }
+  ].filter(function(x) { return x.value > 0; });
+  var byCourse = {};
+  entries.forEach(function(e) {
+    var c = e.course || "Unknown";
+    byCourse[c] = byCourse[c] || { held: 0, total: 0 };
+    byCourse[c].total += 1;
+    if (e.status === "Held") byCourse[c].held += 1;
+  });
+  var bars = Object.keys(byCourse).slice(0, 8).map(function(c) {
+    return { label: c.slice(0, 8), value: byCourse[c].held, color: "#1d4ed8" };
+  });
+  var compliance = entries.length ? Math.round((held / entries.length) * 100) : 0;
+  var blocks = entries.map(function(e, i) {
+    return "<tr><td>" + (i + 1) + "</td><td>" + (e.date || "") + "</td><td>" + (e.course || "") + "</td><td>" + (e.lecturer || "") +
+      "</td><td>" + (e.status || "") + "</td><td>" + (e.topic || "—") + "</td></tr>";
+  }).join("");
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>EOCNS QA Lecture Compliance Pack</title><style>" +
+    "body{font-family:Georgia,serif;color:#111;padding:28px;max-width:920px;margin:0 auto}" +
+    "h1{color:#1B3A6B;text-align:center;font-size:1.35rem;margin-bottom:4px}" +
+    ".sub{text-align:center;color:#555;margin-bottom:18px;font-size:13px}" +
+    "h2{color:#1B3A6B;font-size:1.05rem;border-bottom:2px solid #1B3A6B;padding-bottom:4px;margin-top:26px}" +
+    "table{width:100%;border-collapse:collapse;font-size:12px} th{background:#1B3A6B;color:#fff;padding:7px} td{border:1px solid #ccc;padding:6px}" +
+    "tr:nth-child(even) td{background:#f5f7fb} p{line-height:1.55;font-size:13px}" +
+    ".kpi{display:flex;gap:10px;flex-wrap:wrap}.kpi div{flex:1;min-width:110px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px;text-align:center}" +
+    ".kpi strong{display:block;font-size:1.2rem;color:#1d4ed8}" +
+    "</style></head><body>" +
+    "<h1>Eastern Oak College of Nursing Sciences</h1>" +
+    "<div class=\"sub\">Quality Assurance · Lecture Compliance Pack</div>" +
+    "<h2>1. Executive summary</h2>" +
+    "<p>This pack consolidates <strong>" + entries.length + "</strong> lecture log entries. Delivery compliance (status Held) stands at <strong>" +
+    compliance + "%</strong> (" + held + " held, " + missed + " missed, " + partial + " partial). Charts below summarise status mix and held sessions by course. Detailed logs follow for audit and filing.</p>" +
+    "<div class=\"kpi\"><div><strong>" + entries.length + "</strong>Logs</div><div><strong>" + compliance + "%</strong>Held rate</div>" +
+    "<div><strong>" + missed + "</strong>Missed</div></div>" +
+    "<h2>2. Status mix & course delivery</h2>" +
+    "<div style=\"display:flex;gap:20px;flex-wrap:wrap;align-items:center\">" + svgPie(pie, 150) + svgBars(bars, 320, 140) + "</div>" +
+    "<h2>3. Lecture log register</h2>" +
+    "<table><thead><tr><th>#</th><th>Date</th><th>Course</th><th>Lecturer</th><th>Status</th><th>Topic</th></tr></thead><tbody>" +
+    blocks + "</tbody></table>" +
+    "<h2>4. Certification</h2><p>Generated by the EOCNS QA Attendance System for internal quality review.</p>" +
+    "<p style=\"margin-top:32px\">QA Officer: ______________________ &nbsp;&nbsp; Date: ______________</p>" +
+    "</body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 350);
+}
+
+async function renderTimetableBoard() {
+  await ensureTimetables();
+  var key = (document.getElementById("ttBoardClass") && document.getElementById("ttBoardClass").value) || "100_nursing";
+  var tt = TIMETABLES_CACHE[key] || { slots: [] };
+  var days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+  var byDay = { 0: [], 1: [], 2: [], 3: [], 4: [] };
+  (tt.slots || []).forEach(function(s) {
+    var d = Number(s.weekday);
+    if (byDay[d]) byDay[d].push(s);
+  });
+  var cols = days.map(function(name, d) {
+    var cells = (byDay[d] || []).map(function(s) {
+      return '<button type="button" class="tt-slot" data-tt-code="' + escapeHtml(s.code || "") + '" data-tt-start="' + escapeHtml(s.start || "") + '">' +
+        '<strong>' + escapeHtml(s.code || "?") + '</strong><span>' + escapeHtml((s.start || "") + "–" + (s.end || "")) + '</span></button>';
+    }).join("") || '<span class="muted-note">—</span>';
+    return '<div class="tt-col"><div class="tt-col-h">' + name + '</div>' + cells + '</div>';
+  }).join("");
+  var board = document.getElementById("timetableBoard");
+  if (board) board.innerHTML = '<div class="card__body"><div class="tt-grid">' + cols + '</div></div>';
+  board && board.querySelectorAll(".tt-slot").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!isQaOfficer()) { alert("Sign in as QA Officer to log from the board."); return; }
+      await openQaEntryForm(null);
+      document.getElementById("qaEntryClass").value = key;
+      var code = btn.getAttribute("data-tt-code");
+      var start = btn.getAttribute("data-tt-start");
+      var courseSel = document.getElementById("qaEntryCourse");
+      if (courseSel && code) {
+        for (var i = 0; i < courseSel.options.length; i++) {
+          if (courseSel.options[i].value.indexOf(code) === 0) { courseSel.selectedIndex = i; break; }
+        }
+      }
+      if (start && document.getElementById("qaEntryStart")) document.getElementById("qaEntryStart").value = start.length === 4 ? ("0" + start) : start;
+      calcQaDurationMinutes();
+    });
+  });
+}
+
+async function importStudentsCsv(file) {
+  if (!isQaOfficer()) return;
+  var text = await file.text();
+  var lines = text.split(/\r?\n/).filter(function(l) { return l.trim(); });
+  if (lines.length < 2) { alert("CSV needs a header row and data."); return; }
+  function splitCsv(line) {
+    var out = [], cur = "", q = false;
+    for (var i = 0; i < line.length; i++) {
+      var ch = line[i];
+      if (ch === '"') { q = !q; continue; }
+      if (ch === "," && !q) { out.push(cur.trim()); cur = ""; continue; }
+      cur += ch;
+    }
+    out.push(cur.trim());
+    return out;
+  }
+  var headers = splitCsv(lines[0]).map(function(h) { return h.toLowerCase(); });
+  var idx = function(names) {
+    for (var i = 0; i < names.length; i++) {
+      var j = headers.indexOf(names[i]);
+      if (j >= 0) return j;
+    }
+    return -1;
+  };
+  var iName = idx(["name", "full name", "names of students", "student name"]);
+  var iReg = idx(["regno", "reg no", "reg. no", "registration number", "reg"]);
+  var iProg = idx(["programme", "program", "department"]);
+  var iLevel = idx(["level"]);
+  var iHostel = idx(["hostel"]);
+  if (iName < 0) { alert("CSV must include a Name column."); return; }
+  var added = 0;
+  for (var r = 1; r < lines.length; r++) {
+    var cols = splitCsv(lines[r]);
+    var name = cols[iName];
+    if (!name) continue;
+    var rec = {
+      id: "stu_" + Date.now().toString(36) + r,
+      name: name,
+      regNo: iReg >= 0 ? (cols[iReg] || "") : "",
+      programme: iProg >= 0 ? (cols[iProg] || "") : "",
+      level: iLevel >= 0 ? (cols[iLevel] || "") : "",
+      hostel: iHostel >= 0 ? (cols[iHostel] || "") : "",
+      status: "Active",
+      gender: "",
+      phone: "",
+      createdAt: new Date().toISOString()
+    };
+    await put("students", rec);
+    added++;
+  }
+  await writeAudit({ action: "create", entity: "students", entityId: "csv_import", reason: "Imported " + added + " students from CSV" });
+  markDirty("student import");
+  await renderStudentsTable();
+  alert("Imported " + added + " students. Publish when ready.");
+}
+
+async function exportFullSnapshot() {
+  if (!isQaOfficer()) return;
+  var snap = {
+    exportedAt: new Date().toISOString(),
+    students: shapeStudentsForRepo(await getAll("students")),
+    lecturers: await getAll("lecturers"),
+    sessions: await getAll("sessions"),
+    qa_entries: await getAll("qa_entries"),
+    audit: await getAll("audit"),
+    programmes: await getAll("programmes"),
+    levels: await getAll("levels"),
+    courses: await getAll("courses"),
+    attendance: await getAll("attendance"),
+    hostel_runs: await getAll("hostel_runs"),
+    timetables: TIMETABLES_CACHE || {}
+  };
+  downloadJsonReport("EOCNS_Snapshot_" + new Date().toISOString().slice(0, 10) + ".json", snap);
+}
+
+async function importFullSnapshot(file) {
+  if (!isQaOfficer()) return;
+  if (!confirm("Import snapshot? This overwrites local master data with the file contents. Publish afterwards to update the repository.")) return;
+  var snap = JSON.parse(await file.text());
+  async function replaceStore(name, rows) {
+    var existing = await getAll(name);
+    for (var i = 0; i < existing.length; i++) {
+      var key = existing[i].id != null ? existing[i].id : (existing[i].code != null ? existing[i].code : existing[i].key);
+      if (key != null) await del(name, key);
+    }
+    for (var j = 0; j < (rows || []).length; j++) await put(name, rows[j]);
+  }
+  if (snap.students) await replaceStore("students", snap.students.map(studentFromRepo));
+  if (snap.lecturers) await replaceStore("lecturers", snap.lecturers);
+  if (snap.sessions) await replaceStore("sessions", snap.sessions);
+  if (snap.qa_entries) await replaceStore("qa_entries", snap.qa_entries);
+  if (snap.programmes) await replaceStore("programmes", snap.programmes);
+  if (snap.levels) await replaceStore("levels", snap.levels);
+  if (snap.courses) await replaceStore("courses", snap.courses);
+  if (snap.attendance) await replaceStore("attendance", snap.attendance);
+  if (snap.hostel_runs) await replaceStore("hostel_runs", snap.hostel_runs);
+  if (snap.timetables) TIMETABLES_CACHE = snap.timetables;
+  markDirty("snapshot import");
+  await renderStudentsTable();
+  refreshDashboardStats();
+  alert("Snapshot loaded into this browser. Publish to repository to make it permanent.");
+}
+
 
 })();

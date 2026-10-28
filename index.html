@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20" />
+  <link rel="stylesheet" href="style.css?v=21" />
 </head>
 <body class="role-viewer">
   <div id="dirtyBanner" class="dirty-banner" hidden role="status"></div>
@@ -36,6 +36,7 @@
         </div>
         <div class="nav-section">
           <p class="nav-section__label">Quality Assurance</p>
+          <a href="#" class="nav-item" data-view="timetable-board">Timetable board</a>
           <a href="#" class="nav-item" data-view="qa-daily">Daily QA</a>
           <a href="#" class="nav-item" data-view="qa-weekly">Weekly QA</a>
           <a href="#" class="nav-item" data-view="qa-monthly">Monthly QA</a>
@@ -113,6 +114,8 @@
             </div>
             <div class="page-toolbar__right">
               <span class="count-pill" id="studentsCount">0 students</span>
+              <button class="btn btn--ghost qa-edit-only" id="btnImportStudentsCsv">Import CSV</button>
+              <input type="file" id="studentsCsvInput" accept=".csv,text/csv" hidden />
               <button class="btn btn--ghost" id="btnSeedStudents" class="btn btn--ghost qa-edit-only" title="Load the official class lists from the college registers">Load official list</button>
               <button class="btn btn--primary" id="btnAddStudent" class="btn btn--primary qa-edit-only">+ Add Student</button>
             </div>
@@ -175,6 +178,31 @@
           </div>
 
           <div class="card" style="margin-bottom:16px">
+            <div class="card__header"><h3>Master hostel roster</h3></div>
+            <div class="card__body">
+              <p class="muted-note">Hostel assignment always comes from the <strong>student master list</strong>, not the biometric machine Location ID (machines often mix Hostel 1 / 2). Moving a student between hostels does not rewrite past published reports; new reports use the current master hostel.</p>
+              <div class="form-grid">
+                <label class="field"><span class="field__label">Filter by hostel</span>
+                  <select id="hostelRosterFilter">
+                    <option value="">All hostels</option>
+                    <option value="Hostel 1">Hostel 1</option>
+                    <option value="Hostel 2">Hostel 2</option>
+                    <option value="Off-campus">Off-campus</option>
+                    <option value="__unset">Not set</option>
+                  </select>
+                </label>
+                <label class="field"><span class="field__label">Programme</span><select id="hostelRosterProgramme"><option value="">All</option></select></label>
+                <label class="field"><span class="field__label">Level</span><select id="hostelRosterLevel"><option value="">All</option></select></label>
+                <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--ghost" id="btnRefreshHostelRoster">Refresh roster</button></label>
+              </div>
+              <div class="table-scroll" style="margin-top:12px;max-height:280px;overflow:auto">
+                <table class="data-table"><thead><tr><th>Name</th><th>Reg No</th><th>Programme</th><th>Level</th><th>Hostel</th></tr></thead>
+                <tbody id="hostelRosterBody"></tbody></table>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
             <div class="card__header"><h3>2. Report settings</h3></div>
             <div class="card__body">
               <div class="form-grid">
@@ -211,7 +239,21 @@
           <div id="sessionsList"></div>
           <div class="empty-state" id="sessionsEmpty"><h3>No sessions yet</h3><p>Create the first academic session.</p></div>
         </section>
-                        <section class="view" id="view-qa-daily">
+                        <section class="view" id="view-timetable-board">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Weekly grid from saved timetables. Officers can open a slot to log a lecture.</p></div>
+            <div class="page-toolbar__right">
+              <select id="ttBoardClass">
+                <option value="100_nursing">100 Level Nursing</option>
+                <option value="200_nursing">200 Level Nursing</option>
+                <option value="200_midwifery">200 Level Midwifery</option>
+              </select>
+              <button type="button" class="btn btn--primary" id="btnRenderTtBoard">Show week board</button>
+            </div>
+          </div>
+          <div id="timetableBoard" class="card"><div class="card__body muted-note">Choose a class and click Show week board.</div></div>
+        </section>
+        <section class="view" id="view-qa-daily">
           <div class="page-toolbar">
             <div class="page-toolbar__left">
               <p class="muted-note" style="margin:0">Timetable slots for the day — mark each as delivered or missed (same workflow as the college QA analyser).</p>
@@ -386,10 +428,14 @@
         <section class="view" id="view-reports">
           <div class="page-toolbar">
             <div class="page-toolbar__left">
-              <p class="muted-note" style="margin:0">Lecture logs from the master sheet (QA entries) — same fields as the college lecture report form.</p>
+              <p class="muted-note" style="margin:0">Professional QA and compliance packs: executive summary, charts, tables and narrative.</p>
             </div>
-            <div class="page-toolbar__right qa-edit-only">
-              <button type="button" class="btn btn--ghost" id="btnExportLectureLogs">⬇ Export lecture logs JSON</button>
+            <div class="page-toolbar__right" style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="btn btn--primary" id="btnPrintFullQaPack">Print full QA pack</button>
+              <button type="button" class="btn btn--ghost qa-edit-only" id="btnExportLectureLogs">Export JSON</button>
+              <button type="button" class="btn btn--ghost qa-edit-only" id="btnExportSnapshot">Export full snapshot</button>
+              <button type="button" class="btn btn--ghost qa-edit-only" id="btnImportSnapshot">Import snapshot</button>
+              <input type="file" id="snapshotFileInput" accept="application/json,.json" hidden />
             </div>
           </div>
           <div class="card" style="margin-bottom:16px">
@@ -542,7 +588,14 @@
           <label class="field"><span class="field__label">Programme</span><select id="studentProgramme"><option value="">— Select —</option></select></label>
           <label class="field"><span class="field__label">Level</span><select id="studentLevel"><option value="">— Select —</option></select></label>
           <label class="field"><span class="field__label">Gender</span><select id="studentGender"><option value="">—</option><option value="Female">Female</option><option value="Male">Male</option></select></label>
-          <label class="field"><span class="field__label">Hostel</span><input type="text" id="studentHostel" /></label>
+          <label class="field"><span class="field__label">Hostel (master)</span>
+            <select id="studentHostel">
+              <option value="">— Not set —</option>
+              <option value="Hostel 1">Hostel 1</option>
+              <option value="Hostel 2">Hostel 2</option>
+              <option value="Off-campus">Off-campus</option>
+            </select>
+          </label>
           <label class="field"><span class="field__label">Status</span><select id="studentStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></label>
           <label class="field"><span class="field__label">Phone</span><input type="tel" id="studentPhone" /></label>
           <label class="field field--full" id="auditReasonGroup" hidden><span class="field__label">Reason for change <span class="req">*</span></span><textarea id="auditReason" rows="2"></textarea></label>
@@ -651,6 +704,6 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=20"></script>
+  <script src="app.js?v=21"></script>
 </body>
 </html>
