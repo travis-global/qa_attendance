@@ -60,13 +60,6 @@
         "hours": 2
       },
       {
-        "weekday": 2,
-        "code": "ECA",
-        "start": "13:00",
-        "end": "15:00",
-        "hours": 2
-      },
-      {
         "weekday": 3,
         "code": "EED 126",
         "start": "08:00",
