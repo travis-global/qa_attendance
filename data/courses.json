@@ -163,6 +163,11 @@
     ]
   },
   {
+    "code": "RAD 342",
+    "name": "Radiography",
+    "classKeys": []
+  },
+  {
     "code": "RES 201",
     "name": "Research and Statistics",
     "classKeys": [
