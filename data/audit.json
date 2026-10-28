@@ -174,5 +174,17 @@
     "user": "QA Officer",
     "source": "system",
     "id": 9
+  },
+  {
+    "ref": "REF/EOCNS/QA/1010",
+    "action": "create",
+    "entity": "courses",
+    "entityId": "RAD 342",
+    "reason": "New course RAD 342",
+    "details": {},
+    "timestamp": "2026-10-28T13:59:31.888Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 10
   }
 ]
