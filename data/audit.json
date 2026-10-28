@@ -1,1 +1,166 @@
-[]
+[
+  {
+    "ref": "REF/EOCNS/QA/1001",
+    "action": "create",
+    "entity": "programmes",
+    "entityId": "Public Health",
+    "reason": "New programme Public Health",
+    "details": {},
+    "timestamp": "2026-10-28T10:40:42.345Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 1
+  },
+  {
+    "ref": "REF/EOCNS/QA/1002",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mvrzl49lolixb",
+    "reason": "New lecturer registration",
+    "details": {
+      "lec": {
+        "id": "lec_mvrzl49lolixb",
+        "name": "Jane Doe",
+        "staffId": "001",
+        "phone": "",
+        "courses": [
+          "History"
+        ],
+        "status": "Active",
+        "createdAt": "2026-10-28T10:43:41.145Z",
+        "updatedAt": "2026-10-28T10:43:41.145Z"
+      }
+    },
+    "timestamp": "2026-10-28T10:43:41.153Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 2
+  },
+  {
+    "ref": "REF/EOCNS/QA/1003",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa70ues3",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0026/GNS",
+      "name": "Abigail Akachukwu Nwonyi"
+    },
+    "timestamp": "2026-10-28T13:20:50.829Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 3
+  },
+  {
+    "ref": "REF/EOCNS/QA/1004",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaauxf8d6",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0094/GNS",
+      "name": "Abigail Oka Ojong"
+    },
+    "timestamp": "2026-10-28T13:20:50.831Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 4
+  },
+  {
+    "ref": "REF/EOCNS/QA/1005",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacjgg19i",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Public Health",
+        "level": "200"
+      },
+      "regNo": "EOCNS/200/0038/MID",
+      "name": "Angela Ezinne Igwe"
+    },
+    "timestamp": "2026-10-28T13:21:24.018Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 5
+  },
+  {
+    "ref": "REF/EOCNS/QA/1006",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaakqjkkg",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Public Health",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0060/GNS",
+      "name": "Anita Ifunanya Nnaemeka"
+    },
+    "timestamp": "2026-10-28T13:21:24.023Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 6
+  },
+  {
+    "ref": "REF/EOCNS/QA/1007",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabpes46t",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Public Health",
+        "level": "200"
+      },
+      "regNo": "EOCNS/200/0024/GNS",
+      "name": "Annabel Kosarachi Aliozor"
+    },
+    "timestamp": "2026-10-28T13:21:24.026Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 7
+  },
+  {
+    "ref": "REF/EOCNS/QA/1008",
+    "action": "delete",
+    "entity": "courses",
+    "entityId": "ECA",
+    "reason": "Course removed",
+    "details": {},
+    "timestamp": "2026-10-28T13:45:14.563Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 8
+  }
+]
