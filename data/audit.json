@@ -162,5 +162,17 @@
     "user": "QA Officer",
     "source": "system",
     "id": 8
+  },
+  {
+    "ref": "REF/EOCNS/QA/1009",
+    "action": "update",
+    "entity": "timetables",
+    "entityId": "200_nursing",
+    "reason": "Timetable edited for 200_nursing",
+    "details": {},
+    "timestamp": "2026-10-28T13:56:44.795Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 9
   }
 ]
