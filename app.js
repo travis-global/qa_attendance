@@ -1573,6 +1573,235 @@ async function importFullSnapshot(file) {
 }
 
 
+
+function eocnsReportStyles() {
+  return "body{font-family:'Segoe UI',system-ui,Georgia,serif;color:#1a1a2e;padding:28px;max-width:960px;margin:0 auto;line-height:1.45}" +
+    "h1{color:#1B3A6B;text-align:center;margin:0 0 4px;font-size:1.45rem;letter-spacing:0.02em}" +
+    "h1 .gold{color:#c9a227;display:block;font-size:0.95rem;font-weight:600;margin-top:4px}" +
+    ".sub{text-align:center;color:#555;margin:0 0 8px;font-size:12px}" +
+    ".rule{height:3px;background:linear-gradient(90deg,#1B3A6B,#c9a227,#1B3A6B);border:0;margin:12px 0 20px}" +
+    "h2{color:#1B3A6B;font-size:0.95rem;margin:28px 0 10px;padding:8px 12px;background:#e8eef7;border-left:4px solid #1B3A6B}" +
+    "table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}" +
+    "th{background:#1B3A6B;color:#fff;padding:8px;text-align:left;font-weight:600}" +
+    "td{border:1px solid #c5cdd8;padding:7px 8px;vertical-align:top}" +
+    "tr:nth-child(even) td{background:#f7f9fc}" +
+    ".kpi{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 8px}" +
+    ".kpi>div{flex:1;min-width:110px;text-align:center;border:1px solid #c5cdd8;border-radius:8px;padding:12px 8px;background:#fff}" +
+    ".kpi strong{display:block;font-size:1.45rem;line-height:1.2}" +
+    ".kpi span{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:#555}" +
+    ".k-sched strong{color:#1B3A6B}.k-del strong{color:#0f766e}.k-miss strong{color:#b91c1c}.k-rate strong{color:#0f766e}" +
+    ".meta-grid{display:grid;grid-template-columns:140px 1fr;gap:4px 12px;font-size:13px;margin:8px 0 12px}" +
+    ".meta-grid b{color:#334}" +
+    ".absent-head th{background:#b91c1c}" +
+    ".note{background:#fff8e6;border-left:4px solid #c9a227;padding:8px 12px;font-size:12px;margin:8px 0}" +
+    ".charts{display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin:12px 0}" +
+    ".footer{margin-top:36px;font-size:12px;color:#555;text-align:center}" +
+    "@media print{body{padding:12px} .kpi>div{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
+}
+
+function classLabelFromKey(key) {
+  var map = { "100_nursing": "100 LEVEL NURSING DEPARTMENT", "200_nursing": "200 LEVEL NURSING DEPARTMENT", "200_midwifery": "200 LEVEL MIDWIFERY DEPARTMENT" };
+  return map[key] || String(key || "CLASS").replace(/_/g, " ").toUpperCase();
+}
+
+function formatTimeNice(t) {
+  if (!t) return "";
+  var m = String(t).match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return t;
+  var h = Number(m[1]), min = m[2], ap = h >= 12 ? "PM" : "AM";
+  var h12 = h % 12; if (!h12) h12 = 12;
+  return h12 + ":" + min + " " + ap;
+}
+
+function formatDateLong(iso) {
+  if (!iso) return "";
+  var d = new Date(iso + "T12:00:00");
+  if (isNaN(d)) return iso;
+  var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  return d.getDate() + (d.getDate()===1||d.getDate()===21||d.getDate()===31?"st":d.getDate()===2||d.getDate()===22?"nd":d.getDate()===3||d.getDate()===23?"rd":"th") + " " + months[d.getMonth()] + ", " + d.getFullYear();
+}
+
+async function printDailyLectureReport() {
+  var date = (document.getElementById("qaDailyDate") && document.getElementById("qaDailyDate").value) || "";
+  var classKey = (document.getElementById("qaDailyClass") && document.getElementById("qaDailyClass").value) || "100_nursing";
+  if (!date) { alert("Choose a date on Daily QA first."); return; }
+  await ensureTimetables();
+  var tt = TIMETABLES_CACHE[classKey] || { slots: [] };
+  var weekday = (new Date(date + "T12:00:00").getDay() + 6) % 7; // Mon=0
+  var slots = (tt.slots || []).filter(function(s) { return Number(s.weekday) === weekday; });
+  var entries = (await getQaEntries()).filter(function(e) { return e.date === date && e.classKey === classKey; });
+  var sessionName = "Academic Session";
+  try {
+    var sessions = await getAll("sessions");
+    var active = sessions.find(function(s) { return s.status === "Active"; });
+    if (active) sessionName = active.name;
+  } catch (_) {}
+  var students = await getAll("students");
+  function resolveAbsent(list) {
+    if (!list || !list.length) return [];
+    return list.map(function(a) {
+      var sn = String(a).trim();
+      var found = students.find(function(s) { return String(s.serial) === sn || String(s.regNo) === sn || (s.name && s.name.toLowerCase() === sn.toLowerCase()); });
+      return { sn: found ? (found.serial || sn) : sn, name: found ? found.name : sn };
+    });
+  }
+  var scheduleRows = "";
+  var courseBlocks = "";
+  var allAbsent = {};
+  var used = slots.length ? slots : entries.map(function(e) {
+    return { code: (e.course || "").split("—")[0].trim(), start: e.start, end: e.end, hours: e.duration ? e.duration / 60 : 2 };
+  });
+  used.forEach(function(slot, i) {
+    var code = slot.code || "";
+    var ent = entries.find(function(e) {
+      return (e.course || "").indexOf(code) >= 0 || (e.start && slot.start && e.start === slot.start);
+    }) || entries[i];
+    var remark = ent ? (ent.status === "Held" ? "Lecture held" : ent.status === "Missed" ? "Lecture missed" : (ent.status || "Logged")) : "Not logged";
+    var title = ent ? (ent.course || code) : courseName(code);
+    scheduleRows += "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(String(title).replace(/^[^—]+—\s*/, "") || title) +
+      "</td><td>" + escapeHtml(code) + "</td><td>" + formatTimeNice(slot.start || (ent && ent.start)) +
+      "</td><td>" + formatTimeNice(slot.end || (ent && ent.end)) + "</td><td>" + escapeHtml(remark) + "</td></tr>";
+    if (ent) {
+      var abs = resolveAbsent(ent.absent);
+      abs.forEach(function(a) { allAbsent[a.sn + "|" + a.name] = a; });
+      var obj = (ent.objectives || "").split(/[.;\n]+/).map(function(x) { return x.trim(); }).filter(Boolean);
+      courseBlocks += "<h2>COURSE " + (i + 1) + " INFORMATION</h2>" +
+        "<div class=\"meta-grid\">" +
+        "<b>Course Code:</b><span>" + escapeHtml(code || (ent.course || "")) + "</span>" +
+        "<b>Course Title:</b><span>" + escapeHtml(ent.course || title) + "</span>" +
+        "<b>Lecturer:</b><span>" + escapeHtml(ent.lecturer || "—") + "</span>" +
+        "<b>Topic:</b><span>" + escapeHtml(ent.topic || "—") + "</span>" +
+        "<b>Date:</b><span>" + formatDateLong(ent.date) + "</span>" +
+        "<b>Time:</b><span>" + formatTimeNice(ent.start) + " – " + formatTimeNice(ent.end) + "</span></div>" +
+        "<h2>LEARNING OBJECTIVES</h2><ul>" + (obj.length ? obj.map(function(o) { return "<li>" + escapeHtml(o) + "</li>"; }).join("") : "<li>—</li>") + "</ul>" +
+        "<h2>LECTURE SUMMARY</h2><p>" + escapeHtml(ent.lectureSummary || "—") + "</p>" +
+        "<h2>ASSIGNMENT</h2><div class=\"note\">" + escapeHtml(ent.assignment || "None was given") + "</div>" +
+        "<h2>REMARKS</h2><p>" + escapeHtml(ent.remark || "—") + "</p>" +
+        "<h2>ABSENT STUDENTS</h2>" +
+        (abs.length ? ("<table><thead class=\"absent-head\"><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
+          abs.map(function(a) { return "<tr><td>" + escapeHtml(String(a.sn)) + "</td><td>" + escapeHtml(a.name) + "</td></tr>"; }).join("") +
+          "</tbody></table>") : "<p>None recorded.</p>");
+    }
+  });
+  var absentList = Object.keys(allAbsent).map(function(k) { return allAbsent[k]; });
+  var registered = students.filter(function(s) {
+    if (s.status && s.status !== "Active") return false;
+    // best-effort class filter by level in classKey
+    if (classKey.indexOf("100") === 0) return String(s.level) === "100";
+    if (classKey.indexOf("200") === 0) return String(s.level) === "200";
+    return true;
+  }).length;
+  var present = Math.max(0, registered - absentList.length);
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>Today's Lecture Report</title><style>" + eocnsReportStyles() + "</style></head><body>" +
+    "<h1>TODAY'S LECTURE(S) REPORT<span class=\"gold\">" + escapeHtml(classLabelFromKey(classKey)) + "</span></h1>" +
+    "<div class=\"sub\">" + escapeHtml(classKey.replace(/_.*/, "").toUpperCase() + " Level") + " · " + escapeHtml(sessionName) + " · " + formatDateLong(date) + "</div>" +
+    "<hr class=\"rule\"/>" +
+    "<h2>COURSE SCHEDULE / TIMETABLE</h2>" +
+    "<table><thead><tr><th>S/N</th><th>Course Title</th><th>Course Code</th><th>Start Time</th><th>End Time</th><th>Remark</th></tr></thead><tbody>" +
+    (scheduleRows || "<tr><td colspan=\"6\">No timetable slots or logs for this day.</td></tr>") + "</tbody></table>" +
+    courseBlocks +
+    "<h2>CONSOLIDATED ATTENDANCE REPORT</h2>" +
+    "<div class=\"kpi\"><div class=\"k-sched\"><strong>" + registered + "</strong><span>Total registered</span></div>" +
+    "<div class=\"k-del\"><strong>" + present + "</strong><span>Present (est.)</span></div>" +
+    "<div class=\"k-miss\"><strong>" + absentList.length + "</strong><span>Absent (unique)</span></div></div>" +
+    "<h2>CONSOLIDATED ABSENT STUDENTS LIST</h2>" +
+    (absentList.length ? ("<table><thead class=\"absent-head\"><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
+      absentList.map(function(a) { return "<tr><td>" + escapeHtml(String(a.sn)) + "</td><td>" + escapeHtml(a.name) + "</td></tr>"; }).join("") +
+      "</tbody></table>") : "<p>No absentees recorded in lecture logs for this day.</p>") +
+    "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + " · EOCNS QA System</div>" +
+    "</body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 400);
+}
+
+function printWeeklyProfessionalPack(payload) {
+  var p = payload || window.__weeklyQaPayload;
+  if (!p) { alert("Build the weekly report first."); return; }
+  var compliance = p.scheduled ? Math.round((p.delivered / p.scheduled) * 1000) / 10 : 0;
+  var courseRows = (p.courseRows || []).map(function(r) {
+    return "<tr><td>" + escapeHtml(r.course) + "</td><td>" + escapeHtml(r.lecturer) + "</td><td>" + r.sched +
+      "</td><td>" + r.deliv + "</td><td>" + r.missed + "</td><td>" + r.hrs + "</td><td>" + escapeHtml(r.status) +
+      "</td><td>" + r.pct + "</td></tr>";
+  }).join("");
+  var dayRows = (p.dayRows || []).map(function(r) {
+    return "<tr><td>" + escapeHtml(r.date) + "</td><td>" + escapeHtml(r.day) + "</td><td>" + escapeHtml(r.course) +
+      "</td><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml(r.topic) + "</td><td>" + escapeHtml(r.time) +
+      "</td><td>" + escapeHtml(r.hrs) + "</td></tr>";
+  }).join("");
+  var pie = [
+    { label: "Delivered", value: p.delivered, color: "#0f766e" },
+    { label: "Missed", value: p.missed, color: "#b91c1c" }
+  ].filter(function(x) { return x.value > 0; });
+  var bars = (p.courseRows || []).slice(0, 10).map(function(r) {
+    return { label: String(r.course).slice(0, 8), value: r.deliv, color: "#1d4ed8" };
+  });
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Weekly QA Report</title><style>" + eocnsReportStyles() + "</style></head><body>" +
+    "<h1>EOCNS QA REPORT — WEEKLY<span class=\"gold\">Staff Teaching Commitment &amp; Lecture Attendance</span></h1>" +
+    "<div class=\"sub\"><strong>" + escapeHtml(classLabelFromKey(p.classKey)) + "</strong><br/>" +
+    escapeHtml(p.periodLabel) + "<br/>Generated: " + new Date().toLocaleString() + " · Excluded: " + escapeHtml(p.excluded || "None") + "</div>" +
+    "<hr class=\"rule\"/>" +
+    "<h2>WEEKLY SUMMARY</h2>" +
+    "<div class=\"kpi\">" +
+    "<div class=\"k-sched\"><strong>" + p.scheduled + "</strong><span>Scheduled</span></div>" +
+    "<div class=\"k-del\"><strong>" + p.delivered + "</strong><span>Delivered</span></div>" +
+    "<div class=\"k-miss\"><strong>" + p.missed + "</strong><span>Missed</span></div>" +
+    "<div class=\"k-rate\"><strong>" + compliance + "%</strong><span>Compliance</span></div></div>" +
+    "<p>Teaching delivery for this window stands at <strong>" + compliance + "%</strong> " +
+    "(" + p.delivered + " of " + p.scheduled + " scheduled contact sessions logged as held). " +
+    (p.missed ? (p.missed + " session(s) were missed and should be rescheduled or explained in audit.") : "No missed sessions were recorded.") + "</p>" +
+    "<h2>COURSE COMPLIANCE</h2>" +
+    "<table><thead><tr><th>Course</th><th>Lecturer(s)</th><th>Sched</th><th>Deliv</th><th>Missed</th><th>Hrs Del</th><th>Status</th><th>%</th></tr></thead><tbody>" +
+    (courseRows || "<tr><td colspan=\"8\">No course data.</td></tr>") + "</tbody></table>" +
+    "<h2>VISUAL ANALYSIS</h2><div class=\"charts\">" +
+    (typeof svgPie === "function" ? svgPie(pie, 160) : "") +
+    (typeof svgBars === "function" ? svgBars(bars, 340, 150) : "") + "</div>" +
+    "<h2>DAY-BY-DAY BREAKDOWN</h2>" +
+    "<table><thead><tr><th>Date</th><th>Day</th><th>Course</th><th>Lecturer</th><th>Topic</th><th>Time</th><th>Hrs</th></tr></thead><tbody>" +
+    (dayRows || "<tr><td colspan=\"7\">No lectures logged in range.</td></tr>") + "</tbody></table>" +
+    "<div class=\"footer\">— End of Weekly QA Report — · EOCNS QA Attendance System</div></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 400);
+}
+
+function printMonthlyProfessionalPack(payload) {
+  var p = payload || window.__monthlyQaPayload;
+  if (!p) { alert("Build the monthly report first."); return; }
+  var w = window.open("", "_blank");
+  if (!w) return;
+  var courseRows = (p.courseRows || []).map(function(r) {
+    return "<tr><td>" + escapeHtml(r.course) + "</td><td>" + r.scheduled + "</td><td>" + r.held + "</td><td>" + r.missed + "</td><td>" + r.rate + "%</td></tr>";
+  }).join("");
+  var pie = [
+    { label: "Held", value: p.delivered, color: "#0f766e" },
+    { label: "Missed", value: p.missed, color: "#b91c1c" }
+  ].filter(function(x) { return x.value > 0; });
+  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Monthly QA Report</title><style>" + eocnsReportStyles() + "</style></head><body>" +
+    "<h1>EOCNS — MONTHLY QA REPORT<span class=\"gold\">Lecture Delivery &amp; Compliance Analysis</span></h1>" +
+    "<div class=\"sub\"><strong>" + escapeHtml(classLabelFromKey(p.classKey)) + "</strong><br/>Reporting period: " + escapeHtml(p.monthLabel) +
+    " · Generated " + new Date().toLocaleString() + "</div><hr class=\"rule\"/>" +
+    "<h2>EXECUTIVE SUMMARY</h2>" +
+    "<div class=\"kpi\">" +
+    "<div class=\"k-sched\"><strong>" + p.scheduled + "</strong><span>Scheduled</span></div>" +
+    "<div class=\"k-del\"><strong>" + p.delivered + "</strong><span>Delivered</span></div>" +
+    "<div class=\"k-miss\"><strong>" + p.missed + "</strong><span>Missed</span></div>" +
+    "<div class=\"k-rate\"><strong>" + p.rate + "%</strong><span>Compliance</span></div></div>" +
+    "<p>Over <strong>" + escapeHtml(p.monthLabel) + "</strong>, the class recorded <strong>" + p.rate + "%</strong> delivery compliance. " +
+    "This pack is intended for academic board review and continuous quality improvement.</p>" +
+    "<h2>COURSE PERFORMANCE</h2>" +
+    "<table><thead><tr><th>Course</th><th>Scheduled</th><th>Held</th><th>Missed</th><th>Rate</th></tr></thead><tbody>" +
+    (courseRows || "<tr><td colspan=\"5\">No data</td></tr>") + "</tbody></table>" +
+    "<h2>VISUAL ANALYSIS</h2><div class=\"charts\">" +
+    (typeof svgPie === "function" ? svgPie(pie, 160) : "") + "</div>" +
+    "<div class=\"footer\">— End of Monthly QA Report — · Eastern Oak College of Nursing Sciences</div></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 400);
+}
+
 })();
   if (document.getElementById("qaDailyDate") && !document.getElementById("qaDailyDate").value) {
     document.getElementById("qaDailyDate").value = todayStr;
@@ -1586,6 +1815,9 @@ async function importFullSnapshot(file) {
   document.getElementById("qaDailyDate") && document.getElementById("qaDailyDate").addEventListener("change", renderQaDaily);
   document.getElementById("qaDailyClass") && document.getElementById("qaDailyClass").addEventListener("change", renderQaDaily);
   document.getElementById("btnBuildWeeklyQa") && document.getElementById("btnBuildWeeklyQa").addEventListener("click", buildWeeklyQaReport);
+  document.getElementById("btnPrintWeeklyQa") && document.getElementById("btnPrintWeeklyQa").addEventListener("click", function() { printWeeklyProfessionalPack(); });
+  document.getElementById("btnPrintMonthlyQa") && document.getElementById("btnPrintMonthlyQa").addEventListener("click", function() { printMonthlyProfessionalPack(); });
+  document.getElementById("btnPrintDailyReport") && document.getElementById("btnPrintDailyReport").addEventListener("click", printDailyLectureReport);
   document.getElementById("btnBuildMonthlyQa") && document.getElementById("btnBuildMonthlyQa").addEventListener("click", buildMonthlyQaReport);
   document.getElementById("btnAddProgramme") && document.getElementById("btnAddProgramme").addEventListener("click", addProgrammePrompt);
   document.getElementById("btnAddLevel") && document.getElementById("btnAddLevel").addEventListener("click", addLevelPrompt);
@@ -1787,38 +2019,59 @@ function studentFromRepo(s) {
 }
 
 async function hydrateAllFromRepoIfEmpty() {
-  const students = await getAll("students");
-  if (students.length === 0) {
+  var loaded = [];
+  async function fillIfEmpty(store, path, label) {
     try {
-      const rows = await fetchRepoJson(DATA_FILES.students);
+      var existing = await getAll(store);
+      if (existing.length) return existing.length;
+      var rows = await fetchRepoJson(path);
       if (Array.isArray(rows) && rows.length) {
-        for (const s of rows) await put("students", studentFromRepo(s));
+        if (store === "students") {
+          for (var i = 0; i < rows.length; i++) await put("students", studentFromRepo(rows[i]));
+        } else {
+          await putMany(store, rows);
+        }
+        loaded.push(label + " (" + rows.length + ")");
+        return rows.length;
       }
-    } catch (e) { console.warn("students hydrate", e); }
-  }
-  for (const [store, path] of [
-    ["lecturers", DATA_FILES.lecturers],
-    ["sessions", DATA_FILES.sessions],
-    ["qa_entries", DATA_FILES.qa_entries],
-    ["audit", DATA_FILES.audit],
-    ["programmes", DATA_FILES.programmes],
-    ["levels", DATA_FILES.levels],
-    ["courses", DATA_FILES.courses],
-    ["attendance", DATA_FILES.attendance],
-    ["hostel_runs", DATA_FILES.hostel_runs],
-  ]) {
-    try {
-      const existing = await getAll(store);
-      if (existing.length) continue;
-      const rows = await fetchRepoJson(path);
-      if (Array.isArray(rows) && rows.length) await putMany(store, rows);
     } catch (e) { console.warn(store + " hydrate", e); }
+    return 0;
   }
+  var nStu = await fillIfEmpty("students", DATA_FILES.students, "students");
+  await fillIfEmpty("lecturers", DATA_FILES.lecturers, "lecturers");
+  await fillIfEmpty("sessions", DATA_FILES.sessions, "sessions");
+  await fillIfEmpty("qa_entries", DATA_FILES.qa_entries, "lecture logs");
+  await fillIfEmpty("audit", DATA_FILES.audit, "audit");
+  await fillIfEmpty("programmes", DATA_FILES.programmes, "programmes");
+  await fillIfEmpty("levels", DATA_FILES.levels, "levels");
+  await fillIfEmpty("courses", DATA_FILES.courses, "courses");
+  await fillIfEmpty("attendance", DATA_FILES.attendance, "attendance");
+  await fillIfEmpty("hostel_runs", DATA_FILES.hostel_runs, "hostel runs");
   try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config); } catch (e) { console.warn("config", e); }
   try { TIMETABLES_CACHE = await fetchRepoJson(DATA_FILES.timetables); } catch (e) { TIMETABLES_CACHE = {}; }
   PROGRAMMES_CACHE = await getAll("programmes");
   LEVELS_CACHE = await getAll("levels");
   COURSES_CACHE = await getAll("courses");
+  // Always refresh student cache for UI
+  try { await loadStudents(); } catch (_) {}
+  var totalStu = (await getAll("students")).length;
+  var banner = document.getElementById("masterLoadBanner");
+  if (banner) {
+    if (loaded.length) {
+      banner.hidden = false;
+      banner.textContent = "Master data loaded automatically from the repository: " + loaded.join(", ") + ". Total students on this device: " + totalStu + ".";
+      setTimeout(function() { banner.hidden = true; }, 12000);
+    } else if (totalStu > 0) {
+      banner.hidden = false;
+      banner.textContent = "Master list ready (" + totalStu + " students). Data was already on this device — no manual “Load official list” needed.";
+      setTimeout(function() { banner.hidden = true; }, 7000);
+    } else {
+      banner.hidden = false;
+      banner.textContent = "No students in the repository master yet. Add students or use Reload master list after publishing a list.";
+      setTimeout(function() { banner.hidden = true; }, 10000);
+    }
+  }
+  return { loaded: loaded, totalStu: totalStu };
 }
 
 async function reloadAllFromRepo(force) {
@@ -2438,156 +2691,151 @@ function initQaMonthlyView() {
 }
 
 async function buildWeeklyQaReport() {
-  var startVal = document.getElementById("qaWeekStart") && document.getElementById("qaWeekStart").value;
-  var endVal = document.getElementById("qaWeekEnd") && document.getElementById("qaWeekEnd").value;
-  if (!startVal || !endVal) { alert("Pick both start and end dates."); return; }
-  if (endVal < startVal) { alert("End date must be on or after start date."); return; }
+  await ensureTimetables();
+  var start = (document.getElementById("qaWeekStart") && document.getElementById("qaWeekStart").value) || "";
+  var end = (document.getElementById("qaWeekEnd") && document.getElementById("qaWeekEnd").value) || "";
   var classKey = (document.getElementById("qaWeekClass") && document.getElementById("qaWeekClass").value) || "100_nursing";
-  var excluded = parseExcludeDates(document.getElementById("qaWeekExclude") && document.getElementById("qaWeekExclude").value);
-  var schoolDays = [];
-  var cur = new Date(startVal + "T12:00:00");
-  var end = new Date(endVal + "T12:00:00");
-  while (cur <= end) {
-    var iso = cur.toISOString().slice(0, 10);
-    var dow = cur.getDay();
-    if (dow !== 0 && dow !== 6 && !excluded.has(iso)) schoolDays.push(iso);
-    cur.setDate(cur.getDate() + 1);
-  }
-  var tts = await ensureTimetables();
-  var tt = tts[classKey] || { slots: [] };
-  var entries = (await getQaEntries()).filter(function(e) { return schoolDays.indexOf(e.date) >= 0 && e.classKey === classKey; });
-  var sched = {};
-  schoolDays.forEach(function(iso) {
-    var wd = weekdayOfDate(iso);
-    (tt.slots || []).filter(function(s) { return s.weekday === wd; }).forEach(function(s) {
-      sched[s.code] = (sched[s.code] || 0) + 1;
-    });
-  });
-  var delivered = {}, missedMap = {};
-  entries.forEach(function(e) {
-    var m = (e.course || "").match(/^([A-Z]{2,6}\s*\d{0,3}|PRAC|TUT|PSY|ECA)/i);
-    var c = m ? m[1].replace(/\s+/, " ").toUpperCase() : "OTHER";
-    if (e.status === "Held" || e.status === "Partial") delivered[c] = (delivered[c] || 0) + 1;
-    if (e.status === "Missed") missedMap[c] = (missedMap[c] || 0) + 1;
-  });
-  var codes = Object.keys(Object.assign({}, sched, delivered, missedMap)).sort();
-  var totS = 0, totD = 0, totM = 0;
-  var courseRows = codes.map(function(code) {
-    var s = sched[code] || 0, d = delivered[code] || 0, m = missedMap[code] || 0;
-    totS += s; totD += d; totM += m;
-    var status = "Not in Timetable";
-    if (s > 0) {
-      if (d >= s && m === 0) status = d > s ? "Over-Delivered" : "Fully Delivered";
-      else if (d === 0) status = "Fully Missed";
-      else status = "Partially Missed";
+  var excludeRaw = (document.getElementById("qaWeekExclude") && document.getElementById("qaWeekExclude").value) || "";
+  var excluded = excludeRaw.split(/[,;\s]+/).map(function(s) { return s.trim(); }).filter(Boolean);
+  if (!start || !end) { alert("Choose week start and end dates."); return; }
+  var tt = TIMETABLES_CACHE[classKey] || { slots: [] };
+  var slots = tt.slots || [];
+  var scheduled = 0;
+  var cursor = new Date(start + "T12:00:00");
+  var endD = new Date(end + "T12:00:00");
+  while (cursor <= endD) {
+    var iso = cursor.toISOString().slice(0, 10);
+    if (excluded.indexOf(iso) < 0) {
+      var wd = (cursor.getDay() + 6) % 7;
+      scheduled += slots.filter(function(s) { return Number(s.weekday) === wd; }).length;
     }
-    var rate = s ? Math.round((Math.min(d, s) / s) * 100) : 0;
-    return { code: code, s: s, d: d, m: m, status: status, rate: rate };
-  });
-  var rate = totS ? Math.round((totD / totS) * 100) : 0;
-  var summary = document.getElementById("qaWeeklySummary");
-  if (summary) {
-    summary.hidden = false;
-    summary.innerHTML = "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + totS + "</span><span class=\"stat-card__label\">Scheduled slots</span></div></div>" +
-      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + totD + "</span><span class=\"stat-card__label\">Delivered</span></div></div>" +
-      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + totM + "</span><span class=\"stat-card__label\">Missed logs</span></div></div>" +
-      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + rate + "%</span><span class=\"stat-card__label\">Compliance</span></div></div>";
+    cursor.setDate(cursor.getDate() + 1);
   }
-  var card = document.getElementById("qaWeeklyCard");
-  var dayCard = document.getElementById("qaWeeklyDayCard");
-  if (card) card.hidden = false;
-  if (dayCard) dayCard.hidden = false;
-  var cb = document.getElementById("qaWeeklyCourseBody");
-  if (cb) cb.innerHTML = courseRows.map(function(r) {
-    return "<tr><td>" + escapeHtml(courseName(r.code)) + "</td><td>" + r.s + "</td><td>" + r.d + "</td><td>" + r.m + "</td><td>" + escapeHtml(r.status) + "</td><td>" + r.rate + "%</td></tr>";
-  }).join("") || "<tr><td colspan=\"6\">No data.</td></tr>";
-  var DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-  var tbody = document.getElementById("qaWeeklyTableBody");
-  var dayRows = [];
-  schoolDays.forEach(function(iso) {
-    var wd = weekdayOfDate(iso);
-    (tt.slots || []).filter(function(s) { return s.weekday === wd; }).forEach(function(s) {
-      var ent = entries.find(function(e) { return e.date === iso && e.course && e.course.indexOf(s.code) >= 0; });
-      dayRows.push("<tr><td>" + iso + "</td><td>" + DAYS[wd] + "</td><td>" + escapeHtml(courseName(s.code)) + "</td><td>" + s.hours + "</td><td>" + escapeHtml(ent ? ent.status : "Pending") + "</td><td>" + escapeHtml(ent ? (ent.lecturer || "—") : "—") + "</td></tr>");
-    });
+  var entries = (await getQaEntries()).filter(function(e) {
+    return e.classKey === classKey && e.date >= start && e.date <= end && excluded.indexOf(e.date) < 0;
   });
-  if (tbody) tbody.innerHTML = dayRows.join("") || "<tr><td colspan=\"6\">No school days.</td></tr>";
-  var dl = document.getElementById("btnDownloadWeeklyQa");
-  if (dl) dl.onclick = function() {
-    downloadJsonReport("QA_Weekly_" + startVal + "_to_" + endVal + "_" + classKey + ".json", {
-      startDate: startVal, endDate: endVal, classKey: classKey, schoolDays: schoolDays,
-      totals: { scheduled: totS, delivered: totD, missed: totM, rate: rate }, courseRows: courseRows, entries: entries
-    });
+  var delivered = entries.filter(function(e) { return e.status === "Held" || e.status === "Partial"; }).length;
+  var missed = entries.filter(function(e) { return e.status === "Missed"; }).length;
+  if (!entries.length && scheduled) missed = Math.max(0, scheduled - delivered);
+  var byCourse = {};
+  slots.forEach(function(s) {
+    byCourse[s.code] = byCourse[s.code] || { course: s.code, lecturer: "", sched: 0, deliv: 0, missed: 0, hrs: 0 };
+  });
+  cursor = new Date(start + "T12:00:00");
+  while (cursor <= endD) {
+    var iso2 = cursor.toISOString().slice(0, 10);
+    if (excluded.indexOf(iso2) < 0) {
+      var wd2 = (cursor.getDay() + 6) % 7;
+      slots.filter(function(s) { return Number(s.weekday) === wd2; }).forEach(function(s) {
+        byCourse[s.code] = byCourse[s.code] || { course: s.code, lecturer: "", sched: 0, deliv: 0, missed: 0, hrs: 0 };
+        byCourse[s.code].sched += 1;
+      });
+    }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  entries.forEach(function(e) {
+    var code = (e.course || "").split("—")[0].trim() || e.course || "Other";
+    byCourse[code] = byCourse[code] || { course: code, lecturer: "", sched: 0, deliv: 0, missed: 0, hrs: 0 };
+    if (e.lecturer) byCourse[code].lecturer = e.lecturer;
+    if (e.status === "Held" || e.status === "Partial") {
+      byCourse[code].deliv += 1;
+      byCourse[code].hrs += (Number(e.duration) || 0) / 60;
+    }
+    if (e.status === "Missed") byCourse[code].missed += 1;
+  });
+  var courseRows = Object.keys(byCourse).map(function(k) {
+    var r = byCourse[k];
+    var pct = r.sched ? Math.round((r.deliv / r.sched) * 1000) / 10 : (r.deliv ? "—" : "0");
+    var status = r.sched === 0 && r.deliv ? "Not in Timetable" : (r.missed === 0 && r.deliv >= r.sched && r.sched ? "Fully Delivered" : (r.deliv === 0 && r.sched ? "Fully Missed" : "Partial"));
+    return { course: r.course, lecturer: r.lecturer || "—", sched: r.sched, deliv: r.deliv, missed: r.missed, hrs: (Math.round(r.hrs * 10) / 10) + "h", status: status, pct: pct === "—" ? "—" : (pct + "%") };
+  });
+  var dayNames = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  var dayRows = entries.slice().sort(function(a, b) { return String(a.date).localeCompare(String(b.date)); }).map(function(e) {
+    var d = new Date(e.date + "T12:00:00");
+    return {
+      date: e.date,
+      day: dayNames[(d.getDay() + 6) % 7],
+      course: e.course || "",
+      lecturer: e.lecturer || "",
+      topic: e.topic || "",
+      time: formatTimeNice(e.start) + " – " + formatTimeNice(e.end),
+      hrs: e.duration != null ? (Math.round((Number(e.duration) / 60) * 10) / 10) + "h" : ""
+    };
+  });
+  var rate = scheduled ? Math.round((delivered / scheduled) * 1000) / 10 : 0;
+  var out = document.getElementById("qaWeeklyResult");
+  if (out) {
+    out.innerHTML = "<div class=\"pro-report\"><h3 style=\"margin:0 0 8px\">Weekly summary</h3>" +
+      "<div class=\"stats-grid\" style=\"margin-bottom:12px\">" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + scheduled + "</span><span class=\"stat-card__label\">Scheduled</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + delivered + "</span><span class=\"stat-card__label\">Delivered</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + missed + "</span><span class=\"stat-card__label\">Missed</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + rate + "%</span><span class=\"stat-card__label\">Compliance</span></div></div></div>" +
+      "<p class=\"muted-note\">Click <strong>Print weekly pack</strong> for the full professional report (course table, charts, day-by-day).</p></div>";
+  }
+  window.__weeklyQaPayload = {
+    classKey: classKey,
+    periodLabel: "Week: " + start + " to " + end,
+    excluded: excluded.join(", ") || "None",
+    scheduled: scheduled,
+    delivered: delivered,
+    missed: missed,
+    courseRows: courseRows,
+    dayRows: dayRows
   };
 }
 
 async function buildMonthlyQaReport() {
-  var monthVal = document.getElementById("qaMonthInput") && document.getElementById("qaMonthInput").value;
-  if (!monthVal) { alert("Pick a month."); return; }
+  await ensureTimetables();
+  var monthVal = (document.getElementById("qaMonth") && document.getElementById("qaMonth").value) || "";
   var classKey = (document.getElementById("qaMonthClass") && document.getElementById("qaMonthClass").value) || "100_nursing";
-  var excluded = parseExcludeDates(document.getElementById("qaMonthExclude") && document.getElementById("qaMonthExclude").value);
-  var parts = monthVal.split("-").map(Number);
-  var y = parts[0], m = parts[1];
-  var schoolDays = [];
-  var dim = new Date(y, m, 0).getDate();
-  for (var day = 1; day <= dim; day++) {
-    var d = new Date(y, m - 1, day);
-    if (d.getDay() === 0 || d.getDay() === 6) continue;
-    var iso = d.toISOString().slice(0, 10);
-    if (excluded.has(iso)) continue;
-    schoolDays.push(iso);
-  }
-  var tts = await ensureTimetables();
-  var tt = tts[classKey] || { slots: [] };
-  var entries = (await getQaEntries()).filter(function(e) { return (e.date || "").indexOf(monthVal) === 0 && e.classKey === classKey; });
-  var sched = {};
-  schoolDays.forEach(function(iso) {
-    var wd = weekdayOfDate(iso);
-    (tt.slots || []).filter(function(s) { return s.weekday === wd; }).forEach(function(s) {
-      sched[s.code] = (sched[s.code] || 0) + 1;
-    });
+  if (!monthVal) { alert("Choose a month."); return; }
+  var entries = (await getQaEntries()).filter(function(e) {
+    return e.classKey === classKey && String(e.date || "").slice(0, 7) === monthVal;
   });
-  var delivered = {}, missedMap = {}, byLec = {};
+  var tt = TIMETABLES_CACHE[classKey] || { slots: [] };
+  // Approximate scheduled: count weekdays in month × slots per weekday
+  var y = Number(monthVal.slice(0, 4)), m = Number(monthVal.slice(5, 7)) - 1;
+  var scheduled = 0;
+  var d = new Date(y, m, 1);
+  while (d.getMonth() === m) {
+    var wd = (d.getDay() + 6) % 7;
+    if (wd < 5) scheduled += (tt.slots || []).filter(function(s) { return Number(s.weekday) === wd; }).length;
+    d.setDate(d.getDate() + 1);
+  }
+  var delivered = entries.filter(function(e) { return e.status === "Held" || e.status === "Partial"; }).length;
+  var missed = entries.filter(function(e) { return e.status === "Missed"; }).length;
+  var rate = scheduled ? Math.round((delivered / scheduled) * 1000) / 10 : (entries.length ? Math.round((delivered / entries.length) * 1000) / 10 : 0);
+  var byCourse = {};
   entries.forEach(function(e) {
-    var mcode = (e.course || "").match(/^([A-Z0-9 ]+?)(?:\s*—|$)/i);
-    var c = mcode ? mcode[1].trim() : (e.course || "OTHER");
-    if (e.status === "Held" || e.status === "Partial") delivered[c] = (delivered[c] || 0) + 1;
-    if (e.status === "Missed") missedMap[c] = (missedMap[c] || 0) + 1;
-    var lec = e.lecturer || "—";
-    if (!byLec[lec]) byLec[lec] = { held: 0, missed: 0 };
-    if (e.status === "Missed") byLec[lec].missed++;
-    else if (e.status === "Held" || e.status === "Partial") byLec[lec].held++;
+    var c = e.course || "Other";
+    byCourse[c] = byCourse[c] || { course: c, scheduled: 0, held: 0, missed: 0 };
+    if (e.status === "Held" || e.status === "Partial") byCourse[c].held += 1;
+    if (e.status === "Missed") byCourse[c].missed += 1;
   });
-  var totS = 0, totD = 0, totM = 0;
-  var codes = Object.keys(Object.assign({}, sched, delivered)).sort();
-  var courseRows = codes.map(function(code) {
-    var s = sched[code] || 0, d = delivered[code] || 0, m = missedMap[code] || 0;
-    totS += s; totD += d; totM += m;
-    return { code: code, s: s, d: d, m: m, rate: s ? Math.round((Math.min(d, s) / s) * 100) : 0 };
+  var courseRows = Object.keys(byCourse).map(function(k) {
+    var r = byCourse[k];
+    var t = r.held + r.missed;
+    return { course: r.course, scheduled: t, held: r.held, missed: r.missed, rate: t ? Math.round((r.held / t) * 1000) / 10 : 0 };
   });
-  var rate = totS ? Math.round((totD / totS) * 100) : 0;
-  var summary = document.getElementById("qaMonthlySummary");
-  if (summary) {
-    summary.hidden = false;
-    summary.innerHTML = "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + totS + "</span><span class=\"stat-card__label\">Scheduled</span></div></div>" +
-      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + totD + "</span><span class=\"stat-card__label\">Delivered</span></div></div>" +
-      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + totM + "</span><span class=\"stat-card__label\">Missed</span></div></div>" +
-      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + rate + "%</span><span class=\"stat-card__label\">Compliance</span></div></div>";
+  var out = document.getElementById("qaMonthlyResult");
+  if (out) {
+    out.innerHTML = "<div class=\"pro-report\"><h3 style=\"margin:0 0 8px\">Monthly summary</h3>" +
+      "<div class=\"stats-grid\">" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + scheduled + "</span><span class=\"stat-card__label\">Scheduled (est.)</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + delivered + "</span><span class=\"stat-card__label\">Delivered</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + missed + "</span><span class=\"stat-card__label\">Missed</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + rate + "%</span><span class=\"stat-card__label\">Compliance</span></div></div></div>" +
+      "<p class=\"muted-note\">Use <strong>Print monthly pack</strong> for the full professional board report.</p></div>";
   }
-  var detail = document.getElementById("qaMonthlyDetail");
-  if (detail) detail.hidden = false;
-  var cb = document.getElementById("qaMonthCourseBody");
-  var lb = document.getElementById("qaMonthLecBody");
-  if (cb) cb.innerHTML = courseRows.map(function(r) {
-    return "<tr><td>" + escapeHtml(courseName(r.code)) + "</td><td>" + r.s + "</td><td>" + r.d + "</td><td>" + r.m + "</td><td>" + r.rate + "%</td></tr>";
-  }).join("") || "<tr><td colspan=\"5\">No data.</td></tr>";
-  if (lb) lb.innerHTML = Object.keys(byLec).sort().map(function(name) {
-    var h = byLec[name].held, m = byLec[name].missed, t = h + m;
-    return "<tr><td>" + escapeHtml(name) + "</td><td>" + h + "</td><td>" + m + "</td><td>" + (t ? Math.round((h / t) * 100) : 0) + "%</td></tr>";
-  }).join("") || "<tr><td colspan=\"4\">No data.</td></tr>";
-  var dl = document.getElementById("btnDownloadMonthlyQa");
-  if (dl) dl.onclick = function() {
-    downloadJsonReport("QA_Monthly_" + monthVal + "_" + classKey + ".json", { month: monthVal, classKey: classKey, totals: { scheduled: totS, delivered: totD, missed: totM, rate: rate }, courseRows: courseRows, byLec: byLec, entries: entries });
+  window.__monthlyQaPayload = {
+    classKey: classKey,
+    monthLabel: monthVal,
+    scheduled: scheduled,
+    delivered: delivered,
+    missed: missed,
+    rate: rate,
+    courseRows: courseRows
   };
 }
 
@@ -3181,5 +3429,234 @@ async function importFullSnapshot(file) {
   alert("Snapshot loaded into this browser. Publish to repository to make it permanent.");
 }
 
+
+
+function eocnsReportStyles() {
+  return "body{font-family:'Segoe UI',system-ui,Georgia,serif;color:#1a1a2e;padding:28px;max-width:960px;margin:0 auto;line-height:1.45}" +
+    "h1{color:#1B3A6B;text-align:center;margin:0 0 4px;font-size:1.45rem;letter-spacing:0.02em}" +
+    "h1 .gold{color:#c9a227;display:block;font-size:0.95rem;font-weight:600;margin-top:4px}" +
+    ".sub{text-align:center;color:#555;margin:0 0 8px;font-size:12px}" +
+    ".rule{height:3px;background:linear-gradient(90deg,#1B3A6B,#c9a227,#1B3A6B);border:0;margin:12px 0 20px}" +
+    "h2{color:#1B3A6B;font-size:0.95rem;margin:28px 0 10px;padding:8px 12px;background:#e8eef7;border-left:4px solid #1B3A6B}" +
+    "table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}" +
+    "th{background:#1B3A6B;color:#fff;padding:8px;text-align:left;font-weight:600}" +
+    "td{border:1px solid #c5cdd8;padding:7px 8px;vertical-align:top}" +
+    "tr:nth-child(even) td{background:#f7f9fc}" +
+    ".kpi{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 8px}" +
+    ".kpi>div{flex:1;min-width:110px;text-align:center;border:1px solid #c5cdd8;border-radius:8px;padding:12px 8px;background:#fff}" +
+    ".kpi strong{display:block;font-size:1.45rem;line-height:1.2}" +
+    ".kpi span{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:#555}" +
+    ".k-sched strong{color:#1B3A6B}.k-del strong{color:#0f766e}.k-miss strong{color:#b91c1c}.k-rate strong{color:#0f766e}" +
+    ".meta-grid{display:grid;grid-template-columns:140px 1fr;gap:4px 12px;font-size:13px;margin:8px 0 12px}" +
+    ".meta-grid b{color:#334}" +
+    ".absent-head th{background:#b91c1c}" +
+    ".note{background:#fff8e6;border-left:4px solid #c9a227;padding:8px 12px;font-size:12px;margin:8px 0}" +
+    ".charts{display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin:12px 0}" +
+    ".footer{margin-top:36px;font-size:12px;color:#555;text-align:center}" +
+    "@media print{body{padding:12px} .kpi>div{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
+}
+
+function classLabelFromKey(key) {
+  var map = { "100_nursing": "100 LEVEL NURSING DEPARTMENT", "200_nursing": "200 LEVEL NURSING DEPARTMENT", "200_midwifery": "200 LEVEL MIDWIFERY DEPARTMENT" };
+  return map[key] || String(key || "CLASS").replace(/_/g, " ").toUpperCase();
+}
+
+function formatTimeNice(t) {
+  if (!t) return "";
+  var m = String(t).match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return t;
+  var h = Number(m[1]), min = m[2], ap = h >= 12 ? "PM" : "AM";
+  var h12 = h % 12; if (!h12) h12 = 12;
+  return h12 + ":" + min + " " + ap;
+}
+
+function formatDateLong(iso) {
+  if (!iso) return "";
+  var d = new Date(iso + "T12:00:00");
+  if (isNaN(d)) return iso;
+  var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  return d.getDate() + (d.getDate()===1||d.getDate()===21||d.getDate()===31?"st":d.getDate()===2||d.getDate()===22?"nd":d.getDate()===3||d.getDate()===23?"rd":"th") + " " + months[d.getMonth()] + ", " + d.getFullYear();
+}
+
+async function printDailyLectureReport() {
+  var date = (document.getElementById("qaDailyDate") && document.getElementById("qaDailyDate").value) || "";
+  var classKey = (document.getElementById("qaDailyClass") && document.getElementById("qaDailyClass").value) || "100_nursing";
+  if (!date) { alert("Choose a date on Daily QA first."); return; }
+  await ensureTimetables();
+  var tt = TIMETABLES_CACHE[classKey] || { slots: [] };
+  var weekday = (new Date(date + "T12:00:00").getDay() + 6) % 7; // Mon=0
+  var slots = (tt.slots || []).filter(function(s) { return Number(s.weekday) === weekday; });
+  var entries = (await getQaEntries()).filter(function(e) { return e.date === date && e.classKey === classKey; });
+  var sessionName = "Academic Session";
+  try {
+    var sessions = await getAll("sessions");
+    var active = sessions.find(function(s) { return s.status === "Active"; });
+    if (active) sessionName = active.name;
+  } catch (_) {}
+  var students = await getAll("students");
+  function resolveAbsent(list) {
+    if (!list || !list.length) return [];
+    return list.map(function(a) {
+      var sn = String(a).trim();
+      var found = students.find(function(s) { return String(s.serial) === sn || String(s.regNo) === sn || (s.name && s.name.toLowerCase() === sn.toLowerCase()); });
+      return { sn: found ? (found.serial || sn) : sn, name: found ? found.name : sn };
+    });
+  }
+  var scheduleRows = "";
+  var courseBlocks = "";
+  var allAbsent = {};
+  var used = slots.length ? slots : entries.map(function(e) {
+    return { code: (e.course || "").split("—")[0].trim(), start: e.start, end: e.end, hours: e.duration ? e.duration / 60 : 2 };
+  });
+  used.forEach(function(slot, i) {
+    var code = slot.code || "";
+    var ent = entries.find(function(e) {
+      return (e.course || "").indexOf(code) >= 0 || (e.start && slot.start && e.start === slot.start);
+    }) || entries[i];
+    var remark = ent ? (ent.status === "Held" ? "Lecture held" : ent.status === "Missed" ? "Lecture missed" : (ent.status || "Logged")) : "Not logged";
+    var title = ent ? (ent.course || code) : courseName(code);
+    scheduleRows += "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(String(title).replace(/^[^—]+—\s*/, "") || title) +
+      "</td><td>" + escapeHtml(code) + "</td><td>" + formatTimeNice(slot.start || (ent && ent.start)) +
+      "</td><td>" + formatTimeNice(slot.end || (ent && ent.end)) + "</td><td>" + escapeHtml(remark) + "</td></tr>";
+    if (ent) {
+      var abs = resolveAbsent(ent.absent);
+      abs.forEach(function(a) { allAbsent[a.sn + "|" + a.name] = a; });
+      var obj = (ent.objectives || "").split(/[.;\n]+/).map(function(x) { return x.trim(); }).filter(Boolean);
+      courseBlocks += "<h2>COURSE " + (i + 1) + " INFORMATION</h2>" +
+        "<div class=\"meta-grid\">" +
+        "<b>Course Code:</b><span>" + escapeHtml(code || (ent.course || "")) + "</span>" +
+        "<b>Course Title:</b><span>" + escapeHtml(ent.course || title) + "</span>" +
+        "<b>Lecturer:</b><span>" + escapeHtml(ent.lecturer || "—") + "</span>" +
+        "<b>Topic:</b><span>" + escapeHtml(ent.topic || "—") + "</span>" +
+        "<b>Date:</b><span>" + formatDateLong(ent.date) + "</span>" +
+        "<b>Time:</b><span>" + formatTimeNice(ent.start) + " – " + formatTimeNice(ent.end) + "</span></div>" +
+        "<h2>LEARNING OBJECTIVES</h2><ul>" + (obj.length ? obj.map(function(o) { return "<li>" + escapeHtml(o) + "</li>"; }).join("") : "<li>—</li>") + "</ul>" +
+        "<h2>LECTURE SUMMARY</h2><p>" + escapeHtml(ent.lectureSummary || "—") + "</p>" +
+        "<h2>ASSIGNMENT</h2><div class=\"note\">" + escapeHtml(ent.assignment || "None was given") + "</div>" +
+        "<h2>REMARKS</h2><p>" + escapeHtml(ent.remark || "—") + "</p>" +
+        "<h2>ABSENT STUDENTS</h2>" +
+        (abs.length ? ("<table><thead class=\"absent-head\"><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
+          abs.map(function(a) { return "<tr><td>" + escapeHtml(String(a.sn)) + "</td><td>" + escapeHtml(a.name) + "</td></tr>"; }).join("") +
+          "</tbody></table>") : "<p>None recorded.</p>");
+    }
+  });
+  var absentList = Object.keys(allAbsent).map(function(k) { return allAbsent[k]; });
+  var registered = students.filter(function(s) {
+    if (s.status && s.status !== "Active") return false;
+    // best-effort class filter by level in classKey
+    if (classKey.indexOf("100") === 0) return String(s.level) === "100";
+    if (classKey.indexOf("200") === 0) return String(s.level) === "200";
+    return true;
+  }).length;
+  var present = Math.max(0, registered - absentList.length);
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>Today's Lecture Report</title><style>" + eocnsReportStyles() + "</style></head><body>" +
+    "<h1>TODAY'S LECTURE(S) REPORT<span class=\"gold\">" + escapeHtml(classLabelFromKey(classKey)) + "</span></h1>" +
+    "<div class=\"sub\">" + escapeHtml(classKey.replace(/_.*/, "").toUpperCase() + " Level") + " · " + escapeHtml(sessionName) + " · " + formatDateLong(date) + "</div>" +
+    "<hr class=\"rule\"/>" +
+    "<h2>COURSE SCHEDULE / TIMETABLE</h2>" +
+    "<table><thead><tr><th>S/N</th><th>Course Title</th><th>Course Code</th><th>Start Time</th><th>End Time</th><th>Remark</th></tr></thead><tbody>" +
+    (scheduleRows || "<tr><td colspan=\"6\">No timetable slots or logs for this day.</td></tr>") + "</tbody></table>" +
+    courseBlocks +
+    "<h2>CONSOLIDATED ATTENDANCE REPORT</h2>" +
+    "<div class=\"kpi\"><div class=\"k-sched\"><strong>" + registered + "</strong><span>Total registered</span></div>" +
+    "<div class=\"k-del\"><strong>" + present + "</strong><span>Present (est.)</span></div>" +
+    "<div class=\"k-miss\"><strong>" + absentList.length + "</strong><span>Absent (unique)</span></div></div>" +
+    "<h2>CONSOLIDATED ABSENT STUDENTS LIST</h2>" +
+    (absentList.length ? ("<table><thead class=\"absent-head\"><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
+      absentList.map(function(a) { return "<tr><td>" + escapeHtml(String(a.sn)) + "</td><td>" + escapeHtml(a.name) + "</td></tr>"; }).join("") +
+      "</tbody></table>") : "<p>No absentees recorded in lecture logs for this day.</p>") +
+    "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + " · EOCNS QA System</div>" +
+    "</body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 400);
+}
+
+function printWeeklyProfessionalPack(payload) {
+  var p = payload || window.__weeklyQaPayload;
+  if (!p) { alert("Build the weekly report first."); return; }
+  var compliance = p.scheduled ? Math.round((p.delivered / p.scheduled) * 1000) / 10 : 0;
+  var courseRows = (p.courseRows || []).map(function(r) {
+    return "<tr><td>" + escapeHtml(r.course) + "</td><td>" + escapeHtml(r.lecturer) + "</td><td>" + r.sched +
+      "</td><td>" + r.deliv + "</td><td>" + r.missed + "</td><td>" + r.hrs + "</td><td>" + escapeHtml(r.status) +
+      "</td><td>" + r.pct + "</td></tr>";
+  }).join("");
+  var dayRows = (p.dayRows || []).map(function(r) {
+    return "<tr><td>" + escapeHtml(r.date) + "</td><td>" + escapeHtml(r.day) + "</td><td>" + escapeHtml(r.course) +
+      "</td><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml(r.topic) + "</td><td>" + escapeHtml(r.time) +
+      "</td><td>" + escapeHtml(r.hrs) + "</td></tr>";
+  }).join("");
+  var pie = [
+    { label: "Delivered", value: p.delivered, color: "#0f766e" },
+    { label: "Missed", value: p.missed, color: "#b91c1c" }
+  ].filter(function(x) { return x.value > 0; });
+  var bars = (p.courseRows || []).slice(0, 10).map(function(r) {
+    return { label: String(r.course).slice(0, 8), value: r.deliv, color: "#1d4ed8" };
+  });
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Weekly QA Report</title><style>" + eocnsReportStyles() + "</style></head><body>" +
+    "<h1>EOCNS QA REPORT — WEEKLY<span class=\"gold\">Staff Teaching Commitment &amp; Lecture Attendance</span></h1>" +
+    "<div class=\"sub\"><strong>" + escapeHtml(classLabelFromKey(p.classKey)) + "</strong><br/>" +
+    escapeHtml(p.periodLabel) + "<br/>Generated: " + new Date().toLocaleString() + " · Excluded: " + escapeHtml(p.excluded || "None") + "</div>" +
+    "<hr class=\"rule\"/>" +
+    "<h2>WEEKLY SUMMARY</h2>" +
+    "<div class=\"kpi\">" +
+    "<div class=\"k-sched\"><strong>" + p.scheduled + "</strong><span>Scheduled</span></div>" +
+    "<div class=\"k-del\"><strong>" + p.delivered + "</strong><span>Delivered</span></div>" +
+    "<div class=\"k-miss\"><strong>" + p.missed + "</strong><span>Missed</span></div>" +
+    "<div class=\"k-rate\"><strong>" + compliance + "%</strong><span>Compliance</span></div></div>" +
+    "<p>Teaching delivery for this window stands at <strong>" + compliance + "%</strong> " +
+    "(" + p.delivered + " of " + p.scheduled + " scheduled contact sessions logged as held). " +
+    (p.missed ? (p.missed + " session(s) were missed and should be rescheduled or explained in audit.") : "No missed sessions were recorded.") + "</p>" +
+    "<h2>COURSE COMPLIANCE</h2>" +
+    "<table><thead><tr><th>Course</th><th>Lecturer(s)</th><th>Sched</th><th>Deliv</th><th>Missed</th><th>Hrs Del</th><th>Status</th><th>%</th></tr></thead><tbody>" +
+    (courseRows || "<tr><td colspan=\"8\">No course data.</td></tr>") + "</tbody></table>" +
+    "<h2>VISUAL ANALYSIS</h2><div class=\"charts\">" +
+    (typeof svgPie === "function" ? svgPie(pie, 160) : "") +
+    (typeof svgBars === "function" ? svgBars(bars, 340, 150) : "") + "</div>" +
+    "<h2>DAY-BY-DAY BREAKDOWN</h2>" +
+    "<table><thead><tr><th>Date</th><th>Day</th><th>Course</th><th>Lecturer</th><th>Topic</th><th>Time</th><th>Hrs</th></tr></thead><tbody>" +
+    (dayRows || "<tr><td colspan=\"7\">No lectures logged in range.</td></tr>") + "</tbody></table>" +
+    "<div class=\"footer\">— End of Weekly QA Report — · EOCNS QA Attendance System</div></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 400);
+}
+
+function printMonthlyProfessionalPack(payload) {
+  var p = payload || window.__monthlyQaPayload;
+  if (!p) { alert("Build the monthly report first."); return; }
+  var w = window.open("", "_blank");
+  if (!w) return;
+  var courseRows = (p.courseRows || []).map(function(r) {
+    return "<tr><td>" + escapeHtml(r.course) + "</td><td>" + r.scheduled + "</td><td>" + r.held + "</td><td>" + r.missed + "</td><td>" + r.rate + "%</td></tr>";
+  }).join("");
+  var pie = [
+    { label: "Held", value: p.delivered, color: "#0f766e" },
+    { label: "Missed", value: p.missed, color: "#b91c1c" }
+  ].filter(function(x) { return x.value > 0; });
+  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Monthly QA Report</title><style>" + eocnsReportStyles() + "</style></head><body>" +
+    "<h1>EOCNS — MONTHLY QA REPORT<span class=\"gold\">Lecture Delivery &amp; Compliance Analysis</span></h1>" +
+    "<div class=\"sub\"><strong>" + escapeHtml(classLabelFromKey(p.classKey)) + "</strong><br/>Reporting period: " + escapeHtml(p.monthLabel) +
+    " · Generated " + new Date().toLocaleString() + "</div><hr class=\"rule\"/>" +
+    "<h2>EXECUTIVE SUMMARY</h2>" +
+    "<div class=\"kpi\">" +
+    "<div class=\"k-sched\"><strong>" + p.scheduled + "</strong><span>Scheduled</span></div>" +
+    "<div class=\"k-del\"><strong>" + p.delivered + "</strong><span>Delivered</span></div>" +
+    "<div class=\"k-miss\"><strong>" + p.missed + "</strong><span>Missed</span></div>" +
+    "<div class=\"k-rate\"><strong>" + p.rate + "%</strong><span>Compliance</span></div></div>" +
+    "<p>Over <strong>" + escapeHtml(p.monthLabel) + "</strong>, the class recorded <strong>" + p.rate + "%</strong> delivery compliance. " +
+    "This pack is intended for academic board review and continuous quality improvement.</p>" +
+    "<h2>COURSE PERFORMANCE</h2>" +
+    "<table><thead><tr><th>Course</th><th>Scheduled</th><th>Held</th><th>Missed</th><th>Rate</th></tr></thead><tbody>" +
+    (courseRows || "<tr><td colspan=\"5\">No data</td></tr>") + "</tbody></table>" +
+    "<h2>VISUAL ANALYSIS</h2><div class=\"charts\">" +
+    (typeof svgPie === "function" ? svgPie(pie, 160) : "") + "</div>" +
+    "<div class=\"footer\">— End of Monthly QA Report — · Eastern Oak College of Nursing Sciences</div></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 400);
+}
 
 })();

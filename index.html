@@ -8,10 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=21" />
+  <link rel="stylesheet" href="style.css?v=22" />
 </head>
 <body class="role-viewer">
   <div id="dirtyBanner" class="dirty-banner" hidden role="status"></div>
+  <div id="masterLoadBanner" class="master-load-banner" hidden role="status"></div>
   <div class="app">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar__brand">
@@ -116,7 +117,7 @@
               <span class="count-pill" id="studentsCount">0 students</span>
               <button class="btn btn--ghost qa-edit-only" id="btnImportStudentsCsv">Import CSV</button>
               <input type="file" id="studentsCsvInput" accept=".csv,text/csv" hidden />
-              <button class="btn btn--ghost" id="btnSeedStudents" class="btn btn--ghost qa-edit-only" title="Load the official class lists from the college registers">Load official list</button>
+              <button class="btn btn--ghost" id="btnSeedStudents" class="btn btn--ghost qa-edit-only" title="Only needed if the repository list is empty">Reload master list</button>
               <button class="btn btn--primary" id="btnAddStudent" class="btn btn--primary qa-edit-only">+ Add Student</button>
             </div>
           </div>
@@ -259,6 +260,7 @@
               <p class="muted-note" style="margin:0">Timetable slots for the day — mark each as delivered or missed (same workflow as the college QA analyser).</p>
             </div>
             <div class="page-toolbar__right" style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="btn btn--primary" id="btnPrintDailyReport">Print today's lecture report</button>
               <button class="btn btn--ghost qa-edit-only" id="btnAddQaEntry">+ Extra lecture</button>
             </div>
           </div>
@@ -319,6 +321,7 @@
                 </label>
                 <label class="field"><span class="field__label">&nbsp;</span>
                   <button type="button" class="btn btn--primary" id="btnBuildWeeklyQa">Build weekly report</button>
+                  <button type="button" class="btn btn--ghost" id="btnPrintWeeklyQa">Print weekly pack</button>
                 </label>
               </div>
             </div>
@@ -368,6 +371,7 @@
                 </label>
                 <label class="field"><span class="field__label">&nbsp;</span>
                   <button type="button" class="btn btn--primary" id="btnBuildMonthlyQa">Build monthly report</button>
+                  <button type="button" class="btn btn--ghost" id="btnPrintMonthlyQa">Print monthly pack</button>
                 </label>
               </div>
             </div>
@@ -704,6 +708,6 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=21"></script>
+  <script src="app.js?v=22"></script>
 </body>
 </html>
