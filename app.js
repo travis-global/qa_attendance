@@ -62,38 +62,77 @@ document.querySelectorAll("[data-goto]").forEach((el) => {
   el.addEventListener("click", () => showView(el.dataset.goto));
 });
 const DB_NAME = "eocns_attendance";
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 let db = null;
+
+async function resetLocalDatabase() {
+  try {
+    if (db) { try { db.close(); } catch (_) {} db = null; }
+    await new Promise(function(resolve, reject) {
+      var r = indexedDB.deleteDatabase(DB_NAME);
+      r.onsuccess = function() { resolve(); };
+      r.onerror = function() { reject(r.error); };
+      r.onblocked = function() { reject(new Error("Close other tabs of this site, then try again.")); };
+    });
+    return true;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
+}
+
 function openDB() {
   return new Promise((resolve, reject) => {
+    let settled = false;
     const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onerror = () => reject(req.error);
-    req.onsuccess = () => { db = req.result; resolve(db); };
+    req.onerror = () => {
+      if (settled) return;
+      settled = true;
+      reject(req.error || new Error("IndexedDB open failed"));
+    };
+    req.onsuccess = () => {
+      if (settled) return;
+      settled = true;
+      db = req.result;
+      db.onversionchange = function() {
+        try { db.close(); } catch (_) {}
+      };
+      resolve(db);
+    };
+    req.onblocked = () => {
+      console.warn("IndexedDB upgrade blocked — close other tabs of this site and reload.");
+    };
     req.onupgradeneeded = (e) => {
       const database = e.target.result;
-      if (!database.objectStoreNames.contains("students")) {
-        const store = database.createObjectStore("students", { keyPath: "id" });
-        store.createIndex("regNo", "regNo", { unique: true });
-      }
-      if (!database.objectStoreNames.contains("lecturers")) database.createObjectStore("lecturers", { keyPath: "id" });
-      if (!database.objectStoreNames.contains("sessions")) database.createObjectStore("sessions", { keyPath: "id" });
-      if (!database.objectStoreNames.contains("audit")) {
-        const audit = database.createObjectStore("audit", { keyPath: "id", autoIncrement: true });
-        audit.createIndex("ref", "ref", { unique: true });
-      }
-      if (!database.objectStoreNames.contains("meta")) database.createObjectStore("meta", { keyPath: "key" });
-      if (!database.objectStoreNames.contains("qa_entries")) {
-        const qa = database.createObjectStore("qa_entries", { keyPath: "id" });
-        qa.createIndex("date", "date", { unique: false });
-        qa.createIndex("classKey", "classKey", { unique: false });
-      }
-      if (!database.objectStoreNames.contains("programmes")) database.createObjectStore("programmes", { keyPath: "id" });
-      if (!database.objectStoreNames.contains("levels")) database.createObjectStore("levels", { keyPath: "id" });
-      if (!database.objectStoreNames.contains("courses")) database.createObjectStore("courses", { keyPath: "code" });
-      if (!database.objectStoreNames.contains("attendance")) {
-        const att = database.createObjectStore("attendance", { keyPath: "id" });
-        att.createIndex("date", "date", { unique: false });
-        att.createIndex("classKey", "classKey", { unique: false });
+      try {
+        if (!database.objectStoreNames.contains("students")) {
+          const store = database.createObjectStore("students", { keyPath: "id" });
+          // non-unique: many TMP/blank reg numbers are allowed
+          store.createIndex("regNo", "regNo", { unique: false });
+        }
+        if (!database.objectStoreNames.contains("lecturers")) database.createObjectStore("lecturers", { keyPath: "id" });
+        if (!database.objectStoreNames.contains("sessions")) database.createObjectStore("sessions", { keyPath: "id" });
+        if (!database.objectStoreNames.contains("audit")) {
+          const audit = database.createObjectStore("audit", { keyPath: "id", autoIncrement: true });
+          audit.createIndex("ref", "ref", { unique: false });
+        }
+        if (!database.objectStoreNames.contains("meta")) database.createObjectStore("meta", { keyPath: "key" });
+        if (!database.objectStoreNames.contains("qa_entries")) {
+          const qa = database.createObjectStore("qa_entries", { keyPath: "id" });
+          qa.createIndex("date", "date", { unique: false });
+          qa.createIndex("classKey", "classKey", { unique: false });
+        }
+        if (!database.objectStoreNames.contains("programmes")) database.createObjectStore("programmes", { keyPath: "id" });
+        if (!database.objectStoreNames.contains("levels")) database.createObjectStore("levels", { keyPath: "id" });
+        if (!database.objectStoreNames.contains("courses")) database.createObjectStore("courses", { keyPath: "code" });
+        if (!database.objectStoreNames.contains("attendance")) {
+          const att = database.createObjectStore("attendance", { keyPath: "id" });
+          att.createIndex("date", "date", { unique: false });
+          att.createIndex("classKey", "classKey", { unique: false });
+        }
+      } catch (upgradeErr) {
+        console.error("onupgradeneeded", upgradeErr);
+        throw upgradeErr;
       }
     };
   });
@@ -1055,9 +1094,10 @@ async function generateHostelReport() {
 
 openDB().then(async () => {
   console.log("EOCNS Attendance System ready");
-  try { await hydrateAllFromRepoIfEmpty(); } catch (e) { console.warn(e); }
+  try {
+  try { await hydrateAllFromRepoIfEmpty(); } catch (e) { console.warn("hydrate", e); }
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
-  refreshDashboardStats();
+  try { refreshDashboardStats(); } catch (e) { console.warn("stats", e); }
   initQaOfficerUI();
   document.getElementById("btnAddStudent")?.addEventListener("click", () => openStudentForm());
   document.getElementById("studentForm")?.addEventListener("submit", saveStudent);
@@ -1358,9 +1398,25 @@ function printSingleLectureReport(entry) {
   document.getElementById("btnSaveTimetable")?.addEventListener("click", saveTimetableLocal);
   document.getElementById("ttClassKey")?.addEventListener("change", renderTimetableEditor);
   document.getElementById("btnDownloadAudit")?.addEventListener("click", downloadAuditJson);
+  } catch (bootErr) {
+    console.error("post-db boot", bootErr);
+    alert("App loaded the database but a startup step failed.\n\nCause: " + (bootErr && bootErr.message ? bootErr.message : String(bootErr)) + "\n\nCheck the browser console (F12) for details. You can still try Settings → Publish after reload.");
+  }
 }).catch(err => {
-  console.error(err);
-  alert("Could not initialise the local database.");
+  console.error("EOCNS boot error", err);
+  var msg = (err && err.message) ? err.message : String(err || "unknown error");
+  var hint = "";
+  if (/QuotaExceeded|quota/i.test(msg)) hint = " Storage is full. Free space or clear site data for this origin.";
+  else if (/blocked|version/i.test(msg)) hint = " Close other tabs of this site, then reload.";
+  else if (/IndexedDB|IDB|database/i.test(msg)) hint = " Try clearing site data for travis-global.github.io (Application → Storage → Clear) then reload.";
+  else hint = " If this keeps happening: DevTools → Application → IndexedDB → delete eocns_attendance → reload.";
+  var offer = window.confirm("Startup problem.\n\nCause: " + msg + "\n\nWhat to try:" + hint + "\n\nClick OK to clear the local database and reload (repo data will re-load). Click Cancel to stay.");
+  if (offer) {
+    resetLocalDatabase().then(function(ok) {
+      if (ok) location.reload();
+      else alert("Could not clear database. Close other tabs of this site and try again.");
+    });
+  }
 });
 
 // =========================================================
@@ -1686,8 +1742,25 @@ async function publishAllToRepo() {
     if (panel) panel.hidden = true;
     if (document.getElementById("qaPublishPin")) document.getElementById("qaPublishPin").value = "";
   } catch (err) {
-    console.error(err);
-    if (status) status.textContent = "Publish failed: " + (err.message || String(err));
+    console.error("publish error", err);
+    var msg = (err && err.message) ? err.message : String(err || "unknown");
+    var note = "";
+    if (/Unauthorized|401|PUBLISH_KEY/i.test(msg)) {
+      note = " Cause: publishWorkerKey in data/config.json does not match the Worker secret PUBLISH_KEY (or secret is empty/wrong). Fix: wrangler secret put PUBLISH_KEY with the exact config value, then wrangler deploy.";
+    } else if (/Failed to fetch|NetworkError|CORS|Load failed/i.test(msg)) {
+      note = " Cause: browser could not reach the Worker URL (wrong publishWorkerUrl, offline, or CORS). Check data/config.json publishWorkerUrl and that the worker is deployed.";
+    } else if (/GITHUB_TOKEN|not configured/i.test(msg)) {
+      note = " Cause: Worker has no GITHUB_TOKEN secret. Run: npx wrangler secret put GITHUB_TOKEN";
+    } else if (/403|404|Contents/i.test(msg)) {
+      note = " Cause: GitHub rejected the commit (token scope, repo name, or branch). Token needs Contents Read and write on travis-global/qa_attendance.";
+    } else if (/Path not allowed/i.test(msg)) {
+      note = " Cause: Worker allow-list is outdated. Pull latest cloudflare-worker and run npx wrangler deploy.";
+    } else if (/Incorrect officer PIN/i.test(msg)) {
+      note = " Cause: PIN does not match data/config.json qaPin.";
+    } else {
+      note = " See browser console (F12) for full detail.";
+    }
+    if (status) status.textContent = "Publish failed: " + msg + note;
   }
 }
 
