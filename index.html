@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=19" />
+  <link rel="stylesheet" href="style.css?v=20" />
 </head>
 <body class="role-viewer">
   <div id="dirtyBanner" class="dirty-banner" hidden role="status"></div>
@@ -358,8 +358,7 @@
               <p class="muted-note" style="margin:0">Printable class attendance sheets from the student master (programme + level).</p>
             </div>
             <div class="page-toolbar__right" style="display:flex;gap:8px;flex-wrap:wrap">
-              <button type="button" class="btn btn--primary qa-edit-only" id="btnSaveAttendance">Save attendance</button>
-              <button type="button" class="btn btn--ghost qa-edit-only" id="btnPrintAttendance">Print sheet</button>
+              <button type="button" class="btn btn--primary" id="btnPrintAttendance">Print sheet</button>
             </div>
           </div>
           <div class="card" style="margin-bottom:16px">
@@ -367,11 +366,13 @@
               <div class="form-grid">
                 <label class="field"><span class="field__label">Programme <span class="req">*</span></span><select id="attProgramme"><option value="">— Select —</option></select></label>
                 <label class="field"><span class="field__label">Level <span class="req">*</span></span><select id="attLevel"><option value="">— Select —</option></select></label>
+                <label class="field"><span class="field__label">Session label</span><input type="text" id="attSessionLabel" placeholder="e.g. 2026/2027 SESSION" /></label>
+                <label class="field"><span class="field__label">Course code columns</span><input type="number" id="attCourseCols" min="1" max="12" value="4" /></label>
                 <label class="field"><span class="field__label">&nbsp;</span>
                   <button type="button" class="btn btn--primary" id="btnBuildAttendance">Build sheet</button>
                 </label>
               </div>
-              <p class="muted-note" style="margin:12px 0 0">Sheet lists S/N, full name and registration number for the selected programme and level. Mark Present (P) or Absent (A) when logging; print for paper use.</p>
+              <p class="muted-note" style="margin:12px 0 0">Matches the college paper format: S/N, student names, then blank <strong>COURSE CODE</strong> columns for marking, plus lecturer signature lines at the bottom.</p>
             </div>
           </div>
           <div class="card" id="attendanceSheetCard">
@@ -650,6 +651,6 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=19"></script>
+  <script src="app.js?v=20"></script>
 </body>
 </html>

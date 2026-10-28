@@ -1057,3 +1057,43 @@ body.role-officer th.qa-edit-only { display: table-cell; }
   background: #92400e; color: #fff;
   padding: 10px 16px; font-size: 0.875rem; text-align: center;
 }
+
+.att-sheet-official { max-width: 100%; }
+.att-sheet-title {
+  font-size: 1.05rem !important;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 12px !important;
+  color: #111 !important;
+}
+.att-sheet-date { margin: 0 0 14px; font-size: 0.95rem; }
+.att-sheet-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.att-sheet-table th,
+.att-sheet-table td {
+  border: 1px solid #222 !important;
+  padding: 6px 8px;
+  vertical-align: middle;
+}
+.att-sheet-table th {
+  background: #f3f4f6 !important;
+  color: #111 !important;
+  font-weight: 700;
+  text-align: center;
+}
+.att-sn { width: 48px; text-align: center !important; font-weight: 600; }
+.att-name { text-align: left !important; min-width: 180px; }
+.att-course-col { min-width: 72px; }
+.att-mark-cell { height: 28px; }
+.att-sig-block { margin-top: 28px; }
+.att-sig-line {
+  margin: 0 0 14px;
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
+  word-break: break-all;
+}
+@media print {
+  .att-sheet-title { color: #000 !important; }
+  .att-sheet-table th { background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

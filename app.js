@@ -2184,6 +2184,20 @@ async function buildAttendanceSheet() {
     alert("Select both programme and level to build the sheet.");
     return;
   }
+  var sessionLabel = (document.getElementById("attSessionLabel") && document.getElementById("attSessionLabel").value.trim()) || "";
+  if (!sessionLabel) {
+    try {
+      var sessions = await getAll("sessions");
+      var active = sessions.find(function(s) { return s.status === "Active"; });
+      if (active && active.name) sessionLabel = active.name;
+    } catch (_) {}
+  }
+  if (!sessionLabel) sessionLabel = new Date().getFullYear() + "/" + (new Date().getFullYear() + 1) + " SESSION";
+
+  var colCount = Number(document.getElementById("attCourseCols") && document.getElementById("attCourseCols").value) || 4;
+  if (colCount < 1) colCount = 1;
+  if (colCount > 12) colCount = 12;
+
   var list = studentsCache.filter(function(s) {
     if (s.status && s.status !== "Active") return false;
     if (String(s.programme || "") !== prog) return false;
@@ -2191,39 +2205,49 @@ async function buildAttendanceSheet() {
     return true;
   }).sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
 
-  var sheetKey = [prog, level].join("|");
-  var existing = (await getAll("attendance")).find(function(r) { return r.sheetKey === sheetKey; });
-  var marks = (existing && existing.marks) || {};
-
   var title = document.getElementById("attendanceSheetTitle");
   if (title) title.textContent = "Attendance sheet — " + prog + " · Level " + level;
+
   var body = document.getElementById("attendanceSheetBody");
   if (!body) return;
   if (!list.length) {
     body.innerHTML = "<div class=\"empty-state\"><h3>No students</h3><p>No active students in this programme and level.</p></div>";
     return;
   }
-  window.__attSheetMeta = { sheetKey: sheetKey, programme: prog, level: level, studentIds: list.map(function(s) { return s.id; }) };
+
+  var dept = String(prog).toUpperCase() + " DEPARTMENT";
+  var lvlLabel = String(level) + " LVL";
+  var headTitle = "EOCNS ATTENDANCE FOR " + dept + " " + lvlLabel + " - " + sessionLabel;
+
+  var courseHeaders = "";
+  for (var c = 0; c < colCount; c++) {
+    courseHeaders += "<th class=\"att-course-col\">COURSE CODE</th>";
+  }
+
   var rows = list.map(function(s, i) {
-    var m = marks[s.id] || "";
-    var pChecked = m === "P" ? " checked" : "";
-    var aChecked = m === "A" ? " checked" : "";
-    return "<tr data-stu=\"" + s.id + "\"><td style=\"text-align:center\">" + (i + 1) + "</td><td>" + escapeHtml(s.name) +
-      "</td><td>" + escapeHtml(s.regNo || "") + "</td>" +
-      "<td class=\"qa-edit-only\" style=\"text-align:center\"><input type=\"radio\" name=\"att-" + s.id + "\" value=\"P\"" + pChecked + " /></td>" +
-      "<td class=\"qa-edit-only\" style=\"text-align:center\"><input type=\"radio\" name=\"att-" + s.id + "\" value=\"A\"" + aChecked + " /></td>" +
-      "<td></td></tr>";
+    var cells = "";
+    for (var c = 0; c < colCount; c++) cells += "<td class=\"att-mark-cell\"></td>";
+    return "<tr><td class=\"att-sn\">" + (i + 1) + "</td><td class=\"att-name\">" + escapeHtml(s.name) + "</td>" + cells + "</tr>";
   }).join("");
-  body.innerHTML = "<div class=\"print-report\" id=\"attendancePrintRoot\">" +
-    "<h1>EOCNS Class Attendance Sheet</h1>" +
-    "<div class=\"sub\">" + escapeHtml(prog) + " · Level " + escapeHtml(String(level)) + " · " + list.length + " students</div>" +
-    "<table><thead><tr><th style=\"width:48px\">S/N</th><th>Full Name</th><th>Reg. No</th><th style=\"width:48px\">P</th><th style=\"width:48px\">A</th><th style=\"width:140px\">Signature</th></tr></thead><tbody>" +
-    rows + "</tbody></table>" +
-    "<p style=\"margin-top:24px;font-size:0.85rem\">Lecturer: ______________________ &nbsp;&nbsp; Date: ______________</p>" +
+
+  var sigLines = "";
+  for (var s = 0; s < Math.max(4, colCount); s++) {
+    sigLines += "<p class=\"att-sig-line\"><strong>LECTURERS NAME, COURSE AND SIGNATURE</strong>……………………………………………………………………………………</p>";
+  }
+
+  body.innerHTML =
+    "<div class=\"print-report att-sheet-official\" id=\"attendancePrintRoot\">" +
+    "<h1 class=\"att-sheet-title\">" + escapeHtml(headTitle) + "</h1>" +
+    "<p class=\"att-sheet-date\"><strong>DATE:</strong> ________________________</p>" +
+    "<table class=\"att-sheet-table\">" +
+    "<thead><tr><th class=\"att-sn\">S/N</th><th class=\"att-name\">NAMES OF STUDENTS</th>" + courseHeaders + "</tr></thead>" +
+    "<tbody>" + rows + "</tbody></table>" +
+    "<div class=\"att-sig-block\">" + sigLines + "</div>" +
     "</div>";
 }
 function printAttendanceSheet() {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to print/export sheets."); return; }
+  var root = document.getElementById("attendancePrintRoot");
+  if (!root) { alert("Build a sheet first (programme + level)."); return; }
   window.print();
 }
 function printLectureReport() {
