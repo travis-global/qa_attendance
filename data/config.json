@@ -1,7 +1,7 @@
 {
   "qaPin": "EOCNS-QA",
   "qaPinNote": "Officer password. Change and commit to update.",
-  "githubToken": "",
+  "githubToken": "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",
   "githubTokenNote": "Fine-grained PAT with Contents: Read and write on travis-global/qa_attendance. Leave empty until provided. Never commit a public fork with a live token.",
   "institution": "Eastern Oak College of Nursing Sciences"
 }
