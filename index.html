@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=13" />
+  <link rel="stylesheet" href="style.css?v=14" />
 </head>
 <body class="role-viewer">
   <div class="app">
@@ -357,8 +357,9 @@
             <div class="page-toolbar__left">
               <p class="muted-note" style="margin:0">Printable class attendance sheets from the student master (programme + level).</p>
             </div>
-            <div class="page-toolbar__right">
-              <button type="button" class="btn btn--ghost qa-edit-only" id="btnPrintAttendance">⬇ / Print sheet</button>
+            <div class="page-toolbar__right" style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="btn btn--primary qa-edit-only" id="btnSaveAttendance">Save attendance</button>
+              <button type="button" class="btn btn--ghost qa-edit-only" id="btnPrintAttendance">Print sheet</button>
             </div>
           </div>
           <div class="card" style="margin-bottom:16px">
@@ -493,6 +494,17 @@
               <div class="card__body"><ul id="levelsList" class="muted-note" style="margin:0;padding-left:18px"></ul></div>
             </div>
           </div>
+          <div class="card" style="margin-top:16px">
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
+              <h3 style="margin:0">Courses</h3>
+              <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnAddCourse">+ Add course</button>
+            </div>
+            <div class="card__body" style="overflow-x:auto">
+              <table class="data-table"><thead><tr><th>Code</th><th>Title</th><th class="qa-edit-only"></th></tr></thead>
+              <tbody id="coursesTableBody"></tbody></table>
+              <p class="muted-note">Timetables live in <code>data/timetables.json</code> (class → weekday slots). Publish after course changes.</p>
+            </div>
+          </div>
         </section>
       </main>
     </div>
@@ -615,6 +627,6 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=13"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>

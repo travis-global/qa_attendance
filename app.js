@@ -50,7 +50,7 @@ function showView(viewId) {
   if (viewId === "qa-daily") renderQaDaily();
   if (viewId === "qa-weekly") initQaWeeklyView();
   if (viewId === "qa-monthly") initQaMonthlyView();
-  if (viewId === "settings") renderProgrammesLevels();
+  if (viewId === "settings") { renderProgrammesLevels(); renderCoursesTable(); }
   if (viewId === "reports") renderReportsView();
   if (viewId === "attendance") { fillProgrammeLevelSelects(); if (document.getElementById("attSheetDate") && !document.getElementById("attSheetDate").value) document.getElementById("attSheetDate").value = new Date().toISOString().slice(0, 10); }
   if (viewId === "audit") renderAuditLog();
@@ -62,7 +62,7 @@ document.querySelectorAll("[data-goto]").forEach((el) => {
   el.addEventListener("click", () => showView(el.dataset.goto));
 });
 const DB_NAME = "eocns_attendance";
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 let db = null;
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -90,6 +90,11 @@ function openDB() {
       if (!database.objectStoreNames.contains("programmes")) database.createObjectStore("programmes", { keyPath: "id" });
       if (!database.objectStoreNames.contains("levels")) database.createObjectStore("levels", { keyPath: "id" });
       if (!database.objectStoreNames.contains("courses")) database.createObjectStore("courses", { keyPath: "code" });
+      if (!database.objectStoreNames.contains("attendance")) {
+        const att = database.createObjectStore("attendance", { keyPath: "id" });
+        att.createIndex("date", "date", { unique: false });
+        att.createIndex("classKey", "classKey", { unique: false });
+      }
     };
   });
 }
@@ -1099,6 +1104,12 @@ async function buildAttendanceSheet() {
     if (level && String(s.level || "") !== String(level)) return false;
     return true;
   }).sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
+
+  // Load existing marks for this sheet key
+  var sheetKey = [date, prog, level, course].join("|");
+  var existing = (await getAll("attendance")).find(function(r) { return r.sheetKey === sheetKey; });
+  var marks = (existing && existing.marks) || {};
+
   var title = document.getElementById("attendanceSheetTitle");
   if (title) title.textContent = "Attendance — " + (prog || "All programmes") + " · Level " + (level || "all") + " · " + date;
   var body = document.getElementById("attendanceSheetBody");
@@ -1107,10 +1118,16 @@ async function buildAttendanceSheet() {
     body.innerHTML = "<div class=\"empty-state\"><h3>No students</h3><p>No active students match these filters.</p></div>";
     return;
   }
+  window.__attSheetMeta = { sheetKey: sheetKey, date: date, programme: prog, level: level, course: course, studentIds: list.map(function(s) { return s.id; }) };
   var rows = list.map(function(s, i) {
-    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
+    var m = marks[s.id] || "";
+    var pChecked = m === "P" ? " checked" : "";
+    var aChecked = m === "A" ? " checked" : "";
+    return "<tr data-stu=\"" + s.id + "\"><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
       "</td><td>" + escapeHtml(s.programme || "") + "</td><td>" + escapeHtml(String(s.level || "")) +
-      "</td><td style=\"width:48px\"></td><td style=\"width:48px\"></td><td style=\"width:120px\"></td></tr>";
+      "</td><td class=\"qa-edit-only\"><input type=\"radio\" name=\"att-" + s.id + "\" value=\"P\"" + pChecked + " /></td>" +
+      "<td class=\"qa-edit-only\"><input type=\"radio\" name=\"att-" + s.id + "\" value=\"A\"" + aChecked + " /></td>" +
+      "<td></td></tr>";
   }).join("");
   body.innerHTML = "<div class=\"print-report\" id=\"attendancePrintRoot\">" +
     "<h1>EOCNS Class Attendance Sheet</h1>" +
@@ -1120,6 +1137,34 @@ async function buildAttendanceSheet() {
     "<p style=\"margin-top:24px;font-size:0.85rem\">Lecturer: ______________________ &nbsp;&nbsp; Date: " + escapeHtml(date) + "</p>" +
     "</div>";
 }
+async function saveAttendanceSheet() {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to save attendance."); return; }
+  var meta = window.__attSheetMeta;
+  if (!meta) { alert("Build a sheet first."); return; }
+  var marks = {};
+  (meta.studentIds || []).forEach(function(id) {
+    var el = document.querySelector('input[name="att-' + id + '"]:checked');
+    if (el) marks[id] = el.value;
+  });
+  var now = new Date().toISOString();
+  var all = await getAll("attendance");
+  var prev = all.find(function(r) { return r.sheetKey === meta.sheetKey; });
+  var rec = {
+    id: prev ? prev.id : ("att_" + Date.now().toString(36)),
+    sheetKey: meta.sheetKey,
+    date: meta.date,
+    programme: meta.programme,
+    level: meta.level,
+    course: meta.course,
+    marks: marks,
+    updatedAt: now,
+    createdAt: prev ? prev.createdAt : now
+  };
+  await put("attendance", rec);
+  await writeAudit({ action: prev ? "update" : "create", entity: "attendance", entityId: rec.id, reason: "Class attendance saved", details: { date: meta.date, course: meta.course, count: Object.keys(marks).length } });
+  alert("Attendance saved for " + meta.date + (meta.course ? " · " + meta.course : "") + ". Publish to repository when ready.");
+}
+
 function printAttendanceSheet() {
   if (!isQaOfficer()) { alert("Sign in as QA Officer to print/export sheets."); return; }
   window.print();
@@ -1130,26 +1175,68 @@ function printLectureReport() {
   if (!entries.length) { alert("Build a filtered report first."); return; }
   var w = window.open("", "_blank");
   if (!w) { alert("Allow pop-ups to print."); return; }
-  var rows = entries.map(function(e) {
-    return "<tr><td>" + (e.date || "") + "</td><td>" + (e.course || "") + "</td><td>" + (e.lecturer || "") +
-      "</td><td>" + [e.start, e.end].filter(Boolean).join("–") + "</td><td>" + (e.status || "") +
-      "</td><td>" + (e.topic || "") + "</td><td>" + (Array.isArray(e.absent) ? e.absent.join(", ") : "") + "</td></tr>";
+  var blocks = entries.map(function(e, i) {
+    return "<div style=\"margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid #ccc\">" +
+      "<h2 style=\"color:#1B3A6B;font-size:1.05rem;margin:0 0 6px\">" + (i + 1) + ". " + (e.course || "Course") + "</h2>" +
+      "<table><tr><td><b>Date</b></td><td>" + (e.date || "") + "</td><td><b>Class</b></td><td>" + (e.classKey || "") + "</td></tr>" +
+      "<tr><td><b>Lecturer</b></td><td>" + (e.lecturer || "") + "</td><td><b>Time</b></td><td>" + [e.start, e.end].filter(Boolean).join(" – ") + "</td></tr>" +
+      "<tr><td><b>Status</b></td><td>" + (e.status || "") + "</td><td><b>Duration</b></td><td>" + (e.duration != null ? e.duration + " min" : "") + "</td></tr>" +
+      "<tr><td><b>Topic</b></td><td colspan=\"3\">" + (e.topic || "—") + "</td></tr>" +
+      "<tr><td><b>Objectives</b></td><td colspan=\"3\">" + (e.objectives || "—") + "</td></tr>" +
+      "<tr><td><b>Summary</b></td><td colspan=\"3\">" + (e.lectureSummary || "—") + "</td></tr>" +
+      "<tr><td><b>Assignment</b></td><td colspan=\"3\">" + (e.assignment || "—") + "</td></tr>" +
+      "<tr><td><b>Remarks</b></td><td colspan=\"3\">" + (e.remark || "—") + "</td></tr>" +
+      "<tr><td><b>Absent</b></td><td colspan=\"3\">" + (Array.isArray(e.absent) ? e.absent.join(", ") : (e.absent || "—")) + "</td></tr>" +
+      "</table></div>";
   }).join("");
   w.document.write("<!DOCTYPE html><html><head><title>EOCNS Lecture Report</title><style>" +
-    "body{font-family:Georgia,serif;color:#1a1a2e;padding:24px} h1{color:#1B3A6B;text-align:center}" +
-    "table{width:100%;border-collapse:collapse;font-size:12px} th,td{border:1px solid #999;padding:6px;text-align:left}" +
-    "th{background:#1B3A6B;color:#fff} .sub{text-align:center;color:#555;margin-bottom:16px}</style></head><body>" +
-    "<h1>EOCNS Lecture Report</h1><div class=\"sub\">Master log · " + entries.length + " entries · " + new Date().toLocaleString() + "</div>" +
-    "<table><thead><tr><th>Date</th><th>Course</th><th>Lecturer</th><th>Time</th><th>Status</th><th>Topic</th><th>Absent</th></tr></thead><tbody>" +
-    rows + "</tbody></table></body></html>");
+    "body{font-family:Georgia,serif;color:#1a1a2e;padding:28px;max-width:860px;margin:0 auto}" +
+    "h1{color:#1B3A6B;text-align:center;margin-bottom:4px}" +
+    ".sub{text-align:center;color:#555;margin-bottom:20px;font-size:13px}" +
+    "table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}" +
+    "td{border:1px solid #bbb;padding:5px 8px;vertical-align:top}" +
+    "@media print{body{padding:0}}</style></head><body>" +
+    "<h1>EOCNS Lecture Report</h1><div class=\"sub\">Quality Assurance · " + entries.length + " lecture log(s) · " + new Date().toLocaleString() + "</div>" +
+    blocks + "</body></html>");
   w.document.close();
   w.focus();
-  w.print();
+  setTimeout(function() { w.print(); }, 300);
 }
 async function downloadAuditJson() {
   if (!isQaOfficer()) return;
   var list = await getAll("audit");
   downloadJsonReport("EOCNS_Audit_" + new Date().toISOString().slice(0, 10) + ".json", { exportedAt: new Date().toISOString(), entries: list });
+}
+
+
+async function renderCoursesTable() {
+  COURSES_CACHE = await getAll("courses");
+  var tbody = document.getElementById("coursesTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = COURSES_CACHE.length ? COURSES_CACHE.map(function(c) {
+    var del = isQaOfficer() ? ('<button type="button" class="icon-btn-sm" data-del-course="' + escapeHtml(c.code) + '">Del</button>') : "";
+    return "<tr><td>" + escapeHtml(c.code) + "</td><td>" + escapeHtml(c.name || "") + "</td><td class=\"qa-edit-only\">" + del + "</td></tr>";
+  }).join("") : "<tr><td colspan=\"3\">No courses yet</td></tr>";
+  tbody.querySelectorAll("[data-del-course]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!isQaOfficer()) return;
+      if (!confirm("Remove course " + btn.getAttribute("data-del-course") + "?")) return;
+      await del("courses", btn.getAttribute("data-del-course"));
+      await writeAudit({ action: "delete", entity: "courses", entityId: btn.getAttribute("data-del-course"), reason: "Course removed" });
+      await renderCoursesTable();
+      seedQaDatalists && seedQaDatalists();
+    });
+  });
+}
+async function addCoursePrompt() {
+  if (!isQaOfficer()) return;
+  var code = prompt("Course code (e.g. NUS 121)");
+  if (!code) return;
+  var name = prompt("Course title", "") || "";
+  await put("courses", { code: code.trim(), name: name.trim(), classKeys: [] });
+  await writeAudit({ action: "create", entity: "courses", entityId: code.trim(), reason: "New course " + code });
+  await renderCoursesTable();
+  if (typeof seedQaDatalists === "function") seedQaDatalists();
 }
 
 })();
@@ -1173,7 +1260,9 @@ async function downloadAuditJson() {
   document.getElementById("btnDownloadFilteredReports")?.addEventListener("click", exportLectureLogs);
   document.getElementById("btnPrintLectureReport")?.addEventListener("click", printLectureReport);
   document.getElementById("btnBuildAttendance")?.addEventListener("click", buildAttendanceSheet);
+  document.getElementById("btnSaveAttendance")?.addEventListener("click", saveAttendanceSheet);
   document.getElementById("btnPrintAttendance")?.addEventListener("click", printAttendanceSheet);
+  document.getElementById("btnAddCourse")?.addEventListener("click", addCoursePrompt);
   document.getElementById("btnDownloadAudit")?.addEventListener("click", downloadAuditJson);
 }).catch(err => {
   console.error(err);
@@ -1198,6 +1287,7 @@ const DATA_FILES = {
   levels: "data/levels.json",
   courses: "data/courses.json",
   timetables: "data/timetables.json",
+  attendance: "data/attendance.json",
   config: "data/config.json",
 };
 let APP_CONFIG = { qaPin: "EOCNS-QA" };
@@ -1334,6 +1424,7 @@ async function hydrateAllFromRepoIfEmpty() {
     ["programmes", DATA_FILES.programmes],
     ["levels", DATA_FILES.levels],
     ["courses", DATA_FILES.courses],
+    ["attendance", DATA_FILES.attendance],
   ]) {
     try {
       const existing = await getAll(store);
@@ -1470,6 +1561,7 @@ async function publishAllToRepo() {
     files[DATA_FILES.levels] = JSON.stringify(await getAll("levels"), null, 2);
     files[DATA_FILES.courses] = JSON.stringify(await getAll("courses"), null, 2);
     if (TIMETABLES_CACHE) files[DATA_FILES.timetables] = JSON.stringify(TIMETABLES_CACHE, null, 2);
+    files[DATA_FILES.attendance] = JSON.stringify(await getAll("attendance"), null, 2);
 
     var headers = { "Content-Type": "application/json" };
     var key = (APP_CONFIG.publishWorkerKey || "").trim();
@@ -2060,6 +2152,37 @@ async function downloadAuditJson() {
   if (!isQaOfficer()) return;
   var list = await getAll("audit");
   downloadJsonReport("EOCNS_Audit_" + new Date().toISOString().slice(0, 10) + ".json", { exportedAt: new Date().toISOString(), entries: list });
+}
+
+
+async function renderCoursesTable() {
+  COURSES_CACHE = await getAll("courses");
+  var tbody = document.getElementById("coursesTableBody");
+  if (!tbody) return;
+  tbody.innerHTML = COURSES_CACHE.length ? COURSES_CACHE.map(function(c) {
+    var del = isQaOfficer() ? ('<button type="button" class="icon-btn-sm" data-del-course="' + escapeHtml(c.code) + '">Del</button>') : "";
+    return "<tr><td>" + escapeHtml(c.code) + "</td><td>" + escapeHtml(c.name || "") + "</td><td class=\"qa-edit-only\">" + del + "</td></tr>";
+  }).join("") : "<tr><td colspan=\"3\">No courses yet</td></tr>";
+  tbody.querySelectorAll("[data-del-course]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!isQaOfficer()) return;
+      if (!confirm("Remove course " + btn.getAttribute("data-del-course") + "?")) return;
+      await del("courses", btn.getAttribute("data-del-course"));
+      await writeAudit({ action: "delete", entity: "courses", entityId: btn.getAttribute("data-del-course"), reason: "Course removed" });
+      await renderCoursesTable();
+      seedQaDatalists && seedQaDatalists();
+    });
+  });
+}
+async function addCoursePrompt() {
+  if (!isQaOfficer()) return;
+  var code = prompt("Course code (e.g. NUS 121)");
+  if (!code) return;
+  var name = prompt("Course title", "") || "";
+  await put("courses", { code: code.trim(), name: name.trim(), classKeys: [] });
+  await writeAudit({ action: "create", entity: "courses", entityId: code.trim(), reason: "New course " + code });
+  await renderCoursesTable();
+  if (typeof seedQaDatalists === "function") seedQaDatalists();
 }
 
 })();
