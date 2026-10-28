@@ -1,0 +1,12 @@
+name = "eocns-publish"
+main = "src/index.js"
+compatibility_date = "2024-10-01"
+
+# Set secrets after deploy:
+#   npx wrangler secret put GITHUB_TOKEN
+#   npx wrangler secret put PUBLISH_KEY   (optional shared key; if set, app must send it)
+
+[vars]
+REPO_OWNER = "travis-global"
+REPO_NAME = "qa_attendance"
+REPO_BRANCH = "main"

@@ -2,5 +2,7 @@
   "qaPin": "EOCNS-QA",
   "qaPinNote": "Officer password. Change and commit to update.",
   "institution": "Eastern Oak College of Nursing Sciences",
-  "publishNote": "GitHub Secrets are not available to static Pages JavaScript. Officers paste a fine-grained token into the session publish form after PIN verification; the token is never written to the repository."
+  "publishWorkerUrl": "",
+  "publishWorkerKey": "",
+  "publishNote": "Set publishWorkerUrl to your Cloudflare Worker URL after deploy. GitHub PAT stays only in the Worker secret GITHUB_TOKEN."
 }

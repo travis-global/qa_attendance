@@ -1451,33 +1451,47 @@ async function publishAllToRepo() {
     if (status) status.textContent = "Incorrect officer PIN.";
     return;
   }
-  var tokenEl = document.getElementById("qaSessionToken");
-  var token = (tokenEl && tokenEl.value.trim()) || "";
-  try {
-    if (!token) token = sessionStorage.getItem("eocns-publish-token") || "";
-  } catch (_) {}
-  if (!token) {
-    if (status) status.textContent = "Paste a fine-grained token for this session (Contents: Read and write). It is not stored in the repository.";
+  try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config); } catch (_) {}
+  var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
+  if (!workerUrl) {
+    if (status) status.textContent = "Set publishWorkerUrl in data/config.json to your Cloudflare Worker URL, then reload.";
     return;
   }
-  try { sessionStorage.setItem("eocns-publish-token", token); } catch (_) {}
-  if (status) status.textContent = "Publishing all data files…";
+  if (status) status.textContent = "Sending data to publish worker…";
   try {
     var students = shapeStudentsForRepo(await getAll("students"));
-    await githubPutFile(token, DATA_FILES.students, JSON.stringify(students, null, 2), "Update students (" + students.length + ") via EOCNS QA System");
-    await githubPutFile(token, DATA_FILES.lecturers, JSON.stringify(await getAll("lecturers"), null, 2), "Update lecturers via EOCNS");
-    await githubPutFile(token, DATA_FILES.sessions, JSON.stringify(await getAll("sessions"), null, 2), "Update sessions via EOCNS");
-    await githubPutFile(token, DATA_FILES.qa_entries, JSON.stringify(await getAll("qa_entries"), null, 2), "Update QA entries via EOCNS");
-    await githubPutFile(token, DATA_FILES.audit, JSON.stringify(await getAll("audit"), null, 2), "Update audit log via EOCNS");
-    await githubPutFile(token, DATA_FILES.programmes, JSON.stringify(await getAll("programmes"), null, 2), "Update programmes via EOCNS");
-    await githubPutFile(token, DATA_FILES.levels, JSON.stringify(await getAll("levels"), null, 2), "Update levels via EOCNS");
-    await githubPutFile(token, DATA_FILES.courses, JSON.stringify(await getAll("courses"), null, 2), "Update courses via EOCNS");
-    if (TIMETABLES_CACHE) await githubPutFile(token, DATA_FILES.timetables, JSON.stringify(TIMETABLES_CACHE, null, 2), "Update timetables via EOCNS");
-    if (status) status.textContent = "Published all master data, QA logs and audit to the repository.";
+    var files = {};
+    files[DATA_FILES.students] = JSON.stringify(students, null, 2);
+    files[DATA_FILES.lecturers] = JSON.stringify(await getAll("lecturers"), null, 2);
+    files[DATA_FILES.sessions] = JSON.stringify(await getAll("sessions"), null, 2);
+    files[DATA_FILES.qa_entries] = JSON.stringify(await getAll("qa_entries"), null, 2);
+    files[DATA_FILES.audit] = JSON.stringify(await getAll("audit"), null, 2);
+    files[DATA_FILES.programmes] = JSON.stringify(await getAll("programmes"), null, 2);
+    files[DATA_FILES.levels] = JSON.stringify(await getAll("levels"), null, 2);
+    files[DATA_FILES.courses] = JSON.stringify(await getAll("courses"), null, 2);
+    if (TIMETABLES_CACHE) files[DATA_FILES.timetables] = JSON.stringify(TIMETABLES_CACHE, null, 2);
+
+    var headers = { "Content-Type": "application/json" };
+    var key = (APP_CONFIG.publishWorkerKey || "").trim();
+    if (key) headers["X-EOCNS-Key"] = key;
+
+    var res = await fetch(workerUrl.replace(/\/$/, ""), {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        message: "Update master data via EOCNS QA System",
+        files: files
+      })
+    });
+    var body = {};
+    try { body = await res.json(); } catch (_) {}
+    if (!res.ok) {
+      throw new Error(body.error || ("Worker HTTP " + res.status));
+    }
+    if (status) status.textContent = "Published via worker: " + ((body.updated && body.updated.join(", ")) || "ok");
     var panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = true;
     if (document.getElementById("qaPublishPin")) document.getElementById("qaPublishPin").value = "";
-    if (tokenEl) tokenEl.value = "";
   } catch (err) {
     console.error(err);
     if (status) status.textContent = "Publish failed: " + (err.message || String(err));

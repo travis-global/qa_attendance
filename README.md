@@ -2,15 +2,17 @@
 
 Live: https://travis-global.github.io/qa_attendance/
 
+## Publish (Cloudflare Worker)
+
+The GitHub token is **not** stored in the repo or the browser.
+
+1. Deploy `cloudflare-worker/` (see that folder’s README)
+2. `npx wrangler secret put GITHUB_TOKEN` (fine-grained PAT, Contents write)
+3. Put the worker URL in `data/config.json` → `publishWorkerUrl`
+4. Officer: Settings → Publish → confirm PIN → worker commits `data/*.json`
+
 ## Roles
-- **Viewer:** all screens read-only. Audit shows **Access not granted**.
-- **QA Officer (PIN in `data/config.json`):** edit, log, download, print, publish.
+- Viewer: read-only; Audit = Access not granted
+- QA Officer (PIN in `data/config.json`): edit, download, publish
 
-## Publish & GitHub Secrets
-GitHub Actions **secrets are not readable from static GitHub Pages JavaScript**.  
-Publish flow: sign in with PIN → paste fine-grained token for **this browser session only** → token is never written into the repository.
-
-## Modules
-Dashboard · Students (bulk move) · Lecturers · Hostel boarding-fee · Attendance sheets · Sessions · Daily/Weekly/Monthly QA · Reports (JSON + Print/PDF) · Audit (officer only) · Settings
-
-Hard-refresh after deploys: Ctrl+Shift+R
+Hard-refresh: Ctrl+Shift+R

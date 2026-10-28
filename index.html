@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=12" />
+  <link rel="stylesheet" href="style.css?v=13" />
 </head>
 <body class="role-viewer">
   <div class="app">
@@ -461,12 +461,9 @@
                 </div>
                 <div id="qaPublishStatus" class="muted-note" style="margin-top:12px"></div>
                 <div id="qaTokenPanel" style="margin-top:16px" hidden>
-                  <p class="muted-note">GitHub Secrets cannot be read from a static GitHub Pages app. After PIN check, paste a fine-grained token for this browser session only (not saved to the repository).</p>
+                  <p class="muted-note">Confirm with your officer PIN. The page then sends data to the publish worker; the GitHub token stays on the worker only.</p>
                   <label class="field field--full"><span class="field__label">Confirm officer PIN</span>
                     <input type="password" id="qaPublishPin" placeholder="Officer PIN" autocomplete="off" />
-                  </label>
-                  <label class="field field--full"><span class="field__label">Session publish token</span>
-                    <input type="password" id="qaSessionToken" placeholder="github_pat_… (session only)" autocomplete="off" />
                   </label>
                   <button type="button" class="btn btn--primary" id="btnConfirmPublish" style="margin-top:8px">Confirm publish all</button>
                 </div>
@@ -618,6 +615,6 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=12"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>
