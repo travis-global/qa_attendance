@@ -101,6 +101,14 @@ function getAll(storeName) {
     req.onerror = () => reject(req.error);
   });
 }
+function del(storeName, key) {
+  return new Promise(function(resolve, reject) {
+    var t = db.transaction(storeName, "readwrite");
+    t.objectStore(storeName).delete(key);
+    t.oncomplete = function() { resolve(); };
+    t.onerror = function() { reject(t.error); };
+  });
+}
 function put(storeName, value) {
   return new Promise((resolve, reject) => {
     const req = tx(storeName, "readwrite").put(value);
@@ -153,6 +161,21 @@ async function generateTempRegNo(programme) {
   }
   return "TMP-EOCNS/" + year + "/" + String(Math.min(maxNum + 1, 1000)).padStart(4, "0") + "/" + code;
 }
+async function generateStaffId() {
+  const list = await getAll("lecturers");
+  const year = new Date().getFullYear();
+  const prefix = "EOCNS/STF/" + year + "/";
+  let max = 0;
+  list.forEach(function(l) {
+    const sid = l.staffId || "";
+    if (sid.indexOf(prefix) === 0) {
+      const n = parseInt(sid.slice(prefix.length), 10);
+      if (!isNaN(n) && n > max) max = n;
+    }
+  });
+  return prefix + String(max + 1).padStart(4, "0");
+}
+
 function generateId(prefix) {
   return prefix + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
@@ -171,33 +194,100 @@ async function loadStudents() {
 }
 async function renderStudentsTable() {
   await loadStudents();
+  await fillProgrammeLevelSelects();
   const tbody = document.getElementById("studentsTableBody");
   const empty = document.getElementById("studentsEmpty");
   const countEl = document.getElementById("studentsCount");
   if (!tbody) return;
-  const search = (document.getElementById("studentSearch")?.value || "").toLowerCase().trim();
-  const progFilter = document.getElementById("filterProgramme")?.value || "";
-  const levelFilter = document.getElementById("filterLevel")?.value || "";
-  let list = studentsCache;
-  if (search) list = list.filter(s => s.name.toLowerCase().includes(search) || (s.regNo || "").toLowerCase().includes(search));
-  if (progFilter) list = list.filter(s => s.programme === progFilter);
-  if (levelFilter) list = list.filter(s => String(s.level) === levelFilter);
+  const search = (document.getElementById("studentSearch") && document.getElementById("studentSearch").value || "").toLowerCase().trim();
+  const fProg = (document.getElementById("filterProgramme") && document.getElementById("filterProgramme").value) || "";
+  const fLevel = (document.getElementById("filterLevel") && document.getElementById("filterLevel").value) || "";
+  let list = studentsCache.slice();
+  if (search) list = list.filter(function(s) {
+    return (s.name || "").toLowerCase().indexOf(search) >= 0 || (s.regNo || "").toLowerCase().indexOf(search) >= 0;
+  });
+  if (fProg) list = list.filter(function(s) { return String(s.programme || "") === fProg; });
+  if (fLevel) list = list.filter(function(s) { return String(s.level || "") === String(fLevel); });
   if (countEl) countEl.textContent = list.length + " student" + (list.length !== 1 ? "s" : "");
-  if (list.length === 0) { tbody.innerHTML = ""; if (empty) empty.hidden = false; return; }
+  if (!list.length) {
+    tbody.innerHTML = "";
+    if (empty) empty.hidden = false;
+    return;
+  }
   if (empty) empty.hidden = true;
-  tbody.innerHTML = list.map(s => {
-    const isTemp = !s.regNo || String(s.regNo).startsWith("TMP-EOCNS/");
-    return "<tr data-id=\"" + s.id + "\"><td><div class=\"cell-main\">" + escapeHtml(s.name) + "</div></td>" +
-      "<td><span class=\"badge " + (isTemp ? "badge--amber" : "badge--teal") + "\">" + escapeHtml(s.regNo || "-") + "</span>" + (isTemp ? "<div class=\"cell-sub\">Temporary</div>" : "") + "</td>" +
-      "<td>" + escapeHtml(s.programme || "-") + "</td><td>" + (s.level ? s.level + " Level" : "-") + "</td>" +
-      "<td>" + escapeHtml(s.hostel || "-") + "</td>" +
-      "<td><span class=\"badge " + (s.status === "Active" ? "badge--green" : "badge--muted") + "\">" + escapeHtml(s.status || "Active") + "</span></td>" +
-      "<td class=\"actions-cell\"><button class=\"icon-btn-sm\" data-action=\"edit\" data-id=\"" + s.id + "\">Edit</button></td></tr>";
+  tbody.innerHTML = list.map(function(s) {
+    var actions = isQaOfficer()
+      ? ('<button type="button" class="icon-btn-sm" data-edit-stu="' + s.id + '">Edit</button>')
+      : "";
+    var cb = isQaOfficer()
+      ? ('<td class="qa-edit-only"><input type="checkbox" class="stu-select" value="' + s.id + '" /></td>')
+      : '<td class="qa-edit-only"></td>';
+    return "<tr>" + cb + "<td><div class=\"cell-main\">" + escapeHtml(s.name) + "</div></td><td>" + escapeHtml(s.regNo || "—") +
+      "</td><td>" + escapeHtml(s.programme || "—") + "</td><td>" + escapeHtml(String(s.level || "—")) +
+      "</td><td>" + escapeHtml(s.hostel || "—") + "</td><td><span class=\"badge " + (s.status === "Active" ? "badge--green" : "badge--muted") + "\">" +
+      escapeHtml(s.status || "Active") + "</span></td><td class=\"qa-edit-only\">" + actions + "</td></tr>";
   }).join("");
-  tbody.querySelectorAll("[data-action=edit]").forEach(btn => btn.addEventListener("click", () => openStudentForm(btn.dataset.id)));
+  tbody.querySelectorAll("[data-edit-stu]").forEach(function(btn) {
+    btn.addEventListener("click", function() { openStudentForm(btn.getAttribute("data-edit-stu")); });
+  });
+  tbody.querySelectorAll(".stu-select").forEach(function(cb) {
+    cb.addEventListener("change", updateBulkSelectedCount);
+  });
+  updateBulkSelectedCount();
 }
-function openStudentForm(id) {
+function updateBulkSelectedCount() {
+  var n = document.querySelectorAll(".stu-select:checked").length;
+  var el = document.getElementById("bulkSelectedCount");
+  if (el) el.textContent = n + " selected";
+}
+async function bulkMoveStudents() {
+  if (!isQaOfficer()) return;
+  var ids = Array.from(document.querySelectorAll(".stu-select:checked")).map(function(el) { return el.value; });
+  if (!ids.length) { alert("Select one or more students first."); return; }
+  var prog = (document.getElementById("bulkProgramme") && document.getElementById("bulkProgramme").value) || "";
+  var level = (document.getElementById("bulkLevel") && document.getElementById("bulkLevel").value) || "";
+  if (!prog && !level) { alert("Choose a target programme and/or level."); return; }
+  if (!confirm("Move " + ids.length + " student(s)? Past attendance and QA logs keep their historical programme/level; only the student master record changes.")) return;
+  var now = new Date().toISOString();
+  for (var i = 0; i < ids.length; i++) {
+    var s = studentsCache.find(function(x) { return x.id === ids[i]; });
+    if (!s) continue;
+    var before = { programme: s.programme, level: s.level };
+    if (prog) s.programme = prog;
+    if (level) s.level = level;
+    s.updatedAt = now;
+    await put("students", s);
+    await writeAudit({
+      action: "update",
+      entity: "students",
+      entityId: s.id,
+      reason: "Programme/level move (upgrade or transfer)",
+      details: { before: before, after: { programme: s.programme, level: s.level }, regNo: s.regNo, name: s.name }
+    });
+  }
+  await renderStudentsTable();
+  alert("Updated " + ids.length + " student record(s). Historical logs are unchanged.");
+}
+async function bulkDeactivateStudents() {
+  if (!isQaOfficer()) return;
+  var ids = Array.from(document.querySelectorAll(".stu-select:checked")).map(function(el) { return el.value; });
+  if (!ids.length) { alert("Select students to remove from the active group."); return; }
+  if (!confirm("Mark " + ids.length + " student(s) as Inactive? They remain in the register for audit integrity.")) return;
+  var now = new Date().toISOString();
+  for (var i = 0; i < ids.length; i++) {
+    var s = studentsCache.find(function(x) { return x.id === ids[i]; });
+    if (!s) continue;
+    s.status = "Inactive";
+    s.updatedAt = now;
+    await put("students", s);
+    await writeAudit({ action: "update", entity: "students", entityId: s.id, reason: "Removed from active group (status Inactive)", details: { name: s.name, regNo: s.regNo } });
+  }
+  await renderStudentsTable();
+}
+
+async function openStudentForm(id) {
   if (!isQaOfficer()) { alert("Sign in as QA Officer in Settings to add or edit records."); return; }
+  await fillProgrammeLevelSelects();
   const modal = document.getElementById("studentModal");
   document.getElementById("studentForm").reset();
   document.getElementById("studentId").value = "";
@@ -277,36 +367,144 @@ async function renderLecturersTable() {
   const empty = document.getElementById("lecturersEmpty");
   const countEl = document.getElementById("lecturersCount");
   if (!tbody) return;
-  const search = (document.getElementById("lecturerSearch")?.value || "").toLowerCase().trim();
+  const search = (document.getElementById("lecturerSearch") && document.getElementById("lecturerSearch").value || "").toLowerCase().trim();
   let list = lecturersCache;
-  if (search) list = list.filter(l => l.name.toLowerCase().includes(search) || (l.staffId || "").toLowerCase().includes(search));
+  if (search) list = list.filter(function(l) {
+    return (l.name || "").toLowerCase().indexOf(search) >= 0 || (l.staffId || "").toLowerCase().indexOf(search) >= 0;
+  });
   if (countEl) countEl.textContent = list.length + " lecturer" + (list.length !== 1 ? "s" : "");
-  if (list.length === 0) { tbody.innerHTML = ""; if (empty) empty.hidden = false; return; }
+  if (!list.length) {
+    tbody.innerHTML = "";
+    if (empty) empty.hidden = false;
+    return;
+  }
   if (empty) empty.hidden = true;
-  tbody.innerHTML = list.map(l => "<tr><td><div class=\"cell-main\">" + escapeHtml(l.name) + "</div></td><td>" + escapeHtml(l.staffId || "-") + "</td><td>" + escapeHtml((l.courses || []).join(", ") || "-") + "</td><td>" + escapeHtml(l.phone || "-") + "</td><td><span class=\"badge " + (l.status === "Active" ? "badge--green" : "badge--muted") + "\">" + escapeHtml(l.status || "Active") + "</span></td><td></td></tr>").join("");
+  tbody.innerHTML = list.map(function(l) {
+    var actions = isQaOfficer()
+      ? ('<button type="button" class="icon-btn-sm" data-edit-lec="' + l.id + '">Edit</button> <button type="button" class="icon-btn-sm" data-del-lec="' + l.id + '">Del</button>')
+      : "";
+    return "<tr><td><div class=\"cell-main\">" + escapeHtml(l.name) + "</div></td><td>" + escapeHtml(l.staffId || "—") +
+      "</td><td>" + escapeHtml((l.courses || []).join(", ") || "—") + "</td><td>" + escapeHtml(l.phone || "—") +
+      "</td><td><span class=\"badge " + (l.status === "Active" ? "badge--green" : "badge--muted") + "\">" + escapeHtml(l.status || "Active") +
+      "</span></td><td class=\"qa-edit-only\">" + actions + "</td></tr>";
+  }).join("");
+  tbody.querySelectorAll("[data-edit-lec]").forEach(function(btn) {
+    btn.addEventListener("click", function() { openLecturerForm(btn.getAttribute("data-edit-lec")); });
+  });
+  tbody.querySelectorAll("[data-del-lec]").forEach(function(btn) {
+    btn.addEventListener("click", function() { deleteLecturer(btn.getAttribute("data-del-lec")); });
+  });
 }
-function openLecturerForm() {
+async function openLecturerForm(id) {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to manage lecturers."); return; }
   document.getElementById("lecturerForm").reset();
-  document.getElementById("lecturerModalTitle").textContent = "Add Lecturer";
+  var title = document.getElementById("lecturerModalTitle");
+  var staffEl = document.getElementById("lecturerStaffId");
+  if (!id) {
+    title.textContent = "Add Lecturer";
+    staffEl.value = await generateStaffId();
+    staffEl.readOnly = true;
+  } else {
+    title.textContent = "Edit Lecturer";
+    await loadLecturers();
+    var l = lecturersCache.find(function(x) { return x.id === id; });
+    if (!l) return;
+    document.getElementById("lecturerName").value = l.name || "";
+    staffEl.value = l.staffId || "";
+    staffEl.readOnly = true;
+    document.getElementById("lecturerPhone").value = l.phone || "";
+    document.getElementById("lecturerCourses").value = (l.courses || []).join(", ");
+    if (document.getElementById("lecturerStatus")) document.getElementById("lecturerStatus").value = l.status || "Active";
+    // stash edit id
+    document.getElementById("lecturerForm").dataset.editId = id;
+  }
+  if (!id) document.getElementById("lecturerForm").dataset.editId = "";
   document.getElementById("lecturerModal").hidden = false;
   document.getElementById("lecturerName").focus();
 }
 async function saveLecturer(e) {
   e.preventDefault();
-  const name = document.getElementById("lecturerName").value.trim();
+  if (!isQaOfficer()) return;
+  var name = document.getElementById("lecturerName").value.trim();
   if (!name) { alert("Name is required"); return; }
-  const staffId = document.getElementById("lecturerStaffId").value.trim();
-  const phone = document.getElementById("lecturerPhone").value.trim();
-  const courses = document.getElementById("lecturerCourses").value.split(",").map(c => c.trim()).filter(Boolean);
-  const status = document.getElementById("lecturerStatus").value || "Active";
-  const now = new Date().toISOString();
-  const lec = { id: generateId("lec"), name, staffId, phone, courses, status, createdAt: now, updatedAt: now };
-  await writeAudit({ action: "create", entity: "lecturers", entityId: lec.id, reason: "New lecturer registration", details: { lec } });
+  var staffId = document.getElementById("lecturerStaffId").value.trim();
+  if (!staffId) staffId = await generateStaffId();
+  var phone = document.getElementById("lecturerPhone").value.trim();
+  var courses = document.getElementById("lecturerCourses").value.split(",").map(function(c) { return c.trim(); }).filter(Boolean);
+  var status = (document.getElementById("lecturerStatus") && document.getElementById("lecturerStatus").value) || "Active";
+  var now = new Date().toISOString();
+  var editId = document.getElementById("lecturerForm").dataset.editId || "";
+  var lec;
+  if (editId) {
+    await loadLecturers();
+    lec = lecturersCache.find(function(x) { return x.id === editId; }) || {};
+    lec = Object.assign({}, lec, { name: name, staffId: staffId, phone: phone, courses: courses, status: status, updatedAt: now });
+    await writeAudit({ action: "update", entity: "lecturers", entityId: lec.id, reason: "Lecturer profile updated", details: { name: name } });
+  } else {
+    lec = { id: generateId("lec"), name: name, staffId: staffId, phone: phone, courses: courses, status: status, createdAt: now, updatedAt: now };
+    await writeAudit({ action: "create", entity: "lecturers", entityId: lec.id, reason: "New lecturer registration", details: { name: name, staffId: staffId } });
+  }
   await put("lecturers", lec);
   document.getElementById("lecturerModal").hidden = true;
   await renderLecturersTable();
   refreshDashboardStats();
 }
+async function deleteLecturer(id) {
+  if (!isQaOfficer()) return;
+  if (!confirm("Remove this lecturer from the register?")) return;
+  await del("lecturers", id);
+  await writeAudit({ action: "delete", entity: "lecturers", entityId: id, reason: "Lecturer removed" });
+  await renderLecturersTable();
+  refreshDashboardStats();
+}
+
+async function fillProgrammeLevelSelects() {
+  PROGRAMMES_CACHE = await getAll("programmes");
+  LEVELS_CACHE = await getAll("levels");
+  var progOpts = PROGRAMMES_CACHE.map(function(p) {
+    return '<option value="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</option>";
+  }).join("");
+  var lvlOpts = LEVELS_CACHE.map(function(l) {
+    var v = l.value != null ? l.value : l.name;
+    return '<option value="' + escapeHtml(String(v)) + '">' + escapeHtml(l.name) + "</option>";
+  }).join("");
+  ["studentProgramme", "filterProgramme", "bulkProgramme"].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var cur = el.value;
+    var first = el.options[0] ? el.options[0].outerHTML : '<option value="">—</option>';
+    el.innerHTML = first + progOpts;
+    if (cur) el.value = cur;
+  });
+  ["studentLevel", "filterLevel", "bulkLevel"].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var cur = el.value;
+    var first = el.options[0] ? el.options[0].outerHTML : '<option value="">—</option>';
+    el.innerHTML = first + lvlOpts;
+    if (cur) el.value = cur;
+  });
+}
+function renderSessionChipBoxes(selectedProgrammes, selectedLevels) {
+  selectedProgrammes = selectedProgrammes || [];
+  selectedLevels = selectedLevels || [];
+  var pbox = document.getElementById("sessionProgrammesBox");
+  var lbox = document.getElementById("sessionLevelsBox");
+  if (pbox) {
+    pbox.innerHTML = PROGRAMMES_CACHE.map(function(p) {
+      var checked = selectedProgrammes.indexOf(p.name) >= 0 ? " checked" : "";
+      return '<label class="chip"><input type="checkbox" name="sessionProgramme" value="' + escapeHtml(p.name) + '"' + checked + "> " + escapeHtml(p.name) + "</label>";
+    }).join(" ") || '<span class="muted-note">No programmes yet — add one below.</span>';
+  }
+  if (lbox) {
+    lbox.innerHTML = LEVELS_CACHE.map(function(l) {
+      var v = String(l.value != null ? l.value : l.name);
+      var checked = selectedLevels.map(String).indexOf(v) >= 0 || selectedLevels.indexOf(l.name) >= 0 ? " checked" : "";
+      return '<label class="chip"><input type="checkbox" name="sessionLevel" value="' + escapeHtml(v) + '"' + checked + "> " + escapeHtml(l.name) + "</label>";
+    }).join(" ") || '<span class="muted-note">No levels yet — add one below.</span>';
+  }
+}
+
 async function renderSessionsList() {
   const sessions = await getAll("sessions");
   const container = document.getElementById("sessionsList");
@@ -316,29 +514,81 @@ async function renderSessionsList() {
   if (!sessions.length) { if (container) container.innerHTML = ""; if (empty) empty.hidden = false; return; }
   if (empty) empty.hidden = true;
   if (container) {
-    container.innerHTML = sessions.map(s => "<div class=\"card\" style=\"margin-bottom:12px\"><div class=\"card__body\"><strong>" + escapeHtml(s.name) + "</strong><div class=\"cell-sub\">" + escapeHtml((s.programmes || []).join(", ")) + " · Levels: " + ((s.levels || []).join(", ") || "-") + "</div><span class=\"badge " + (s.status === "Active" ? "badge--green" : "badge--muted") + "\">" + escapeHtml(s.status) + "</span></div></div>").join("");
+    container.innerHTML = sessions.map(function(s) {
+      var actions = isQaOfficer()
+        ? ('<div style="margin-top:8px" class="qa-edit-only"><button type="button" class="btn btn--ghost btn--sm" data-edit-sess="' + s.id + '">Edit</button> <button type="button" class="btn btn--ghost btn--sm" data-del-sess="' + s.id + '">Delete</button></div>')
+        : "";
+      return "<div class=\"card\" style=\"margin-bottom:12px\"><div class=\"card__body\"><strong>" + escapeHtml(s.name) +
+        "</strong> <span class=\"badge " + (s.status === "Active" ? "badge--green" : "badge--muted") + "\">" + escapeHtml(s.status || "") + "</span>" +
+        "<div class=\"cell-sub\">" + escapeHtml((s.programmes || []).join(", ") || "—") + " · Levels: " + escapeHtml((s.levels || []).join(", ") || "—") +
+        (s.startDate ? " · Started " + escapeHtml(s.startDate) : "") + "</div>" + actions + "</div></div>";
+    }).join("");
+    container.querySelectorAll("[data-edit-sess]").forEach(function(btn) {
+      btn.addEventListener("click", function() { openSessionForm(btn.getAttribute("data-edit-sess")); });
+    });
+    container.querySelectorAll("[data-del-sess]").forEach(function(btn) {
+      btn.addEventListener("click", function() { deleteSession(btn.getAttribute("data-del-sess")); });
+    });
   }
 }
-function openSessionForm() {
+async function openSessionForm(id) {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to manage sessions."); return; }
+  PROGRAMMES_CACHE = await getAll("programmes");
+  LEVELS_CACHE = await getAll("levels");
   document.getElementById("sessionForm").reset();
-  document.getElementById("sessionModalTitle").textContent = "New Academic Session";
+  document.getElementById("sessionId").value = id || "";
+  var selectedP = [], selectedL = [];
+  if (id) {
+    var sessions = await getAll("sessions");
+    var s = sessions.find(function(x) { return x.id === id; });
+    if (s) {
+      document.getElementById("sessionModalTitle").textContent = "Edit Session";
+      document.getElementById("sessionName").value = s.name || "";
+      document.getElementById("sessionStart").value = s.startDate || "";
+      document.getElementById("sessionStatus").value = s.status || "Active";
+      selectedP = s.programmes || [];
+      selectedL = s.levels || [];
+    }
+  } else {
+    document.getElementById("sessionModalTitle").textContent = "New Academic Session";
+  }
+  renderSessionChipBoxes(selectedP, selectedL);
   document.getElementById("sessionModal").hidden = false;
   document.getElementById("sessionName").focus();
 }
 async function saveSession(e) {
   e.preventDefault();
-  const name = document.getElementById("sessionName").value.trim();
+  if (!isQaOfficer()) return;
+  var name = document.getElementById("sessionName").value.trim();
   if (!name) { alert("Session name is required"); return; }
-  const startDate = document.getElementById("sessionStart").value;
-  const endDate = document.getElementById("sessionEnd").value;
-  const status = document.getElementById("sessionStatus").value || "Active";
-  const programmes = Array.from(document.getElementById("sessionProgrammes").selectedOptions).map(o => o.value);
-  const levels = Array.from(document.querySelectorAll('input[name="sessionLevel"]:checked')).map(cb => Number(cb.value));
-  const now = new Date().toISOString();
-  const session = { id: generateId("ses"), name, startDate: startDate || null, endDate: endDate || null, programmes, levels, status, createdAt: now, updatedAt: now };
-  await writeAudit({ action: "create", entity: "sessions", entityId: session.id, reason: "New academic session", details: { session } });
-  await put("sessions", session);
+  var startDate = document.getElementById("sessionStart").value || "";
+  var status = document.getElementById("sessionStatus").value || "Active";
+  var programmes = Array.from(document.querySelectorAll('input[name="sessionProgramme"]:checked')).map(function(el) { return el.value; });
+  var levels = Array.from(document.querySelectorAll('input[name="sessionLevel"]:checked')).map(function(el) { return el.value; });
+  var now = new Date().toISOString();
+  var id = document.getElementById("sessionId").value;
+  var sess;
+  if (id) {
+    var all = await getAll("sessions");
+    sess = all.find(function(x) { return x.id === id; }) || { id: id };
+    sess = Object.assign({}, sess, { name: name, startDate: startDate, status: status, programmes: programmes, levels: levels, updatedAt: now });
+    // drop endDate if present
+    delete sess.endDate;
+    await writeAudit({ action: "update", entity: "sessions", entityId: id, reason: "Session updated", details: { name: name } });
+  } else {
+    sess = { id: generateId("sess"), name: name, startDate: startDate, status: status, programmes: programmes, levels: levels, createdAt: now, updatedAt: now };
+    await writeAudit({ action: "create", entity: "sessions", entityId: sess.id, reason: "New academic session", details: { name: name } });
+  }
+  await put("sessions", sess);
   document.getElementById("sessionModal").hidden = true;
+  await renderSessionsList();
+  refreshDashboardStats();
+}
+async function deleteSession(id) {
+  if (!isQaOfficer()) return;
+  if (!confirm("Delete this session?")) return;
+  await del("sessions", id);
+  await writeAudit({ action: "delete", entity: "sessions", entityId: id, reason: "Session deleted" });
   await renderSessionsList();
   refreshDashboardStats();
 }
@@ -773,11 +1023,21 @@ openDB().then(async () => {
     document.getElementById(id)?.addEventListener("input", renderStudentsTable);
     document.getElementById(id)?.addEventListener("change", renderStudentsTable);
   });
-  document.getElementById("btnAddLecturer")?.addEventListener("click", () => openLecturerForm());
+  document.getElementById("btnAddLecturer")?.addEventListener("click", () => openLecturerForm(null));
   document.getElementById("lecturerForm")?.addEventListener("submit", saveLecturer);
   document.getElementById("lecturerSearch")?.addEventListener("input", renderLecturersTable);
   document.getElementById("lecturerModalBackdrop")?.addEventListener("click", () => { document.getElementById("lecturerModal").hidden = true; });
-  document.getElementById("btnAddSession")?.addEventListener("click", () => openSessionForm());
+  document.getElementById("btnAddSession")?.addEventListener("click", () => openSessionForm(null));
+  document.getElementById("btnSessionAddProgramme")?.addEventListener("click", async () => { await addProgrammePrompt(); PROGRAMMES_CACHE = await getAll("programmes"); renderSessionChipBoxes(Array.from(document.querySelectorAll('input[name="sessionProgramme"]:checked')).map(el => el.value), Array.from(document.querySelectorAll('input[name="sessionLevel"]:checked')).map(el => el.value)); await fillProgrammeLevelSelects(); });
+  document.getElementById("btnSessionAddLevel")?.addEventListener("click", async () => { await addLevelPrompt(); LEVELS_CACHE = await getAll("levels"); renderSessionChipBoxes(Array.from(document.querySelectorAll('input[name="sessionProgramme"]:checked')).map(el => el.value), Array.from(document.querySelectorAll('input[name="sessionLevel"]:checked')).map(el => el.value)); await fillProgrammeLevelSelects(); });
+  document.getElementById("btnBulkMove")?.addEventListener("click", bulkMoveStudents);
+  document.getElementById("btnBulkDeactivate")?.addEventListener("click", bulkDeactivateStudents);
+  document.getElementById("filterProgramme")?.addEventListener("change", renderStudentsTable);
+  document.getElementById("filterLevel")?.addEventListener("change", renderStudentsTable);
+  document.getElementById("selectAllStudents")?.addEventListener("change", function(e) {
+    document.querySelectorAll(".stu-select").forEach(function(cb) { cb.checked = e.target.checked; });
+    updateBulkSelectedCount();
+  });
   document.getElementById("sessionForm")?.addEventListener("submit", saveSession);
   document.getElementById("sessionModalBackdrop")?.addEventListener("click", () => { document.getElementById("sessionModal").hidden = true; });
 
@@ -1278,6 +1538,7 @@ async function addProgrammePrompt() {
   await put("programmes", { id: "prog_" + Date.now().toString(36), name: name.trim(), code: code.trim(), status: "Active" });
   await writeAudit({ action: "create", entity: "programmes", entityId: name, reason: "New programme " + name });
   await renderProgrammesLevels();
+  await fillProgrammeLevelSelects();
 }
 async function addLevelPrompt() {
   if (!isQaOfficer()) return;
@@ -1287,6 +1548,7 @@ async function addLevelPrompt() {
   await put("levels", { id: "lvl_" + Date.now().toString(36), name: name.trim(), value: value, status: "Active" });
   await writeAudit({ action: "create", entity: "levels", entityId: name, reason: "New level " + name });
   await renderProgrammesLevels();
+  await fillProgrammeLevelSelects();
 }
 
 async function renderQaDaily() {

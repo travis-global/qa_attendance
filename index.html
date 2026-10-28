@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=10" />
 </head>
 <body class="role-viewer">
   <div class="app">
@@ -128,7 +128,7 @@
             <div class="page-toolbar__left"><div class="search-box"><input type="search" id="lecturerSearch" placeholder="Search lecturer or staff ID…" /></div></div>
             <div class="page-toolbar__right">
               <span class="count-pill" id="lecturersCount">0 lecturers</span>
-              <button class="btn btn--primary" id="btnAddLecturer" class="btn btn--primary qa-edit-only">+ Add Lecturer</button>
+              <button class="btn btn--primary" id="btnAddLecturer" class="btn btn--primary qa-edit-only" class="btn btn--primary qa-edit-only">+ Add Lecturer</button>
             </div>
           </div>
           <div class="table-card">
@@ -186,7 +186,7 @@
             <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Create and manage academic sessions.</p></div>
             <div class="page-toolbar__right">
               <span class="count-pill" id="sessionsCount">0 sessions</span>
-              <button class="btn btn--primary" id="btnAddSession" class="btn btn--primary qa-edit-only">+ New Session</button>
+              <button class="btn btn--primary" id="btnAddSession" class="btn btn--primary qa-edit-only" class="btn btn--primary qa-edit-only">+ New Session</button>
             </div>
           </div>
           <div id="sessionsList"></div>
@@ -219,7 +219,27 @@
             </div>
           </div>
           <div id="qaDailyStats" class="stats-grid" style="margin-bottom:16px" hidden></div>
-          <div class="card">
+          
+          <div class="card qa-edit-only" id="studentBulkBar" style="margin-bottom:12px">
+            <div class="card__body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+              <label class="field" style="margin:0"><span class="field__label">Filter programme</span>
+                <select id="filterProgramme"><option value="">All programmes</option></select>
+              </label>
+              <label class="field" style="margin:0"><span class="field__label">Filter level</span>
+                <select id="filterLevel"><option value="">All levels</option></select>
+              </label>
+              <label class="field" style="margin:0"><span class="field__label">Move selected to programme</span>
+                <select id="bulkProgramme"><option value="">— Programme —</option></select>
+              </label>
+              <label class="field" style="margin:0"><span class="field__label">Move selected to level</span>
+                <select id="bulkLevel"><option value="">— Level —</option></select>
+              </label>
+              <button type="button" class="btn btn--primary" id="btnBulkMove">Apply move / upgrade</button>
+              <button type="button" class="btn btn--ghost" id="btnBulkDeactivate">Remove from active group</button>
+              <span class="muted-note" id="bulkSelectedCount">0 selected</span>
+            </div>
+          </div>
+<div class="card">
             <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
               <h3 style="margin:0">Scheduled vs logged</h3>
               <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadDailyQa" title="Download day report" hidden>⬇ Download</button>
@@ -400,8 +420,8 @@
         <div class="form-grid">
           <label class="field field--full"><span class="field__label">Full Name <span class="req">*</span></span><input type="text" id="studentName" required /></label>
           <label class="field"><span class="field__label">Registration Number</span><input type="text" id="studentRegNo" placeholder="Leave blank for TMP-EOCNS/YY/####/CODE" /></label>
-          <label class="field"><span class="field__label">Programme</span><select id="studentProgramme"><option value="">— Select —</option><option value="Nursing">Nursing</option><option value="Midwifery">Midwifery</option></select></label>
-          <label class="field"><span class="field__label">Level</span><select id="studentLevel"><option value="">— Select —</option><option value="100">100</option><option value="200">200</option><option value="300">300</option></select></label>
+          <label class="field"><span class="field__label">Programme</span><select id="studentProgramme"><option value="">— Select —</option></select></label>
+          <label class="field"><span class="field__label">Level</span><select id="studentLevel"><option value="">— Select —</option></select></label>
           <label class="field"><span class="field__label">Gender</span><select id="studentGender"><option value="">—</option><option value="Female">Female</option><option value="Male">Male</option></select></label>
           <label class="field"><span class="field__label">Hostel</span><input type="text" id="studentHostel" /></label>
           <label class="field"><span class="field__label">Status</span><select id="studentStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></label>
@@ -421,7 +441,7 @@
       <form id="lecturerForm" class="modal__body">
         <div class="form-grid">
           <label class="field field--full"><span class="field__label">Full Name <span class="req">*</span></span><input type="text" id="lecturerName" required /></label>
-          <label class="field"><span class="field__label">Staff ID</span><input type="text" id="lecturerStaffId" /></label>
+          <label class="field"><span class="field__label">Staff ID <span class="cell-sub">(auto)</span></span><input type="text" id="lecturerStaffId" readonly placeholder="EOCNS/STF/YYYY/####" /></label>
           <label class="field"><span class="field__label">Phone</span><input type="tel" id="lecturerPhone" /></label>
           <label class="field field--full"><span class="field__label">Courses (comma separated)</span><input type="text" id="lecturerCourses" /></label>
           <label class="field"><span class="field__label">Status</span><select id="lecturerStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></label>
@@ -436,13 +456,19 @@
     <div class="modal__dialog">
       <div class="modal__header"><h3 id="sessionModalTitle">New Academic Session</h3><button class="icon-btn" type="button" onclick="document.getElementById('sessionModal').hidden=true">×</button></div>
       <form id="sessionForm" class="modal__body">
+        <input type="hidden" id="sessionId" />
         <div class="form-grid">
-          <label class="field field--full"><span class="field__label">Session Name <span class="req">*</span></span><input type="text" id="sessionName" required /></label>
+          <label class="field field--full"><span class="field__label">Session Name <span class="req">*</span></span><input type="text" id="sessionName" required placeholder="e.g. 2025/2026 Academic Session" /></label>
           <label class="field"><span class="field__label">Start Date</span><input type="date" id="sessionStart" /></label>
-          <label class="field"><span class="field__label">End Date</span><input type="date" id="sessionEnd" /></label>
-          <label class="field field--full"><span class="field__label">Programmes</span><select id="sessionProgrammes" multiple size="3"><option value="Nursing">Nursing</option><option value="Midwifery">Midwifery</option></select></label>
-          <label class="field field--full"><span class="field__label">Levels</span><div><label><input type="checkbox" name="sessionLevel" value="100"> 100</label> <label><input type="checkbox" name="sessionLevel" value="200"> 200</label> <label><input type="checkbox" name="sessionLevel" value="300"> 300</label></div></label>
-          <label class="field"><span class="field__label">Status</span><select id="sessionStatus"><option value="Active">Active</option><option value="Completed">Completed</option><option value="Planned">Planned</option></select></label>
+          <label class="field"><span class="field__label">Status</span><select id="sessionStatus"><option value="Active">Active</option><option value="Planned">Planned</option><option value="Completed">Completed</option></select></label>
+          <label class="field field--full"><span class="field__label">Programmes</span>
+            <div id="sessionProgrammesBox" class="chip-box"></div>
+            <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnSessionAddProgramme" style="margin-top:8px">+ New programme</button>
+          </label>
+          <label class="field field--full"><span class="field__label">Levels</span>
+            <div id="sessionLevelsBox" class="chip-box"></div>
+            <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnSessionAddLevel" style="margin-top:8px">+ New level</button>
+          </label>
         </div>
         <div class="modal__footer"><button type="button" class="btn btn--ghost" onclick="document.getElementById('sessionModal').hidden=true">Cancel</button><button type="submit" class="btn btn--primary">Save Session</button></div>
       </form>
@@ -493,6 +519,6 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>

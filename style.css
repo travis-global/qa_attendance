@@ -1000,3 +1000,27 @@ body.role-officer button.qa-edit-only,
 body.role-officer .btn.qa-edit-only { display: inline-flex; }
 body.role-officer td.qa-edit-only,
 body.role-officer th.qa-edit-only { display: table-cell; }
+
+.chip-box { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border, #cbd5e1);
+  background: var(--surface-2, #f8fafc);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.chip input { margin: 0; }
+.icon-btn-sm {
+  border: 1px solid var(--border, #cbd5e1);
+  background: transparent;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  color: inherit;
+}
+.icon-btn-sm:hover { background: var(--surface-2, #f1f5f9); }
