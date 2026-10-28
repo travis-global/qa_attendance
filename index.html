@@ -8,9 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="stylesheet" href="style.css?v=9" />
 </head>
-<body>
+<body class="role-viewer">
   <div class="app">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar__brand">
@@ -109,8 +109,8 @@
             </div>
             <div class="page-toolbar__right">
               <span class="count-pill" id="studentsCount">0 students</span>
-              <button class="btn btn--ghost" id="btnSeedStudents" title="Load the official class lists from the college registers">Load official list</button>
-              <button class="btn btn--primary" id="btnAddStudent">+ Add Student</button>
+              <button class="btn btn--ghost" id="btnSeedStudents" class="btn btn--ghost qa-edit-only" title="Load the official class lists from the college registers">Load official list</button>
+              <button class="btn btn--primary" id="btnAddStudent" class="btn btn--primary qa-edit-only">+ Add Student</button>
             </div>
           </div>
           <div class="table-card">
@@ -128,7 +128,7 @@
             <div class="page-toolbar__left"><div class="search-box"><input type="search" id="lecturerSearch" placeholder="Search lecturer or staff ID…" /></div></div>
             <div class="page-toolbar__right">
               <span class="count-pill" id="lecturersCount">0 lecturers</span>
-              <button class="btn btn--primary" id="btnAddLecturer">+ Add Lecturer</button>
+              <button class="btn btn--primary" id="btnAddLecturer" class="btn btn--primary qa-edit-only">+ Add Lecturer</button>
             </div>
           </div>
           <div class="table-card">
@@ -186,19 +186,19 @@
             <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Create and manage academic sessions.</p></div>
             <div class="page-toolbar__right">
               <span class="count-pill" id="sessionsCount">0 sessions</span>
-              <button class="btn btn--primary" id="btnAddSession">+ New Session</button>
+              <button class="btn btn--primary" id="btnAddSession" class="btn btn--primary qa-edit-only">+ New Session</button>
             </div>
           </div>
           <div id="sessionsList"></div>
           <div class="empty-state" id="sessionsEmpty"><h3>No sessions yet</h3><p>Create the first academic session.</p></div>
         </section>
-                <section class="view" id="view-qa-daily">
+                        <section class="view" id="view-qa-daily">
           <div class="page-toolbar">
             <div class="page-toolbar__left">
-              <p class="muted-note" style="margin:0">Log lectures held or missed for a given day — feeds weekly and monthly compliance.</p>
+              <p class="muted-note" style="margin:0">Timetable slots for the day — mark each as delivered or missed (same workflow as the college QA analyser).</p>
             </div>
-            <div class="page-toolbar__right">
-              <button class="btn btn--primary" id="btnAddQaEntry">+ Log lecture</button>
+            <div class="page-toolbar__right qa-edit-only">
+              <button class="btn btn--ghost" id="btnAddQaEntry">+ Extra lecture (not on timetable)</button>
             </div>
           </div>
           <div class="card" style="margin-bottom:16px">
@@ -213,26 +213,30 @@
                   </select>
                 </label>
                 <label class="field"><span class="field__label">&nbsp;</span>
-                  <button type="button" class="btn btn--ghost" id="btnFilterQaDaily">Show day</button>
+                  <button type="button" class="btn btn--primary" id="btnFilterQaDaily">Load day board</button>
                 </label>
               </div>
             </div>
           </div>
+          <div id="qaDailyStats" class="stats-grid" style="margin-bottom:16px" hidden></div>
           <div class="card">
-            <div class="card__header"><h3>Entries for selected day</h3></div>
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+              <h3 style="margin:0">Scheduled vs logged</h3>
+              <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadDailyQa" title="Download day report" hidden>⬇ Download</button>
+            </div>
             <div class="card__body" style="overflow-x:auto">
               <table class="data-table">
-                <thead><tr><th>Course</th><th>Lecturer</th><th>Status</th><th>Duration</th><th>Remark</th><th></th></tr></thead>
+                <thead><tr><th>Time</th><th>Course</th><th>Hrs</th><th>Status</th><th>Lecturer</th><th>Actual mins</th><th class="qa-edit-only"></th></tr></thead>
                 <tbody id="qaDailyTableBody"></tbody>
               </table>
-              <div class="empty-state" id="qaDailyEmpty"><h3>No entries</h3><p>Click + Log lecture to record compliance for this day.</p></div>
+              <div class="empty-state" id="qaDailyEmpty"><h3>Pick a date and class</h3><p>Then click Load day board to see timetable slots.</p></div>
             </div>
           </div>
         </section>
-                <section class="view" id="view-qa-weekly">
+                        <section class="view" id="view-qa-weekly">
           <div class="page-toolbar">
             <div class="page-toolbar__left">
-              <p class="muted-note" style="margin:0">Weekly teaching compliance summary from daily logs.</p>
+              <p class="muted-note" style="margin:0">Weekly teaching compliance — scheduled vs delivered vs missed (Mon–Fri), matching the QA weekly analyser.</p>
             </div>
           </div>
           <div class="card" style="margin-bottom:16px">
@@ -244,8 +248,10 @@
                     <option value="100_nursing">100 Level Nursing</option>
                     <option value="200_nursing">200 Level Nursing</option>
                     <option value="200_midwifery">200 Level Midwifery</option>
-                    <option value="">All classes</option>
                   </select>
+                </label>
+                <label class="field field--full"><span class="field__label">Exclude dates (holidays, comma YYYY-MM-DD)</span>
+                  <input type="text" id="qaWeekExclude" placeholder="e.g. 2026-06-12, 2026-06-13" />
                 </label>
                 <label class="field"><span class="field__label">&nbsp;</span>
                   <button type="button" class="btn btn--primary" id="btnBuildWeeklyQa">Build weekly report</button>
@@ -254,20 +260,32 @@
             </div>
           </div>
           <div id="qaWeeklySummary" class="stats-grid" style="margin-bottom:16px" hidden></div>
-          <div class="card" id="qaWeeklyCard" hidden>
-            <div class="card__header"><h3>Weekly breakdown</h3></div>
+          <div class="card" id="qaWeeklyCard" hidden style="margin-bottom:16px">
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+              <h3 style="margin:0">Course compliance (scheduled vs delivered)</h3>
+              <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadWeeklyQa" title="Download weekly report">⬇ Download</button>
+            </div>
             <div class="card__body" style="overflow-x:auto">
               <table class="data-table">
-                <thead><tr><th>Date</th><th>Course</th><th>Lecturer</th><th>Status</th><th>Duration</th></tr></thead>
+                <thead><tr><th>Course</th><th>Scheduled</th><th>Delivered</th><th>Missed</th><th>Status</th><th>Rate</th></tr></thead>
+                <tbody id="qaWeeklyCourseBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card" id="qaWeeklyDayCard" hidden>
+            <div class="card__header"><h3>Day-by-day breakdown</h3></div>
+            <div class="card__body" style="overflow-x:auto">
+              <table class="data-table">
+                <thead><tr><th>Date</th><th>Day</th><th>Course</th><th>Scheduled hrs</th><th>Logged status</th><th>Lecturer</th></tr></thead>
                 <tbody id="qaWeeklyTableBody"></tbody>
               </table>
             </div>
           </div>
         </section>
-                <section class="view" id="view-qa-monthly">
+                        <section class="view" id="view-qa-monthly">
           <div class="page-toolbar">
             <div class="page-toolbar__left">
-              <p class="muted-note" style="margin:0">Full monthly quality assurance — compliance rates by course and lecturer.</p>
+              <p class="muted-note" style="margin:0">Full monthly QA — compliance by course and lecturer against the timetable.</p>
             </div>
           </div>
           <div class="card" style="margin-bottom:16px">
@@ -279,8 +297,10 @@
                     <option value="100_nursing">100 Level Nursing</option>
                     <option value="200_nursing">200 Level Nursing</option>
                     <option value="200_midwifery">200 Level Midwifery</option>
-                    <option value="">All classes</option>
                   </select>
+                </label>
+                <label class="field field--full"><span class="field__label">Exclude dates (comma YYYY-MM-DD)</span>
+                  <input type="text" id="qaMonthExclude" placeholder="holidays / mid-term breaks" />
                 </label>
                 <label class="field"><span class="field__label">&nbsp;</span>
                   <button type="button" class="btn btn--primary" id="btnBuildMonthlyQa">Build monthly report</button>
@@ -291,9 +311,12 @@
           <div id="qaMonthlySummary" class="stats-grid" style="margin-bottom:16px" hidden></div>
           <div class="grid-2" id="qaMonthlyDetail" hidden>
             <div class="card">
-              <div class="card__header"><h3>By course</h3></div>
+              <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0">By course</h3>
+                <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadMonthlyQa">⬇ Download</button>
+              </div>
               <div class="card__body" style="overflow-x:auto">
-                <table class="data-table"><thead><tr><th>Course</th><th>Held</th><th>Missed</th><th>Rate</th></tr></thead>
+                <table class="data-table"><thead><tr><th>Course</th><th>Scheduled</th><th>Delivered</th><th>Missed</th><th>Rate</th></tr></thead>
                 <tbody id="qaMonthCourseBody"></tbody></table>
               </div>
             </div>
@@ -310,11 +333,11 @@
         <section class="view" id="view-audit">
           <div class="card"><div class="card__header"><h3>Audit Trail</h3></div><div class="card__body" id="auditList"><p>No audit entries yet.</p></div></div>
         </section>
-        <section class="view" id="view-settings">
+                <section class="view" id="view-settings">
           <div class="card" style="margin-bottom:16px">
             <div class="card__header"><h3>QA Officer access</h3></div>
             <div class="card__body">
-              <p class="muted-note" style="margin-top:0">Master student data is stored in the repository (<code>data/students.json</code>). Export and publish are only available after officer sign-in.</p>
+              <p class="muted-note" style="margin-top:0">Everyone can view. Editing, creating records, and downloads require QA Officer sign-in. PIN is stored in <code>data/config.json</code> in the repository (change it there and publish).</p>
               <div id="qaAuthLoggedOut">
                 <div class="form-grid" style="max-width:360px">
                   <label class="field field--full"><span class="field__label">Officer PIN</span><input type="password" id="qaPinInput" placeholder="Enter QA PIN" autocomplete="off" /></label>
@@ -323,7 +346,7 @@
                 <p id="qaAuthError" class="muted-note" style="color:#b91c1c;margin-top:8px" hidden></p>
               </div>
               <div id="qaAuthLoggedIn" hidden>
-                <p style="margin:0 0 12px"><span class="badge badge--green">Signed in</span> QA Officer session active on this device.</p>
+                <p style="margin:0 0 12px"><span class="badge badge--green">Signed in</span> Edit and download roles active.</p>
                 <div style="display:flex;flex-wrap:wrap;gap:10px">
                   <button type="button" class="btn btn--primary" id="btnExportStudents">Export snapshot (JSON)</button>
                   <button type="button" class="btn btn--primary" id="btnPublishAll">Publish all data to repository</button>
@@ -331,20 +354,36 @@
                 </div>
                 <div id="qaPublishStatus" class="muted-note" style="margin-top:12px"></div>
                 <div id="qaTokenPanel" style="margin-top:16px" hidden>
-                  <label class="field field--full"><span class="field__label">GitHub fine-grained token (Contents: Read and write on this repo)</span>
+                  <label class="field field--full"><span class="field__label">GitHub fine-grained token (Contents: Read and write)</span>
                     <input type="password" id="qaGithubToken" placeholder="github_pat_…" autocomplete="off" />
                   </label>
-                  <p class="muted-note">Publishes students, lecturers, sessions, QA logs and audit trail to <code>data/*.json</code>. Token stays in this browser session only.</p>
+                  <p class="muted-note">Publishes all <code>data/*.json</code> files. Token stays in this browser session only.</p>
                   <button type="button" class="btn btn--primary" id="btnConfirmPublish" style="margin-top:8px">Confirm publish all</button>
                 </div>
               </div>
             </div>
           </div>
-          <div class="card">
+          <div class="card" style="margin-bottom:16px">
             <div class="card__header"><h3>Data source</h3></div>
             <div class="card__body">
-              <p class="muted-note" style="margin:0">All master data and logs load from <code>data/*.json</code> in the repository (students, lecturers, sessions, QA entries, audit). The browser only keeps a working cache and session keys. Publish after changes so nothing is lost.</p>
+              <p class="muted-note" style="margin:0">Students, lecturers, sessions, programmes, levels, courses, timetables, QA logs and audit all live under <code>data/</code> in the repository.</p>
               <button type="button" class="btn btn--ghost" id="btnReloadFromRepo" style="margin-top:12px">Reload all data from repository</button>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0">Programmes</h3>
+                <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnAddProgramme">+ Add</button>
+              </div>
+              <div class="card__body"><ul id="programmesList" class="muted-note" style="margin:0;padding-left:18px"></ul></div>
+            </div>
+            <div class="card">
+              <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0">Levels</h3>
+                <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnAddLevel">+ Add</button>
+              </div>
+              <div class="card__body"><ul id="levelsList" class="muted-note" style="margin:0;padding-left:18px"></ul></div>
             </div>
           </div>
         </section>
@@ -454,6 +493,6 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=8"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>

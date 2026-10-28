@@ -50,6 +50,7 @@ function showView(viewId) {
   if (viewId === "qa-daily") renderQaDaily();
   if (viewId === "qa-weekly") initQaWeeklyView();
   if (viewId === "qa-monthly") initQaMonthlyView();
+  if (viewId === "settings") renderProgrammesLevels();
 }
 document.querySelectorAll("[data-view]").forEach((el) => {
   el.addEventListener("click", (e) => { e.preventDefault(); showView(el.dataset.view); });
@@ -58,7 +59,7 @@ document.querySelectorAll("[data-goto]").forEach((el) => {
   el.addEventListener("click", () => showView(el.dataset.goto));
 });
 const DB_NAME = "eocns_attendance";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 let db = null;
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -83,6 +84,9 @@ function openDB() {
         qa.createIndex("date", "date", { unique: false });
         qa.createIndex("classKey", "classKey", { unique: false });
       }
+      if (!database.objectStoreNames.contains("programmes")) database.createObjectStore("programmes", { keyPath: "id" });
+      if (!database.objectStoreNames.contains("levels")) database.createObjectStore("levels", { keyPath: "id" });
+      if (!database.objectStoreNames.contains("courses")) database.createObjectStore("courses", { keyPath: "code" });
     };
   });
 }
@@ -193,6 +197,7 @@ async function renderStudentsTable() {
   tbody.querySelectorAll("[data-action=edit]").forEach(btn => btn.addEventListener("click", () => openStudentForm(btn.dataset.id)));
 }
 function openStudentForm(id) {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer in Settings to add or edit records."); return; }
   const modal = document.getElementById("studentModal");
   document.getElementById("studentForm").reset();
   document.getElementById("studentId").value = "";
@@ -817,6 +822,8 @@ openDB().then(async () => {
   document.getElementById("qaDailyClass")?.addEventListener("change", renderQaDaily);
   document.getElementById("btnBuildWeeklyQa")?.addEventListener("click", buildWeeklyQaReport);
   document.getElementById("btnBuildMonthlyQa")?.addEventListener("click", buildMonthlyQaReport);
+  document.getElementById("btnAddProgramme")?.addEventListener("click", addProgrammePrompt);
+  document.getElementById("btnAddLevel")?.addEventListener("click", addLevelPrompt);
 }).catch(err => {
   console.error(err);
   alert("Could not initialise the local database.");
@@ -827,7 +834,7 @@ openDB().then(async () => {
 // Master list: data/students.json in the repository
 // =========================================================
 const QA_PIN_KEY = "eocns-qa-session";
-const QA_DEFAULT_PIN = "EOCNS-QA";
+/* PIN from APP_CONFIG.qaPin / data/config.json */
 const REPO_OWNER = "travis-global";
 const REPO_NAME = "qa_attendance";
 const DATA_FILES = {
@@ -836,7 +843,18 @@ const DATA_FILES = {
   sessions: "data/sessions.json",
   qa_entries: "data/qa_entries.json",
   audit: "data/audit.json",
+  programmes: "data/programmes.json",
+  levels: "data/levels.json",
+  courses: "data/courses.json",
+  timetables: "data/timetables.json",
+  config: "data/config.json",
 };
+let APP_CONFIG = { qaPin: "EOCNS-QA" };
+let TIMETABLES_CACHE = null;
+let COURSES_CACHE = [];
+let PROGRAMMES_CACHE = [];
+let LEVELS_CACHE = [];
+
 
 function isQaOfficer() {
   try { return sessionStorage.getItem(QA_PIN_KEY) === "1"; } catch (_) { return false; }
@@ -847,6 +865,8 @@ function setQaOfficer(on) {
     if (on) sessionStorage.setItem(QA_PIN_KEY, "1");
     else sessionStorage.removeItem(QA_PIN_KEY);
   } catch (_) {}
+  document.body.classList.toggle("role-officer", !!on);
+  document.body.classList.toggle("role-viewer", !on);
   updateQaOfficerUI();
 }
 
@@ -859,11 +879,12 @@ function updateQaOfficerUI() {
 }
 
 function initQaOfficerUI() {
+  setQaOfficer(isQaOfficer());
   updateQaOfficerUI();
   document.getElementById("btnQaLogin")?.addEventListener("click", () => {
     const pin = (document.getElementById("qaPinInput")?.value || "").trim();
     const err = document.getElementById("qaAuthError");
-    if (pin === QA_DEFAULT_PIN) {
+    if (pin === (APP_CONFIG.qaPin || "EOCNS-QA")) {
       setQaOfficer(true);
       if (err) err.hidden = true;
       if (document.getElementById("qaPinInput")) document.getElementById("qaPinInput").value = "";
@@ -958,6 +979,9 @@ async function hydrateAllFromRepoIfEmpty() {
     ["sessions", DATA_FILES.sessions],
     ["qa_entries", DATA_FILES.qa_entries],
     ["audit", DATA_FILES.audit],
+    ["programmes", DATA_FILES.programmes],
+    ["levels", DATA_FILES.levels],
+    ["courses", DATA_FILES.courses],
   ]) {
     try {
       const existing = await getAll(store);
@@ -966,6 +990,11 @@ async function hydrateAllFromRepoIfEmpty() {
       if (Array.isArray(rows) && rows.length) await putMany(store, rows);
     } catch (e) { console.warn(store + " hydrate", e); }
   }
+  try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config); } catch (e) { console.warn("config", e); }
+  try { TIMETABLES_CACHE = await fetchRepoJson(DATA_FILES.timetables); } catch (e) { TIMETABLES_CACHE = {}; }
+  PROGRAMMES_CACHE = await getAll("programmes");
+  LEVELS_CACHE = await getAll("levels");
+  COURSES_CACHE = await getAll("courses");
 }
 
 async function reloadAllFromRepo(force) {
@@ -1088,8 +1117,12 @@ async function publishAllToRepo() {
       "Update QA entries (" + qa_entries.length + ") via EOCNS QA System");
     await githubPutFile(token, DATA_FILES.audit, JSON.stringify(audit, null, 2),
       "Update audit log (" + audit.length + ") via EOCNS QA System");
-
-    if (status) status.textContent = "Published students, lecturers, sessions, QA logs and audit to the repository.";
+    await githubPutFile(token, DATA_FILES.programmes, JSON.stringify(await getAll("programmes"), null, 2), "Update programmes via EOCNS");
+    await githubPutFile(token, DATA_FILES.levels, JSON.stringify(await getAll("levels"), null, 2), "Update levels via EOCNS");
+    await githubPutFile(token, DATA_FILES.courses, JSON.stringify(await getAll("courses"), null, 2), "Update courses via EOCNS");
+    if (TIMETABLES_CACHE) await githubPutFile(token, DATA_FILES.timetables, JSON.stringify(TIMETABLES_CACHE, null, 2), "Update timetables via EOCNS");
+    if (APP_CONFIG) await githubPutFile(token, DATA_FILES.config, JSON.stringify(APP_CONFIG, null, 2), "Update config via EOCNS");
+    if (status) status.textContent = "Published all master data, QA logs and audit to the repository.";
     const panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = true;
     if (document.getElementById("qaGithubToken")) document.getElementById("qaGithubToken").value = "";
@@ -1134,6 +1167,7 @@ async function getQaEntries() {
 }
 
 function openQaEntryForm(id) {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to log lectures."); return; }
   const modal = document.getElementById("qaEntryModal");
   if (!modal) return;
   document.getElementById("qaEntryForm").reset();
@@ -1198,36 +1232,150 @@ async function deleteQaEntry(id) {
   await renderQaDaily();
 }
 
+
+async function ensureTimetables() {
+  if (TIMETABLES_CACHE) return TIMETABLES_CACHE;
+  try { TIMETABLES_CACHE = await fetchRepoJson(DATA_FILES.timetables); } catch (_) { TIMETABLES_CACHE = {}; }
+  return TIMETABLES_CACHE;
+}
+function courseName(code) {
+  const c = COURSES_CACHE.find(function(x) { return x.code === code; });
+  return c ? (code + " — " + c.name) : code;
+}
+function weekdayOfDate(dateStr) {
+  const d = new Date(dateStr + "T12:00:00");
+  const wd = d.getDay();
+  return wd === 0 ? 6 : wd - 1;
+}
+function downloadJsonReport(filename, payload) {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to download."); return; }
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+function parseExcludeDates(text) {
+  return new Set((text || "").split(",").map(function(s) { return s.trim(); }).filter(Boolean));
+}
+async function renderProgrammesLevels() {
+  PROGRAMMES_CACHE = await getAll("programmes");
+  LEVELS_CACHE = await getAll("levels");
+  const pl = document.getElementById("programmesList");
+  const ll = document.getElementById("levelsList");
+  if (pl) pl.innerHTML = PROGRAMMES_CACHE.length ? PROGRAMMES_CACHE.map(function(p) {
+    return "<li>" + escapeHtml(p.name) + " (" + escapeHtml(p.code || "") + ")</li>";
+  }).join("") : "<li>None yet</li>";
+  if (ll) ll.innerHTML = LEVELS_CACHE.length ? LEVELS_CACHE.map(function(l) {
+    return "<li>" + escapeHtml(l.name) + "</li>";
+  }).join("") : "<li>None yet</li>";
+}
+async function addProgrammePrompt() {
+  if (!isQaOfficer()) return;
+  const name = prompt("Programme name (e.g. Nursing)");
+  if (!name) return;
+  const code = prompt("Short code (e.g. GNS)", name.slice(0, 3).toUpperCase()) || "";
+  await put("programmes", { id: "prog_" + Date.now().toString(36), name: name.trim(), code: code.trim(), status: "Active" });
+  await writeAudit({ action: "create", entity: "programmes", entityId: name, reason: "New programme " + name });
+  await renderProgrammesLevels();
+}
+async function addLevelPrompt() {
+  if (!isQaOfficer()) return;
+  const name = prompt("Level name (e.g. 100 Level)");
+  if (!name) return;
+  const value = Number(prompt("Numeric value", "100")) || 0;
+  await put("levels", { id: "lvl_" + Date.now().toString(36), name: name.trim(), value: value, status: "Active" });
+  await writeAudit({ action: "create", entity: "levels", entityId: name, reason: "New level " + name });
+  await renderProgrammesLevels();
+}
+
 async function renderQaDaily() {
   const dateEl = document.getElementById("qaDailyDate");
   const classEl = document.getElementById("qaDailyClass");
   if (!dateEl) return;
   if (!dateEl.value) dateEl.value = new Date().toISOString().slice(0, 10);
   const date = dateEl.value;
-  const classKey = classEl?.value || "";
-  let list = await getQaEntries();
-  list = list.filter(e => e.date === date && (!classKey || e.classKey === classKey));
-  list.sort((a, b) => (a.course || "").localeCompare(b.course || ""));
+  const classKey = classEl && classEl.value ? classEl.value : "100_nursing";
+  const tts = await ensureTimetables();
+  const tt = tts[classKey] || { slots: [] };
+  const wd = weekdayOfDate(date);
+  const slots = (tt.slots || []).filter(function(s) { return s.weekday === wd; });
+  let entries = await getQaEntries();
+  entries = entries.filter(function(e) { return e.date === date && e.classKey === classKey; });
   const tbody = document.getElementById("qaDailyTableBody");
   const empty = document.getElementById("qaDailyEmpty");
+  const stats = document.getElementById("qaDailyStats");
+  const dl = document.getElementById("btnDownloadDailyQa");
   if (!tbody) return;
-  if (!list.length) {
+  if (wd > 4 && slots.length === 0) {
     tbody.innerHTML = "";
-    if (empty) empty.hidden = false;
+    if (empty) { empty.hidden = false; empty.innerHTML = "<h3>Weekend</h3><p>No timetable slots (Mon–Fri only).</p>"; }
+    if (stats) stats.hidden = true;
+    if (dl) dl.hidden = true;
+    return;
+  }
+  function findEntry(slot) {
+    return entries.find(function(e) {
+      return e.course && (e.course.indexOf(slot.code) === 0 || e.course.indexOf(slot.code + " ") >= 0);
+    });
+  }
+  var scheduled = slots.length, held = 0, missed = 0;
+  var rows = slots.map(function(slot) {
+    var ent = findEntry(slot);
+    var status = ent ? ent.status : "Pending";
+    if (status === "Held" || status === "Partial") held++;
+    if (status === "Missed") missed++;
+    var badge = status === "Held" ? "badge--green" : status === "Missed" ? "badge--amber" : "badge--muted";
+    var lecturer = ent ? (ent.lecturer || "—") : "—";
+    var mins = ent && ent.duration != null ? ent.duration : "—";
+    var editCell = isQaOfficer()
+      ? ('<td class="qa-edit-only"><button type="button" class="icon-btn-sm" data-log-slot="' + escapeHtml(slot.code) + '|' + escapeHtml(slot.start) + '">Log</button></td>')
+      : '<td class="qa-edit-only"></td>';
+    return "<tr><td>" + escapeHtml(slot.start + "–" + slot.end) + "</td><td>" + escapeHtml(courseName(slot.code)) +
+      "</td><td>" + slot.hours + "</td><td><span class=\"badge " + badge + "\">" + escapeHtml(status) + "</span></td><td>" +
+      escapeHtml(lecturer) + "</td><td>" + mins + "</td>" + editCell + "</tr>";
+  });
+  entries.forEach(function(e) {
+    var onTt = slots.some(function(s) { return e.course && e.course.indexOf(s.code) >= 0; });
+    if (onTt) return;
+    if (e.status === "Held" || e.status === "Partial") held++;
+    if (e.status === "Missed") missed++;
+    var badge = e.status === "Held" ? "badge--green" : e.status === "Missed" ? "badge--amber" : "badge--muted";
+    rows.push("<tr><td>—</td><td>" + escapeHtml(e.course) + " <span class=\"cell-sub\">extra</span></td><td>—</td><td><span class=\"badge " + badge + "\">" +
+      escapeHtml(e.status) + "</span></td><td>" + escapeHtml(e.lecturer || "—") + "</td><td>" + (e.duration != null ? e.duration : "—") +
+      "</td><td class=\"qa-edit-only\"></td></tr>");
+  });
+  if (!rows.length) {
+    tbody.innerHTML = "";
+    if (empty) { empty.hidden = false; empty.innerHTML = "<h3>No slots</h3><p>No timetable for this class/day.</p>"; }
+    if (stats) stats.hidden = true;
     return;
   }
   if (empty) empty.hidden = true;
-  tbody.innerHTML = list.map(e => {
-    const badge = e.status === "Held" ? "badge--green" : e.status === "Missed" ? "badge--amber" : "badge--muted";
-    return "<tr><td>" + escapeHtml(e.course) + "</td><td>" + escapeHtml(e.lecturer) + "</td>" +
-      "<td><span class=\"badge " + badge + "\">" + escapeHtml(e.status) + "</span></td>" +
-      "<td>" + (e.duration != null ? e.duration + " min" : "—") + "</td>" +
-      "<td>" + escapeHtml(e.remark || "—") + "</td>" +
-      "<td class=\"actions-cell\"><button class=\"icon-btn-sm\" data-del-qa=\"" + e.id + "\">Del</button></td></tr>";
-  }).join("");
-  tbody.querySelectorAll("[data-del-qa]").forEach(btn => {
-    btn.addEventListener("click", () => deleteQaEntry(btn.getAttribute("data-del-qa")));
+  tbody.innerHTML = rows.join("");
+  tbody.querySelectorAll("[data-log-slot]").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      var parts = btn.getAttribute("data-log-slot").split("|");
+      openQaEntryForm(null);
+      document.getElementById("qaEntryCourse").value = courseName(parts[0]);
+      document.getElementById("qaEntryDate").value = date;
+      document.getElementById("qaEntryClass").value = classKey;
+    });
   });
+  if (stats) {
+    stats.hidden = false;
+    var rate = scheduled ? Math.round((held / scheduled) * 100) : 0;
+    stats.innerHTML = "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + scheduled + "</span><span class=\"stat-card__label\">Scheduled</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + held + "</span><span class=\"stat-card__label\">Held / Partial</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + missed + "</span><span class=\"stat-card__label\">Missed</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + rate + "%</span><span class=\"stat-card__label\">Day rate</span></div></div>";
+  }
+  if (dl) {
+    dl.hidden = !isQaOfficer();
+    dl.onclick = function() {
+      downloadJsonReport("QA_Daily_" + date + "_" + classKey + ".json", { date: date, classKey: classKey, scheduled: scheduled, held: held, missed: missed, entries: entries });
+    };
+  }
 }
 
 function mondayOf(d) {
@@ -1255,90 +1403,152 @@ function initQaMonthlyView() {
 }
 
 async function buildWeeklyQaReport() {
-  const startVal = document.getElementById("qaWeekStart")?.value;
+  var startVal = document.getElementById("qaWeekStart") && document.getElementById("qaWeekStart").value;
   if (!startVal) { alert("Pick the week start date."); return; }
-  const start = new Date(startVal + "T00:00:00");
-  const dates = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
-    dates.push(d.toISOString().slice(0, 10));
+  var classKey = (document.getElementById("qaWeekClass") && document.getElementById("qaWeekClass").value) || "100_nursing";
+  var excluded = parseExcludeDates(document.getElementById("qaWeekExclude") && document.getElementById("qaWeekExclude").value);
+  var start = new Date(startVal + "T12:00:00");
+  var schoolDays = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(start); d.setDate(start.getDate() + i);
+    var iso = d.toISOString().slice(0, 10);
+    if (d.getDay() === 0 || d.getDay() === 6) continue;
+    if (excluded.has(iso)) continue;
+    schoolDays.push(iso);
   }
-  const classKey = document.getElementById("qaWeekClass")?.value || "";
-  let list = await getQaEntries();
-  list = list.filter(e => dates.includes(e.date) && (!classKey || e.classKey === classKey));
-  list.sort((a, b) => (a.date + a.course).localeCompare(b.date + b.course));
-  const held = list.filter(e => e.status === "Held" || e.status === "Partial").length;
-  const missed = list.filter(e => e.status === "Missed").length;
-  const total = list.length;
-  const rate = total ? Math.round((held / total) * 100) : 0;
-  const summary = document.getElementById("qaWeeklySummary");
+  var tts = await ensureTimetables();
+  var tt = tts[classKey] || { slots: [] };
+  var entries = (await getQaEntries()).filter(function(e) { return schoolDays.indexOf(e.date) >= 0 && e.classKey === classKey; });
+  var sched = {};
+  schoolDays.forEach(function(iso) {
+    var wd = weekdayOfDate(iso);
+    (tt.slots || []).filter(function(s) { return s.weekday === wd; }).forEach(function(s) {
+      sched[s.code] = (sched[s.code] || 0) + 1;
+    });
+  });
+  var delivered = {}, missedMap = {};
+  entries.forEach(function(e) {
+    var m = (e.course || "").match(/^([A-Z]{2,6}\s*\d{0,3}|PRAC|TUT|PSY|ECA)/i);
+    var c = m ? m[1].replace(/\s+/, " ").toUpperCase() : "OTHER";
+    if (e.status === "Held" || e.status === "Partial") delivered[c] = (delivered[c] || 0) + 1;
+    if (e.status === "Missed") missedMap[c] = (missedMap[c] || 0) + 1;
+  });
+  var codes = Object.keys(Object.assign({}, sched, delivered, missedMap)).sort();
+  var totS = 0, totD = 0, totM = 0;
+  var courseRows = codes.map(function(code) {
+    var s = sched[code] || 0, d = delivered[code] || 0, m = missedMap[code] || 0;
+    totS += s; totD += d; totM += m;
+    var status = "Not in Timetable";
+    if (s > 0) {
+      if (d >= s && m === 0) status = d > s ? "Over-Delivered" : "Fully Delivered";
+      else if (d === 0) status = "Fully Missed";
+      else status = "Partially Missed";
+    }
+    var rate = s ? Math.round((Math.min(d, s) / s) * 100) : 0;
+    return { code: code, s: s, d: d, m: m, status: status, rate: rate };
+  });
+  var rate = totS ? Math.round((totD / totS) * 100) : 0;
+  var summary = document.getElementById("qaWeeklySummary");
   if (summary) {
     summary.hidden = false;
-    summary.innerHTML =
-      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + total + "</span><span class=\"stat-card__label\">Logged</span></div></div>" +
-      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + held + "</span><span class=\"stat-card__label\">Held / Partial</span></div></div>" +
-      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + missed + "</span><span class=\"stat-card__label\">Missed</span></div></div>" +
+    summary.innerHTML = "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + totS + "</span><span class=\"stat-card__label\">Scheduled slots</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + totD + "</span><span class=\"stat-card__label\">Delivered</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + totM + "</span><span class=\"stat-card__label\">Missed logs</span></div></div>" +
       "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + rate + "%</span><span class=\"stat-card__label\">Compliance</span></div></div>";
   }
-  const card = document.getElementById("qaWeeklyCard");
-  const tbody = document.getElementById("qaWeeklyTableBody");
+  var card = document.getElementById("qaWeeklyCard");
+  var dayCard = document.getElementById("qaWeeklyDayCard");
   if (card) card.hidden = false;
-  if (tbody) {
-    tbody.innerHTML = list.length ? list.map(e => {
-      const badge = e.status === "Held" ? "badge--green" : e.status === "Missed" ? "badge--amber" : "badge--muted";
-      return "<tr><td>" + escapeHtml(e.date) + "</td><td>" + escapeHtml(e.course) + "</td><td>" + escapeHtml(e.lecturer) +
-        "</td><td><span class=\"badge " + badge + "\">" + escapeHtml(e.status) + "</span></td><td>" +
-        (e.duration != null ? e.duration + " min" : "—") + "</td></tr>";
-    }).join("") : "<tr><td colspan=\"5\">No entries for this week.</td></tr>";
-  }
+  if (dayCard) dayCard.hidden = false;
+  var cb = document.getElementById("qaWeeklyCourseBody");
+  if (cb) cb.innerHTML = courseRows.map(function(r) {
+    return "<tr><td>" + escapeHtml(courseName(r.code)) + "</td><td>" + r.s + "</td><td>" + r.d + "</td><td>" + r.m + "</td><td>" + escapeHtml(r.status) + "</td><td>" + r.rate + "%</td></tr>";
+  }).join("") || "<tr><td colspan=\"6\">No data.</td></tr>";
+  var DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  var tbody = document.getElementById("qaWeeklyTableBody");
+  var dayRows = [];
+  schoolDays.forEach(function(iso) {
+    var wd = weekdayOfDate(iso);
+    (tt.slots || []).filter(function(s) { return s.weekday === wd; }).forEach(function(s) {
+      var ent = entries.find(function(e) { return e.date === iso && e.course && e.course.indexOf(s.code) >= 0; });
+      dayRows.push("<tr><td>" + iso + "</td><td>" + DAYS[wd] + "</td><td>" + escapeHtml(courseName(s.code)) + "</td><td>" + s.hours + "</td><td>" + escapeHtml(ent ? ent.status : "Pending") + "</td><td>" + escapeHtml(ent ? (ent.lecturer || "—") : "—") + "</td></tr>");
+    });
+  });
+  if (tbody) tbody.innerHTML = dayRows.join("") || "<tr><td colspan=\"6\">No school days.</td></tr>";
+  var dl = document.getElementById("btnDownloadWeeklyQa");
+  if (dl) dl.onclick = function() {
+    downloadJsonReport("QA_Weekly_" + startVal + "_" + classKey + ".json", { weekStart: startVal, classKey: classKey, schoolDays: schoolDays, totals: { scheduled: totS, delivered: totD, missed: totM, rate: rate }, courseRows: courseRows, entries: entries });
+  };
 }
 
 async function buildMonthlyQaReport() {
-  const monthVal = document.getElementById("qaMonthInput")?.value;
+  var monthVal = document.getElementById("qaMonthInput") && document.getElementById("qaMonthInput").value;
   if (!monthVal) { alert("Pick a month."); return; }
-  const classKey = document.getElementById("qaMonthClass")?.value || "";
-  let list = await getQaEntries();
-  list = list.filter(e => (e.date || "").startsWith(monthVal) && (!classKey || e.classKey === classKey));
-  const held = list.filter(e => e.status === "Held" || e.status === "Partial").length;
-  const missed = list.filter(e => e.status === "Missed").length;
-  const total = list.length;
-  const rate = total ? Math.round((held / total) * 100) : 0;
-  const summary = document.getElementById("qaMonthlySummary");
+  var classKey = (document.getElementById("qaMonthClass") && document.getElementById("qaMonthClass").value) || "100_nursing";
+  var excluded = parseExcludeDates(document.getElementById("qaMonthExclude") && document.getElementById("qaMonthExclude").value);
+  var parts = monthVal.split("-").map(Number);
+  var y = parts[0], m = parts[1];
+  var schoolDays = [];
+  var dim = new Date(y, m, 0).getDate();
+  for (var day = 1; day <= dim; day++) {
+    var d = new Date(y, m - 1, day);
+    if (d.getDay() === 0 || d.getDay() === 6) continue;
+    var iso = d.toISOString().slice(0, 10);
+    if (excluded.has(iso)) continue;
+    schoolDays.push(iso);
+  }
+  var tts = await ensureTimetables();
+  var tt = tts[classKey] || { slots: [] };
+  var entries = (await getQaEntries()).filter(function(e) { return (e.date || "").indexOf(monthVal) === 0 && e.classKey === classKey; });
+  var sched = {};
+  schoolDays.forEach(function(iso) {
+    var wd = weekdayOfDate(iso);
+    (tt.slots || []).filter(function(s) { return s.weekday === wd; }).forEach(function(s) {
+      sched[s.code] = (sched[s.code] || 0) + 1;
+    });
+  });
+  var delivered = {}, missedMap = {}, byLec = {};
+  entries.forEach(function(e) {
+    var mcode = (e.course || "").match(/^([A-Z0-9 ]+?)(?:\s*—|$)/i);
+    var c = mcode ? mcode[1].trim() : (e.course || "OTHER");
+    if (e.status === "Held" || e.status === "Partial") delivered[c] = (delivered[c] || 0) + 1;
+    if (e.status === "Missed") missedMap[c] = (missedMap[c] || 0) + 1;
+    var lec = e.lecturer || "—";
+    if (!byLec[lec]) byLec[lec] = { held: 0, missed: 0 };
+    if (e.status === "Missed") byLec[lec].missed++;
+    else if (e.status === "Held" || e.status === "Partial") byLec[lec].held++;
+  });
+  var totS = 0, totD = 0, totM = 0;
+  var codes = Object.keys(Object.assign({}, sched, delivered)).sort();
+  var courseRows = codes.map(function(code) {
+    var s = sched[code] || 0, d = delivered[code] || 0, m = missedMap[code] || 0;
+    totS += s; totD += d; totM += m;
+    return { code: code, s: s, d: d, m: m, rate: s ? Math.round((Math.min(d, s) / s) * 100) : 0 };
+  });
+  var rate = totS ? Math.round((totD / totS) * 100) : 0;
+  var summary = document.getElementById("qaMonthlySummary");
   if (summary) {
     summary.hidden = false;
-    summary.innerHTML =
-      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + total + "</span><span class=\"stat-card__label\">Logged</span></div></div>" +
-      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + held + "</span><span class=\"stat-card__label\">Held / Partial</span></div></div>" +
-      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + missed + "</span><span class=\"stat-card__label\">Missed</span></div></div>" +
+    summary.innerHTML = "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + totS + "</span><span class=\"stat-card__label\">Scheduled</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + totD + "</span><span class=\"stat-card__label\">Delivered</span></div></div>" +
+      "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + totM + "</span><span class=\"stat-card__label\">Missed</span></div></div>" +
       "<div class=\"stat-card\"><div class=\"stat-card__body\"><span class=\"stat-card__value\">" + rate + "%</span><span class=\"stat-card__label\">Compliance</span></div></div>";
   }
-  function aggregate(keyFn) {
-    const map = {};
-    list.forEach(e => {
-      const k = keyFn(e) || "—";
-      if (!map[k]) map[k] = { held: 0, missed: 0 };
-      if (e.status === "Missed") map[k].missed++;
-      else if (e.status === "Held" || e.status === "Partial") map[k].held++;
-    });
-    return Object.keys(map).sort().map(k => {
-      const h = map[k].held, m = map[k].missed, t = h + m;
-      const r = t ? Math.round((h / t) * 100) : 0;
-      return { name: k, held: h, missed: m, rate: r };
-    });
-  }
-  const byCourse = aggregate(e => e.course);
-  const byLec = aggregate(e => e.lecturer);
-  const detail = document.getElementById("qaMonthlyDetail");
+  var detail = document.getElementById("qaMonthlyDetail");
   if (detail) detail.hidden = false;
-  const cb = document.getElementById("qaMonthCourseBody");
-  const lb = document.getElementById("qaMonthLecBody");
-  if (cb) cb.innerHTML = byCourse.length ? byCourse.map(r =>
-    "<tr><td>" + escapeHtml(r.name) + "</td><td>" + r.held + "</td><td>" + r.missed + "</td><td>" + r.rate + "%</td></tr>"
-  ).join("") : "<tr><td colspan=\"4\">No data.</td></tr>";
-  if (lb) lb.innerHTML = byLec.length ? byLec.map(r =>
-    "<tr><td>" + escapeHtml(r.name) + "</td><td>" + r.held + "</td><td>" + r.missed + "</td><td>" + r.rate + "%</td></tr>"
-  ).join("") : "<tr><td colspan=\"4\">No data.</td></tr>";
+  var cb = document.getElementById("qaMonthCourseBody");
+  var lb = document.getElementById("qaMonthLecBody");
+  if (cb) cb.innerHTML = courseRows.map(function(r) {
+    return "<tr><td>" + escapeHtml(courseName(r.code)) + "</td><td>" + r.s + "</td><td>" + r.d + "</td><td>" + r.m + "</td><td>" + r.rate + "%</td></tr>";
+  }).join("") || "<tr><td colspan=\"5\">No data.</td></tr>";
+  if (lb) lb.innerHTML = Object.keys(byLec).sort().map(function(name) {
+    var h = byLec[name].held, m = byLec[name].missed, t = h + m;
+    return "<tr><td>" + escapeHtml(name) + "</td><td>" + h + "</td><td>" + m + "</td><td>" + (t ? Math.round((h / t) * 100) : 0) + "%</td></tr>";
+  }).join("") || "<tr><td colspan=\"4\">No data.</td></tr>";
+  var dl = document.getElementById("btnDownloadMonthlyQa");
+  if (dl) dl.onclick = function() {
+    downloadJsonReport("QA_Monthly_" + monthVal + "_" + classKey + ".json", { month: monthVal, classKey: classKey, totals: { scheduled: totS, delivered: totD, missed: totM, rate: rate }, courseRows: courseRows, byLec: byLec, entries: entries });
+  };
 }
 
 

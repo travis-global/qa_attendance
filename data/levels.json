@@ -1,0 +1,20 @@
+[
+  {
+    "id": "lvl_100",
+    "name": "100 Level",
+    "value": 100,
+    "status": "Active"
+  },
+  {
+    "id": "lvl_200",
+    "name": "200 Level",
+    "value": 200,
+    "status": "Active"
+  },
+  {
+    "id": "lvl_300",
+    "name": "300 Level",
+    "value": 300,
+    "status": "Active"
+  }
+]

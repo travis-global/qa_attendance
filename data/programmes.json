@@ -1,0 +1,14 @@
+[
+  {
+    "id": "prog_nursing",
+    "name": "Nursing",
+    "code": "GNS",
+    "status": "Active"
+  },
+  {
+    "id": "prog_midwifery",
+    "name": "Midwifery",
+    "code": "MID",
+    "status": "Active"
+  }
+]

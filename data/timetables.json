@@ -1,0 +1,356 @@
+{
+  "100_nursing": {
+    "class_name": "100 Level Nursing (ND 1)",
+    "department": "EOCNS Nursing Department",
+    "slots": [
+      {
+        "weekday": 0,
+        "code": "NUS 121",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 0,
+        "code": "PSY",
+        "start": "10:00",
+        "end": "12:00",
+        "hours": 2
+      },
+      {
+        "weekday": 0,
+        "code": "NUS 122",
+        "start": "13:00",
+        "end": "15:00",
+        "hours": 2
+      },
+      {
+        "weekday": 1,
+        "code": "NUR 125",
+        "start": "08:00",
+        "end": "11:00",
+        "hours": 3
+      },
+      {
+        "weekday": 1,
+        "code": "PRAC",
+        "start": "11:00",
+        "end": "12:00",
+        "hours": 1
+      },
+      {
+        "weekday": 1,
+        "code": "PRAC",
+        "start": "13:00",
+        "end": "15:00",
+        "hours": 2
+      },
+      {
+        "weekday": 2,
+        "code": "NUS 124",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 2,
+        "code": "NUR 121",
+        "start": "10:00",
+        "end": "12:00",
+        "hours": 2
+      },
+      {
+        "weekday": 2,
+        "code": "ECA",
+        "start": "13:00",
+        "end": "15:00",
+        "hours": 2
+      },
+      {
+        "weekday": 3,
+        "code": "EED 126",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 3,
+        "code": "NUR 122",
+        "start": "10:00",
+        "end": "12:00",
+        "hours": 2
+      },
+      {
+        "weekday": 3,
+        "code": "NUR 121",
+        "start": "13:00",
+        "end": "15:00",
+        "hours": 2
+      },
+      {
+        "weekday": 4,
+        "code": "NUS 121",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 4,
+        "code": "NUS 124",
+        "start": "10:00",
+        "end": "11:00",
+        "hours": 1
+      },
+      {
+        "weekday": 4,
+        "code": "NUR 122",
+        "start": "11:00",
+        "end": "12:00",
+        "hours": 1
+      },
+      {
+        "weekday": 4,
+        "code": "PRAC",
+        "start": "13:00",
+        "end": "15:00",
+        "hours": 2
+      }
+    ]
+  },
+  "200_nursing": {
+    "class_name": "200 Level Nursing",
+    "department": "200 Level Nursing Department",
+    "slots": [
+      {
+        "weekday": 0,
+        "code": "FNS 201",
+        "start": "08:00",
+        "end": "11:00",
+        "hours": 3
+      },
+      {
+        "weekday": 0,
+        "code": "POL 201",
+        "start": "12:00",
+        "end": "14:00",
+        "hours": 2
+      },
+      {
+        "weekday": 0,
+        "code": "PRAC",
+        "start": "14:00",
+        "end": "15:00",
+        "hours": 1
+      },
+      {
+        "weekday": 1,
+        "code": "TUT",
+        "start": "08:00",
+        "end": "09:00",
+        "hours": 1
+      },
+      {
+        "weekday": 1,
+        "code": "RH 201",
+        "start": "09:00",
+        "end": "11:00",
+        "hours": 2
+      },
+      {
+        "weekday": 1,
+        "code": "PHARM 201",
+        "start": "12:00",
+        "end": "14:00",
+        "hours": 2
+      },
+      {
+        "weekday": 1,
+        "code": "TUT",
+        "start": "14:00",
+        "end": "15:00",
+        "hours": 1
+      },
+      {
+        "weekday": 2,
+        "code": "RH 201",
+        "start": "08:00",
+        "end": "09:00",
+        "hours": 1
+      },
+      {
+        "weekday": 2,
+        "code": "CH 201",
+        "start": "09:00",
+        "end": "11:00",
+        "hours": 2
+      },
+      {
+        "weekday": 2,
+        "code": "PRAC",
+        "start": "12:00",
+        "end": "13:00",
+        "hours": 1
+      },
+      {
+        "weekday": 2,
+        "code": "ECA",
+        "start": "13:00",
+        "end": "15:00",
+        "hours": 2
+      },
+      {
+        "weekday": 3,
+        "code": "MSN 201",
+        "start": "08:00",
+        "end": "11:00",
+        "hours": 3
+      },
+      {
+        "weekday": 3,
+        "code": "RES 201",
+        "start": "12:00",
+        "end": "14:00",
+        "hours": 2
+      },
+      {
+        "weekday": 3,
+        "code": "TUT",
+        "start": "14:00",
+        "end": "15:00",
+        "hours": 1
+      },
+      {
+        "weekday": 4,
+        "code": "PRAC",
+        "start": "08:00",
+        "end": "09:00",
+        "hours": 1
+      },
+      {
+        "weekday": 4,
+        "code": "PWS 201",
+        "start": "09:00",
+        "end": "11:00",
+        "hours": 2
+      },
+      {
+        "weekday": 4,
+        "code": "NUT 201",
+        "start": "12:00",
+        "end": "14:00",
+        "hours": 2
+      },
+      {
+        "weekday": 4,
+        "code": "STAT 201",
+        "start": "14:00",
+        "end": "15:00",
+        "hours": 1
+      }
+    ]
+  },
+  "200_midwifery": {
+    "class_name": "200 Level Midwifery",
+    "department": "200 Level Midwifery Department",
+    "slots": [
+      {
+        "weekday": 0,
+        "code": "PHARM 202",
+        "start": "08:00",
+        "end": "11:00",
+        "hours": 3
+      },
+      {
+        "weekday": 0,
+        "code": "NMW 201",
+        "start": "12:00",
+        "end": "15:00",
+        "hours": 3
+      },
+      {
+        "weekday": 1,
+        "code": "ANP 201",
+        "start": "08:00",
+        "end": "11:00",
+        "hours": 3
+      },
+      {
+        "weekday": 1,
+        "code": "PRAC",
+        "start": "12:00",
+        "end": "13:00",
+        "hours": 1
+      },
+      {
+        "weekday": 1,
+        "code": "TUT",
+        "start": "13:00",
+        "end": "15:00",
+        "hours": 2
+      },
+      {
+        "weekday": 2,
+        "code": "PRAC",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 2,
+        "code": "MID 221",
+        "start": "10:00",
+        "end": "11:00",
+        "hours": 1
+      },
+      {
+        "weekday": 2,
+        "code": "MID 221",
+        "start": "12:00",
+        "end": "15:00",
+        "hours": 3
+      },
+      {
+        "weekday": 3,
+        "code": "CMWP 201",
+        "start": "08:00",
+        "end": "11:00",
+        "hours": 3
+      },
+      {
+        "weekday": 3,
+        "code": "CMWP 201",
+        "start": "12:00",
+        "end": "15:00",
+        "hours": 3
+      },
+      {
+        "weekday": 4,
+        "code": "CM 201",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 4,
+        "code": "TUT",
+        "start": "10:00",
+        "end": "11:00",
+        "hours": 1
+      },
+      {
+        "weekday": 4,
+        "code": "INF 201",
+        "start": "12:00",
+        "end": "14:00",
+        "hours": 2
+      },
+      {
+        "weekday": 4,
+        "code": "NMW 201",
+        "start": "14:00",
+        "end": "15:00",
+        "hours": 1
+      }
+    ]
+  }
+}

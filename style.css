@@ -992,3 +992,11 @@ code {
   .page-toolbar__left, .page-toolbar__right { width: 100%; }
   .search-box { min-width: 0; flex: 1; }
 }
+
+/* Role gating: viewers cannot use edit/download controls */
+body.role-viewer .qa-edit-only { display: none !important; }
+body.role-officer .qa-edit-only { display: inline-flex; }
+body.role-officer button.qa-edit-only,
+body.role-officer .btn.qa-edit-only { display: inline-flex; }
+body.role-officer td.qa-edit-only,
+body.role-officer th.qa-edit-only { display: table-cell; }
