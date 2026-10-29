@@ -68,11 +68,19 @@
           <h1 id="pageTitle">Dashboard</h1>
           <p id="pageSubtitle">Eastern Oak College of Nursing Sciences</p>
         </div>
-        <div class="topbar__actions">
-          <button class="icon-btn" id="themeToggle">🌓</button>
+        <div class="topbar__actions" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <label class="field" style="margin:0;min-width:180px">
+            <span class="field__label" style="font-size:0.7rem;margin:0">Active session</span>
+            <select id="globalSessionSelect" style="min-width:160px"></select>
+          </label>
+          <button class="icon-btn" id="themeToggle" title="Theme">🌓</button>
         </div>
       </header>
       <main class="content" id="content">
+        <div id="sessionContextBanner" class="card" style="margin-bottom:12px;padding:10px 14px;border-left:4px solid #0d9488" hidden>
+          <strong id="sessionContextTitle">No active session</strong>
+          <span class="muted-note" id="sessionContextDetail" style="margin-left:8px"></span>
+        </div>
         <section class="view active" id="view-dashboard">
           <div class="hero-card">
             <div class="hero-card__content">
@@ -879,7 +887,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=26"></script>
+  <script src="app.js?v=27"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

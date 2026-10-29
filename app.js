@@ -21,7 +21,7 @@ document.querySelectorAll(".nav-item").forEach((item) => {
 });
 const titles = {
   dashboard: { title: "Dashboard", subtitle: "Eastern Oak College of Nursing Sciences" },
-  students: { title: "Students", subtitle: "Master student registry" },
+  students: { title: "Students", subtitle: "Master registry · filtered by active session programmes & levels" },
   lecturers: { title: "Lecturers", subtitle: "Staff & course assignments" },
   hostel: { title: "Hostel Attendance", subtitle: "Gate log to boarding fee reports" },
   sessions: { title: "Academic Sessions", subtitle: "Programmes, levels and timetables" },
@@ -279,8 +279,7 @@ function formatDate(iso) {
   return new Date(iso).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 async function loadStudents() {
-  studentsCache = await getAll("students");
-  studentsCache.sort((a, b) => a.name.localeCompare(b.name));
+  studentsCache = await studentsForActiveSession();
   return studentsCache;
 }
 async function renderStudentsTable() {
@@ -683,10 +682,23 @@ async function saveSession(e) {
     await writeAudit({ action: "create", entity: "sessions", entityId: sess.id, reason: "New academic session", details: { name: name } });
   }
   await put("sessions", sess);
+  // Session roster is derived from master students by programme/level — no duplicate table
+  try {
+    var prevActive = ACTIVE_SESSION;
+    ACTIVE_SESSION = sess;
+    var roster = await studentsForActiveSession();
+    ACTIVE_SESSION = prevActive;
+    await writeAudit({ action: id ? "update" : "create", entity: "sessions", entityId: sess.id, reason: "Session saved · " + roster.length + " master students match programmes/levels", details: { programmes: programmes, levels: levels, rosterCount: roster.length } });
+  } catch (_) {}
   document.getElementById("sessionModal").hidden = true;
-  markDirty();
+  markDirty("session");
+  if (sess.status === "Active") {
+    try { localStorage.setItem(ACTIVE_SESSION_KEY, sess.id); } catch (_) {}
+  }
+  await refreshSessionChrome();
   await renderSessionsList();
   refreshDashboardStats();
+  alert("Session saved. Master list students matching these programmes/levels are in scope (" + (ACTIVE_SESSION && ACTIVE_SESSION.id === sess.id ? (await studentsForActiveSession()).length + " students" : "select this session in the top bar") + ").");
 }
 async function deleteSession(id) {
   if (!isQaOfficer()) return;
@@ -1188,6 +1200,10 @@ openDB().then(async () => {
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
   try { refreshDashboardStats(); } catch (e) { console.warn("stats", e); }
   initQaOfficerUI();
+  document.getElementById("globalSessionSelect")?.addEventListener("change", function() {
+    setActiveSessionId(this.value);
+  });
+  try { await refreshSessionChrome(); } catch (e) { console.warn("session chrome", e); }
   document.getElementById("btnAddStudent")?.addEventListener("click", () => openStudentForm());
   document.getElementById("studentForm")?.addEventListener("submit", saveStudent);
   document.getElementById("btnCancelStudent")?.addEventListener("click", closeStudentForm);
@@ -2687,6 +2703,123 @@ const DATA_FILES = {
   remedial_logs: "data/remedial_logs.json",
   config: "data/config.json",
 };
+
+// ========== ACTIVE ACADEMIC SESSION CONTEXT ==========
+var ACTIVE_SESSION_KEY = "eocns_active_session_id";
+var ACTIVE_SESSION = null; // full session object or null
+
+function normalizeToken(s) {
+  return String(s || "").toLowerCase().replace(/level/gi, "").replace(/[^a-z0-9]/g, "").trim();
+}
+function programmeMatches(studentProg, sessionProgs) {
+  if (!sessionProgs || !sessionProgs.length) return true;
+  var sp = normalizeToken(studentProg);
+  return sessionProgs.some(function(p) {
+    var np = normalizeToken(p);
+    return sp === np || sp.indexOf(np) >= 0 || np.indexOf(sp) >= 0;
+  });
+}
+function levelMatches(studentLevel, sessionLevels) {
+  if (!sessionLevels || !sessionLevels.length) return true;
+  var sl = normalizeToken(studentLevel);
+  return sessionLevels.some(function(l) {
+    var nl = normalizeToken(l);
+    return sl === nl || sl.indexOf(nl) >= 0 || nl.indexOf(sl) >= 0;
+  });
+}
+
+async function loadActiveSession() {
+  var id = null;
+  try { id = localStorage.getItem(ACTIVE_SESSION_KEY); } catch (_) {}
+  var sessions = await getAll("sessions");
+  if (id) ACTIVE_SESSION = sessions.find(function(s) { return s.id === id; }) || null;
+  if (!ACTIVE_SESSION) {
+    ACTIVE_SESSION = sessions.find(function(s) { return s.status === "Active"; }) || sessions[0] || null;
+    if (ACTIVE_SESSION) {
+      try { localStorage.setItem(ACTIVE_SESSION_KEY, ACTIVE_SESSION.id); } catch (_) {}
+    }
+  }
+  return ACTIVE_SESSION;
+}
+
+async function setActiveSessionId(id) {
+  try { localStorage.setItem(ACTIVE_SESSION_KEY, id || ""); } catch (_) {}
+  await loadActiveSession();
+  await refreshSessionChrome();
+  // re-render current view lightly
+  try {
+    var active = document.querySelector(".nav-item.active");
+    if (active) active.click();
+  } catch (_) {}
+  try { refreshDashboardStats(); } catch (_) {}
+  showToast(ACTIVE_SESSION ? ("Working in session: " + ACTIVE_SESSION.name) : "No session selected");
+}
+
+async function refreshSessionChrome() {
+  await loadActiveSession();
+  var sessions = await getAll("sessions");
+  var sel = document.getElementById("globalSessionSelect");
+  if (sel) {
+    sel.innerHTML = '<option value="">— Select session —</option>' + sessions.map(function(s) {
+      return '<option value="' + escapeHtml(s.id) + '"' + (ACTIVE_SESSION && ACTIVE_SESSION.id === s.id ? " selected" : "") + ">" +
+        escapeHtml(s.name) + (s.status ? " (" + s.status + ")" : "") + "</option>";
+    }).join("");
+  }
+  var banner = document.getElementById("sessionContextBanner");
+  var title = document.getElementById("sessionContextTitle");
+  var detail = document.getElementById("sessionContextDetail");
+  if (!ACTIVE_SESSION) {
+    if (banner) banner.hidden = false;
+    if (title) title.textContent = "No active academic session";
+    if (detail) detail.textContent = "Create or select a session in the top bar. Students, logs and reports are scoped to the session programmes & levels.";
+    return;
+  }
+  if (banner) banner.hidden = false;
+  if (title) title.textContent = ACTIVE_SESSION.name;
+  var roster = await studentsForActiveSession();
+  if (detail) {
+    detail.textContent = "Programmes: " + (ACTIVE_SESSION.programmes || []).join(", ") +
+      " · Levels: " + (ACTIVE_SESSION.levels || []).join(", ") +
+      " · Master students in scope: " + roster.length +
+      (ACTIVE_SESSION.startDate ? (" · From " + ACTIVE_SESSION.startDate) : "");
+  }
+}
+
+/** Master-list students automatically in scope for the active session (programme + level). */
+async function studentsForActiveSession() {
+  await loadActiveSession();
+  var all = await getAll("students");
+  if (!ACTIVE_SESSION) return all.slice();
+  var progs = ACTIVE_SESSION.programmes || [];
+  var levels = ACTIVE_SESSION.levels || [];
+  return all.filter(function(st) {
+    return programmeMatches(st.programme, progs) && levelMatches(st.level, levels);
+  });
+}
+
+function requireActiveSession(actionLabel) {
+  if (ACTIVE_SESSION && ACTIVE_SESSION.id) return true;
+  alert((actionLabel || "This action") + " needs an active academic session. Select one in the top bar (or create it under Sessions).");
+  return false;
+}
+
+function stampSessionFields(obj) {
+  if (!obj) obj = {};
+  if (ACTIVE_SESSION) {
+    obj.sessionId = ACTIVE_SESSION.id;
+    obj.sessionName = ACTIVE_SESSION.name;
+  }
+  return obj;
+}
+
+function entryInActiveSession(entry) {
+  if (!ACTIVE_SESSION) return true;
+  if (entry.sessionId) return entry.sessionId === ACTIVE_SESSION.id;
+  // legacy rows: keep if date is on/after session start
+  if (ACTIVE_SESSION.startDate && entry.date && entry.date < ACTIVE_SESSION.startDate) return false;
+  return true;
+}
+
 let APP_CONFIG = { qaPin: "EOCNS-QA" };
 let TIMETABLES_CACHE = null;
 let COURSES_CACHE = [];
@@ -3259,8 +3392,9 @@ function calcQaDurationMinutes() {
 
 
 async function getQaEntries() {
-  try { return await getAll("qa_entries"); }
-  catch (_) { return []; }
+  var all = await getAll("qa_entries");
+  await loadActiveSession();
+  return all.filter(entryInActiveSession);
 }
 
 async function openQaEntryForm(id) {
@@ -3353,7 +3487,7 @@ async function saveQaEntry(e) {
     var existing = (await getQaEntries()).find(function(x) { return x.id === id; });
     if (existing && existing.createdAt) entry.createdAt = existing.createdAt;
   }
-  await put("qa_entries", entry);
+  stampSessionFields(entry); await put("qa_entries", entry);
   await writeAudit({ action: id ? "update" : "create", entity: "qa_entries", entityId: entry.id, reason: id ? "Lecture log updated" : "Lecture logged", details: { date: date, course: course, status: status, classKey: classKey } });
   markDirty("lecture log");
   document.getElementById("qaEntryModal").hidden = true;
