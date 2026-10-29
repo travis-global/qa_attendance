@@ -29,6 +29,8 @@ const titles = {
   "qa-daily": { title: "Daily QA", subtitle: "Lecture compliance" },
   "qa-weekly": { title: "Weekly QA", subtitle: "Weekly teaching compliance" },
   "qa-monthly": { title: "Monthly QA", subtitle: "Full monthly quality assurance" },
+  remedial: { title: "Remedial System", subtitle: "Make-up and remedial teaching logs" },
+  "lecturer-hours": { title: "Lecturer contract hours", subtitle: "Contracted vs delivered hours" },
   reports: { title: "Reports and Export", subtitle: "Attendance sheets, PDFs and CSV" },
   audit: { title: "Audit Log", subtitle: "Every change with REF/EOCNS/QA" },
   settings: { title: "Settings", subtitle: "Roles, letterhead and system preferences" },
@@ -44,6 +46,11 @@ function showView(viewId) {
   try { sessionStorage.setItem("eocns-last-view", viewId); } catch (_) {}
   if (viewId === "students") renderStudentsTable();
   if (viewId === "lecturers") renderLecturersTable();
+  if (viewId === "remedial") renderRemedialTable();
+  if (viewId === "lecturer-hours") {
+    var m = document.getElementById("lecturerHoursMonth");
+    if (m && !m.value) m.value = new Date().toISOString().slice(0, 7);
+  }
   if (viewId === "sessions") renderSessionsList();
   if (viewId === "dashboard") refreshDashboardStats();
   if (viewId === "audit") renderAuditLog();
@@ -87,7 +94,7 @@ window.addEventListener("beforeunload", function(e) {
 });
 
 const DB_NAME = "eocns_attendance";
-const DB_VERSION = 6;
+const DB_VERSION = 7;
 let db = null;
 
 async function resetLocalDatabase() {
@@ -157,6 +164,9 @@ function openDB() {
         }
         if (!database.objectStoreNames.contains("hostel_runs")) {
           database.createObjectStore("hostel_runs", { keyPath: "id" });
+        }
+        if (!database.objectStoreNames.contains("remedial")) {
+          database.createObjectStore("remedial", { keyPath: "id" });
         }
       } catch (upgradeErr) {
         console.error("onupgradeneeded", upgradeErr);
@@ -439,30 +449,22 @@ async function loadLecturers() {
 }
 async function renderLecturersTable() {
   await loadLecturers();
-  const tbody = document.getElementById("lecturersTableBody");
-  const empty = document.getElementById("lecturersEmpty");
-  const countEl = document.getElementById("lecturersCount");
-  if (!tbody) return;
-  const search = (document.getElementById("lecturerSearch") && document.getElementById("lecturerSearch").value || "").toLowerCase().trim();
-  let list = lecturersCache;
-  if (search) list = list.filter(function(l) {
-    return (l.name || "").toLowerCase().indexOf(search) >= 0 || (l.staffId || "").toLowerCase().indexOf(search) >= 0;
+  var q = ((document.getElementById("lecturerSearch") && document.getElementById("lecturerSearch").value) || "").toLowerCase().trim();
+  var list = lecturersCache.filter(function(l) {
+    if (!q) return true;
+    return String(l.name || "").toLowerCase().indexOf(q) >= 0 || String(l.staffId || "").toLowerCase().indexOf(q) >= 0;
   });
-  if (countEl) countEl.textContent = list.length + " lecturer" + (list.length !== 1 ? "s" : "");
-  if (!list.length) {
-    tbody.innerHTML = "";
-    if (empty) empty.hidden = false;
-    return;
-  }
-  if (empty) empty.hidden = true;
+  var tbody = document.getElementById("lecturersTableBody");
+  if (!tbody) return;
   tbody.innerHTML = list.map(function(l) {
+    var ch = l.contractHoursPerMonth != null && l.contractHoursPerMonth !== "" ? l.contractHoursPerMonth : "—";
     var actions = isQaOfficer()
       ? ('<button type="button" class="icon-btn-sm" data-edit-lec="' + l.id + '">Edit</button> <button type="button" class="icon-btn-sm" data-del-lec="' + l.id + '">Del</button>')
       : "";
-    return "<tr><td><div class=\"cell-main\">" + escapeHtml(l.name) + "</div></td><td>" + escapeHtml(l.staffId || "—") +
-      "</td><td>" + escapeHtml((l.courses || []).join(", ") || "—") + "</td><td>" + escapeHtml(l.phone || "—") +
-      "</td><td><span class=\"badge " + (l.status === "Active" ? "badge--green" : "badge--muted") + "\">" + escapeHtml(l.status || "Active") +
-      "</span></td><td class=\"qa-edit-only\">" + actions + "</td></tr>";
+    return "<tr><td>" + escapeHtml(l.name) + "</td><td>" + escapeHtml(l.staffId || "") + "</td><td>" +
+      escapeHtml((l.courses || []).join(", ")) + "</td><td>" + escapeHtml(String(ch)) + "</td><td>" +
+      escapeHtml(l.phone || "") + "</td><td>" + escapeHtml(l.status || "Active") +
+      "</td><td class=\"qa-edit-only\">" + actions + "</td></tr>";
   }).join("");
   tbody.querySelectorAll("[data-edit-lec]").forEach(function(btn) {
     btn.addEventListener("click", function() { openLecturerForm(btn.getAttribute("data-edit-lec")); });
@@ -470,59 +472,77 @@ async function renderLecturersTable() {
   tbody.querySelectorAll("[data-del-lec]").forEach(function(btn) {
     btn.addEventListener("click", function() { deleteLecturer(btn.getAttribute("data-del-lec")); });
   });
+  var count = document.getElementById("lecturersCount");
+  if (count) count.textContent = list.length + " lecturers";
 }
 async function openLecturerForm(id) {
   if (!isQaOfficer()) { alert("Sign in as QA Officer to manage lecturers."); return; }
   document.getElementById("lecturerForm").reset();
-  var title = document.getElementById("lecturerModalTitle");
-  var staffEl = document.getElementById("lecturerStaffId");
+  document.getElementById("lecturerId").value = id || "";
+  document.getElementById("lecturerModalTitle").textContent = id ? "Edit lecturer" : "Add lecturer";
   if (!id) {
-    title.textContent = "Add Lecturer";
-    staffEl.value = await generateStaffId();
-    staffEl.readOnly = true;
+    document.getElementById("lecturerStaffId").value = await generateStaffId();
   } else {
-    title.textContent = "Edit Lecturer";
     await loadLecturers();
     var l = lecturersCache.find(function(x) { return x.id === id; });
-    if (!l) return;
-    document.getElementById("lecturerName").value = l.name || "";
-    staffEl.value = l.staffId || "";
-    staffEl.readOnly = true;
-    document.getElementById("lecturerPhone").value = l.phone || "";
-    document.getElementById("lecturerCourses").value = (l.courses || []).join(", ");
-    if (document.getElementById("lecturerStatus")) document.getElementById("lecturerStatus").value = l.status || "Active";
-    // stash edit id
-    document.getElementById("lecturerForm").dataset.editId = id;
+    if (l) {
+      document.getElementById("lecturerName").value = l.name || "";
+      document.getElementById("lecturerStaffId").value = l.staffId || "";
+      document.getElementById("lecturerPhone").value = l.phone || "";
+      document.getElementById("lecturerCourses").value = (l.courses || []).join(", ");
+      document.getElementById("lecturerContractHours").value = l.contractHoursPerMonth != null ? l.contractHoursPerMonth : "";
+      document.getElementById("lecturerStatus").value = l.status || "Active";
+    }
   }
-  if (!id) document.getElementById("lecturerForm").dataset.editId = "";
+  // show REF for edits
+  var refG = document.getElementById("lecturerAuditRefGroup");
+  if (!refG) {
+    // inject if missing - skip, use prompt on save for edit
+  }
   document.getElementById("lecturerModal").hidden = false;
-  document.getElementById("lecturerName").focus();
 }
 async function saveLecturer(e) {
   e.preventDefault();
   if (!isQaOfficer()) return;
+  var id = document.getElementById("lecturerId").value || null;
   var name = document.getElementById("lecturerName").value.trim();
-  if (!name) { alert("Name is required"); return; }
-  var staffId = document.getElementById("lecturerStaffId").value.trim();
-  if (!staffId) staffId = await generateStaffId();
-  var phone = document.getElementById("lecturerPhone").value.trim();
+  if (!name) return;
+  var ref = "";
+  if (id) {
+    ref = prompt("Official REF for this lecturer change (required):", "REF/EOCNS/QA/");
+    if (!ref || !String(ref).trim()) { alert("REF is required for edits."); return; }
+    ref = String(ref).trim();
+  }
   var courses = document.getElementById("lecturerCourses").value.split(",").map(function(c) { return c.trim(); }).filter(Boolean);
-  var status = (document.getElementById("lecturerStatus") && document.getElementById("lecturerStatus").value) || "Active";
+  var contractRaw = document.getElementById("lecturerContractHours").value;
+  var contractHours = contractRaw === "" ? null : Number(contractRaw);
   var now = new Date().toISOString();
-  var editId = document.getElementById("lecturerForm").dataset.editId || "";
-  var lec;
-  if (editId) {
-    await loadLecturers();
-    lec = lecturersCache.find(function(x) { return x.id === editId; }) || {};
-    lec = Object.assign({}, lec, { name: name, staffId: staffId, phone: phone, courses: courses, status: status, updatedAt: now });
-    await writeAudit({ action: "update", entity: "lecturers", entityId: lec.id, reason: "Lecturer profile updated", details: { name: name } });
-  } else {
-    lec = { id: generateId("lec"), name: name, staffId: staffId, phone: phone, courses: courses, status: status, createdAt: now, updatedAt: now };
-    await writeAudit({ action: "create", entity: "lecturers", entityId: lec.id, reason: "New lecturer registration", details: { name: name, staffId: staffId } });
+  var lec = {
+    id: id || ("lec_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
+    name: name,
+    staffId: document.getElementById("lecturerStaffId").value.trim() || await generateStaffId(),
+    phone: document.getElementById("lecturerPhone").value.trim(),
+    courses: courses,
+    contractHoursPerMonth: contractHours,
+    status: document.getElementById("lecturerStatus").value || "Active",
+    updatedAt: now
+  };
+  if (!id) lec.createdAt = now;
+  else {
+    var prev = lecturersCache.find(function(x) { return x.id === id; });
+    if (prev && prev.createdAt) lec.createdAt = prev.createdAt;
   }
   await put("lecturers", lec);
+  await writeAudit({
+    action: id ? "update" : "create",
+    entity: "lecturers",
+    entityId: lec.id,
+    externalRef: ref || undefined,
+    reason: id ? ("Lecturer updated · contract " + (contractHours != null ? contractHours + "h/mo" : "n/a")) : "Lecturer created",
+    details: { name: name, contractHoursPerMonth: contractHours, courses: courses }
+  });
+  markDirty("lecturers");
   document.getElementById("lecturerModal").hidden = true;
-  markDirty();
   await renderLecturersTable();
   refreshDashboardStats();
 }
@@ -1539,6 +1559,7 @@ async function exportFullSnapshot() {
     courses: await getAll("courses"),
     attendance: await getAll("attendance"),
     hostel_runs: await getAll("hostel_runs"),
+    remedial: await getAll("remedial"),
     timetables: TIMETABLES_CACHE || {}
   };
   downloadJsonReport("EOCNS_Snapshot_" + new Date().toISOString().slice(0, 10) + ".json", snap);
@@ -1565,6 +1586,7 @@ async function importFullSnapshot(file) {
   if (snap.courses) await replaceStore("courses", snap.courses);
   if (snap.attendance) await replaceStore("attendance", snap.attendance);
   if (snap.hostel_runs) await replaceStore("hostel_runs", snap.hostel_runs);
+  if (snap.remedial) await replaceStore("remedial", snap.remedial);
   if (snap.timetables) TIMETABLES_CACHE = snap.timetables;
   markDirty("snapshot import");
   await renderStudentsTable();
@@ -1802,6 +1824,225 @@ function printMonthlyProfessionalPack(payload) {
   setTimeout(function() { w.print(); }, 400);
 }
 
+
+function downloadAttendanceAsWord() {
+  var root = document.getElementById("attendancePrintRoot");
+  if (!root) { alert("Build a sheet first (programme + level)."); return; }
+  var prog = (document.getElementById("attProgramme") && document.getElementById("attProgramme").value) || "";
+  var level = (document.getElementById("attLevel") && document.getElementById("attLevel").value) || "";
+  var htmlContent = root.innerHTML;
+  // Word-compatible HTML document (opens editable in Microsoft Word / Google Docs / LibreOffice)
+  var doc =
+    "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>" +
+    "<head><meta charset='utf-8'><title>EOCNS Attendance Sheet</title>" +
+    "<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->" +
+    "<style>" +
+    "body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;color:#000}" +
+    "h1, .att-sheet-title{font-size:14pt;text-align:center;text-transform:uppercase;margin:0 0 12pt}" +
+    "table{border-collapse:collapse;width:100%}" +
+    "th,td{border:1px solid #000;padding:6pt 4pt;vertical-align:middle}" +
+    "th{background:#f0f0f0;font-weight:bold;text-align:center}" +
+    ".att-sn{width:40px;text-align:center}" +
+    ".att-mark-cell{height:22pt;width:70px}" +
+    ".att-sig-line{margin:10pt 0;font-size:10pt}" +
+    "</style></head><body>" + htmlContent + "</body></html>";
+  var blob = new Blob(["\ufeff", doc], { type: "application/msword" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  var safe = (prog + "_L" + level).replace(/[^\w\-]+/g, "_");
+  a.href = url;
+  a.download = "EOCNS_Attendance_" + safe + ".doc";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function() { URL.revokeObjectURL(url); a.remove(); }, 500);
+}
+
+async function renderRemedialTable() {
+  var list = await getAll("remedial");
+  list.sort(function(a, b) { return String(b.date || "").localeCompare(String(a.date || "")); });
+  var tbody = document.getElementById("remedialTableBody");
+  var empty = document.getElementById("remedialEmpty");
+  if (!tbody) return;
+  if (!list.length) {
+    tbody.innerHTML = "";
+    if (empty) empty.hidden = false;
+    return;
+  }
+  if (empty) empty.hidden = true;
+  tbody.innerHTML = list.map(function(r) {
+    var actions = isQaOfficer()
+      ? ('<button type="button" class="icon-btn-sm" data-edit-rem="' + r.id + '">Edit</button> <button type="button" class="icon-btn-sm" data-del-rem="' + r.id + '">Del</button>')
+      : "";
+    return "<tr><td>" + escapeHtml(r.date || "") + "</td><td>" + escapeHtml(r.course || "") +
+      "</td><td>" + escapeHtml(r.lecturer || "") + "</td><td>" + escapeHtml(String(r.hours || "")) +
+      "</td><td>" + escapeHtml(r.classKey || "") + "</td><td>" + escapeHtml(r.reason || "") +
+      "</td><td>" + escapeHtml(r.ref || "") + "</td><td class=\"qa-edit-only\">" + actions + "</td></tr>";
+  }).join("");
+  tbody.querySelectorAll("[data-edit-rem]").forEach(function(btn) {
+    btn.addEventListener("click", function() { openRemedialForm(btn.getAttribute("data-edit-rem")); });
+  });
+  tbody.querySelectorAll("[data-del-rem]").forEach(function(btn) {
+    btn.addEventListener("click", function() { deleteRemedial(btn.getAttribute("data-del-rem")); });
+  });
+}
+
+async function fillRemedialSelects() {
+  await seedQaDatalists();
+  var cSel = document.getElementById("remedialCourse");
+  var lSel = document.getElementById("remedialLecturer");
+  if (cSel) {
+    var opts = '<option value="">— Select —</option>';
+    (COURSES_CACHE || []).forEach(function(c) {
+      var label = c.code + (c.name ? (" — " + c.name) : "");
+      opts += '<option value="' + escapeHtml(label) + '">' + escapeHtml(label) + '</option>';
+    });
+    cSel.innerHTML = opts;
+  }
+  if (lSel) {
+    await loadLecturers();
+    var optsL = '<option value="">— Select —</option>';
+    (lecturersCache || []).filter(function(l) { return !l.status || l.status === "Active"; }).forEach(function(l) {
+      optsL += '<option value="' + escapeHtml(l.name) + '">' + escapeHtml(l.name) + '</option>';
+    });
+    lSel.innerHTML = optsL;
+  }
+}
+
+async function openRemedialForm(id) {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to log remedial sessions."); return; }
+  await fillRemedialSelects();
+  document.getElementById("remedialForm").reset();
+  document.getElementById("remedialId").value = id || "";
+  document.getElementById("remedialModalTitle").textContent = id ? "Edit remedial session" : "Log remedial session";
+  if (id) {
+    var list = await getAll("remedial");
+    var r = list.find(function(x) { return x.id === id; });
+    if (r) {
+      document.getElementById("remedialDate").value = r.date || "";
+      document.getElementById("remedialHours").value = r.hours != null ? r.hours : 2;
+      document.getElementById("remedialCourse").value = r.course || "";
+      document.getElementById("remedialLecturer").value = r.lecturer || "";
+      document.getElementById("remedialClass").value = r.classKey || "100_nursing";
+      document.getElementById("remedialReason").value = r.reason || "";
+      document.getElementById("remedialRef").value = r.ref || "";
+    }
+  }
+  document.getElementById("remedialModal").hidden = false;
+}
+
+function closeRemedialForm() {
+  document.getElementById("remedialModal").hidden = true;
+}
+
+async function saveRemedial(e) {
+  e.preventDefault();
+  if (!isQaOfficer()) return;
+  var id = document.getElementById("remedialId").value || null;
+  var ref = (document.getElementById("remedialRef").value || "").trim();
+  if (!ref) { alert("Official REF is required."); return; }
+  var now = new Date().toISOString();
+  var rec = {
+    id: id || ("rem_" + Date.now().toString(36)),
+    date: document.getElementById("remedialDate").value,
+    hours: Number(document.getElementById("remedialHours").value) || 0,
+    course: document.getElementById("remedialCourse").value,
+    lecturer: document.getElementById("remedialLecturer").value,
+    classKey: document.getElementById("remedialClass").value,
+    reason: (document.getElementById("remedialReason").value || "").trim(),
+    ref: ref,
+    updatedAt: now
+  };
+  if (!id) rec.createdAt = now;
+  await put("remedial", rec);
+  await writeAudit({
+    action: id ? "update" : "create",
+    entity: "remedial",
+    entityId: rec.id,
+    externalRef: ref,
+    reason: id ? "Remedial session updated" : "Remedial session logged",
+    details: { date: rec.date, course: rec.course, lecturer: rec.lecturer, hours: rec.hours }
+  });
+  markDirty("remedial");
+  closeRemedialForm();
+  await renderRemedialTable();
+}
+
+async function deleteRemedial(id) {
+  if (!isQaOfficer()) return;
+  var ref = prompt("Official REF to delete this remedial record:", "REF/EOCNS/QA/");
+  if (!ref || !String(ref).trim()) return;
+  if (!confirm("Delete this remedial session?")) return;
+  await del("remedial", id);
+  await writeAudit({ action: "delete", entity: "remedial", entityId: id, externalRef: String(ref).trim(), reason: "Remedial session deleted" });
+  markDirty("remedial");
+  await renderRemedialTable();
+}
+
+async function buildLecturerHoursReport() {
+  var monthVal = (document.getElementById("lecturerHoursMonth") && document.getElementById("lecturerHoursMonth").value) || "";
+  if (!monthVal) { alert("Choose a month."); return; }
+  await loadLecturers();
+  var qa = await getQaEntries();
+  var rem = await getAll("remedial");
+  var rows = [];
+  lecturersCache.filter(function(l) { return !l.status || l.status === "Active"; }).forEach(function(l) {
+    var contract = Number(l.contractHoursPerMonth) || 0;
+    var deliveredMin = 0;
+    qa.forEach(function(e) {
+      if (String(e.date || "").slice(0, 7) !== monthVal) return;
+      if ((e.lecturer || "") !== l.name) return;
+      if (e.status === "Missed") return;
+      deliveredMin += Number(e.duration) || 0;
+    });
+    var remHours = 0;
+    rem.forEach(function(r) {
+      if (String(r.date || "").slice(0, 7) !== monthVal) return;
+      if ((r.lecturer || "") !== l.name) return;
+      remHours += Number(r.hours) || 0;
+    });
+    var delivered = Math.round((deliveredMin / 60) * 10) / 10 + remHours;
+    var variance = Math.round((delivered - contract) * 10) / 10;
+    rows.push({
+      name: l.name,
+      staffId: l.staffId || "",
+      contract: contract,
+      delivered: delivered,
+      remedial: remHours,
+      variance: variance,
+      status: contract <= 0 ? "No contract set" : (variance >= 0 ? "Met / over" : "Below contract")
+    });
+  });
+  window.__lecturerHoursPayload = { month: monthVal, rows: rows };
+  var body = document.getElementById("lecturerHoursResult");
+  if (!body) return;
+  body.innerHTML = '<div class="card__body"><table class="data-table"><thead><tr><th>Lecturer</th><th>Staff ID</th><th>Contract h/mo</th><th>Delivered (logs+remedial)</th><th>Of which remedial</th><th>Variance</th><th>Status</th></tr></thead><tbody>' +
+    rows.map(function(r) {
+      return "<tr><td>" + escapeHtml(r.name) + "</td><td>" + escapeHtml(r.staffId) + "</td><td>" + r.contract +
+        "</td><td>" + r.delivered + "</td><td>" + r.remedial + "</td><td>" + r.variance + "</td><td>" + escapeHtml(r.status) + "</td></tr>";
+    }).join("") + "</tbody></table></div>";
+}
+
+function printLecturerHoursPack() {
+  var p = window.__lecturerHoursPayload;
+  if (!p) { alert("Build the report first."); return; }
+  var rows = p.rows.map(function(r, i) {
+    return "<tr><td>" + (i + 1) + "</td><td>" + r.name + "</td><td>" + r.staffId + "</td><td>" + r.contract +
+      "</td><td>" + r.delivered + "</td><td>" + r.remedial + "</td><td>" + r.variance + "</td><td>" + r.status + "</td></tr>";
+  }).join("");
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>Lecturer Contract Hours</title><style>" +
+    (typeof eocnsReportStyles === "function" ? eocnsReportStyles() : "body{font-family:Georgia,serif;padding:24px} table{border-collapse:collapse;width:100%} th,td{border:1px solid #ccc;padding:6px}") +
+    "</style></head><body>" +
+    "<h1>EOCNS LECTURER HOURS REPORT<span class=\"gold\">Contract vs delivered · " + p.month + "</span></h1>" +
+    "<div class=\"sub\">Delivered hours = lecture log durations (Held/Partial) + remedial hours for the month.</div><hr class=\"rule\"/>" +
+    "<table><thead><tr><th>#</th><th>Lecturer</th><th>Staff ID</th><th>Contract</th><th>Delivered</th><th>Remedial</th><th>Variance</th><th>Status</th></tr></thead><tbody>" +
+    rows + "</tbody></table>" +
+    "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + "</div></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 300);
+}
+
 })();
   if (document.getElementById("qaDailyDate") && !document.getElementById("qaDailyDate").value) {
     document.getElementById("qaDailyDate").value = todayStr;
@@ -1828,6 +2069,14 @@ function printMonthlyProfessionalPack(payload) {
   document.getElementById("btnBuildAttendance") && document.getElementById("btnBuildAttendance").addEventListener("click", buildAttendanceSheet);
   document.getElementById("btnSaveAttendance") && document.getElementById("btnSaveAttendance").addEventListener("click", saveAttendanceSheet);
   document.getElementById("btnPrintAttendance") && document.getElementById("btnPrintAttendance").addEventListener("click", printAttendanceSheet);
+  document.getElementById("btnDownloadAttendanceDocx") && document.getElementById("btnDownloadAttendanceDocx").addEventListener("click", downloadAttendanceAsWord);
+  document.getElementById("btnAddRemedial") && document.getElementById("btnAddRemedial").addEventListener("click", function() { openRemedialForm(null); });
+  document.getElementById("remedialForm") && document.getElementById("remedialForm").addEventListener("submit", saveRemedial);
+  document.getElementById("btnCancelRemedial") && document.getElementById("btnCancelRemedial").addEventListener("click", closeRemedialForm);
+  document.getElementById("btnCloseRemedial") && document.getElementById("btnCloseRemedial").addEventListener("click", closeRemedialForm);
+  document.getElementById("remedialModalBackdrop") && document.getElementById("remedialModalBackdrop").addEventListener("click", closeRemedialForm);
+  document.getElementById("btnBuildLecturerHours") && document.getElementById("btnBuildLecturerHours").addEventListener("click", buildLecturerHoursReport);
+  document.getElementById("btnPrintLecturerHours") && document.getElementById("btnPrintLecturerHours").addEventListener("click", printLecturerHoursPack);
   document.getElementById("btnAddCourse") && document.getElementById("btnAddCourse").addEventListener("click", addCoursePrompt);
   document.getElementById("btnAddTimetableSlot") && document.getElementById("btnAddTimetableSlot").addEventListener("click", addTimetableSlot);
   document.getElementById("btnSaveTimetable") && document.getElementById("btnSaveTimetable").addEventListener("click", saveTimetableLocal);
@@ -1900,6 +2149,7 @@ const DATA_FILES = {
   timetables: "data/timetables.json",
   attendance: "data/attendance.json",
   hostel_runs: "data/hostel_runs.json",
+  remedial: "data/remedial.json",
   config: "data/config.json",
 };
 let APP_CONFIG = { qaPin: "EOCNS-QA" };
@@ -2047,6 +2297,7 @@ async function hydrateAllFromRepoIfEmpty() {
   await fillIfEmpty("courses", DATA_FILES.courses, "courses");
   await fillIfEmpty("attendance", DATA_FILES.attendance, "attendance");
   await fillIfEmpty("hostel_runs", DATA_FILES.hostel_runs, "hostel runs");
+  await fillIfEmpty("remedial", DATA_FILES.remedial, "remedial");
   try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config); } catch (e) { console.warn("config", e); }
   try { TIMETABLES_CACHE = await fetchRepoJson(DATA_FILES.timetables); } catch (e) { TIMETABLES_CACHE = {}; }
   PROGRAMMES_CACHE = await getAll("programmes");
@@ -2199,6 +2450,7 @@ async function publishAllToRepo() {
     if (TIMETABLES_CACHE) files[DATA_FILES.timetables] = JSON.stringify(TIMETABLES_CACHE, null, 2);
     files[DATA_FILES.attendance] = JSON.stringify(await getAll("attendance"), null, 2);
     files[DATA_FILES.hostel_runs] = JSON.stringify(await getAll("hostel_runs"), null, 2);
+    files[DATA_FILES.remedial] = JSON.stringify(await getAll("remedial"), null, 2);
 
     var key = (APP_CONFIG.publishWorkerKey || "").trim();
     var headers = { "Content-Type": "application/json" };
@@ -3396,6 +3648,7 @@ async function exportFullSnapshot() {
     courses: await getAll("courses"),
     attendance: await getAll("attendance"),
     hostel_runs: await getAll("hostel_runs"),
+    remedial: await getAll("remedial"),
     timetables: TIMETABLES_CACHE || {}
   };
   downloadJsonReport("EOCNS_Snapshot_" + new Date().toISOString().slice(0, 10) + ".json", snap);
@@ -3422,6 +3675,7 @@ async function importFullSnapshot(file) {
   if (snap.courses) await replaceStore("courses", snap.courses);
   if (snap.attendance) await replaceStore("attendance", snap.attendance);
   if (snap.hostel_runs) await replaceStore("hostel_runs", snap.hostel_runs);
+  if (snap.remedial) await replaceStore("remedial", snap.remedial);
   if (snap.timetables) TIMETABLES_CACHE = snap.timetables;
   markDirty("snapshot import");
   await renderStudentsTable();
@@ -3657,6 +3911,225 @@ function printMonthlyProfessionalPack(payload) {
     "<div class=\"footer\">— End of Monthly QA Report — · Eastern Oak College of Nursing Sciences</div></body></html>");
   w.document.close();
   setTimeout(function() { w.print(); }, 400);
+}
+
+
+function downloadAttendanceAsWord() {
+  var root = document.getElementById("attendancePrintRoot");
+  if (!root) { alert("Build a sheet first (programme + level)."); return; }
+  var prog = (document.getElementById("attProgramme") && document.getElementById("attProgramme").value) || "";
+  var level = (document.getElementById("attLevel") && document.getElementById("attLevel").value) || "";
+  var htmlContent = root.innerHTML;
+  // Word-compatible HTML document (opens editable in Microsoft Word / Google Docs / LibreOffice)
+  var doc =
+    "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>" +
+    "<head><meta charset='utf-8'><title>EOCNS Attendance Sheet</title>" +
+    "<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]-->" +
+    "<style>" +
+    "body{font-family:Arial,Helvetica,sans-serif;font-size:11pt;color:#000}" +
+    "h1, .att-sheet-title{font-size:14pt;text-align:center;text-transform:uppercase;margin:0 0 12pt}" +
+    "table{border-collapse:collapse;width:100%}" +
+    "th,td{border:1px solid #000;padding:6pt 4pt;vertical-align:middle}" +
+    "th{background:#f0f0f0;font-weight:bold;text-align:center}" +
+    ".att-sn{width:40px;text-align:center}" +
+    ".att-mark-cell{height:22pt;width:70px}" +
+    ".att-sig-line{margin:10pt 0;font-size:10pt}" +
+    "</style></head><body>" + htmlContent + "</body></html>";
+  var blob = new Blob(["\ufeff", doc], { type: "application/msword" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  var safe = (prog + "_L" + level).replace(/[^\w\-]+/g, "_");
+  a.href = url;
+  a.download = "EOCNS_Attendance_" + safe + ".doc";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function() { URL.revokeObjectURL(url); a.remove(); }, 500);
+}
+
+async function renderRemedialTable() {
+  var list = await getAll("remedial");
+  list.sort(function(a, b) { return String(b.date || "").localeCompare(String(a.date || "")); });
+  var tbody = document.getElementById("remedialTableBody");
+  var empty = document.getElementById("remedialEmpty");
+  if (!tbody) return;
+  if (!list.length) {
+    tbody.innerHTML = "";
+    if (empty) empty.hidden = false;
+    return;
+  }
+  if (empty) empty.hidden = true;
+  tbody.innerHTML = list.map(function(r) {
+    var actions = isQaOfficer()
+      ? ('<button type="button" class="icon-btn-sm" data-edit-rem="' + r.id + '">Edit</button> <button type="button" class="icon-btn-sm" data-del-rem="' + r.id + '">Del</button>')
+      : "";
+    return "<tr><td>" + escapeHtml(r.date || "") + "</td><td>" + escapeHtml(r.course || "") +
+      "</td><td>" + escapeHtml(r.lecturer || "") + "</td><td>" + escapeHtml(String(r.hours || "")) +
+      "</td><td>" + escapeHtml(r.classKey || "") + "</td><td>" + escapeHtml(r.reason || "") +
+      "</td><td>" + escapeHtml(r.ref || "") + "</td><td class=\"qa-edit-only\">" + actions + "</td></tr>";
+  }).join("");
+  tbody.querySelectorAll("[data-edit-rem]").forEach(function(btn) {
+    btn.addEventListener("click", function() { openRemedialForm(btn.getAttribute("data-edit-rem")); });
+  });
+  tbody.querySelectorAll("[data-del-rem]").forEach(function(btn) {
+    btn.addEventListener("click", function() { deleteRemedial(btn.getAttribute("data-del-rem")); });
+  });
+}
+
+async function fillRemedialSelects() {
+  await seedQaDatalists();
+  var cSel = document.getElementById("remedialCourse");
+  var lSel = document.getElementById("remedialLecturer");
+  if (cSel) {
+    var opts = '<option value="">— Select —</option>';
+    (COURSES_CACHE || []).forEach(function(c) {
+      var label = c.code + (c.name ? (" — " + c.name) : "");
+      opts += '<option value="' + escapeHtml(label) + '">' + escapeHtml(label) + '</option>';
+    });
+    cSel.innerHTML = opts;
+  }
+  if (lSel) {
+    await loadLecturers();
+    var optsL = '<option value="">— Select —</option>';
+    (lecturersCache || []).filter(function(l) { return !l.status || l.status === "Active"; }).forEach(function(l) {
+      optsL += '<option value="' + escapeHtml(l.name) + '">' + escapeHtml(l.name) + '</option>';
+    });
+    lSel.innerHTML = optsL;
+  }
+}
+
+async function openRemedialForm(id) {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to log remedial sessions."); return; }
+  await fillRemedialSelects();
+  document.getElementById("remedialForm").reset();
+  document.getElementById("remedialId").value = id || "";
+  document.getElementById("remedialModalTitle").textContent = id ? "Edit remedial session" : "Log remedial session";
+  if (id) {
+    var list = await getAll("remedial");
+    var r = list.find(function(x) { return x.id === id; });
+    if (r) {
+      document.getElementById("remedialDate").value = r.date || "";
+      document.getElementById("remedialHours").value = r.hours != null ? r.hours : 2;
+      document.getElementById("remedialCourse").value = r.course || "";
+      document.getElementById("remedialLecturer").value = r.lecturer || "";
+      document.getElementById("remedialClass").value = r.classKey || "100_nursing";
+      document.getElementById("remedialReason").value = r.reason || "";
+      document.getElementById("remedialRef").value = r.ref || "";
+    }
+  }
+  document.getElementById("remedialModal").hidden = false;
+}
+
+function closeRemedialForm() {
+  document.getElementById("remedialModal").hidden = true;
+}
+
+async function saveRemedial(e) {
+  e.preventDefault();
+  if (!isQaOfficer()) return;
+  var id = document.getElementById("remedialId").value || null;
+  var ref = (document.getElementById("remedialRef").value || "").trim();
+  if (!ref) { alert("Official REF is required."); return; }
+  var now = new Date().toISOString();
+  var rec = {
+    id: id || ("rem_" + Date.now().toString(36)),
+    date: document.getElementById("remedialDate").value,
+    hours: Number(document.getElementById("remedialHours").value) || 0,
+    course: document.getElementById("remedialCourse").value,
+    lecturer: document.getElementById("remedialLecturer").value,
+    classKey: document.getElementById("remedialClass").value,
+    reason: (document.getElementById("remedialReason").value || "").trim(),
+    ref: ref,
+    updatedAt: now
+  };
+  if (!id) rec.createdAt = now;
+  await put("remedial", rec);
+  await writeAudit({
+    action: id ? "update" : "create",
+    entity: "remedial",
+    entityId: rec.id,
+    externalRef: ref,
+    reason: id ? "Remedial session updated" : "Remedial session logged",
+    details: { date: rec.date, course: rec.course, lecturer: rec.lecturer, hours: rec.hours }
+  });
+  markDirty("remedial");
+  closeRemedialForm();
+  await renderRemedialTable();
+}
+
+async function deleteRemedial(id) {
+  if (!isQaOfficer()) return;
+  var ref = prompt("Official REF to delete this remedial record:", "REF/EOCNS/QA/");
+  if (!ref || !String(ref).trim()) return;
+  if (!confirm("Delete this remedial session?")) return;
+  await del("remedial", id);
+  await writeAudit({ action: "delete", entity: "remedial", entityId: id, externalRef: String(ref).trim(), reason: "Remedial session deleted" });
+  markDirty("remedial");
+  await renderRemedialTable();
+}
+
+async function buildLecturerHoursReport() {
+  var monthVal = (document.getElementById("lecturerHoursMonth") && document.getElementById("lecturerHoursMonth").value) || "";
+  if (!monthVal) { alert("Choose a month."); return; }
+  await loadLecturers();
+  var qa = await getQaEntries();
+  var rem = await getAll("remedial");
+  var rows = [];
+  lecturersCache.filter(function(l) { return !l.status || l.status === "Active"; }).forEach(function(l) {
+    var contract = Number(l.contractHoursPerMonth) || 0;
+    var deliveredMin = 0;
+    qa.forEach(function(e) {
+      if (String(e.date || "").slice(0, 7) !== monthVal) return;
+      if ((e.lecturer || "") !== l.name) return;
+      if (e.status === "Missed") return;
+      deliveredMin += Number(e.duration) || 0;
+    });
+    var remHours = 0;
+    rem.forEach(function(r) {
+      if (String(r.date || "").slice(0, 7) !== monthVal) return;
+      if ((r.lecturer || "") !== l.name) return;
+      remHours += Number(r.hours) || 0;
+    });
+    var delivered = Math.round((deliveredMin / 60) * 10) / 10 + remHours;
+    var variance = Math.round((delivered - contract) * 10) / 10;
+    rows.push({
+      name: l.name,
+      staffId: l.staffId || "",
+      contract: contract,
+      delivered: delivered,
+      remedial: remHours,
+      variance: variance,
+      status: contract <= 0 ? "No contract set" : (variance >= 0 ? "Met / over" : "Below contract")
+    });
+  });
+  window.__lecturerHoursPayload = { month: monthVal, rows: rows };
+  var body = document.getElementById("lecturerHoursResult");
+  if (!body) return;
+  body.innerHTML = '<div class="card__body"><table class="data-table"><thead><tr><th>Lecturer</th><th>Staff ID</th><th>Contract h/mo</th><th>Delivered (logs+remedial)</th><th>Of which remedial</th><th>Variance</th><th>Status</th></tr></thead><tbody>' +
+    rows.map(function(r) {
+      return "<tr><td>" + escapeHtml(r.name) + "</td><td>" + escapeHtml(r.staffId) + "</td><td>" + r.contract +
+        "</td><td>" + r.delivered + "</td><td>" + r.remedial + "</td><td>" + r.variance + "</td><td>" + escapeHtml(r.status) + "</td></tr>";
+    }).join("") + "</tbody></table></div>";
+}
+
+function printLecturerHoursPack() {
+  var p = window.__lecturerHoursPayload;
+  if (!p) { alert("Build the report first."); return; }
+  var rows = p.rows.map(function(r, i) {
+    return "<tr><td>" + (i + 1) + "</td><td>" + r.name + "</td><td>" + r.staffId + "</td><td>" + r.contract +
+      "</td><td>" + r.delivered + "</td><td>" + r.remedial + "</td><td>" + r.variance + "</td><td>" + r.status + "</td></tr>";
+  }).join("");
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>Lecturer Contract Hours</title><style>" +
+    (typeof eocnsReportStyles === "function" ? eocnsReportStyles() : "body{font-family:Georgia,serif;padding:24px} table{border-collapse:collapse;width:100%} th,td{border:1px solid #ccc;padding:6px}") +
+    "</style></head><body>" +
+    "<h1>EOCNS LECTURER HOURS REPORT<span class=\"gold\">Contract vs delivered · " + p.month + "</span></h1>" +
+    "<div class=\"sub\">Delivered hours = lecture log durations (Held/Partial) + remedial hours for the month.</div><hr class=\"rule\"/>" +
+    "<table><thead><tr><th>#</th><th>Lecturer</th><th>Staff ID</th><th>Contract</th><th>Delivered</th><th>Remedial</th><th>Variance</th><th>Status</th></tr></thead><tbody>" +
+    rows + "</tbody></table>" +
+    "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + "</div></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 300);
 }
 
 })();
