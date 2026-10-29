@@ -2747,41 +2747,63 @@ async function changeQaOfficerPin() {
     setStatus("New PIN is the same as the current PIN.");
     return;
   }
-  if (!confirm("Update the QA officer PIN in the repository now? Other devices will use the new PIN after they refresh and reload config.")) return;
+  if (!confirm("Update the QA officer PIN in the repository now? Other devices will use the new PIN after they refresh.")) return;
 
-  // Update local config
-  APP_CONFIG = Object.assign({}, APP_CONFIG, {
-    qaPin: neu,
-    qaPinNote: "Officer password. Rotated " + new Date().toISOString().slice(0, 10) + ".",
-    qaPinUpdatedAt: new Date().toISOString()
-  });
-
+  // Refresh worker URL/key from repo config if possible (do not overwrite qaPin yet)
   var workerUrl = (APP_CONFIG.publishWorkerUrl || "").trim();
   var pubKey = (APP_CONFIG.publishWorkerKey || "").trim();
+  try {
+    var remoteCfg = await fetchRepoJson(DATA_FILES.config + "?t=" + Date.now());
+    if (remoteCfg && remoteCfg.publishWorkerUrl) workerUrl = String(remoteCfg.publishWorkerUrl).trim();
+    if (remoteCfg && remoteCfg.publishWorkerKey) pubKey = String(remoteCfg.publishWorkerKey).trim();
+  } catch (_) {}
+
   if (!workerUrl) {
-    setStatus("PIN updated in this browser only. Publish worker URL is missing — set it in config and publish data/config.json.");
-    markDirty("config pin");
+    setStatus("publishWorkerUrl is missing in config. Cannot update the repository.");
     return;
   }
+
+  // Build next config — only apply locally AFTER successful push
+  var nextConfig = Object.assign({}, APP_CONFIG, {
+    qaPin: neu,
+    qaPinNote: "Officer password. Rotated " + new Date().toISOString().slice(0, 10) + ".",
+    qaPinUpdatedAt: new Date().toISOString(),
+    publishWorkerUrl: workerUrl,
+    publishWorkerKey: pubKey
+  });
 
   setStatus("Updating data/config.json via publish worker…");
   try {
     var files = {};
-    files[DATA_FILES.config] = JSON.stringify(APP_CONFIG, null, 2);
-    var res = await fetch(workerUrl, {
+    files[DATA_FILES.config] = JSON.stringify(nextConfig, null, 2);
+    // Same headers as normal Publish (CORS allows X-EOCNS-Key)
+    var headers = { "Content-Type": "application/json" };
+    if (pubKey) headers["X-EOCNS-Key"] = pubKey;
+
+    var res = await fetch(workerUrl.replace(/\/$/, ""), {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-Publish-Key": pubKey },
-      body: JSON.stringify({ publishKey: pubKey, files: files, message: "chore: rotate QA officer PIN" })
+      headers: headers,
+      body: JSON.stringify({
+        message: "chore: rotate QA officer PIN",
+        publishKey: pubKey,
+        files: files
+      })
     });
     var body = {};
     try { body = await res.json(); } catch (_) {}
     if (!res.ok) {
       var detail = body.error || body.message || res.statusText || ("HTTP " + res.status);
-      setStatus("Repository update failed: " + detail + ". Local PIN was updated in this session only — fix the worker and try again, or publish full data from Settings.");
-      markDirty("config pin");
+      if (/Path not allowed/i.test(detail)) {
+        detail += " — Redeploy the Cloudflare Worker with the latest code (config.json must be on the allow-list).";
+      }
+      if (/Unauthorized|401/i.test(detail)) {
+        detail += " — PUBLISH_KEY on the worker must match publishWorkerKey in config.";
+      }
+      setStatus("Repository update failed: " + detail + " PIN was NOT changed.");
       return;
     }
-    // Stay signed in; clear form fields
+    // Success: apply locally
+    APP_CONFIG = nextConfig;
     ["changePinCurrent", "changePinNew", "changePinConfirm"].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.value = "";
@@ -2796,13 +2818,18 @@ async function changeQaOfficerPin() {
         details: { rotatedAt: APP_CONFIG.qaPinUpdatedAt }
       });
     } catch (_) {}
-    setStatus("PIN updated in the repository (data/config.json). Use the new PIN on all devices after refresh. Keep it confidential.");
+    setStatus("PIN updated in the repository (data/config.json). Use the new PIN on all devices after refresh. Keep it confidential.", true);
   } catch (err) {
     console.error(err);
-    setStatus("Network error while updating repository: " + (err.message || String(err)) + ". Local session has the new PIN; publish when online.");
-    markDirty("config pin");
+    var msg = (err && err.message) ? err.message : String(err);
+    var hint = "";
+    if (/Failed to fetch|NetworkError|CORS|Load failed/i.test(msg)) {
+      hint = " Browser could not reach the Worker (URL, offline, or CORS). Confirm publishWorkerUrl and that the worker is deployed. PIN was NOT changed.";
+    }
+    setStatus("Could not update repository: " + msg + "." + hint);
   }
 }
+
 
 function initQaOfficerUI() {
   setQaOfficer(isQaOfficer());

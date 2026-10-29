@@ -24,13 +24,14 @@ const ALLOWED_PATHS = new Set([
   "data/remedial_assignments.json",
   "data/remedial_enrolment.json",
   "data/remedial_meta.json",
+  "data/config.json",
 ]);
 
 function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": origin || "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, X-EOCNS-Key",
+    "Access-Control-Allow-Headers": "Content-Type, X-EOCNS-Key, X-Publish-Key",
     "Access-Control-Max-Age": "86400",
   };
 }
@@ -112,6 +113,7 @@ export default {
     if (env.PUBLISH_KEY) {
       const key =
         request.headers.get("X-EOCNS-Key") ||
+        request.headers.get("X-Publish-Key") ||
         (payload && payload.publishKey) ||
         "";
       if (key !== env.PUBLISH_KEY) {
