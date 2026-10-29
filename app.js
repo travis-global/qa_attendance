@@ -46,7 +46,7 @@ function showView(viewId) {
   try { sessionStorage.setItem("eocns-last-view", viewId); } catch (_) {}
   if (viewId === "students") renderStudentsTable();
   if (viewId === "lecturers") renderLecturersTable();
-  if (viewId === "remedial") renderRemedialTable();
+  if (viewId === "remedial") showRemTab("setup");
   if (viewId === "lecturer-hours") {
     var m = document.getElementById("lecturerHoursMonth");
     if (m && !m.value) m.value = new Date().toISOString().slice(0, 7);
@@ -94,7 +94,7 @@ window.addEventListener("beforeunload", function(e) {
 });
 
 const DB_NAME = "eocns_attendance";
-const DB_VERSION = 7;
+const DB_VERSION = 8;
 let db = null;
 
 async function resetLocalDatabase() {
@@ -168,6 +168,12 @@ function openDB() {
         if (!database.objectStoreNames.contains("remedial")) {
           database.createObjectStore("remedial", { keyPath: "id" });
         }
+        if (!database.objectStoreNames.contains("remedial_meta")) database.createObjectStore("remedial_meta", { keyPath: "key" });
+        if (!database.objectStoreNames.contains("remedial_enrolment")) database.createObjectStore("remedial_enrolment", { keyPath: "id" });
+        if (!database.objectStoreNames.contains("remedial_assignments")) database.createObjectStore("remedial_assignments", { keyPath: "id" });
+        if (!database.objectStoreNames.contains("remedial_timetable")) database.createObjectStore("remedial_timetable", { keyPath: "key" });
+        if (!database.objectStoreNames.contains("remedial_logs")) database.createObjectStore("remedial_logs", { keyPath: "id" });
+
       } catch (upgradeErr) {
         console.error("onupgradeneeded", upgradeErr);
         throw upgradeErr;
@@ -1983,7 +1989,6 @@ async function buildLecturerHoursReport() {
   if (!monthVal) { alert("Choose a month."); return; }
   await loadLecturers();
   var qa = await getQaEntries();
-  var rem = await getAll("remedial");
   var rows = [];
   lecturersCache.filter(function(l) { return !l.status || l.status === "Active"; }).forEach(function(l) {
     var contract = Number(l.contractHoursPerMonth) || 0;
@@ -1994,20 +1999,13 @@ async function buildLecturerHoursReport() {
       if (e.status === "Missed") return;
       deliveredMin += Number(e.duration) || 0;
     });
-    var remHours = 0;
-    rem.forEach(function(r) {
-      if (String(r.date || "").slice(0, 7) !== monthVal) return;
-      if ((r.lecturer || "") !== l.name) return;
-      remHours += Number(r.hours) || 0;
-    });
-    var delivered = Math.round((deliveredMin / 60) * 10) / 10 + remHours;
+    var delivered = Math.round((deliveredMin / 60) * 10) / 10;
     var variance = Math.round((delivered - contract) * 10) / 10;
     rows.push({
       name: l.name,
       staffId: l.staffId || "",
       contract: contract,
       delivered: delivered,
-      remedial: remHours,
       variance: variance,
       status: contract <= 0 ? "No contract set" : (variance >= 0 ? "Met / over" : "Below contract")
     });
@@ -2015,10 +2013,10 @@ async function buildLecturerHoursReport() {
   window.__lecturerHoursPayload = { month: monthVal, rows: rows };
   var body = document.getElementById("lecturerHoursResult");
   if (!body) return;
-  body.innerHTML = '<div class="card__body"><table class="data-table"><thead><tr><th>Lecturer</th><th>Staff ID</th><th>Contract h/mo</th><th>Delivered (logs+remedial)</th><th>Of which remedial</th><th>Variance</th><th>Status</th></tr></thead><tbody>' +
+  body.innerHTML = '<div class="card__body"><p class="muted-note">Regular lecture logs only — remedial hours are excluded.</p><table class="data-table"><thead><tr><th>Lecturer</th><th>Staff ID</th><th>Contract h/mo</th><th>Delivered (regular logs)</th><th>Variance</th><th>Status</th></tr></thead><tbody>' +
     rows.map(function(r) {
       return "<tr><td>" + escapeHtml(r.name) + "</td><td>" + escapeHtml(r.staffId) + "</td><td>" + r.contract +
-        "</td><td>" + r.delivered + "</td><td>" + r.remedial + "</td><td>" + r.variance + "</td><td>" + escapeHtml(r.status) + "</td></tr>";
+        "</td><td>" + r.delivered + "</td><td>" + r.variance + "</td><td>" + escapeHtml(r.status) + "</td></tr>";
     }).join("") + "</tbody></table></div>";
 }
 
@@ -2027,21 +2025,498 @@ function printLecturerHoursPack() {
   if (!p) { alert("Build the report first."); return; }
   var rows = p.rows.map(function(r, i) {
     return "<tr><td>" + (i + 1) + "</td><td>" + r.name + "</td><td>" + r.staffId + "</td><td>" + r.contract +
-      "</td><td>" + r.delivered + "</td><td>" + r.remedial + "</td><td>" + r.variance + "</td><td>" + r.status + "</td></tr>";
+      "</td><td>" + r.delivered + "</td><td>" + r.variance + "</td><td>" + r.status + "</td></tr>";
   }).join("");
   var w = window.open("", "_blank");
   if (!w) return;
   w.document.write("<!DOCTYPE html><html><head><title>Lecturer Contract Hours</title><style>" +
     (typeof eocnsReportStyles === "function" ? eocnsReportStyles() : "body{font-family:Georgia,serif;padding:24px} table{border-collapse:collapse;width:100%} th,td{border:1px solid #ccc;padding:6px}") +
     "</style></head><body>" +
-    "<h1>EOCNS LECTURER HOURS REPORT<span class=\"gold\">Contract vs delivered · " + p.month + "</span></h1>" +
-    "<div class=\"sub\">Delivered hours = lecture log durations (Held/Partial) + remedial hours for the month.</div><hr class=\"rule\"/>" +
-    "<table><thead><tr><th>#</th><th>Lecturer</th><th>Staff ID</th><th>Contract</th><th>Delivered</th><th>Remedial</th><th>Variance</th><th>Status</th></tr></thead><tbody>" +
+    "<h1>EOCNS LECTURER HOURS REPORT<span class=\"gold\">Contract vs regular delivered · " + p.month + "</span></h1>" +
+    "<div class=\"sub\">Delivered hours from regular lecture logs only. Remedial system hours are reported separately.</div><hr class=\"rule\"/>" +
+    "<table><thead><tr><th>#</th><th>Lecturer</th><th>Staff ID</th><th>Contract</th><th>Delivered</th><th>Variance</th><th>Status</th></tr></thead><tbody>" +
     rows + "</tbody></table>" +
     "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + "</div></body></html>");
   w.document.close();
   setTimeout(function() { w.print(); }, 300);
 }
+
+
+// ========== REMEDIAL CLASS SYSTEM (standalone) ==========
+var REM_META = { sessionId: "", programmes: [], levels: [] };
+var REM_TT = { slots: [] };
+
+async function loadRemMeta() {
+  try {
+    var rows = await getAll("remedial_meta");
+    if (rows[0] && rows[0].value) REM_META = rows[0].value;
+  } catch (_) {}
+  if (!REM_META.programmes) REM_META.programmes = [];
+  if (!REM_META.levels) REM_META.levels = [];
+  return REM_META;
+}
+async function saveRemMeta() {
+  await put("remedial_meta", { key: "main", value: REM_META });
+  markDirty("remedial meta");
+}
+async function loadRemTt() {
+  try {
+    var rows = await getAll("remedial_timetable");
+    if (rows[0] && rows[0].value) REM_TT = rows[0].value;
+  } catch (_) {}
+  if (!REM_TT.slots) REM_TT.slots = [];
+  return REM_TT;
+}
+async function saveRemTt() {
+  await put("remedial_timetable", { key: "main", value: REM_TT });
+  markDirty("remedial timetable");
+}
+
+function showRemTab(tab) {
+  document.querySelectorAll(".rem-tab").forEach(function(b) {
+    b.classList.toggle("active", b.getAttribute("data-rem-tab") === tab);
+  });
+  ["setup","enrolment","timetable","logging","weekly","summary"].forEach(function(t) {
+    var el = document.getElementById("remPanel-" + t);
+    if (el) el.hidden = t !== tab;
+  });
+  if (tab === "setup") renderRemSetup();
+  if (tab === "enrolment") renderRemEnrolment();
+  if (tab === "timetable") { renderRemAssignments(); renderRemTimetable(); }
+  if (tab === "logging") fillRemLogCourses();
+}
+
+async function renderRemSetup() {
+  await loadRemMeta();
+  var pl = document.getElementById("remProgrammesList");
+  var ll = document.getElementById("remLevelsList");
+  if (pl) pl.innerHTML = (REM_META.programmes || []).map(function(p) {
+    return "<li>" + escapeHtml(p.name) + (isQaOfficer() ? ' <button type="button" class="icon-btn-sm" data-del-rem-prog="' + escapeHtml(p.id) + '">Del</button>' : "") + "</li>";
+  }).join("") || "<li>None yet</li>";
+  if (ll) ll.innerHTML = (REM_META.levels || []).map(function(p) {
+    return "<li>" + escapeHtml(p.name) + (isQaOfficer() ? ' <button type="button" class="icon-btn-sm" data-del-rem-lvl="' + escapeHtml(p.id) + '">Del</button>' : "") + "</li>";
+  }).join("") || "<li>None yet</li>";
+  pl && pl.querySelectorAll("[data-del-rem-prog]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!isQaOfficer()) return;
+      REM_META.programmes = REM_META.programmes.filter(function(p) { return p.id !== btn.getAttribute("data-del-rem-prog"); });
+      await saveRemMeta(); renderRemSetup();
+    });
+  });
+  ll && ll.querySelectorAll("[data-del-rem-lvl]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!isQaOfficer()) return;
+      REM_META.levels = REM_META.levels.filter(function(p) { return p.id !== btn.getAttribute("data-del-rem-lvl"); });
+      await saveRemMeta(); renderRemSetup();
+    });
+  });
+  var sessions = await getAll("sessions");
+  var sel = document.getElementById("remActiveSession");
+  if (sel) {
+    sel.innerHTML = '<option value="">— Select session —</option>' + sessions.map(function(s) {
+      return '<option value="' + escapeHtml(s.id) + '"' + (REM_META.sessionId === s.id ? " selected" : "") + ">" + escapeHtml(s.name) + "</option>";
+    }).join("");
+  }
+}
+
+async function renderRemEnrolment() {
+  await loadRemMeta();
+  var progSel = document.getElementById("remEnrFilterProg");
+  var lvlSel = document.getElementById("remEnrFilterLevel");
+  if (progSel) {
+    progSel.innerHTML = '<option value="">All programmes</option>' + (REM_META.programmes || []).map(function(p) {
+      return '<option value="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</option>";
+    }).join("");
+  }
+  if (lvlSel) {
+    lvlSel.innerHTML = '<option value="">All levels</option>' + (REM_META.levels || []).map(function(p) {
+      return '<option value="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</option>";
+    }).join("");
+  }
+  var fp = (progSel && progSel.value) || "";
+  var fl = (lvlSel && lvlSel.value) || "";
+  var list = await getAll("remedial_enrolment");
+  list = list.filter(function(s) {
+    if (fp && s.programme !== fp) return false;
+    if (fl && s.level !== fl) return false;
+    return true;
+  }).sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
+  var body = document.getElementById("remEnrolmentBody");
+  var empty = document.getElementById("remEnrolmentEmpty");
+  if (!body) return;
+  if (!list.length) {
+    body.innerHTML = "";
+    if (empty) empty.hidden = false;
+    return;
+  }
+  if (empty) empty.hidden = true;
+  body.innerHTML = list.map(function(s) {
+    var actions = isQaOfficer() ? ('<button type="button" class="icon-btn-sm" data-edit-renr="' + s.id + '">Edit</button> <button type="button" class="icon-btn-sm" data-del-renr="' + s.id + '">Del</button>') : "";
+    return "<tr><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.matric) + "</td><td>" + escapeHtml(s.programme || "") +
+      "</td><td>" + escapeHtml(s.level || "") + "</td><td>" + escapeHtml((s.courses || []).join(", ")) +
+      "</td><td class=\"qa-edit-only\">" + actions + "</td></tr>";
+  }).join("");
+  body.querySelectorAll("[data-edit-renr]").forEach(function(btn) {
+    btn.addEventListener("click", function() { openRemEnrolForm(btn.getAttribute("data-edit-renr")); });
+  });
+  body.querySelectorAll("[data-del-renr]").forEach(function(btn) {
+    btn.addEventListener("click", function() { deleteRemEnrol(btn.getAttribute("data-del-renr")); });
+  });
+}
+
+async function openRemEnrolForm(id) {
+  if (!isQaOfficer()) return;
+  await loadRemMeta();
+  document.getElementById("remEnrolForm").reset();
+  document.getElementById("remEnrolId").value = id || "";
+  var ps = document.getElementById("remEnrolProg");
+  var ls = document.getElementById("remEnrolLevel");
+  ps.innerHTML = (REM_META.programmes || []).map(function(p) { return '<option value="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</option>"; }).join("") || '<option value="">—</option>';
+  ls.innerHTML = (REM_META.levels || []).map(function(p) { return '<option value="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</option>"; }).join("") || '<option value="">—</option>';
+  if (id) {
+    var list = await getAll("remedial_enrolment");
+    var s = list.find(function(x) { return x.id === id; });
+    if (s) {
+      document.getElementById("remEnrolName").value = s.name || "";
+      document.getElementById("remEnrolMatric").value = s.matric || "";
+      document.getElementById("remEnrolProg").value = s.programme || "";
+      document.getElementById("remEnrolLevel").value = s.level || "";
+      document.getElementById("remEnrolCourses").value = (s.courses || []).join(", ");
+      document.getElementById("remEnrolRef").value = s.ref || "";
+    }
+  }
+  document.getElementById("remEnrolModal").hidden = false;
+}
+
+async function saveRemEnrol(e) {
+  e.preventDefault();
+  if (!isQaOfficer()) return;
+  var ref = (document.getElementById("remEnrolRef").value || "").trim();
+  if (!ref) { alert("REF required"); return; }
+  var id = document.getElementById("remEnrolId").value || null;
+  var courses = document.getElementById("remEnrolCourses").value.split(",").map(function(c) { return c.trim(); }).filter(Boolean);
+  var rec = {
+    id: id || ("renr_" + Date.now().toString(36)),
+    name: document.getElementById("remEnrolName").value.trim(),
+    matric: document.getElementById("remEnrolMatric").value.trim(),
+    programme: document.getElementById("remEnrolProg").value,
+    level: document.getElementById("remEnrolLevel").value,
+    courses: courses,
+    ref: ref,
+    updatedAt: new Date().toISOString()
+  };
+  await put("remedial_enrolment", rec);
+  await writeAudit({ action: id ? "update" : "create", entity: "remedial_enrolment", entityId: rec.id, externalRef: ref, reason: "Remedial enrolment", details: { name: rec.name, courses: courses } });
+  markDirty("remedial enrolment");
+  document.getElementById("remEnrolModal").hidden = true;
+  await renderRemEnrolment();
+}
+
+async function deleteRemEnrol(id) {
+  if (!isQaOfficer()) return;
+  var ref = prompt("REF to delete enrolment:", "REF/EOCNS/QA/");
+  if (!ref) return;
+  await del("remedial_enrolment", id);
+  await writeAudit({ action: "delete", entity: "remedial_enrolment", entityId: id, externalRef: String(ref).trim(), reason: "Remedial enrolment removed" });
+  markDirty("remedial enrolment");
+  await renderRemEnrolment();
+}
+
+async function renderRemAssignments() {
+  var list = await getAll("remedial_assignments");
+  var body = document.getElementById("remAssignBody");
+  if (!body) return;
+  body.innerHTML = list.length ? list.map(function(a) {
+    var del = isQaOfficer() ? '<button type="button" class="icon-btn-sm" data-del-rass="' + a.id + '">Del</button>' : "";
+    return "<tr><td>" + escapeHtml(a.code) + "</td><td>" + escapeHtml(a.title || "") + "</td><td>" + escapeHtml(a.lecturer || "") +
+      "</td><td>" + escapeHtml(String(a.hours != null ? a.hours : 2)) + "</td><td class=\"qa-edit-only\">" + del + "</td></tr>";
+  }).join("") : "<tr><td colspan=\"5\">No assignments</td></tr>";
+  body.querySelectorAll("[data-del-rass]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!isQaOfficer()) return;
+      await del("remedial_assignments", btn.getAttribute("data-del-rass"));
+      markDirty("remedial assignments");
+      renderRemAssignments(); fillRemLogCourses();
+    });
+  });
+}
+
+async function renderRemTimetable() {
+  await loadRemTt();
+  var body = document.getElementById("remTtBody");
+  if (!body) return;
+  body.innerHTML = (REM_TT.slots || []).map(function(s, idx) {
+    return "<tr><td>" + s.weekday + "</td><td>" + escapeHtml(s.code || "") + "</td><td>" + escapeHtml(s.start || "") +
+      "</td><td>" + escapeHtml(s.end || "") + "</td><td>" + (s.hours != null ? s.hours : 2) +
+      "</td><td class=\"qa-edit-only\"><button type=\"button\" class=\"icon-btn-sm\" data-del-rtt=\"" + idx + "\">Del</button></td></tr>";
+  }).join("") || "<tr><td colspan=\"6\">No slots</td></tr>";
+  body.querySelectorAll("[data-del-rtt]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!isQaOfficer()) return;
+      REM_TT.slots.splice(Number(btn.getAttribute("data-del-rtt")), 1);
+      await saveRemTt(); renderRemTimetable();
+    });
+  });
+}
+
+async function fillRemLogCourses() {
+  var assigns = await getAll("remedial_assignments");
+  var sel = document.getElementById("remLogCourse");
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Select —</option>' + assigns.map(function(a) {
+    return '<option value="' + escapeHtml(a.code) + '">' + escapeHtml(a.code + (a.title ? " — " + a.title : "")) + "</option>";
+  }).join("");
+}
+
+async function loadRemLogSheet() {
+  var date = document.getElementById("remLogDate").value;
+  var code = document.getElementById("remLogCourse").value;
+  if (!date || !code) { alert("Date and course required"); return; }
+  var enrolled = (await getAll("remedial_enrolment")).filter(function(s) {
+    return (s.courses || []).some(function(c) { return String(c).toUpperCase().indexOf(code.toUpperCase()) >= 0 || code.toUpperCase().indexOf(String(c).toUpperCase()) >= 0; });
+  });
+  var logs = await getAll("remedial_logs");
+  var existing = logs.find(function(l) { return l.date === date && l.courseCode === code; });
+  var marks = (existing && existing.marks) || {};
+  var assigns = await getAll("remedial_assignments");
+  var asg = assigns.find(function(a) { return a.code === code; }) || {};
+  window.__remLogMeta = { date: date, courseCode: code, lecturer: asg.lecturer || "", hours: asg.hours != null ? asg.hours : 2, studentIds: enrolled.map(function(s) { return s.id; }) };
+  var sheet = document.getElementById("remLogSheet");
+  if (!sheet) return;
+  if (!enrolled.length) {
+    sheet.innerHTML = '<div class="card__body"><p>No students enrolled for ' + escapeHtml(code) + '.</p></div>';
+    return;
+  }
+  sheet.innerHTML = '<div class="card__body"><p><strong>' + escapeHtml(code) + '</strong> · ' + escapeHtml(asg.lecturer || "Lecturer TBA") +
+    ' · ' + enrolled.length + ' enrolled</p><table class="data-table"><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>P</th><th>A</th></tr></thead><tbody>' +
+    enrolled.map(function(s, i) {
+      var m = marks[s.id] || "";
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.matric) +
+        '</td><td><input type="radio" name="rem-' + s.id + '" value="P"' + (m === "P" ? " checked" : "") +
+        '/></td><td><input type="radio" name="rem-' + s.id + '" value="A"' + (m === "A" ? " checked" : "") + "/></td></tr>";
+    }).join("") + "</tbody></table></div>";
+}
+
+async function saveRemLog() {
+  if (!isQaOfficer()) return;
+  var meta = window.__remLogMeta;
+  if (!meta) { alert("Load a sheet first"); return; }
+  var ref = prompt("Official REF for this remedial lecture log:", "REF/EOCNS/QA/");
+  if (!ref || !String(ref).trim()) return;
+  var marks = {};
+  (meta.studentIds || []).forEach(function(id) {
+    var el = document.querySelector('input[name="rem-' + id + '"]:checked');
+    if (el) marks[id] = el.value;
+  });
+  var logs = await getAll("remedial_logs");
+  var prev = logs.find(function(l) { return l.date === meta.date && l.courseCode === meta.courseCode; });
+  var rec = {
+    id: prev ? prev.id : ("rlog_" + Date.now().toString(36)),
+    date: meta.date,
+    courseCode: meta.courseCode,
+    lecturer: meta.lecturer,
+    hours: meta.hours,
+    marks: marks,
+    status: "Held",
+    ref: String(ref).trim(),
+    updatedAt: new Date().toISOString()
+  };
+  await put("remedial_logs", rec);
+  await writeAudit({ action: prev ? "update" : "create", entity: "remedial_logs", entityId: rec.id, externalRef: rec.ref, reason: "Remedial lecture attendance log", details: { date: meta.date, course: meta.courseCode } });
+  markDirty("remedial logs");
+  alert("Remedial lecture log saved.");
+}
+
+function parseExcludeDates(raw) {
+  return String(raw || "").split(/[,;\s]+/).map(function(s) { return s.trim(); }).filter(Boolean);
+}
+
+async function computeRemWeekly(start, end, excluded) {
+  var enrolled = await getAll("remedial_enrolment");
+  var logs = await getAll("remedial_logs");
+  var assigns = await getAll("remedial_assignments");
+  await loadRemTt();
+  var days = [];
+  var c = new Date(start + "T12:00:00");
+  var e = new Date(end + "T12:00:00");
+  while (c <= e) {
+    var iso = c.toISOString().slice(0, 10);
+    if (excluded.indexOf(iso) < 0) days.push(iso);
+    c.setDate(c.getDate() + 1);
+  }
+  // course days from logs in range
+  var logsIn = logs.filter(function(l) { return l.date >= start && l.date <= end && excluded.indexOf(l.date) < 0; });
+  // per student course-specific attendance
+  var studentRows = enrolled.map(function(s) {
+    var courses = s.courses || [];
+    var possible = 0, present = 0;
+    logsIn.forEach(function(l) {
+      var match = courses.some(function(c) {
+        return String(c).toUpperCase().indexOf(String(l.courseCode).toUpperCase()) >= 0 ||
+          String(l.courseCode).toUpperCase().indexOf(String(c).toUpperCase()) >= 0;
+      });
+      if (!match) return;
+      possible += 1;
+      if (l.marks && l.marks[s.id] === "P") present += 1;
+    });
+    var pct = possible ? Math.round((present / possible) * 1000) / 10 : null;
+    return { name: s.name, matric: s.matric, programme: s.programme, level: s.level, courses: courses, present: present, possible: possible, pct: pct };
+  });
+  // lecturer hours
+  var lecMap = {};
+  assigns.forEach(function(a) {
+    lecMap[a.lecturer || "Unassigned"] = lecMap[a.lecturer || "Unassigned"] || { lecturer: a.lecturer || "Unassigned", courses: [], taught: 0, missed: 0 };
+    if (a.code) lecMap[a.lecturer || "Unassigned"].courses.push(a.code);
+  });
+  logsIn.forEach(function(l) {
+    var key = l.lecturer || "Unassigned";
+    lecMap[key] = lecMap[key] || { lecturer: key, courses: [], taught: 0, missed: 0 };
+    if (l.status === "Missed") lecMap[key].missed += Number(l.hours) || 0;
+    else lecMap[key].taught += Number(l.hours) || 0;
+  });
+  var confirmed = studentRows.filter(function(s) { return s.possible > 0 || (s.courses && s.courses.length); });
+  var withPct = confirmed.filter(function(s) { return s.pct != null; });
+  var avg = withPct.length ? Math.round((withPct.reduce(function(a, s) { return a + s.pct; }, 0) / withPct.length) * 10) / 10 : 0;
+  var zero = withPct.filter(function(s) { return s.pct === 0; }).length;
+  var perfect = withPct.filter(function(s) { return s.pct === 100; });
+  return {
+    start: start, end: end, excluded: excluded, lectureDays: days.length,
+    registered: enrolled.length, avg: avg, zero: zero, perfect: perfect,
+    studentRows: studentRows, lecturerRows: Object.keys(lecMap).map(function(k) { return lecMap[k]; }),
+    logsIn: logsIn
+  };
+}
+
+async function buildRemWeekly() {
+  var start = document.getElementById("remWeekStart").value;
+  var end = document.getElementById("remWeekEnd").value;
+  var excluded = parseExcludeDates(document.getElementById("remWeekExclude").value);
+  if (!start || !end) { alert("Start and end dates required"); return; }
+  var data = await computeRemWeekly(start, end, excluded);
+  window.__remWeekly = data;
+  var el = document.getElementById("remWeeklyResult");
+  if (!el) return;
+  el.innerHTML = '<div class="pro-report"><h3>Weekly remedial analysis</h3>' +
+    '<div class="stats-grid">' +
+    '<div class="stat-card"><div class="stat-card__body"><span class="stat-card__value">' + data.registered + '</span><span class="stat-card__label">Registered</span></div></div>' +
+    '<div class="stat-card"><div class="stat-card__body"><span class="stat-card__value">' + data.lectureDays + '</span><span class="stat-card__label">Lecture days</span></div></div>' +
+    '<div class="stat-card"><div class="stat-card__body"><span class="stat-card__value">' + data.avg + '%</span><span class="stat-card__label">Avg attendance</span></div></div>' +
+    '<div class="stat-card"><div class="stat-card__body"><span class="stat-card__value">' + data.zero + '</span><span class="stat-card__label">Zero att.</span></div></div>' +
+    '</div><p class="muted-note">Course-specific rates use the official enrolment list. Print for the full professional pack.</p></div>';
+}
+
+function printRemWeeklyPack() {
+  var d = window.__remWeekly;
+  if (!d) { alert("Build weekly analysis first"); return; }
+  var byProg = {};
+  d.studentRows.forEach(function(s) {
+    var p = s.programme || "Other";
+    byProg[p] = byProg[p] || [];
+    byProg[p].push(s);
+  });
+  var progTables = Object.keys(byProg).map(function(p) {
+    var rows = byProg[p].map(function(s, i) {
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.matric) +
+        "</td><td>" + escapeHtml((s.courses || []).join(", ")) + "</td><td>" + s.present + "/" + s.possible +
+        "</td><td>" + (s.pct != null ? s.pct + "%" : "—") + "</td></tr>";
+    }).join("");
+    return "<h2>STUDENT ATTENDANCE — " + escapeHtml(p.toUpperCase()) + " (Course-Specific)</h2>" +
+      "<table><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>Enrolled Courses</th><th>Sess. P/Poss</th><th>%</th></tr></thead><tbody>" +
+      rows + "</tbody></table>";
+  }).join("");
+  var lecRows = d.lecturerRows.map(function(r) {
+    return "<tr><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
+      "</td><td>" + r.taught + "h</td><td>" + r.missed + "h</td></tr>";
+  }).join("");
+  var perfectNames = d.perfect.slice(0, 8).map(function(s) { return s.name; }).join(", ");
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>Remedial Weekly QA</title><style>" + eocnsReportStyles() +
+    ".pill{display:inline-block;padding:10px 14px;margin:4px;border-radius:8px;border:1px solid #c5cdd8;text-align:center;min-width:90px}" +
+    ".pill strong{display:block;font-size:1.3rem}</style></head><body>" +
+    "<div class=\"sub\">EOCNS Quality Assurance Department · Remedial Classes Report · Confidential</div>" +
+    "<h1>EOCNS QUALITY ASSURANCE REPORT<span class=\"gold\">FOR THE REMEDIAL CLASSES</span></h1>" +
+    "<div class=\"sub\">" + escapeHtml(d.start) + " – " + escapeHtml(d.end) + "<br/>Course-Specific Student &amp; Lecturer Attendance Analysis</div><hr class=\"rule\"/>" +
+    "<h2>EXECUTIVE SUMMARY</h2>" +
+    "<div class=\"kpi\">" +
+    "<div class=\"k-sched\"><strong>" + d.registered + "</strong><span>Registered</span></div>" +
+    "<div class=\"k-del\"><strong>" + d.lectureDays + "</strong><span>Lecture days</span></div>" +
+    "<div class=\"k-rate\"><strong>" + d.avg + "%</strong><span>Avg attendance</span></div>" +
+    "<div class=\"k-miss\"><strong>" + d.zero + "</strong><span>Zero att.</span></div></div>" +
+    "<p>Method: Attendance % is calculated only against the specific courses each student is enrolled in (official Remedial Enrolment List). Presence is counted only on days when those enrolled courses were taught.</p>" +
+    (perfectNames ? ("<p><strong>" + d.perfect.length + " perfect (100%):</strong> " + escapeHtml(perfectNames) + (d.perfect.length > 8 ? " …" : "") + "</p>") : "") +
+    "<h2>LECTURER ATTENDANCE &amp; HOURS</h2>" +
+    "<table><thead><tr><th>Lecturer</th><th>Courses</th><th>Hrs Taught</th><th>Hrs Missed</th></tr></thead><tbody>" +
+    (lecRows || "<tr><td colspan=\"4\">No logs</td></tr>") + "</tbody></table>" +
+    progTables +
+    "<div class=\"footer\">Report prepared by Quality Assurance Department · Generated " + new Date().toLocaleString() + "<br/>— End of Report —</div></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 400);
+}
+
+async function buildRemSummary() {
+  var start = document.getElementById("remSumStart").value;
+  var end = document.getElementById("remSumEnd").value;
+  if (!start || !end) { alert("Period required"); return; }
+  // treat whole period as one analysis for summary (aggregate)
+  var data = await computeRemWeekly(start, end, []);
+  // status bands
+  data.studentRows.forEach(function(s) {
+    var p = s.pct;
+    s.status = p == null ? "—" : p >= 80 ? "Excellent" : p >= 65 ? "Good" : p >= 40 ? "At Risk" : "Critical";
+  });
+  window.__remSummary = data;
+  var el = document.getElementById("remSummaryResult");
+  if (el) el.innerHTML = '<div class="pro-report"><h3>Summary ready</h3><p class="muted-note">' + data.registered + ' enrolled · avg ' + data.avg + '% · Print summary pack for full tables.</p></div>';
+}
+
+function printRemSummaryPack() {
+  var d = window.__remSummary;
+  if (!d) { alert("Build summary first"); return; }
+  var byProg = {};
+  d.studentRows.forEach(function(s) {
+    var p = s.programme || "Other";
+    byProg[p] = byProg[p] || [];
+    byProg[p].push(s);
+  });
+  Object.keys(byProg).forEach(function(p) {
+    byProg[p].sort(function(a, b) { return (b.pct || 0) - (a.pct || 0); });
+  });
+  var tables = Object.keys(byProg).map(function(p) {
+    var rows = byProg[p].map(function(s, i) {
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.matric) +
+        "</td><td>" + (s.pct != null ? s.pct + "%" : "—") + "</td><td>" + escapeHtml(s.status) + "</td></tr>";
+    }).join("");
+    return "<h2>" + escapeHtml(p.toUpperCase()) + " — AGGREGATE ATTENDANCE</h2>" +
+      "<table><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>Avg %</th><th>Status</th></tr></thead><tbody>" + rows + "</tbody></table>";
+  }).join("");
+  var lecRows = d.lecturerRows.map(function(r) {
+    return "<tr><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
+      "</td><td>" + r.taught + "h</td><td>" + r.missed + "h</td></tr>";
+  }).join("");
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>Remedial Summary</title><style>" + eocnsReportStyles() + "</style></head><body>" +
+    "<div class=\"sub\">EOCNS Quality Assurance Department · Remedial Classes Report · Confidential</div>" +
+    "<h1>EOCNS QUALITY ASSURANCE REPORT<span class=\"gold\">REMEDIAL CLASSES — COMPREHENSIVE SUMMARY</span></h1>" +
+    "<div class=\"sub\">" + escapeHtml(d.start) + " – " + escapeHtml(d.end) + "<br/>Aggregate Student &amp; Lecturer Performance</div><hr class=\"rule\"/>" +
+    "<h2>EXECUTIVE OVERVIEW</h2>" +
+    "<p>This summary consolidates course-specific attendance for the remedial period. Percentages reflect only the courses each student is required to offer. Lecturer hours are totalled from remedial lecture logs.</p>" +
+    tables +
+    "<h2>LECTURER HOURS — PERIOD COMBINED</h2>" +
+    "<table><thead><tr><th>Lecturer</th><th>Courses</th><th>Hrs Taught</th><th>Hrs Missed</th></tr></thead><tbody>" +
+    lecRows + "</tbody></table>" +
+    "<div class=\"footer\">Report prepared by Quality Assurance Department · Method: official Remedial Enrolment List<br/>— End of Comprehensive Summary —</div></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 400);
+}
+
+// legacy stubs so old listeners don't crash
+async function renderRemedialTable() { showRemTab("setup"); }
+async function openRemedialForm() { showRemTab("logging"); }
+function closeRemedialForm() {}
+async function saveRemedial(e) { if (e && e.preventDefault) e.preventDefault(); }
+async function deleteRemedial() {}
 
 })();
   if (document.getElementById("qaDailyDate") && !document.getElementById("qaDailyDate").value) {
@@ -2070,11 +2545,66 @@ function printLecturerHoursPack() {
   document.getElementById("btnSaveAttendance") && document.getElementById("btnSaveAttendance").addEventListener("click", saveAttendanceSheet);
   document.getElementById("btnPrintAttendance") && document.getElementById("btnPrintAttendance").addEventListener("click", printAttendanceSheet);
   document.getElementById("btnDownloadAttendanceDocx") && document.getElementById("btnDownloadAttendanceDocx").addEventListener("click", downloadAttendanceAsWord);
-  document.getElementById("btnAddRemedial") && document.getElementById("btnAddRemedial").addEventListener("click", function() { openRemedialForm(null); });
-  document.getElementById("remedialForm") && document.getElementById("remedialForm").addEventListener("submit", saveRemedial);
-  document.getElementById("btnCancelRemedial") && document.getElementById("btnCancelRemedial").addEventListener("click", closeRemedialForm);
-  document.getElementById("btnCloseRemedial") && document.getElementById("btnCloseRemedial").addEventListener("click", closeRemedialForm);
-  document.getElementById("remedialModalBackdrop") && document.getElementById("remedialModalBackdrop").addEventListener("click", closeRemedialForm);
+  document.querySelectorAll(".rem-tab").forEach(function(btn) {
+    btn.addEventListener("click", function() { showRemTab(btn.getAttribute("data-rem-tab")); });
+  });
+  document.getElementById("btnRemAddProgramme") && document.getElementById("btnRemAddProgramme").addEventListener("click", async function() {
+    if (!isQaOfficer()) return;
+    var name = prompt("Remedial programme name (e.g. General Nursing)");
+    if (!name) return;
+    await loadRemMeta();
+    REM_META.programmes.push({ id: "rp_" + Date.now().toString(36), name: name.trim() });
+    await saveRemMeta(); renderRemSetup();
+  });
+  document.getElementById("btnRemAddLevel") && document.getElementById("btnRemAddLevel").addEventListener("click", async function() {
+    if (!isQaOfficer()) return;
+    var name = prompt("Remedial level name (e.g. 200 Level)");
+    if (!name) return;
+    await loadRemMeta();
+    REM_META.levels.push({ id: "rl_" + Date.now().toString(36), name: name.trim() });
+    await saveRemMeta(); renderRemSetup();
+  });
+  document.getElementById("btnRemSaveSession") && document.getElementById("btnRemSaveSession").addEventListener("click", async function() {
+    if (!isQaOfficer()) return;
+    await loadRemMeta();
+    REM_META.sessionId = document.getElementById("remActiveSession").value;
+    await saveRemMeta();
+    alert("Remedial session link saved. Publish when ready.");
+  });
+  document.getElementById("btnRemAddEnrolment") && document.getElementById("btnRemAddEnrolment").addEventListener("click", function() { openRemEnrolForm(null); });
+  document.getElementById("remEnrolForm") && document.getElementById("remEnrolForm").addEventListener("submit", saveRemEnrol);
+  document.getElementById("btnCancelRemEnrol") && document.getElementById("btnCancelRemEnrol").addEventListener("click", function() { document.getElementById("remEnrolModal").hidden = true; });
+  document.getElementById("btnCloseRemEnrol") && document.getElementById("btnCloseRemEnrol").addEventListener("click", function() { document.getElementById("remEnrolModal").hidden = true; });
+  document.getElementById("remEnrolModalBackdrop") && document.getElementById("remEnrolModalBackdrop").addEventListener("click", function() { document.getElementById("remEnrolModal").hidden = true; });
+  document.getElementById("remEnrFilterProg") && document.getElementById("remEnrFilterProg").addEventListener("change", renderRemEnrolment);
+  document.getElementById("remEnrFilterLevel") && document.getElementById("remEnrFilterLevel").addEventListener("change", renderRemEnrolment);
+  document.getElementById("btnRemAddAssignment") && document.getElementById("btnRemAddAssignment").addEventListener("click", async function() {
+    if (!isQaOfficer()) return;
+    var code = prompt("Course code"); if (!code) return;
+    var title = prompt("Course title", "") || "";
+    var lecturer = prompt("Lecturer name"); if (!lecturer) return;
+    var hours = Number(prompt("Hours per slot", "2")) || 2;
+    await put("remedial_assignments", { id: "ra_" + Date.now().toString(36), code: code.trim(), title: title.trim(), lecturer: lecturer.trim(), hours: hours });
+    markDirty("remedial assignments");
+    renderRemAssignments(); fillRemLogCourses();
+  });
+  document.getElementById("btnRemAddSlot") && document.getElementById("btnRemAddSlot").addEventListener("click", async function() {
+    if (!isQaOfficer()) return;
+    await loadRemTt();
+    var weekday = Number(prompt("Weekday 0=Mon … 4=Fri", "0"));
+    var code = prompt("Course code"); if (!code) return;
+    var start = prompt("Start HH:MM", "08:00") || "08:00";
+    var end = prompt("End HH:MM", "10:00") || "10:00";
+    var hours = Number(prompt("Hours", "2")) || 2;
+    REM_TT.slots.push({ weekday: weekday, code: code.trim(), start: start, end: end, hours: hours });
+    await saveRemTt(); renderRemTimetable();
+  });
+  document.getElementById("btnRemLoadLogSheet") && document.getElementById("btnRemLoadLogSheet").addEventListener("click", loadRemLogSheet);
+  document.getElementById("btnRemSaveLog") && document.getElementById("btnRemSaveLog").addEventListener("click", saveRemLog);
+  document.getElementById("btnRemBuildWeekly") && document.getElementById("btnRemBuildWeekly").addEventListener("click", buildRemWeekly);
+  document.getElementById("btnRemPrintWeekly") && document.getElementById("btnRemPrintWeekly").addEventListener("click", printRemWeeklyPack);
+  document.getElementById("btnRemBuildSummary") && document.getElementById("btnRemBuildSummary").addEventListener("click", buildRemSummary);
+  document.getElementById("btnRemPrintSummary") && document.getElementById("btnRemPrintSummary").addEventListener("click", printRemSummaryPack);
   document.getElementById("btnBuildLecturerHours") && document.getElementById("btnBuildLecturerHours").addEventListener("click", buildLecturerHoursReport);
   document.getElementById("btnPrintLecturerHours") && document.getElementById("btnPrintLecturerHours").addEventListener("click", printLecturerHoursPack);
   document.getElementById("btnAddCourse") && document.getElementById("btnAddCourse").addEventListener("click", addCoursePrompt);
@@ -2150,6 +2680,11 @@ const DATA_FILES = {
   attendance: "data/attendance.json",
   hostel_runs: "data/hostel_runs.json",
   remedial: "data/remedial.json",
+  remedial_meta: "data/remedial_meta.json",
+  remedial_enrolment: "data/remedial_enrolment.json",
+  remedial_assignments: "data/remedial_assignments.json",
+  remedial_timetable: "data/remedial_timetable.json",
+  remedial_logs: "data/remedial_logs.json",
   config: "data/config.json",
 };
 let APP_CONFIG = { qaPin: "EOCNS-QA" };
@@ -2298,6 +2833,17 @@ async function hydrateAllFromRepoIfEmpty() {
   await fillIfEmpty("attendance", DATA_FILES.attendance, "attendance");
   await fillIfEmpty("hostel_runs", DATA_FILES.hostel_runs, "hostel runs");
   await fillIfEmpty("remedial", DATA_FILES.remedial, "remedial");
+  await fillIfEmpty("remedial_enrolment", DATA_FILES.remedial_enrolment, "remedial enrolment");
+  await fillIfEmpty("remedial_assignments", DATA_FILES.remedial_assignments, "remedial assignments");
+  await fillIfEmpty("remedial_logs", DATA_FILES.remedial_logs, "remedial logs");
+  try {
+    var meta = await fetchRepoJson(DATA_FILES.remedial_meta);
+    if (meta) await put("remedial_meta", { key: "main", value: meta });
+  } catch (_) {}
+  try {
+    var rtt = await fetchRepoJson(DATA_FILES.remedial_timetable);
+    if (rtt) await put("remedial_timetable", { key: "main", value: rtt });
+  } catch (_) {}
   try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config); } catch (e) { console.warn("config", e); }
   try { TIMETABLES_CACHE = await fetchRepoJson(DATA_FILES.timetables); } catch (e) { TIMETABLES_CACHE = {}; }
   PROGRAMMES_CACHE = await getAll("programmes");
@@ -2451,6 +2997,19 @@ async function publishAllToRepo() {
     files[DATA_FILES.attendance] = JSON.stringify(await getAll("attendance"), null, 2);
     files[DATA_FILES.hostel_runs] = JSON.stringify(await getAll("hostel_runs"), null, 2);
     files[DATA_FILES.remedial] = JSON.stringify(await getAll("remedial"), null, 2);
+    files[DATA_FILES.remedial_enrolment] = JSON.stringify(await getAll("remedial_enrolment"), null, 2);
+    files[DATA_FILES.remedial_assignments] = JSON.stringify(await getAll("remedial_assignments"), null, 2);
+    files[DATA_FILES.remedial_logs] = JSON.stringify(await getAll("remedial_logs"), null, 2);
+    try {
+      var rm = await getAll("remedial_meta");
+      var metaVal = (rm[0] && rm[0].value) || { sessionId: "", programmes: [], levels: [] };
+      files[DATA_FILES.remedial_meta] = JSON.stringify(metaVal, null, 2);
+    } catch (_) {}
+    try {
+      var rt = await getAll("remedial_timetable");
+      var ttVal = (rt[0] && rt[0].value) || { slots: [] };
+      files[DATA_FILES.remedial_timetable] = JSON.stringify(ttVal, null, 2);
+    } catch (_) {}
 
     var key = (APP_CONFIG.publishWorkerKey || "").trim();
     var headers = { "Content-Type": "application/json" };
@@ -4131,5 +4690,482 @@ function printLecturerHoursPack() {
   w.document.close();
   setTimeout(function() { w.print(); }, 300);
 }
+
+
+// ========== REMEDIAL CLASS SYSTEM (standalone) ==========
+var REM_META = { sessionId: "", programmes: [], levels: [] };
+var REM_TT = { slots: [] };
+
+async function loadRemMeta() {
+  try {
+    var rows = await getAll("remedial_meta");
+    if (rows[0] && rows[0].value) REM_META = rows[0].value;
+  } catch (_) {}
+  if (!REM_META.programmes) REM_META.programmes = [];
+  if (!REM_META.levels) REM_META.levels = [];
+  return REM_META;
+}
+async function saveRemMeta() {
+  await put("remedial_meta", { key: "main", value: REM_META });
+  markDirty("remedial meta");
+}
+async function loadRemTt() {
+  try {
+    var rows = await getAll("remedial_timetable");
+    if (rows[0] && rows[0].value) REM_TT = rows[0].value;
+  } catch (_) {}
+  if (!REM_TT.slots) REM_TT.slots = [];
+  return REM_TT;
+}
+async function saveRemTt() {
+  await put("remedial_timetable", { key: "main", value: REM_TT });
+  markDirty("remedial timetable");
+}
+
+function showRemTab(tab) {
+  document.querySelectorAll(".rem-tab").forEach(function(b) {
+    b.classList.toggle("active", b.getAttribute("data-rem-tab") === tab);
+  });
+  ["setup","enrolment","timetable","logging","weekly","summary"].forEach(function(t) {
+    var el = document.getElementById("remPanel-" + t);
+    if (el) el.hidden = t !== tab;
+  });
+  if (tab === "setup") renderRemSetup();
+  if (tab === "enrolment") renderRemEnrolment();
+  if (tab === "timetable") { renderRemAssignments(); renderRemTimetable(); }
+  if (tab === "logging") fillRemLogCourses();
+}
+
+async function renderRemSetup() {
+  await loadRemMeta();
+  var pl = document.getElementById("remProgrammesList");
+  var ll = document.getElementById("remLevelsList");
+  if (pl) pl.innerHTML = (REM_META.programmes || []).map(function(p) {
+    return "<li>" + escapeHtml(p.name) + (isQaOfficer() ? ' <button type="button" class="icon-btn-sm" data-del-rem-prog="' + escapeHtml(p.id) + '">Del</button>' : "") + "</li>";
+  }).join("") || "<li>None yet</li>";
+  if (ll) ll.innerHTML = (REM_META.levels || []).map(function(p) {
+    return "<li>" + escapeHtml(p.name) + (isQaOfficer() ? ' <button type="button" class="icon-btn-sm" data-del-rem-lvl="' + escapeHtml(p.id) + '">Del</button>' : "") + "</li>";
+  }).join("") || "<li>None yet</li>";
+  pl && pl.querySelectorAll("[data-del-rem-prog]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!isQaOfficer()) return;
+      REM_META.programmes = REM_META.programmes.filter(function(p) { return p.id !== btn.getAttribute("data-del-rem-prog"); });
+      await saveRemMeta(); renderRemSetup();
+    });
+  });
+  ll && ll.querySelectorAll("[data-del-rem-lvl]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!isQaOfficer()) return;
+      REM_META.levels = REM_META.levels.filter(function(p) { return p.id !== btn.getAttribute("data-del-rem-lvl"); });
+      await saveRemMeta(); renderRemSetup();
+    });
+  });
+  var sessions = await getAll("sessions");
+  var sel = document.getElementById("remActiveSession");
+  if (sel) {
+    sel.innerHTML = '<option value="">— Select session —</option>' + sessions.map(function(s) {
+      return '<option value="' + escapeHtml(s.id) + '"' + (REM_META.sessionId === s.id ? " selected" : "") + ">" + escapeHtml(s.name) + "</option>";
+    }).join("");
+  }
+}
+
+async function renderRemEnrolment() {
+  await loadRemMeta();
+  var progSel = document.getElementById("remEnrFilterProg");
+  var lvlSel = document.getElementById("remEnrFilterLevel");
+  if (progSel) {
+    progSel.innerHTML = '<option value="">All programmes</option>' + (REM_META.programmes || []).map(function(p) {
+      return '<option value="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</option>";
+    }).join("");
+  }
+  if (lvlSel) {
+    lvlSel.innerHTML = '<option value="">All levels</option>' + (REM_META.levels || []).map(function(p) {
+      return '<option value="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</option>";
+    }).join("");
+  }
+  var fp = (progSel && progSel.value) || "";
+  var fl = (lvlSel && lvlSel.value) || "";
+  var list = await getAll("remedial_enrolment");
+  list = list.filter(function(s) {
+    if (fp && s.programme !== fp) return false;
+    if (fl && s.level !== fl) return false;
+    return true;
+  }).sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
+  var body = document.getElementById("remEnrolmentBody");
+  var empty = document.getElementById("remEnrolmentEmpty");
+  if (!body) return;
+  if (!list.length) {
+    body.innerHTML = "";
+    if (empty) empty.hidden = false;
+    return;
+  }
+  if (empty) empty.hidden = true;
+  body.innerHTML = list.map(function(s) {
+    var actions = isQaOfficer() ? ('<button type="button" class="icon-btn-sm" data-edit-renr="' + s.id + '">Edit</button> <button type="button" class="icon-btn-sm" data-del-renr="' + s.id + '">Del</button>') : "";
+    return "<tr><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.matric) + "</td><td>" + escapeHtml(s.programme || "") +
+      "</td><td>" + escapeHtml(s.level || "") + "</td><td>" + escapeHtml((s.courses || []).join(", ")) +
+      "</td><td class=\"qa-edit-only\">" + actions + "</td></tr>";
+  }).join("");
+  body.querySelectorAll("[data-edit-renr]").forEach(function(btn) {
+    btn.addEventListener("click", function() { openRemEnrolForm(btn.getAttribute("data-edit-renr")); });
+  });
+  body.querySelectorAll("[data-del-renr]").forEach(function(btn) {
+    btn.addEventListener("click", function() { deleteRemEnrol(btn.getAttribute("data-del-renr")); });
+  });
+}
+
+async function openRemEnrolForm(id) {
+  if (!isQaOfficer()) return;
+  await loadRemMeta();
+  document.getElementById("remEnrolForm").reset();
+  document.getElementById("remEnrolId").value = id || "";
+  var ps = document.getElementById("remEnrolProg");
+  var ls = document.getElementById("remEnrolLevel");
+  ps.innerHTML = (REM_META.programmes || []).map(function(p) { return '<option value="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</option>"; }).join("") || '<option value="">—</option>';
+  ls.innerHTML = (REM_META.levels || []).map(function(p) { return '<option value="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + "</option>"; }).join("") || '<option value="">—</option>';
+  if (id) {
+    var list = await getAll("remedial_enrolment");
+    var s = list.find(function(x) { return x.id === id; });
+    if (s) {
+      document.getElementById("remEnrolName").value = s.name || "";
+      document.getElementById("remEnrolMatric").value = s.matric || "";
+      document.getElementById("remEnrolProg").value = s.programme || "";
+      document.getElementById("remEnrolLevel").value = s.level || "";
+      document.getElementById("remEnrolCourses").value = (s.courses || []).join(", ");
+      document.getElementById("remEnrolRef").value = s.ref || "";
+    }
+  }
+  document.getElementById("remEnrolModal").hidden = false;
+}
+
+async function saveRemEnrol(e) {
+  e.preventDefault();
+  if (!isQaOfficer()) return;
+  var ref = (document.getElementById("remEnrolRef").value || "").trim();
+  if (!ref) { alert("REF required"); return; }
+  var id = document.getElementById("remEnrolId").value || null;
+  var courses = document.getElementById("remEnrolCourses").value.split(",").map(function(c) { return c.trim(); }).filter(Boolean);
+  var rec = {
+    id: id || ("renr_" + Date.now().toString(36)),
+    name: document.getElementById("remEnrolName").value.trim(),
+    matric: document.getElementById("remEnrolMatric").value.trim(),
+    programme: document.getElementById("remEnrolProg").value,
+    level: document.getElementById("remEnrolLevel").value,
+    courses: courses,
+    ref: ref,
+    updatedAt: new Date().toISOString()
+  };
+  await put("remedial_enrolment", rec);
+  await writeAudit({ action: id ? "update" : "create", entity: "remedial_enrolment", entityId: rec.id, externalRef: ref, reason: "Remedial enrolment", details: { name: rec.name, courses: courses } });
+  markDirty("remedial enrolment");
+  document.getElementById("remEnrolModal").hidden = true;
+  await renderRemEnrolment();
+}
+
+async function deleteRemEnrol(id) {
+  if (!isQaOfficer()) return;
+  var ref = prompt("REF to delete enrolment:", "REF/EOCNS/QA/");
+  if (!ref) return;
+  await del("remedial_enrolment", id);
+  await writeAudit({ action: "delete", entity: "remedial_enrolment", entityId: id, externalRef: String(ref).trim(), reason: "Remedial enrolment removed" });
+  markDirty("remedial enrolment");
+  await renderRemEnrolment();
+}
+
+async function renderRemAssignments() {
+  var list = await getAll("remedial_assignments");
+  var body = document.getElementById("remAssignBody");
+  if (!body) return;
+  body.innerHTML = list.length ? list.map(function(a) {
+    var del = isQaOfficer() ? '<button type="button" class="icon-btn-sm" data-del-rass="' + a.id + '">Del</button>' : "";
+    return "<tr><td>" + escapeHtml(a.code) + "</td><td>" + escapeHtml(a.title || "") + "</td><td>" + escapeHtml(a.lecturer || "") +
+      "</td><td>" + escapeHtml(String(a.hours != null ? a.hours : 2)) + "</td><td class=\"qa-edit-only\">" + del + "</td></tr>";
+  }).join("") : "<tr><td colspan=\"5\">No assignments</td></tr>";
+  body.querySelectorAll("[data-del-rass]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!isQaOfficer()) return;
+      await del("remedial_assignments", btn.getAttribute("data-del-rass"));
+      markDirty("remedial assignments");
+      renderRemAssignments(); fillRemLogCourses();
+    });
+  });
+}
+
+async function renderRemTimetable() {
+  await loadRemTt();
+  var body = document.getElementById("remTtBody");
+  if (!body) return;
+  body.innerHTML = (REM_TT.slots || []).map(function(s, idx) {
+    return "<tr><td>" + s.weekday + "</td><td>" + escapeHtml(s.code || "") + "</td><td>" + escapeHtml(s.start || "") +
+      "</td><td>" + escapeHtml(s.end || "") + "</td><td>" + (s.hours != null ? s.hours : 2) +
+      "</td><td class=\"qa-edit-only\"><button type=\"button\" class=\"icon-btn-sm\" data-del-rtt=\"" + idx + "\">Del</button></td></tr>";
+  }).join("") || "<tr><td colspan=\"6\">No slots</td></tr>";
+  body.querySelectorAll("[data-del-rtt]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!isQaOfficer()) return;
+      REM_TT.slots.splice(Number(btn.getAttribute("data-del-rtt")), 1);
+      await saveRemTt(); renderRemTimetable();
+    });
+  });
+}
+
+async function fillRemLogCourses() {
+  var assigns = await getAll("remedial_assignments");
+  var sel = document.getElementById("remLogCourse");
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Select —</option>' + assigns.map(function(a) {
+    return '<option value="' + escapeHtml(a.code) + '">' + escapeHtml(a.code + (a.title ? " — " + a.title : "")) + "</option>";
+  }).join("");
+}
+
+async function loadRemLogSheet() {
+  var date = document.getElementById("remLogDate").value;
+  var code = document.getElementById("remLogCourse").value;
+  if (!date || !code) { alert("Date and course required"); return; }
+  var enrolled = (await getAll("remedial_enrolment")).filter(function(s) {
+    return (s.courses || []).some(function(c) { return String(c).toUpperCase().indexOf(code.toUpperCase()) >= 0 || code.toUpperCase().indexOf(String(c).toUpperCase()) >= 0; });
+  });
+  var logs = await getAll("remedial_logs");
+  var existing = logs.find(function(l) { return l.date === date && l.courseCode === code; });
+  var marks = (existing && existing.marks) || {};
+  var assigns = await getAll("remedial_assignments");
+  var asg = assigns.find(function(a) { return a.code === code; }) || {};
+  window.__remLogMeta = { date: date, courseCode: code, lecturer: asg.lecturer || "", hours: asg.hours != null ? asg.hours : 2, studentIds: enrolled.map(function(s) { return s.id; }) };
+  var sheet = document.getElementById("remLogSheet");
+  if (!sheet) return;
+  if (!enrolled.length) {
+    sheet.innerHTML = '<div class="card__body"><p>No students enrolled for ' + escapeHtml(code) + '.</p></div>';
+    return;
+  }
+  sheet.innerHTML = '<div class="card__body"><p><strong>' + escapeHtml(code) + '</strong> · ' + escapeHtml(asg.lecturer || "Lecturer TBA") +
+    ' · ' + enrolled.length + ' enrolled</p><table class="data-table"><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>P</th><th>A</th></tr></thead><tbody>' +
+    enrolled.map(function(s, i) {
+      var m = marks[s.id] || "";
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.matric) +
+        '</td><td><input type="radio" name="rem-' + s.id + '" value="P"' + (m === "P" ? " checked" : "") +
+        '/></td><td><input type="radio" name="rem-' + s.id + '" value="A"' + (m === "A" ? " checked" : "") + "/></td></tr>";
+    }).join("") + "</tbody></table></div>";
+}
+
+async function saveRemLog() {
+  if (!isQaOfficer()) return;
+  var meta = window.__remLogMeta;
+  if (!meta) { alert("Load a sheet first"); return; }
+  var ref = prompt("Official REF for this remedial lecture log:", "REF/EOCNS/QA/");
+  if (!ref || !String(ref).trim()) return;
+  var marks = {};
+  (meta.studentIds || []).forEach(function(id) {
+    var el = document.querySelector('input[name="rem-' + id + '"]:checked');
+    if (el) marks[id] = el.value;
+  });
+  var logs = await getAll("remedial_logs");
+  var prev = logs.find(function(l) { return l.date === meta.date && l.courseCode === meta.courseCode; });
+  var rec = {
+    id: prev ? prev.id : ("rlog_" + Date.now().toString(36)),
+    date: meta.date,
+    courseCode: meta.courseCode,
+    lecturer: meta.lecturer,
+    hours: meta.hours,
+    marks: marks,
+    status: "Held",
+    ref: String(ref).trim(),
+    updatedAt: new Date().toISOString()
+  };
+  await put("remedial_logs", rec);
+  await writeAudit({ action: prev ? "update" : "create", entity: "remedial_logs", entityId: rec.id, externalRef: rec.ref, reason: "Remedial lecture attendance log", details: { date: meta.date, course: meta.courseCode } });
+  markDirty("remedial logs");
+  alert("Remedial lecture log saved.");
+}
+
+function parseExcludeDates(raw) {
+  return String(raw || "").split(/[,;\s]+/).map(function(s) { return s.trim(); }).filter(Boolean);
+}
+
+async function computeRemWeekly(start, end, excluded) {
+  var enrolled = await getAll("remedial_enrolment");
+  var logs = await getAll("remedial_logs");
+  var assigns = await getAll("remedial_assignments");
+  await loadRemTt();
+  var days = [];
+  var c = new Date(start + "T12:00:00");
+  var e = new Date(end + "T12:00:00");
+  while (c <= e) {
+    var iso = c.toISOString().slice(0, 10);
+    if (excluded.indexOf(iso) < 0) days.push(iso);
+    c.setDate(c.getDate() + 1);
+  }
+  // course days from logs in range
+  var logsIn = logs.filter(function(l) { return l.date >= start && l.date <= end && excluded.indexOf(l.date) < 0; });
+  // per student course-specific attendance
+  var studentRows = enrolled.map(function(s) {
+    var courses = s.courses || [];
+    var possible = 0, present = 0;
+    logsIn.forEach(function(l) {
+      var match = courses.some(function(c) {
+        return String(c).toUpperCase().indexOf(String(l.courseCode).toUpperCase()) >= 0 ||
+          String(l.courseCode).toUpperCase().indexOf(String(c).toUpperCase()) >= 0;
+      });
+      if (!match) return;
+      possible += 1;
+      if (l.marks && l.marks[s.id] === "P") present += 1;
+    });
+    var pct = possible ? Math.round((present / possible) * 1000) / 10 : null;
+    return { name: s.name, matric: s.matric, programme: s.programme, level: s.level, courses: courses, present: present, possible: possible, pct: pct };
+  });
+  // lecturer hours
+  var lecMap = {};
+  assigns.forEach(function(a) {
+    lecMap[a.lecturer || "Unassigned"] = lecMap[a.lecturer || "Unassigned"] || { lecturer: a.lecturer || "Unassigned", courses: [], taught: 0, missed: 0 };
+    if (a.code) lecMap[a.lecturer || "Unassigned"].courses.push(a.code);
+  });
+  logsIn.forEach(function(l) {
+    var key = l.lecturer || "Unassigned";
+    lecMap[key] = lecMap[key] || { lecturer: key, courses: [], taught: 0, missed: 0 };
+    if (l.status === "Missed") lecMap[key].missed += Number(l.hours) || 0;
+    else lecMap[key].taught += Number(l.hours) || 0;
+  });
+  var confirmed = studentRows.filter(function(s) { return s.possible > 0 || (s.courses && s.courses.length); });
+  var withPct = confirmed.filter(function(s) { return s.pct != null; });
+  var avg = withPct.length ? Math.round((withPct.reduce(function(a, s) { return a + s.pct; }, 0) / withPct.length) * 10) / 10 : 0;
+  var zero = withPct.filter(function(s) { return s.pct === 0; }).length;
+  var perfect = withPct.filter(function(s) { return s.pct === 100; });
+  return {
+    start: start, end: end, excluded: excluded, lectureDays: days.length,
+    registered: enrolled.length, avg: avg, zero: zero, perfect: perfect,
+    studentRows: studentRows, lecturerRows: Object.keys(lecMap).map(function(k) { return lecMap[k]; }),
+    logsIn: logsIn
+  };
+}
+
+async function buildRemWeekly() {
+  var start = document.getElementById("remWeekStart").value;
+  var end = document.getElementById("remWeekEnd").value;
+  var excluded = parseExcludeDates(document.getElementById("remWeekExclude").value);
+  if (!start || !end) { alert("Start and end dates required"); return; }
+  var data = await computeRemWeekly(start, end, excluded);
+  window.__remWeekly = data;
+  var el = document.getElementById("remWeeklyResult");
+  if (!el) return;
+  el.innerHTML = '<div class="pro-report"><h3>Weekly remedial analysis</h3>' +
+    '<div class="stats-grid">' +
+    '<div class="stat-card"><div class="stat-card__body"><span class="stat-card__value">' + data.registered + '</span><span class="stat-card__label">Registered</span></div></div>' +
+    '<div class="stat-card"><div class="stat-card__body"><span class="stat-card__value">' + data.lectureDays + '</span><span class="stat-card__label">Lecture days</span></div></div>' +
+    '<div class="stat-card"><div class="stat-card__body"><span class="stat-card__value">' + data.avg + '%</span><span class="stat-card__label">Avg attendance</span></div></div>' +
+    '<div class="stat-card"><div class="stat-card__body"><span class="stat-card__value">' + data.zero + '</span><span class="stat-card__label">Zero att.</span></div></div>' +
+    '</div><p class="muted-note">Course-specific rates use the official enrolment list. Print for the full professional pack.</p></div>';
+}
+
+function printRemWeeklyPack() {
+  var d = window.__remWeekly;
+  if (!d) { alert("Build weekly analysis first"); return; }
+  var byProg = {};
+  d.studentRows.forEach(function(s) {
+    var p = s.programme || "Other";
+    byProg[p] = byProg[p] || [];
+    byProg[p].push(s);
+  });
+  var progTables = Object.keys(byProg).map(function(p) {
+    var rows = byProg[p].map(function(s, i) {
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.matric) +
+        "</td><td>" + escapeHtml((s.courses || []).join(", ")) + "</td><td>" + s.present + "/" + s.possible +
+        "</td><td>" + (s.pct != null ? s.pct + "%" : "—") + "</td></tr>";
+    }).join("");
+    return "<h2>STUDENT ATTENDANCE — " + escapeHtml(p.toUpperCase()) + " (Course-Specific)</h2>" +
+      "<table><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>Enrolled Courses</th><th>Sess. P/Poss</th><th>%</th></tr></thead><tbody>" +
+      rows + "</tbody></table>";
+  }).join("");
+  var lecRows = d.lecturerRows.map(function(r) {
+    return "<tr><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
+      "</td><td>" + r.taught + "h</td><td>" + r.missed + "h</td></tr>";
+  }).join("");
+  var perfectNames = d.perfect.slice(0, 8).map(function(s) { return s.name; }).join(", ");
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>Remedial Weekly QA</title><style>" + eocnsReportStyles() +
+    ".pill{display:inline-block;padding:10px 14px;margin:4px;border-radius:8px;border:1px solid #c5cdd8;text-align:center;min-width:90px}" +
+    ".pill strong{display:block;font-size:1.3rem}</style></head><body>" +
+    "<div class=\"sub\">EOCNS Quality Assurance Department · Remedial Classes Report · Confidential</div>" +
+    "<h1>EOCNS QUALITY ASSURANCE REPORT<span class=\"gold\">FOR THE REMEDIAL CLASSES</span></h1>" +
+    "<div class=\"sub\">" + escapeHtml(d.start) + " – " + escapeHtml(d.end) + "<br/>Course-Specific Student &amp; Lecturer Attendance Analysis</div><hr class=\"rule\"/>" +
+    "<h2>EXECUTIVE SUMMARY</h2>" +
+    "<div class=\"kpi\">" +
+    "<div class=\"k-sched\"><strong>" + d.registered + "</strong><span>Registered</span></div>" +
+    "<div class=\"k-del\"><strong>" + d.lectureDays + "</strong><span>Lecture days</span></div>" +
+    "<div class=\"k-rate\"><strong>" + d.avg + "%</strong><span>Avg attendance</span></div>" +
+    "<div class=\"k-miss\"><strong>" + d.zero + "</strong><span>Zero att.</span></div></div>" +
+    "<p>Method: Attendance % is calculated only against the specific courses each student is enrolled in (official Remedial Enrolment List). Presence is counted only on days when those enrolled courses were taught.</p>" +
+    (perfectNames ? ("<p><strong>" + d.perfect.length + " perfect (100%):</strong> " + escapeHtml(perfectNames) + (d.perfect.length > 8 ? " …" : "") + "</p>") : "") +
+    "<h2>LECTURER ATTENDANCE &amp; HOURS</h2>" +
+    "<table><thead><tr><th>Lecturer</th><th>Courses</th><th>Hrs Taught</th><th>Hrs Missed</th></tr></thead><tbody>" +
+    (lecRows || "<tr><td colspan=\"4\">No logs</td></tr>") + "</tbody></table>" +
+    progTables +
+    "<div class=\"footer\">Report prepared by Quality Assurance Department · Generated " + new Date().toLocaleString() + "<br/>— End of Report —</div></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 400);
+}
+
+async function buildRemSummary() {
+  var start = document.getElementById("remSumStart").value;
+  var end = document.getElementById("remSumEnd").value;
+  if (!start || !end) { alert("Period required"); return; }
+  // treat whole period as one analysis for summary (aggregate)
+  var data = await computeRemWeekly(start, end, []);
+  // status bands
+  data.studentRows.forEach(function(s) {
+    var p = s.pct;
+    s.status = p == null ? "—" : p >= 80 ? "Excellent" : p >= 65 ? "Good" : p >= 40 ? "At Risk" : "Critical";
+  });
+  window.__remSummary = data;
+  var el = document.getElementById("remSummaryResult");
+  if (el) el.innerHTML = '<div class="pro-report"><h3>Summary ready</h3><p class="muted-note">' + data.registered + ' enrolled · avg ' + data.avg + '% · Print summary pack for full tables.</p></div>';
+}
+
+function printRemSummaryPack() {
+  var d = window.__remSummary;
+  if (!d) { alert("Build summary first"); return; }
+  var byProg = {};
+  d.studentRows.forEach(function(s) {
+    var p = s.programme || "Other";
+    byProg[p] = byProg[p] || [];
+    byProg[p].push(s);
+  });
+  Object.keys(byProg).forEach(function(p) {
+    byProg[p].sort(function(a, b) { return (b.pct || 0) - (a.pct || 0); });
+  });
+  var tables = Object.keys(byProg).map(function(p) {
+    var rows = byProg[p].map(function(s, i) {
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.matric) +
+        "</td><td>" + (s.pct != null ? s.pct + "%" : "—") + "</td><td>" + escapeHtml(s.status) + "</td></tr>";
+    }).join("");
+    return "<h2>" + escapeHtml(p.toUpperCase()) + " — AGGREGATE ATTENDANCE</h2>" +
+      "<table><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>Avg %</th><th>Status</th></tr></thead><tbody>" + rows + "</tbody></table>";
+  }).join("");
+  var lecRows = d.lecturerRows.map(function(r) {
+    return "<tr><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
+      "</td><td>" + r.taught + "h</td><td>" + r.missed + "h</td></tr>";
+  }).join("");
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>Remedial Summary</title><style>" + eocnsReportStyles() + "</style></head><body>" +
+    "<div class=\"sub\">EOCNS Quality Assurance Department · Remedial Classes Report · Confidential</div>" +
+    "<h1>EOCNS QUALITY ASSURANCE REPORT<span class=\"gold\">REMEDIAL CLASSES — COMPREHENSIVE SUMMARY</span></h1>" +
+    "<div class=\"sub\">" + escapeHtml(d.start) + " – " + escapeHtml(d.end) + "<br/>Aggregate Student &amp; Lecturer Performance</div><hr class=\"rule\"/>" +
+    "<h2>EXECUTIVE OVERVIEW</h2>" +
+    "<p>This summary consolidates course-specific attendance for the remedial period. Percentages reflect only the courses each student is required to offer. Lecturer hours are totalled from remedial lecture logs.</p>" +
+    tables +
+    "<h2>LECTURER HOURS — PERIOD COMBINED</h2>" +
+    "<table><thead><tr><th>Lecturer</th><th>Courses</th><th>Hrs Taught</th><th>Hrs Missed</th></tr></thead><tbody>" +
+    lecRows + "</tbody></table>" +
+    "<div class=\"footer\">Report prepared by Quality Assurance Department · Method: official Remedial Enrolment List<br/>— End of Comprehensive Summary —</div></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 400);
+}
+
+// legacy stubs so old listeners don't crash
+async function renderRemedialTable() { showRemTab("setup"); }
+async function openRemedialForm() { showRemTab("logging"); }
+function closeRemedialForm() {}
+async function saveRemedial(e) { if (e && e.preventDefault) e.preventDefault(); }
+async function deleteRemedial() {}
 
 })();

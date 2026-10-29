@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=23" />
+  <link rel="stylesheet" href="style.css?v=24" />
 </head>
 <body class="role-viewer">
   <div id="dirtyBanner" class="dirty-banner" hidden role="status"></div>
@@ -433,30 +433,140 @@
         </section>
 
         
+        
         <section class="view" id="view-remedial">
           <div class="page-toolbar">
             <div class="page-toolbar__left">
-              <p class="muted-note" style="margin:0">Make-up / remedial teaching sessions. Edits require QA officer sign-in and an official REF.</p>
-            </div>
-            <div class="page-toolbar__right qa-edit-only">
-              <button type="button" class="btn btn--primary" id="btnAddRemedial">+ Log remedial session</button>
+              <p class="muted-note" style="margin:0">Standalone Remedial Class System — enrolment by failed courses, timetable, logging, weekly &amp; summary QA packs. Officer sign-in required to edit.</p>
             </div>
           </div>
-          <div class="table-card">
-            <div class="table-scroll">
-              <table class="data-table">
-                <thead><tr><th>Date</th><th>Course</th><th>Lecturer</th><th>Hours</th><th>Class</th><th>Reason</th><th>REF</th><th class="qa-edit-only"></th></tr></thead>
-                <tbody id="remedialTableBody"></tbody>
-              </table>
+          <div class="rem-tabs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+            <button type="button" class="btn btn--ghost rem-tab active" data-rem-tab="setup">Setup</button>
+            <button type="button" class="btn btn--ghost rem-tab" data-rem-tab="enrolment">Enrolment list</button>
+            <button type="button" class="btn btn--ghost rem-tab" data-rem-tab="timetable">Timetable &amp; lecturers</button>
+            <button type="button" class="btn btn--ghost rem-tab" data-rem-tab="logging">Lecture log</button>
+            <button type="button" class="btn btn--ghost rem-tab" data-rem-tab="weekly">Weekly QA</button>
+            <button type="button" class="btn btn--ghost rem-tab" data-rem-tab="summary">Summary report</button>
+          </div>
+
+          <div class="rem-panel" id="remPanel-setup">
+            <div class="grid-2">
+              <div class="card">
+                <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
+                  <h3 style="margin:0">Remedial programmes</h3>
+                  <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnRemAddProgramme">+ Add</button>
+                </div>
+                <div class="card__body"><ul id="remProgrammesList" class="muted-note" style="margin:0;padding-left:18px"></ul></div>
+              </div>
+              <div class="card">
+                <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
+                  <h3 style="margin:0">Remedial levels</h3>
+                  <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnRemAddLevel">+ Add</button>
+                </div>
+                <div class="card__body"><ul id="remLevelsList" class="muted-note" style="margin:0;padding-left:18px"></ul></div>
+              </div>
             </div>
-            <div class="empty-state" id="remedialEmpty"><h3>No remedial sessions yet</h3><p>Officer can log make-up classes after sign-in.</p></div>
+            <div class="card" style="margin-top:12px">
+              <div class="card__body">
+                <label class="field"><span class="field__label">Active remedial session (from Sessions master)</span>
+                  <select id="remActiveSession"><option value="">— Select session —</option></select>
+                </label>
+                <p class="muted-note">Session list comes from Academic Sessions already created in the main system.</p>
+                <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnRemSaveSession">Save session link</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="rem-panel" id="remPanel-enrolment" hidden>
+            <div class="page-toolbar">
+              <div class="page-toolbar__left" style="display:flex;gap:8px;flex-wrap:wrap">
+                <select id="remEnrFilterProg"><option value="">All programmes</option></select>
+                <select id="remEnrFilterLevel"><option value="">All levels</option></select>
+              </div>
+              <div class="page-toolbar__right qa-edit-only">
+                <button type="button" class="btn btn--primary" id="btnRemAddEnrolment">+ Enrol student</button>
+              </div>
+            </div>
+            <div class="table-card">
+              <table class="data-table">
+                <thead><tr><th>Name</th><th>Matric</th><th>Programme</th><th>Level</th><th>Enrolled courses</th><th class="qa-edit-only"></th></tr></thead>
+                <tbody id="remEnrolmentBody"></tbody>
+              </table>
+              <div class="empty-state" id="remEnrolmentEmpty"><h3>No enrolment yet</h3><p>Add only students who failed specific courses.</p></div>
+            </div>
+          </div>
+
+          <div class="rem-panel" id="remPanel-timetable" hidden>
+            <div class="card">
+              <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+                <h3 style="margin:0">Course → lecturer assignments</h3>
+                <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnRemAddAssignment">+ Assignment</button>
+              </div>
+              <div class="card__body table-scroll">
+                <table class="data-table"><thead><tr><th>Course code</th><th>Course title</th><th>Lecturer</th><th>Hours / slot</th><th class="qa-edit-only"></th></tr></thead>
+                <tbody id="remAssignBody"></tbody></table>
+              </div>
+            </div>
+            <div class="card" style="margin-top:12px">
+              <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+                <h3 style="margin:0">Weekly timetable slots</h3>
+                <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnRemAddSlot">+ Slot</button>
+              </div>
+              <div class="card__body table-scroll">
+                <table class="data-table"><thead><tr><th>Weekday</th><th>Course</th><th>Start</th><th>End</th><th>Hours</th><th class="qa-edit-only"></th></tr></thead>
+                <tbody id="remTtBody"></tbody></table>
+                <p class="muted-note">Weekday: 0=Mon … 4=Fri. Save is automatic into local master; Publish to repository when ready.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="rem-panel" id="remPanel-logging" hidden>
+            <div class="card" style="margin-bottom:12px">
+              <div class="card__body form-grid">
+                <label class="field"><span class="field__label">Date</span><input type="date" id="remLogDate" /></label>
+                <label class="field"><span class="field__label">Course</span><select id="remLogCourse"><option value="">— Select —</option></select></label>
+                <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--primary" id="btnRemLoadLogSheet">Load enrolled sheet</button></label>
+              </div>
+            </div>
+            <div id="remLogSheet" class="card"><div class="card__body muted-note">Pick date and course to mark present/absent for enrolled students only.</div></div>
+            <div class="page-toolbar" style="margin-top:12px">
+              <div class="page-toolbar__right qa-edit-only">
+                <button type="button" class="btn btn--primary" id="btnRemSaveLog">Save lecture log (REF required)</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="rem-panel" id="remPanel-weekly" hidden>
+            <div class="card">
+              <div class="card__body form-grid">
+                <label class="field"><span class="field__label">Week start</span><input type="date" id="remWeekStart" /></label>
+                <label class="field"><span class="field__label">Week end</span><input type="date" id="remWeekEnd" /></label>
+                <label class="field field--full"><span class="field__label">Excluded dates</span><input type="text" id="remWeekExclude" placeholder="e.g. 2026-10-13" /></label>
+                <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--primary" id="btnRemBuildWeekly">Build weekly analysis</button></label>
+                <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--ghost" id="btnRemPrintWeekly">Print weekly pack</button></label>
+              </div>
+            </div>
+            <div id="remWeeklyResult" style="margin-top:12px"></div>
+          </div>
+
+          <div class="rem-panel" id="remPanel-summary" hidden>
+            <div class="card">
+              <div class="card__body form-grid">
+                <label class="field"><span class="field__label">Period start</span><input type="date" id="remSumStart" /></label>
+                <label class="field"><span class="field__label">Period end</span><input type="date" id="remSumEnd" /></label>
+                <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--primary" id="btnRemBuildSummary">Build summary</button></label>
+                <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--ghost" id="btnRemPrintSummary">Print summary pack</button></label>
+              </div>
+              <p class="muted-note">Aggregates all remedial weeks in the range (course-specific rates + lecturer hours).</p>
+            </div>
+            <div id="remSummaryResult" style="margin-top:12px"></div>
           </div>
         </section>
 
         <section class="view" id="view-lecturer-hours">
           <div class="page-toolbar">
             <div class="page-toolbar__left">
-              <p class="muted-note" style="margin:0">Contract hours vs hours delivered (from lecture logs + remedial). Month filter applies to delivered hours.</p>
+              <p class="muted-note" style="margin:0">Contract hours vs hours delivered from <strong>regular</strong> lecture logs only (not remedial). Used with monthly QA reporting.</p>
             </div>
             <div class="page-toolbar__right" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
               <input type="month" id="lecturerHoursMonth" />
@@ -467,7 +577,7 @@
           <div id="lecturerHoursResult" class="card"><div class="card__body muted-note">Choose a month and build the report.</div></div>
         </section>
 
-        <section class="view" id="view-reports">
+<section class="view" id="view-reports">
           <div class="page-toolbar">
             <div class="page-toolbar__left">
               <p class="muted-note" style="margin:0">Professional QA and compliance packs: executive summary, charts, tables and narrative.</p>
@@ -749,7 +859,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=23"></script>
+  <script src="app.js?v=24"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>
@@ -777,6 +887,31 @@
         <div class="modal__footer">
           <button type="button" class="btn btn--ghost" id="btnCancelRemedial">Cancel</button>
           <button type="submit" class="btn btn--primary">Save remedial</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <div class="modal" id="remEnrolModal" hidden>
+    <div class="modal__backdrop" id="remEnrolModalBackdrop"></div>
+    <div class="modal__dialog">
+      <div class="modal__header"><h3>Enrol remedial student</h3><button type="button" class="icon-btn" id="btnCloseRemEnrol">&times;</button></div>
+      <form id="remEnrolForm" class="modal__body">
+        <input type="hidden" id="remEnrolId" />
+        <div class="form-grid">
+          <label class="field field--full"><span class="field__label">Full name <span class="req">*</span></span><input type="text" id="remEnrolName" required /></label>
+          <label class="field"><span class="field__label">Matric / Reg No <span class="req">*</span></span><input type="text" id="remEnrolMatric" required /></label>
+          <label class="field"><span class="field__label">Programme</span><select id="remEnrolProg"></select></label>
+          <label class="field"><span class="field__label">Level</span><select id="remEnrolLevel"></select></label>
+          <label class="field field--full"><span class="field__label">Enrolled courses (comma-separated codes)</span>
+            <input type="text" id="remEnrolCourses" required placeholder="e.g. GNS 211, GNS 213, MID 214" />
+          </label>
+          <label class="field field--full"><span class="field__label">Official REF <span class="req">*</span></span><input type="text" id="remEnrolRef" required placeholder="REF/EOCNS/QA/####" /></label>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" id="btnCancelRemEnrol">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save enrolment</button>
         </div>
       </form>
     </div>
