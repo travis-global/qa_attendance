@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "id": "sess_mvt9hjbtg2q3o",
+    "name": "2026/2027 SESSION",
+    "startDate": "2026-10-26",
+    "status": "Active",
+    "programmes": [
+      "Midwifery",
+      "Nursing"
+    ],
+    "levels": [
+      "100",
+      "200",
+      "300"
+    ],
+    "createdAt": "2026-10-29T08:08:36.372Z",
+    "updatedAt": "2026-10-29T08:08:36.372Z"
+  }
+]
