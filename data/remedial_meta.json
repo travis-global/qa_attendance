@@ -1,1 +1,15 @@
-{"sessionId":"","programmes":[{"id":"gns","name":"General Nursing"}],"levels":[{"id":"200","name":"200 Level"}]}
+{
+  "sessionId": "",
+  "programmes": [
+    {
+      "id": "gns",
+      "name": "General Nursing"
+    }
+  ],
+  "levels": [
+    {
+      "id": "200",
+      "name": "200 Level"
+    }
+  ]
+}
