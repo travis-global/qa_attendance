@@ -4434,5 +4434,1227 @@
     "user": "QA Officer",
     "source": "system",
     "id": 193
+  },
+  {
+    "ref": "REF/EOCNS/QA/1001",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt57ucg0o65h",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt57ucg0o65h",
+        "name": "FAVOUR CHISOM AGBO",
+        "regNo": "EOCNS/26/0051/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:09:05.629Z",
+        "updatedAt": "2026-10-29T06:09:05.629Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:09:05.667Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 194
+  },
+  {
+    "ref": "REF/EOCNS/QA/1002",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt59ujxg8324",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt59ujxg8324",
+        "name": "PRICELESS CHINENYE OKO",
+        "regNo": "EOCNS/26/0002/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:10:39.212Z",
+        "updatedAt": "2026-10-29T06:10:39.212Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:10:39.248Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 195
+  },
+  {
+    "ref": "REF/EOCNS/QA/1003",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt5d4x8965hn",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt5d4x8965hn",
+        "name": "FAVOUR CHIBUZOR OKO",
+        "regNo": "EOCNS/26/0003/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:13:12.616Z",
+        "updatedAt": "2026-10-29T06:13:12.616Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:13:12.661Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 196
+  },
+  {
+    "ref": "REF/EOCNS/QA/1004",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt5fmfmll77y",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt5fmfmll77y",
+        "name": "CHUKWUEMWKA DAVID IKECHUKWU",
+        "regNo": "EOCNS/26/0039/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Male",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:15:08.626Z",
+        "updatedAt": "2026-10-29T06:15:08.626Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:15:08.642Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 197
+  },
+  {
+    "ref": "REF/EOCNS/QA/1005",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt5wlheearrl",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt5wlheearrl",
+        "name": "AKPOM AMARACHUKWU NGOZICHUKWU",
+        "regNo": "EOCNS/26/0040/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:28:20.544Z",
+        "updatedAt": "2026-10-29T06:28:20.544Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:28:20.581Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 198
+  },
+  {
+    "ref": "REF/EOCNS/QA/1006",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt5xssjgfxmo",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt5xssjgfxmo",
+        "name": "EKUMMA UZOMA JENNIFER",
+        "regNo": "EOCNS/26/0061/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:29:16.675Z",
+        "updatedAt": "2026-10-29T06:29:16.675Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:29:16.687Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 199
+  },
+  {
+    "ref": "REF/EOCNS/QA/1007",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt5z49174ac3",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt5z49174ac3",
+        "name": "REJOICE B OWATEKIYE",
+        "regNo": "EOCNS/26/0022/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:30:18.176Z",
+        "updatedAt": "2026-10-29T06:30:18.176Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:30:18.225Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 200
+  },
+  {
+    "ref": "REF/EOCNS/QA/1008",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt608i0yal9t",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt608i0yal9t",
+        "name": "CHISOM MERCY IHEOMA",
+        "regNo": "EOCNS/26/0028/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:31:10.344Z",
+        "updatedAt": "2026-10-29T06:31:10.344Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:31:10.357Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 201
+  },
+  {
+    "ref": "REF/EOCNS/QA/1009",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt6228a8k8g9",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt6228a8k8g9",
+        "name": "OHANWACHI DIVINE OLUOMACHI",
+        "regNo": "EOCNS/26/0007/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:32:35.530Z",
+        "updatedAt": "2026-10-29T06:32:35.530Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:32:35.551Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 202
+  },
+  {
+    "ref": "REF/EOCNS/QA/1010",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt640jf92fsi",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt640jf92fsi",
+        "name": "ASOGWU PASCHALINE OGOCHUKWU",
+        "regNo": "EOCNS/26/0018/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Male",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:34:06.649Z",
+        "updatedAt": "2026-10-29T06:34:06.649Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:34:06.695Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 203
+  },
+  {
+    "ref": "REF/EOCNS/QA/1011",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt66dx3ghdd3",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt66dx3ghdd3",
+        "name": "ONYEBUEKE KINGSLEYEMMA",
+        "regNo": "EOCNS/26/0045/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Male",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:35:57.303Z",
+        "updatedAt": "2026-10-29T06:35:57.303Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:35:57.316Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 204
+  },
+  {
+    "ref": "REF/EOCNS/QA/1012",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt67rcfgdgln",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt67rcfgdgln",
+        "name": "BONIFACE ELIJAH",
+        "regNo": "EOCNS/26/0020/GNS",
+        "programme": "Nursing",
+        "level": null,
+        "gender": "Male",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:37:01.359Z",
+        "updatedAt": "2026-10-29T06:37:01.359Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:37:01.372Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 205
+  },
+  {
+    "ref": "REF/EOCNS/QA/1013",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt6a6r28v2lb",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt6a6r28v2lb",
+        "name": "UMUKORO MARY ANUOLUWAKPO",
+        "regNo": "EOCNS/26/0011/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:38:54.635Z",
+        "updatedAt": "2026-10-29T06:38:54.635Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:38:54.666Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 206
+  },
+  {
+    "ref": "REF/EOCNS/QA/1014",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt6bbl7my9to",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt6bbl7my9to",
+        "name": "GEORGE JESSICA UGONNA",
+        "regNo": "EOCNS/26/0065/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:39:47.563Z",
+        "updatedAt": "2026-10-29T06:39:47.563Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:39:47.574Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 207
+  },
+  {
+    "ref": "REF/EOCNS/QA/1015",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt6deqdsqxxo",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt6deqdsqxxo",
+        "name": "ADERSHINA DEBORAH KURFEH",
+        "regNo": "EOCNS/26/0048/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:41:24.947Z",
+        "updatedAt": "2026-10-29T06:41:24.947Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:41:24.975Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 208
+  },
+  {
+    "ref": "REF/EOCNS/QA/1016",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt6eev3mtvwy",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt6eev3mtvwy",
+        "name": "CHRISTIANA C NJOKU",
+        "regNo": "EOCNS/26/0033/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:42:11.775Z",
+        "updatedAt": "2026-10-29T06:42:11.775Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:42:11.786Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 209
+  },
+  {
+    "ref": "REF/EOCNS/QA/1017",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt6fhj86nqz5",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt6fhj86nqz5",
+        "name": "EZE UCHECHI ROSITA",
+        "regNo": "EOCNS/26/0029/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:43:01.892Z",
+        "updatedAt": "2026-10-29T06:43:01.892Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:43:01.904Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 210
+  },
+  {
+    "ref": "REF/EOCNS/QA/1018",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt6gnmsc3yz8",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt6gnmsc3yz8",
+        "name": "NNUBIA PERPETUAL SOBECHI",
+        "regNo": "EOCNS/26/0023/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:43:56.452Z",
+        "updatedAt": "2026-10-29T06:43:56.452Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:43:56.464Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 211
+  },
+  {
+    "ref": "REF/EOCNS/QA/1019",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt6jbpdr1hrn",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt6jbpdr1hrn",
+        "name": "ANI BLESSING CHIKA",
+        "regNo": "EOCNS/26/0071/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:46:00.959Z",
+        "updatedAt": "2026-10-29T06:46:00.959Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:46:01.021Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 212
+  },
+  {
+    "ref": "REF/EOCNS/QA/1020",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt6qfe010hkx",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt6qfe010hkx",
+        "name": "ONWE UKAMAKA DIVINE",
+        "regNo": "EOCNS/26/0073/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:51:32.325Z",
+        "updatedAt": "2026-10-29T06:51:32.325Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:51:32.406Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 213
+  },
+  {
+    "ref": "REF/EOCNS/QA/1021",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt6s51zt1w4x",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt6s51zt1w4x",
+        "name": "CHRISTOPHER NMESOMA PRECIOUS",
+        "regNo": "EOCNS/26/0069/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:52:52.245Z",
+        "updatedAt": "2026-10-29T06:52:52.245Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:52:52.290Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 214
+  },
+  {
+    "ref": "REF/EOCNS/QA/1022",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt6u6wcvitgf",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt6u6wcvitgf",
+        "name": "UGODINMA JULIET MMESOMA",
+        "regNo": "EOCNS/26/0031/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T06:54:27.946Z",
+        "updatedAt": "2026-10-29T06:54:27.946Z"
+      }
+    },
+    "timestamp": "2026-10-29T06:54:28.011Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 215
+  },
+  {
+    "ref": "REF/EOCNS/QA/1023",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt73l5b1n1la",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt73l5b1n1la",
+        "name": "OKONYE PRECIOUS NMESOMA",
+        "regNo": "EOCNS/26/0044/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:01:46.316Z",
+        "updatedAt": "2026-10-29T07:01:46.316Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:01:46.476Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 216
+  },
+  {
+    "ref": "REF/EOCNS/QA/1024",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt75llywrfop",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt75llywrfop",
+        "name": "EKWE LILIAN",
+        "regNo": "EOCNS/26/0009/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:03:20.226Z",
+        "updatedAt": "2026-10-29T07:03:20.226Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:03:20.290Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 217
+  },
+  {
+    "ref": "REF/EOCNS/QA/1025",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt78fw8v8euv",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt78fw8v8euv",
+        "name": "OKEKE SONIA ONYEKACHI",
+        "regNo": "EOCNS/26/0037/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:05:32.790Z",
+        "updatedAt": "2026-10-29T07:05:32.790Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:05:32.877Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 218
+  },
+  {
+    "ref": "REF/EOCNS/QA/1026",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt79nggh3cis",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt79nggh3cis",
+        "name": "OZULU VICTORY OZIOMA",
+        "regNo": "EOCNS/26/0008/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:06:29.248Z",
+        "updatedAt": "2026-10-29T07:06:29.248Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:06:29.276Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 219
+  },
+  {
+    "ref": "REF/EOCNS/QA/1027",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7caou47bpa",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7caou47bpa",
+        "name": "EZEOKE OGECHI FAITH",
+        "regNo": "EOCNS/26/0068/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:08:32.665Z",
+        "updatedAt": "2026-10-29T07:08:32.665Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:08:32.726Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 220
+  },
+  {
+    "ref": "REF/EOCNS/QA/1028",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7em4q8mzz4",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7em4q8mzz4",
+        "name": "AZU LOVETH IFEANYI",
+        "regNo": "EOCNS/26/0059/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:10:20.810Z",
+        "updatedAt": "2026-10-29T07:10:20.810Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:10:20.840Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 221
+  },
+  {
+    "ref": "REF/EOCNS/QA/1029",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7il7amtbt1",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7il7amtbt1",
+        "name": "ORAIDU IFEOMA SATION",
+        "regNo": "EOCNS/26/0032/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:13:26.226Z",
+        "updatedAt": "2026-10-29T07:13:26.226Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:13:26.273Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 222
+  },
+  {
+    "ref": "REF/EOCNS/QA/1030",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7jrp1j42d5",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7jrp1j42d5",
+        "name": "NNAJI ONYINYECHI A",
+        "regNo": "EOCNS/26/0015/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:14:21.301Z",
+        "updatedAt": "2026-10-29T07:14:21.301Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:14:21.320Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 223
+  },
+  {
+    "ref": "REF/EOCNS/QA/1031",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7ndbtiyly8",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7ndbtiyly8",
+        "name": "KELECHI BEATRICE ANURIKA",
+        "regNo": "EOCNS/26/0066/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:17:09.302Z",
+        "updatedAt": "2026-10-29T07:17:09.302Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:17:09.369Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 224
+  },
+  {
+    "ref": "REF/EOCNS/QA/1032",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7oenlzidsn",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7oenlzidsn",
+        "name": "AMADI CHUKWUKAYIMA ASSUMPTA",
+        "regNo": "EOCNS/26/0034/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:17:57.681Z",
+        "updatedAt": "2026-10-29T07:17:57.681Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:17:57.695Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 225
+  },
+  {
+    "ref": "REF/EOCNS/QA/1033",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7pq6j9uquh",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7pq6j9uquh",
+        "name": "NWACHI ARBITA NMESOMA",
+        "regNo": "EOCNS/26/0055/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:18:59.274Z",
+        "updatedAt": "2026-10-29T07:18:59.274Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:18:59.313Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 226
+  },
+  {
+    "ref": "REF/EOCNS/QA/1034",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7rk5ra0ocn",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7rk5ra0ocn",
+        "name": "IGWE CHINAZAEKPERE GIFT",
+        "regNo": "EOCNS/26/0004/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:20:24.778Z",
+        "updatedAt": "2026-10-29T07:20:24.778Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:20:24.871Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 227
+  },
+  {
+    "ref": "REF/EOCNS/QA/1035",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7siw775lhf",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7siw775lhf",
+        "name": "UMAHI PRAISE ANURITA",
+        "regNo": "EOCNS/26/0067/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:21:09.795Z",
+        "updatedAt": "2026-10-29T07:21:09.795Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:21:09.825Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 228
+  },
+  {
+    "ref": "REF/EOCNS/QA/1036",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7uykf39hti",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7uykf39hti",
+        "name": "NWITE FAVOUR OLOUMACHI",
+        "regNo": "EOCNS/26/0056/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:23:03.421Z",
+        "updatedAt": "2026-10-29T07:23:03.421Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:23:03.474Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 229
+  },
+  {
+    "ref": "REF/EOCNS/QA/1037",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7w8djbt7r4",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7w8djbt7r4",
+        "name": "CHUKWU BLESSING IFESINACHI",
+        "regNo": "EOCNS/26/0063/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:24:02.791Z",
+        "updatedAt": "2026-10-29T07:24:02.791Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:24:02.810Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 230
+  },
+  {
+    "ref": "REF/EOCNS/QA/1038",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7xgq65ftgj",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7xgq65ftgj",
+        "name": "PRINCESS CHINWENDU AMADI",
+        "regNo": "EOCNS/26/0052/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:25:00.267Z",
+        "updatedAt": "2026-10-29T07:25:00.267Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:25:00.316Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 231
+  },
+  {
+    "ref": "REF/EOCNS/QA/1039",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7yrcn7md6q",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7yrcn7md6q",
+        "name": "PRECIOUS NKEMUJIKA JOSEPH",
+        "regNo": "EOCNS/26/0019/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:26:00.695Z",
+        "updatedAt": "2026-10-29T07:26:00.695Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:26:00.728Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 232
+  },
+  {
+    "ref": "REF/EOCNS/QA/1040",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt7zy45n0gfo",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt7zy45n0gfo",
+        "name": "AHAMA VICTORIA EGBAI",
+        "regNo": "EOCNS/26/0062/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:26:56.117Z",
+        "updatedAt": "2026-10-29T07:26:56.117Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:26:56.129Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 233
+  },
+  {
+    "ref": "REF/EOCNS/QA/1041",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt81gvh0vuru",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt81gvh0vuru",
+        "name": "UCHECHUKWU BETHEL C",
+        "regNo": "EOCNS/26/0057/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:28:07.084Z",
+        "updatedAt": "2026-10-29T07:28:07.084Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:28:07.096Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 234
+  },
+  {
+    "ref": "REF/EOCNS/QA/1042",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt82nzdyiyzg",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt82nzdyiyzg",
+        "name": "JOSEPH ONYINYECHI SHALOM",
+        "regNo": "EOCNS/26/0053/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:29:02.951Z",
+        "updatedAt": "2026-10-29T07:29:02.951Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:29:02.966Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 235
+  },
+  {
+    "ref": "REF/EOCNS/QA/1043",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt84h1pec3rw",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt84h1pec3rw",
+        "name": "OGBONNA COMFORT",
+        "regNo": "EOCNS/26/0047/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:30:27.277Z",
+        "updatedAt": "2026-10-29T07:30:27.277Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:30:27.308Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 236
+  },
+  {
+    "ref": "REF/EOCNS/QA/1044",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt85m4ld5v99",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt85m4ld5v99",
+        "name": "UBOCHI PROGRESS KOSARACHI",
+        "regNo": "EOCNS/26/0074/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:31:20.517Z",
+        "updatedAt": "2026-10-29T07:31:20.517Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:31:20.534Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 237
+  },
+  {
+    "ref": "REF/EOCNS/QA/1045",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt88v7gifstb",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt88v7gifstb",
+        "name": "MIRACLE OLUEBUBE IGWE",
+        "regNo": "EOCNS/26/0054/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:33:52.251Z",
+        "updatedAt": "2026-10-29T07:33:52.251Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:33:52.294Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 238
+  },
+  {
+    "ref": "REF/EOCNS/QA/1046",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt89txo5zb8g",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt89txo5zb8g",
+        "name": "NWUZOR ONYINYECHI SUCCESS",
+        "regNo": "EOCNS/26/0064/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:34:37.260Z",
+        "updatedAt": "2026-10-29T07:34:37.260Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:34:37.275Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 239
+  },
+  {
+    "ref": "REF/EOCNS/QA/1047",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvt8c14v7pnln",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvt8c14v7pnln",
+        "name": "DAUKEYEI EBIPAMEERE",
+        "regNo": "EOCNS/26/0006/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-29T07:36:19.899Z",
+        "updatedAt": "2026-10-29T07:36:19.899Z"
+      }
+    },
+    "timestamp": "2026-10-29T07:36:20.001Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 240
   }
 ]
