@@ -2717,6 +2717,93 @@ function updateQaOfficerUI() {
   if (inn) inn.hidden = !loggedIn;
 }
 
+
+async function changeQaOfficerPin() {
+  var status = document.getElementById("changePinStatus");
+  function setStatus(msg, ok) {
+    if (!status) return;
+    status.hidden = false;
+    status.textContent = msg;
+    status.style.color = ok ? "#0f766e" : "#b91c1c";
+  }
+  var current = (document.getElementById("changePinCurrent") && document.getElementById("changePinCurrent").value || "").trim();
+  var neu = (document.getElementById("changePinNew") && document.getElementById("changePinNew").value || "").trim();
+  var conf = (document.getElementById("changePinConfirm") && document.getElementById("changePinConfirm").value || "").trim();
+  var expected = (APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA";
+  if (!current) { setStatus("Enter the current PIN."); return; }
+  if (current !== expected) {
+    setStatus("Current PIN is incorrect. PIN was not changed.");
+    return;
+  }
+  if (!neu || neu.length < 4) {
+    setStatus("New PIN must be at least 4 characters.");
+    return;
+  }
+  if (neu !== conf) {
+    setStatus("New PIN and confirmation do not match.");
+    return;
+  }
+  if (neu === current) {
+    setStatus("New PIN is the same as the current PIN.");
+    return;
+  }
+  if (!confirm("Update the QA officer PIN in the repository now? Other devices will use the new PIN after they refresh and reload config.")) return;
+
+  // Update local config
+  APP_CONFIG = Object.assign({}, APP_CONFIG, {
+    qaPin: neu,
+    qaPinNote: "Officer password. Rotated " + new Date().toISOString().slice(0, 10) + ".",
+    qaPinUpdatedAt: new Date().toISOString()
+  });
+
+  var workerUrl = (APP_CONFIG.publishWorkerUrl || "").trim();
+  var pubKey = (APP_CONFIG.publishWorkerKey || "").trim();
+  if (!workerUrl) {
+    setStatus("PIN updated in this browser only. Publish worker URL is missing — set it in config and publish data/config.json.");
+    markDirty("config pin");
+    return;
+  }
+
+  setStatus("Updating data/config.json via publish worker…");
+  try {
+    var files = {};
+    files[DATA_FILES.config] = JSON.stringify(APP_CONFIG, null, 2);
+    var res = await fetch(workerUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Publish-Key": pubKey },
+      body: JSON.stringify({ publishKey: pubKey, files: files, message: "chore: rotate QA officer PIN" })
+    });
+    var body = {};
+    try { body = await res.json(); } catch (_) {}
+    if (!res.ok) {
+      var detail = body.error || body.message || res.statusText || ("HTTP " + res.status);
+      setStatus("Repository update failed: " + detail + ". Local PIN was updated in this session only — fix the worker and try again, or publish full data from Settings.");
+      markDirty("config pin");
+      return;
+    }
+    // Stay signed in; clear form fields
+    ["changePinCurrent", "changePinNew", "changePinConfirm"].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+    if (!isQaOfficer()) setQaOfficer(true);
+    try {
+      await writeAudit({
+        action: "update",
+        entity: "config",
+        entityId: "qaPin",
+        reason: "QA officer PIN rotated",
+        details: { rotatedAt: APP_CONFIG.qaPinUpdatedAt }
+      });
+    } catch (_) {}
+    setStatus("PIN updated in the repository (data/config.json). Use the new PIN on all devices after refresh. Keep it confidential.");
+  } catch (err) {
+    console.error(err);
+    setStatus("Network error while updating repository: " + (err.message || String(err)) + ". Local session has the new PIN; publish when online.");
+    markDirty("config pin");
+  }
+}
+
 function initQaOfficerUI() {
   setQaOfficer(isQaOfficer());
   updateQaOfficerUI();
@@ -2731,6 +2818,7 @@ function initQaOfficerUI() {
       if (err) { err.hidden = false; err.textContent = "Incorrect PIN."; }
     }
   });
+  document.getElementById("btnChangeQaPin")?.addEventListener("click", () => { changeQaOfficerPin(); });
   document.getElementById("btnQaLogout")?.addEventListener("click", () => {
     setQaOfficer(false);
     const panel = document.getElementById("qaTokenPanel");
