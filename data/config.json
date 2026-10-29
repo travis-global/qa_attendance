@@ -1,8 +1,9 @@
 {
-  "qaPin": "EOCNS-QA",
-  "qaPinNote": "Officer password. Change and commit to update.",
+  "qaPin": "EOCNSQA",
+  "qaPinNote": "Officer password. Rotated 2026-10-29.",
   "institution": "Eastern Oak College of Nursing Sciences",
   "publishWorkerUrl": "https://eocns-publish.alemfort12.workers.dev",
   "publishWorkerKey": "K7mQ2vR9xL4pT8nB",
-  "publishNote": "Set publishWorkerUrl to your Cloudflare Worker URL after deploy. GitHub PAT stays only in the Worker secret GITHUB_TOKEN."
+  "publishNote": "Set publishWorkerUrl to your Cloudflare Worker URL after deploy. GitHub PAT stays only in the Worker secret GITHUB_TOKEN.",
+  "qaPinUpdatedAt": "2026-10-29T08:01:54.222Z"
 }
