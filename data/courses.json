@@ -28,14 +28,6 @@
     ]
   },
   {
-    "code": "ECA",
-    "name": "ECA",
-    "classKeys": [
-      "100_nursing",
-      "200_nursing"
-    ]
-  },
-  {
     "code": "EED 126",
     "name": "Intro. to Entrepreneurship",
     "classKeys": [
@@ -169,6 +161,11 @@
     "classKeys": [
       "200_nursing"
     ]
+  },
+  {
+    "code": "RAD 342",
+    "name": "Radiography",
+    "classKeys": []
   },
   {
     "code": "RES 201",
