@@ -21,7 +21,8 @@ document.querySelectorAll(".nav-item").forEach((item) => {
 });
 const titles = {
   dashboard: { title: "Dashboard", subtitle: "Eastern Oak College of Nursing Sciences" },
-  students: { title: "Students", subtitle: "Master registry · filtered by active session programmes & levels" },
+  students: { title: "Students", subtitle: "Master registry · passport profile & full record" },
+  discipline: { title: "Discipline", subtitle: "Student Affairs disciplinary register" },
   lecturers: { title: "Lecturers", subtitle: "Staff & course assignments" },
   hostel: { title: "Hostel Attendance", subtitle: "Gate log to boarding fee reports" },
   sessions: { title: "Academic Sessions", subtitle: "Programmes, levels and timetables" },
@@ -45,6 +46,7 @@ function showView(viewId) {
   if (subEl) subEl.textContent = meta.subtitle;
   try { sessionStorage.setItem("eocns-last-view", viewId); } catch (_) {}
   if (viewId === "students") renderStudentsTable();
+  if (viewId === "discipline") renderDisciplineTable();
   if (viewId === "lecturers") renderLecturersTable();
   if (viewId === "remedial") showRemTab("setup");
   if (viewId === "lecturer-hours") {
@@ -94,7 +96,7 @@ window.addEventListener("beforeunload", function(e) {
 });
 
 const DB_NAME = "eocns_attendance";
-const DB_VERSION = 8;
+const DB_VERSION = 9;
 let db = null;
 
 async function resetLocalDatabase() {
@@ -173,6 +175,7 @@ function openDB() {
         if (!database.objectStoreNames.contains("remedial_assignments")) database.createObjectStore("remedial_assignments", { keyPath: "id" });
         if (!database.objectStoreNames.contains("remedial_timetable")) database.createObjectStore("remedial_timetable", { keyPath: "key" });
         if (!database.objectStoreNames.contains("remedial_logs")) database.createObjectStore("remedial_logs", { keyPath: "id" });
+        if (!database.objectStoreNames.contains("discipline")) database.createObjectStore("discipline", { keyPath: "id" });
 
       } catch (upgradeErr) {
         console.error("onupgradeneeded", upgradeErr);
@@ -1291,6 +1294,33 @@ openDB().then(async () => {
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
   try { refreshDashboardStats(); } catch (e) { console.warn("stats", e); }
   initQaOfficerUI();
+
+  document.getElementById("btnProfilePhoto") && document.getElementById("btnProfilePhoto").addEventListener("click", function() {
+    document.getElementById("profilePhotoInput") && document.getElementById("profilePhotoInput").click();
+  });
+  document.getElementById("profilePhotoInput") && document.getElementById("profilePhotoInput").addEventListener("change", function(e) {
+    var f = e.target.files && e.target.files[0];
+    if (f) handleProfilePhotoUpload(f);
+    e.target.value = "";
+  });
+  document.getElementById("btnProfileFullRecord") && document.getElementById("btnProfileFullRecord").addEventListener("click", function() {
+    openStudentFullRecord(window.__profileStudentId);
+  });
+  document.getElementById("btnCloseFullRecord") && document.getElementById("btnCloseFullRecord").addEventListener("click", closeStudentFullRecord);
+  document.getElementById("btnCloseFullRecord2") && document.getElementById("btnCloseFullRecord2").addEventListener("click", closeStudentFullRecord);
+  document.getElementById("studentFullRecordBackdrop") && document.getElementById("studentFullRecordBackdrop").addEventListener("click", closeStudentFullRecord);
+  document.getElementById("btnPrintStudentSummary") && document.getElementById("btnPrintStudentSummary").addEventListener("click", printStudentSummary);
+  document.getElementById("btnAddDiscipline") && document.getElementById("btnAddDiscipline").addEventListener("click", function() { openDisciplineForm(null); });
+  document.getElementById("disciplineForm") && document.getElementById("disciplineForm").addEventListener("submit", saveDisciplineCase);
+  document.getElementById("btnCloseDiscipline") && document.getElementById("btnCloseDiscipline").addEventListener("click", closeDisciplineForm);
+  document.getElementById("btnCancelDiscipline") && document.getElementById("btnCancelDiscipline").addEventListener("click", closeDisciplineForm);
+  document.getElementById("disciplineModalBackdrop") && document.getElementById("disciplineModalBackdrop").addEventListener("click", closeDisciplineForm);
+  document.getElementById("btnPrintDiscRegister") && document.getElementById("btnPrintDiscRegister").addEventListener("click", printDisciplineRegister);
+  ["discFilterSubject","discFilterStatus","discSearch"].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.addEventListener("change", renderDisciplineTable); el.addEventListener("input", renderDisciplineTable); }
+  });
+
   try { bindStudentProfileCloseHandlers(); } catch (_) {}
   document.getElementById("globalSessionSelect")?.addEventListener("change", function() {
     setActiveSessionId(this.value);
@@ -2639,6 +2669,373 @@ async function deleteRemedial() {}
   }
   var _open = window.open;
   // soft: patch known print functions if defined later - already have amendmentFooterHtml on remedial
+
+// ========== Student photo + full record + Discipline (DSA) ==========
+function compressPassportImage(file, maxSide, quality) {
+  maxSide = maxSide || 480;
+  quality = quality || 0.72;
+  return new Promise(function(resolve, reject) {
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function() {
+      var w = img.width, h = img.height;
+      var scale = Math.min(1, maxSide / Math.max(w, h));
+      var cw = Math.max(1, Math.round(w * scale));
+      var ch = Math.max(1, Math.round(h * scale));
+      var canvas = document.createElement("canvas");
+      canvas.width = cw; canvas.height = ch;
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, cw, ch);
+      URL.revokeObjectURL(url);
+      var dataUrl = canvas.toDataURL("image/jpeg", quality);
+      // second pass if still large (>120KB)
+      if (dataUrl.length > 160000) {
+        dataUrl = canvas.toDataURL("image/jpeg", 0.55);
+      }
+      resolve(dataUrl);
+    };
+    img.onerror = function() { URL.revokeObjectURL(url); reject(new Error("Could not read image")); };
+    img.src = url;
+  });
+}
+
+async function saveStudentPassport(studentId, dataUrl) {
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === studentId; });
+  if (!s) throw new Error("Student not found");
+  s.photoDataUrl = dataUrl;
+  s.photoUpdatedAt = new Date().toISOString();
+  await put("students", s);
+  markDirty("student photo");
+  await writeAudit({
+    action: "update", entity: "students", entityId: studentId,
+    reason: "Passport photograph updated (auto-compressed)",
+    details: { bytesApprox: dataUrl.length }
+  });
+  return s;
+}
+
+async function openStudentProfile(id) {
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === id; });
+  if (!s) return;
+  window.__profileStudentId = id;
+  document.getElementById("studentProfileTitle").textContent = s.name || "Student";
+  var rem = [];
+  try {
+    rem = (await getAll("remedial_enrolment")).filter(function(r) {
+      return r.matric === s.regNo || (r.name && s.name && r.name.toLowerCase() === s.name.toLowerCase());
+    });
+  } catch (_) {}
+  var disc = [];
+  try {
+    disc = (await getAll("discipline")).filter(function(d) {
+      return d.subjectId === s.id || (d.subjectRef && s.regNo && d.subjectRef === s.regNo) ||
+        (d.name && s.name && d.name.toLowerCase() === s.name.toLowerCase());
+    });
+  } catch (_) {}
+  var initials = (s.name || "?").split(/\s+/).map(function(p) { return p[0]; }).join("").slice(0, 2).toUpperCase();
+  var photoHtml = s.photoDataUrl
+    ? '<div class="passport-frame"><img src="' + s.photoDataUrl + '" alt="Passport" /></div>'
+    : '<div class="passport-frame" title="No photo">' + escapeHtml(initials) + "</div>";
+  var body = document.getElementById("studentProfileBody");
+  body.innerHTML =
+    '<div class="profile-layout">' + photoHtml +
+    '<div class="profile-meta">' +
+    "<p><strong>Reg. No:</strong> " + escapeHtml(s.regNo || "—") + "</p>" +
+    "<p><strong>Programme / Level:</strong> " + escapeHtml(s.programme || "—") + " · " + escapeHtml(String(s.level || "—")) + "</p>" +
+    "<p><strong>Hostel:</strong> " + escapeHtml(s.hostel || "—") + "</p>" +
+    "<p><strong>Status:</strong> " + escapeHtml(s.status || "Active") + "</p>" +
+    "<p><strong>Gender / Phone:</strong> " + escapeHtml(s.gender || "—") + " · " + escapeHtml(s.phone || "—") + "</p>" +
+    "<p><strong>Active session:</strong> " + (ACTIVE_SESSION ? escapeHtml(ACTIVE_SESSION.name) : "—") + "</p>" +
+    "<p><strong>Remedial:</strong> " + (rem.length ? rem.map(function(r) { return escapeHtml((r.courses || r.courseCodes || []).join(", ") || "enrolled"); }).join(" | ") : "None on file") + "</p>" +
+    "<p><strong>Discipline cases:</strong> " + (disc.length ? disc.length + " on file" : "None on file") + "</p>" +
+    "</div></div>";
+  var drawer = document.getElementById("studentProfileDrawer");
+  if (drawer) {
+    drawer.hidden = false;
+    drawer.removeAttribute("hidden");
+    drawer.style.display = "";
+  }
+  bindStudentProfileCloseHandlers();
+}
+
+async function handleProfilePhotoUpload(file) {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to set passport photos."); return; }
+  var id = window.__profileStudentId;
+  if (!id || !file) return;
+  try {
+    var dataUrl = await compressPassportImage(file, 480, 0.72);
+    await saveStudentPassport(id, dataUrl);
+    await openStudentProfile(id);
+    alert("Passport photo saved (automatically compressed for clean storage). Publish when ready.");
+  } catch (err) {
+    alert("Photo failed: " + (err.message || String(err)));
+  }
+}
+
+async function buildStudentFullRecord(id) {
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === id; });
+  if (!s) return null;
+  var qa = await getAll("qa_entries");
+  var absents = [];
+  qa.forEach(function(e) {
+    var hit = false;
+    if (Array.isArray(e.absentDetails)) {
+      hit = e.absentDetails.some(function(d) { return d.id === s.id || d.regNo === s.regNo || (d.name && d.name === s.name); });
+    }
+    if (!hit && Array.isArray(e.absent)) {
+      hit = e.absent.some(function(a) {
+        var t = String(a).toLowerCase();
+        return (s.name && t.indexOf(s.name.toLowerCase()) >= 0) || (s.regNo && t.indexOf(String(s.regNo).toLowerCase()) >= 0);
+      });
+    }
+    if (hit) absents.push(e);
+  });
+  var rem = [];
+  try {
+    rem = (await getAll("remedial_enrolment")).filter(function(r) {
+      return r.matric === s.regNo || (r.name && s.name && r.name.toLowerCase() === s.name.toLowerCase());
+    });
+  } catch (_) {}
+  var disc = [];
+  try {
+    disc = (await getAll("discipline")).filter(function(d) {
+      return d.subjectId === s.id || (d.subjectRef && s.regNo && d.subjectRef === s.regNo) ||
+        (d.name && s.name && d.name.toLowerCase() === s.name.toLowerCase());
+    });
+  } catch (_) {}
+  var audit = [];
+  try {
+    audit = (await getAll("audit")).filter(function(a) {
+      return a.entityId === s.id || (a.details && (a.details.regNo === s.regNo || a.details.name === s.name));
+    }).slice(0, 40);
+  } catch (_) {}
+  return { student: s, absents: absents, remedial: rem, discipline: disc, audit: audit };
+}
+
+async function openStudentFullRecord(id) {
+  id = id || window.__profileStudentId;
+  if (!id) return;
+  var data = await buildStudentFullRecord(id);
+  if (!data) return;
+  var s = data.student;
+  document.getElementById("studentFullRecordTitle").textContent = "Full record — " + (s.name || "");
+  var photo = s.photoDataUrl
+    ? '<div class="passport-frame" style="margin-bottom:12px"><img src="' + s.photoDataUrl + '" alt="" /></div>'
+    : "";
+  function listBlock(title, items, rowFn) {
+    if (!items.length) return '<div class="record-section"><h4>' + title + '</h4><p class="muted-note">None on file</p></div>';
+    return '<div class="record-section"><h4>' + title + " (" + items.length + ")</h4><ul style=\"padding-left:18px;margin:0\">" +
+      items.map(rowFn).join("") + "</ul></div>";
+  }
+  var body = document.getElementById("studentFullRecordBody");
+  body.innerHTML = photo +
+    "<p><strong>" + escapeHtml(s.name) + "</strong> · " + escapeHtml(s.regNo || "—") + " · " +
+    escapeHtml(s.programme || "") + " " + escapeHtml(String(s.level || "")) + " · Hostel: " + escapeHtml(s.hostel || "—") + "</p>" +
+    listBlock("Lecture absences (from QA logs)", data.absents, function(e) {
+      return "<li>" + escapeHtml(e.date || "") + " · " + escapeHtml(e.course || "") + " · " + escapeHtml(e.status || "") + "</li>";
+    }) +
+    listBlock("Remedial enrolment", data.remedial, function(r) {
+      return "<li>" + escapeHtml((r.courses || r.courseCodes || []).join(", ") || "enrolled") +
+        (r.sessionName ? " · " + escapeHtml(r.sessionName) : "") + "</li>";
+    }) +
+    listBlock("Disciplinary cases", data.discipline, function(d) {
+      return "<li>" + escapeHtml(d.date || "") + " · " + escapeHtml(d.type || "") + " · " +
+        escapeHtml(d.status || "") + " · " + escapeHtml(d.ref || "") + "</li>";
+    }) +
+    listBlock("Recent audit touches", data.audit, function(a) {
+      return "<li>" + escapeHtml(a.at || a.createdAt || "") + " · " + escapeHtml(a.action || "") + " · " +
+        escapeHtml(a.reason || "") + "</li>";
+    });
+  window.__fullRecordStudentId = id;
+  var m = document.getElementById("studentFullRecordModal");
+  if (m) { m.hidden = false; m.removeAttribute("hidden"); m.style.display = ""; }
+}
+
+function closeStudentFullRecord() {
+  var m = document.getElementById("studentFullRecordModal");
+  if (!m) return;
+  m.hidden = true; m.setAttribute("hidden", ""); m.style.display = "none";
+}
+
+async function printStudentSummary() {
+  var id = window.__fullRecordStudentId || window.__profileStudentId;
+  if (!id) return;
+  var data = await buildStudentFullRecord(id);
+  if (!data) return;
+  var s = data.student;
+  var w = window.open("", "_blank");
+  if (!w) return;
+  var photo = s.photoDataUrl ? '<img src="' + s.photoDataUrl + '" style="width:90px;height:110px;object-fit:cover;border:1px solid #ccc"/>' : "";
+  w.document.write("<!DOCTYPE html><html><head><title>Student summary</title><style>body{font-family:Georgia,serif;padding:24px;color:#0f172a}h1{color:#0d9488;font-size:1.3rem}table{border-collapse:collapse;width:100%;font-size:0.9rem}td,th{border:1px solid #cbd5e1;padding:6px;text-align:left}.muted{color:#64748b;font-size:0.85rem}</style></head><body>" +
+    "<h1>EOCNS — Student Affairs summary</h1>" +
+    (ACTIVE_SESSION ? "<p class=\"muted\">Session: " + escapeHtml(ACTIVE_SESSION.name) + "</p>" : "") +
+    "<div style=\"display:flex;gap:16px\">" + photo + "<div><p><strong>" + escapeHtml(s.name) + "</strong></p>" +
+    "<p>Reg: " + escapeHtml(s.regNo || "—") + "<br/>" + escapeHtml(s.programme || "") + " · Level " + escapeHtml(String(s.level || "")) +
+    "<br/>Hostel: " + escapeHtml(s.hostel || "—") + "</p></div></div>" +
+    "<h3>Disciplinary cases</h3><table><thead><tr><th>Date</th><th>Type</th><th>Status</th><th>REF</th></tr></thead><tbody>" +
+    (data.discipline.length ? data.discipline.map(function(d) {
+      return "<tr><td>" + escapeHtml(d.date||"") + "</td><td>" + escapeHtml(d.type||"") + "</td><td>" + escapeHtml(d.status||"") + "</td><td>" + escapeHtml(d.ref||"") + "</td></tr>";
+    }).join("") : "<tr><td colspan=4>None on file</td></tr>") +
+    "</tbody></table>" +
+    "<h3>Lecture absences logged</h3><p class=\"muted\">" + data.absents.length + " linked QA absence mark(s)</p>" +
+    "<p class=\"muted\">Generated " + new Date().toLocaleString() + " · Officer system summary</p></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 300);
+}
+
+async function renderDisciplineTable() {
+  var tbody = document.getElementById("disciplineTableBody");
+  if (!tbody) return;
+  if (!isQaOfficer()) {
+    tbody.innerHTML = "<tr><td colspan=\"7\">Sign in as QA Officer to view and manage the disciplinary register.</td></tr>";
+    return;
+  }
+  var list = await getAll("discipline");
+  var sub = (document.getElementById("discFilterSubject") && document.getElementById("discFilterSubject").value) || "";
+  var st = (document.getElementById("discFilterStatus") && document.getElementById("discFilterStatus").value) || "";
+  var q = ((document.getElementById("discSearch") && document.getElementById("discSearch").value) || "").toLowerCase().trim();
+  list = list.filter(function(d) {
+    if (sub && d.subjectType !== sub) return false;
+    if (st && d.status !== st) return false;
+    if (q) {
+      var blob = ((d.name || "") + " " + (d.ref || "") + " " + (d.summary || "") + " " + (d.subjectRef || "")).toLowerCase();
+      if (blob.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+  list.sort(function(a, b) { return String(b.date || "").localeCompare(String(a.date || "")); });
+  var count = document.getElementById("discCount");
+  if (count) count.textContent = list.length + " case" + (list.length !== 1 ? "s" : "");
+  tbody.innerHTML = list.length ? list.map(function(d) {
+    return "<tr><td>" + escapeHtml(d.date || "—") + "</td><td>" + escapeHtml(d.subjectType || "") +
+      "</td><td>" + escapeHtml(d.name || "—") + "</td><td>" + escapeHtml(d.type || "—") +
+      "</td><td>" + escapeHtml(d.status || "—") + "</td><td>" + escapeHtml(d.ref || "—") +
+      '</td><td class="qa-edit-only"><button type="button" class="icon-btn-sm" data-edit-disc="' + d.id + '">Edit</button> ' +
+      '<button type="button" class="icon-btn-sm" data-del-disc="' + d.id + '">Del</button></td></tr>';
+  }).join("") : "<tr><td colspan=\"7\">No cases match filters.</td></tr>";
+  tbody.querySelectorAll("[data-edit-disc]").forEach(function(btn) {
+    btn.addEventListener("click", function() { openDisciplineForm(btn.getAttribute("data-edit-disc")); });
+  });
+  tbody.querySelectorAll("[data-del-disc]").forEach(function(btn) {
+    btn.addEventListener("click", function() { deleteDisciplineCase(btn.getAttribute("data-del-disc")); });
+  });
+}
+
+async function openDisciplineForm(id) {
+  if (!isQaOfficer()) return;
+  document.getElementById("disciplineForm").reset();
+  document.getElementById("discId").value = id || "";
+  document.getElementById("disciplineModalTitle").textContent = id ? "Edit disciplinary case" : "New disciplinary case";
+  // datalist names
+  var dl = document.getElementById("discNameList");
+  if (dl) {
+    var students = await getAll("students");
+    var lecturers = await getAll("lecturers");
+    dl.innerHTML = students.map(function(s) { return '<option value="' + escapeHtml(s.name) + '">'; }).join("") +
+      lecturers.map(function(l) { return '<option value="' + escapeHtml(l.name) + '">'; }).join("");
+  }
+  if (id) {
+    var all = await getAll("discipline");
+    var d = all.find(function(x) { return x.id === id; });
+    if (d) {
+      document.getElementById("discSubjectType").value = d.subjectType || "student";
+      document.getElementById("discDate").value = d.date || "";
+      document.getElementById("discName").value = d.name || "";
+      document.getElementById("discSubjectRef").value = d.subjectRef || "";
+      document.getElementById("discSubjectId").value = d.subjectId || "";
+      document.getElementById("discType").value = d.type || "Written warning";
+      document.getElementById("discStatus").value = d.status || "Open";
+      document.getElementById("discSummary").value = d.summary || "";
+      document.getElementById("discOutcome").value = d.outcome || "";
+      document.getElementById("discRef").value = d.ref || "";
+    }
+  } else {
+    document.getElementById("discDate").value = new Date().toISOString().slice(0, 10);
+  }
+  var m = document.getElementById("disciplineModal");
+  if (m) { m.hidden = false; m.removeAttribute("hidden"); m.style.display = ""; }
+}
+
+function closeDisciplineForm() {
+  var m = document.getElementById("disciplineModal");
+  if (!m) return;
+  m.hidden = true; m.setAttribute("hidden", ""); m.style.display = "none";
+}
+
+async function saveDisciplineCase(e) {
+  e.preventDefault();
+  if (!isQaOfficer()) return;
+  var id = (document.getElementById("discId").value || "").trim() || null;
+  var ref = (document.getElementById("discRef").value || "").trim();
+  var name = (document.getElementById("discName").value || "").trim();
+  var summary = (document.getElementById("discSummary").value || "").trim();
+  if (!ref || !name || !summary) { alert("Name, summary and official REF are required."); return; }
+  var now = new Date().toISOString();
+  var rec = {
+    id: id || ("disc_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
+    subjectType: document.getElementById("discSubjectType").value || "student",
+    date: document.getElementById("discDate").value,
+    name: name,
+    subjectRef: (document.getElementById("discSubjectRef").value || "").trim(),
+    subjectId: (document.getElementById("discSubjectId").value || "").trim(),
+    type: document.getElementById("discType").value,
+    status: document.getElementById("discStatus").value,
+    summary: summary,
+    outcome: (document.getElementById("discOutcome").value || "").trim(),
+    ref: ref,
+    updatedAt: now
+  };
+  if (!id) rec.createdAt = now;
+  stampSessionFields(rec);
+  await put("discipline", rec);
+  await writeAudit({
+    action: id ? "update" : "create",
+    entity: "discipline",
+    entityId: rec.id,
+    externalRef: ref,
+    reason: id ? "Disciplinary case updated" : "Disciplinary case opened",
+    details: { name: name, subjectType: rec.subjectType, type: rec.type, status: rec.status }
+  });
+  markDirty("discipline");
+  closeDisciplineForm();
+  await renderDisciplineTable();
+}
+
+async function deleteDisciplineCase(id) {
+  if (!isQaOfficer()) return;
+  var ref = prompt("Official REF to delete this case:", "REF/EOCNS/DSA/");
+  if (!ref || !String(ref).trim()) return;
+  if (!confirm("Delete this disciplinary case?")) return;
+  await del("discipline", id);
+  await writeAudit({ action: "delete", entity: "discipline", entityId: id, externalRef: String(ref).trim(), reason: "Disciplinary case deleted" });
+  markDirty("discipline");
+  await renderDisciplineTable();
+}
+
+async function printDisciplineRegister() {
+  if (!isQaOfficer()) return;
+  var list = await getAll("discipline");
+  list.sort(function(a, b) { return String(b.date || "").localeCompare(String(a.date || "")); });
+  var w = window.open("", "_blank");
+  if (!w) return;
+  var rows = list.map(function(d, i) {
+    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(d.date || "") + "</td><td>" + escapeHtml(d.subjectType || "") +
+      "</td><td>" + escapeHtml(d.name || "") + "</td><td>" + escapeHtml(d.type || "") + "</td><td>" +
+      escapeHtml(d.status || "") + "</td><td>" + escapeHtml(d.ref || "") + "</td></tr>";
+  }).join("");
+  w.document.write("<!DOCTYPE html><html><head><title>Discipline register</title><style>body{font-family:Georgia,serif;padding:24px}table{border-collapse:collapse;width:100%;font-size:0.9rem}th,td{border:1px solid #ccc;padding:6px;text-align:left}h1{color:#0d9488}</style></head><body>" +
+    "<h1>EOCNS Disciplinary Register</h1>" +
+    (ACTIVE_SESSION ? "<p>Session: " + escapeHtml(ACTIVE_SESSION.name) + "</p>" : "") +
+    "<table><thead><tr><th>#</th><th>Date</th><th>Subject</th><th>Name</th><th>Type</th><th>Status</th><th>REF</th></tr></thead><tbody>" +
+    (rows || "<tr><td colspan=7>No cases</td></tr>") + "</tbody></table>" +
+    "<p style=\"margin-top:16px;font-size:0.85rem;color:#64748b\">Generated " + new Date().toLocaleString() + " · Officer-only register</p></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 300);
+}
+
 })();
 
 async function printQaPackWithAmendments(title, bodyHtml) {
@@ -2649,6 +3046,373 @@ async function printQaPackWithAmendments(title, bodyHtml) {
   w.document.write(html);
   w.document.close();
   setTimeout(function() { w.print(); }, 350);
+}
+
+
+// ========== Student photo + full record + Discipline (DSA) ==========
+function compressPassportImage(file, maxSide, quality) {
+  maxSide = maxSide || 480;
+  quality = quality || 0.72;
+  return new Promise(function(resolve, reject) {
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function() {
+      var w = img.width, h = img.height;
+      var scale = Math.min(1, maxSide / Math.max(w, h));
+      var cw = Math.max(1, Math.round(w * scale));
+      var ch = Math.max(1, Math.round(h * scale));
+      var canvas = document.createElement("canvas");
+      canvas.width = cw; canvas.height = ch;
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, cw, ch);
+      URL.revokeObjectURL(url);
+      var dataUrl = canvas.toDataURL("image/jpeg", quality);
+      // second pass if still large (>120KB)
+      if (dataUrl.length > 160000) {
+        dataUrl = canvas.toDataURL("image/jpeg", 0.55);
+      }
+      resolve(dataUrl);
+    };
+    img.onerror = function() { URL.revokeObjectURL(url); reject(new Error("Could not read image")); };
+    img.src = url;
+  });
+}
+
+async function saveStudentPassport(studentId, dataUrl) {
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === studentId; });
+  if (!s) throw new Error("Student not found");
+  s.photoDataUrl = dataUrl;
+  s.photoUpdatedAt = new Date().toISOString();
+  await put("students", s);
+  markDirty("student photo");
+  await writeAudit({
+    action: "update", entity: "students", entityId: studentId,
+    reason: "Passport photograph updated (auto-compressed)",
+    details: { bytesApprox: dataUrl.length }
+  });
+  return s;
+}
+
+async function openStudentProfile(id) {
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === id; });
+  if (!s) return;
+  window.__profileStudentId = id;
+  document.getElementById("studentProfileTitle").textContent = s.name || "Student";
+  var rem = [];
+  try {
+    rem = (await getAll("remedial_enrolment")).filter(function(r) {
+      return r.matric === s.regNo || (r.name && s.name && r.name.toLowerCase() === s.name.toLowerCase());
+    });
+  } catch (_) {}
+  var disc = [];
+  try {
+    disc = (await getAll("discipline")).filter(function(d) {
+      return d.subjectId === s.id || (d.subjectRef && s.regNo && d.subjectRef === s.regNo) ||
+        (d.name && s.name && d.name.toLowerCase() === s.name.toLowerCase());
+    });
+  } catch (_) {}
+  var initials = (s.name || "?").split(/\s+/).map(function(p) { return p[0]; }).join("").slice(0, 2).toUpperCase();
+  var photoHtml = s.photoDataUrl
+    ? '<div class="passport-frame"><img src="' + s.photoDataUrl + '" alt="Passport" /></div>'
+    : '<div class="passport-frame" title="No photo">' + escapeHtml(initials) + "</div>";
+  var body = document.getElementById("studentProfileBody");
+  body.innerHTML =
+    '<div class="profile-layout">' + photoHtml +
+    '<div class="profile-meta">' +
+    "<p><strong>Reg. No:</strong> " + escapeHtml(s.regNo || "—") + "</p>" +
+    "<p><strong>Programme / Level:</strong> " + escapeHtml(s.programme || "—") + " · " + escapeHtml(String(s.level || "—")) + "</p>" +
+    "<p><strong>Hostel:</strong> " + escapeHtml(s.hostel || "—") + "</p>" +
+    "<p><strong>Status:</strong> " + escapeHtml(s.status || "Active") + "</p>" +
+    "<p><strong>Gender / Phone:</strong> " + escapeHtml(s.gender || "—") + " · " + escapeHtml(s.phone || "—") + "</p>" +
+    "<p><strong>Active session:</strong> " + (ACTIVE_SESSION ? escapeHtml(ACTIVE_SESSION.name) : "—") + "</p>" +
+    "<p><strong>Remedial:</strong> " + (rem.length ? rem.map(function(r) { return escapeHtml((r.courses || r.courseCodes || []).join(", ") || "enrolled"); }).join(" | ") : "None on file") + "</p>" +
+    "<p><strong>Discipline cases:</strong> " + (disc.length ? disc.length + " on file" : "None on file") + "</p>" +
+    "</div></div>";
+  var drawer = document.getElementById("studentProfileDrawer");
+  if (drawer) {
+    drawer.hidden = false;
+    drawer.removeAttribute("hidden");
+    drawer.style.display = "";
+  }
+  bindStudentProfileCloseHandlers();
+}
+
+async function handleProfilePhotoUpload(file) {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to set passport photos."); return; }
+  var id = window.__profileStudentId;
+  if (!id || !file) return;
+  try {
+    var dataUrl = await compressPassportImage(file, 480, 0.72);
+    await saveStudentPassport(id, dataUrl);
+    await openStudentProfile(id);
+    alert("Passport photo saved (automatically compressed for clean storage). Publish when ready.");
+  } catch (err) {
+    alert("Photo failed: " + (err.message || String(err)));
+  }
+}
+
+async function buildStudentFullRecord(id) {
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === id; });
+  if (!s) return null;
+  var qa = await getAll("qa_entries");
+  var absents = [];
+  qa.forEach(function(e) {
+    var hit = false;
+    if (Array.isArray(e.absentDetails)) {
+      hit = e.absentDetails.some(function(d) { return d.id === s.id || d.regNo === s.regNo || (d.name && d.name === s.name); });
+    }
+    if (!hit && Array.isArray(e.absent)) {
+      hit = e.absent.some(function(a) {
+        var t = String(a).toLowerCase();
+        return (s.name && t.indexOf(s.name.toLowerCase()) >= 0) || (s.regNo && t.indexOf(String(s.regNo).toLowerCase()) >= 0);
+      });
+    }
+    if (hit) absents.push(e);
+  });
+  var rem = [];
+  try {
+    rem = (await getAll("remedial_enrolment")).filter(function(r) {
+      return r.matric === s.regNo || (r.name && s.name && r.name.toLowerCase() === s.name.toLowerCase());
+    });
+  } catch (_) {}
+  var disc = [];
+  try {
+    disc = (await getAll("discipline")).filter(function(d) {
+      return d.subjectId === s.id || (d.subjectRef && s.regNo && d.subjectRef === s.regNo) ||
+        (d.name && s.name && d.name.toLowerCase() === s.name.toLowerCase());
+    });
+  } catch (_) {}
+  var audit = [];
+  try {
+    audit = (await getAll("audit")).filter(function(a) {
+      return a.entityId === s.id || (a.details && (a.details.regNo === s.regNo || a.details.name === s.name));
+    }).slice(0, 40);
+  } catch (_) {}
+  return { student: s, absents: absents, remedial: rem, discipline: disc, audit: audit };
+}
+
+async function openStudentFullRecord(id) {
+  id = id || window.__profileStudentId;
+  if (!id) return;
+  var data = await buildStudentFullRecord(id);
+  if (!data) return;
+  var s = data.student;
+  document.getElementById("studentFullRecordTitle").textContent = "Full record — " + (s.name || "");
+  var photo = s.photoDataUrl
+    ? '<div class="passport-frame" style="margin-bottom:12px"><img src="' + s.photoDataUrl + '" alt="" /></div>'
+    : "";
+  function listBlock(title, items, rowFn) {
+    if (!items.length) return '<div class="record-section"><h4>' + title + '</h4><p class="muted-note">None on file</p></div>';
+    return '<div class="record-section"><h4>' + title + " (" + items.length + ")</h4><ul style=\"padding-left:18px;margin:0\">" +
+      items.map(rowFn).join("") + "</ul></div>";
+  }
+  var body = document.getElementById("studentFullRecordBody");
+  body.innerHTML = photo +
+    "<p><strong>" + escapeHtml(s.name) + "</strong> · " + escapeHtml(s.regNo || "—") + " · " +
+    escapeHtml(s.programme || "") + " " + escapeHtml(String(s.level || "")) + " · Hostel: " + escapeHtml(s.hostel || "—") + "</p>" +
+    listBlock("Lecture absences (from QA logs)", data.absents, function(e) {
+      return "<li>" + escapeHtml(e.date || "") + " · " + escapeHtml(e.course || "") + " · " + escapeHtml(e.status || "") + "</li>";
+    }) +
+    listBlock("Remedial enrolment", data.remedial, function(r) {
+      return "<li>" + escapeHtml((r.courses || r.courseCodes || []).join(", ") || "enrolled") +
+        (r.sessionName ? " · " + escapeHtml(r.sessionName) : "") + "</li>";
+    }) +
+    listBlock("Disciplinary cases", data.discipline, function(d) {
+      return "<li>" + escapeHtml(d.date || "") + " · " + escapeHtml(d.type || "") + " · " +
+        escapeHtml(d.status || "") + " · " + escapeHtml(d.ref || "") + "</li>";
+    }) +
+    listBlock("Recent audit touches", data.audit, function(a) {
+      return "<li>" + escapeHtml(a.at || a.createdAt || "") + " · " + escapeHtml(a.action || "") + " · " +
+        escapeHtml(a.reason || "") + "</li>";
+    });
+  window.__fullRecordStudentId = id;
+  var m = document.getElementById("studentFullRecordModal");
+  if (m) { m.hidden = false; m.removeAttribute("hidden"); m.style.display = ""; }
+}
+
+function closeStudentFullRecord() {
+  var m = document.getElementById("studentFullRecordModal");
+  if (!m) return;
+  m.hidden = true; m.setAttribute("hidden", ""); m.style.display = "none";
+}
+
+async function printStudentSummary() {
+  var id = window.__fullRecordStudentId || window.__profileStudentId;
+  if (!id) return;
+  var data = await buildStudentFullRecord(id);
+  if (!data) return;
+  var s = data.student;
+  var w = window.open("", "_blank");
+  if (!w) return;
+  var photo = s.photoDataUrl ? '<img src="' + s.photoDataUrl + '" style="width:90px;height:110px;object-fit:cover;border:1px solid #ccc"/>' : "";
+  w.document.write("<!DOCTYPE html><html><head><title>Student summary</title><style>body{font-family:Georgia,serif;padding:24px;color:#0f172a}h1{color:#0d9488;font-size:1.3rem}table{border-collapse:collapse;width:100%;font-size:0.9rem}td,th{border:1px solid #cbd5e1;padding:6px;text-align:left}.muted{color:#64748b;font-size:0.85rem}</style></head><body>" +
+    "<h1>EOCNS — Student Affairs summary</h1>" +
+    (ACTIVE_SESSION ? "<p class=\"muted\">Session: " + escapeHtml(ACTIVE_SESSION.name) + "</p>" : "") +
+    "<div style=\"display:flex;gap:16px\">" + photo + "<div><p><strong>" + escapeHtml(s.name) + "</strong></p>" +
+    "<p>Reg: " + escapeHtml(s.regNo || "—") + "<br/>" + escapeHtml(s.programme || "") + " · Level " + escapeHtml(String(s.level || "")) +
+    "<br/>Hostel: " + escapeHtml(s.hostel || "—") + "</p></div></div>" +
+    "<h3>Disciplinary cases</h3><table><thead><tr><th>Date</th><th>Type</th><th>Status</th><th>REF</th></tr></thead><tbody>" +
+    (data.discipline.length ? data.discipline.map(function(d) {
+      return "<tr><td>" + escapeHtml(d.date||"") + "</td><td>" + escapeHtml(d.type||"") + "</td><td>" + escapeHtml(d.status||"") + "</td><td>" + escapeHtml(d.ref||"") + "</td></tr>";
+    }).join("") : "<tr><td colspan=4>None on file</td></tr>") +
+    "</tbody></table>" +
+    "<h3>Lecture absences logged</h3><p class=\"muted\">" + data.absents.length + " linked QA absence mark(s)</p>" +
+    "<p class=\"muted\">Generated " + new Date().toLocaleString() + " · Officer system summary</p></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 300);
+}
+
+async function renderDisciplineTable() {
+  var tbody = document.getElementById("disciplineTableBody");
+  if (!tbody) return;
+  if (!isQaOfficer()) {
+    tbody.innerHTML = "<tr><td colspan=\"7\">Sign in as QA Officer to view and manage the disciplinary register.</td></tr>";
+    return;
+  }
+  var list = await getAll("discipline");
+  var sub = (document.getElementById("discFilterSubject") && document.getElementById("discFilterSubject").value) || "";
+  var st = (document.getElementById("discFilterStatus") && document.getElementById("discFilterStatus").value) || "";
+  var q = ((document.getElementById("discSearch") && document.getElementById("discSearch").value) || "").toLowerCase().trim();
+  list = list.filter(function(d) {
+    if (sub && d.subjectType !== sub) return false;
+    if (st && d.status !== st) return false;
+    if (q) {
+      var blob = ((d.name || "") + " " + (d.ref || "") + " " + (d.summary || "") + " " + (d.subjectRef || "")).toLowerCase();
+      if (blob.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+  list.sort(function(a, b) { return String(b.date || "").localeCompare(String(a.date || "")); });
+  var count = document.getElementById("discCount");
+  if (count) count.textContent = list.length + " case" + (list.length !== 1 ? "s" : "");
+  tbody.innerHTML = list.length ? list.map(function(d) {
+    return "<tr><td>" + escapeHtml(d.date || "—") + "</td><td>" + escapeHtml(d.subjectType || "") +
+      "</td><td>" + escapeHtml(d.name || "—") + "</td><td>" + escapeHtml(d.type || "—") +
+      "</td><td>" + escapeHtml(d.status || "—") + "</td><td>" + escapeHtml(d.ref || "—") +
+      '</td><td class="qa-edit-only"><button type="button" class="icon-btn-sm" data-edit-disc="' + d.id + '">Edit</button> ' +
+      '<button type="button" class="icon-btn-sm" data-del-disc="' + d.id + '">Del</button></td></tr>';
+  }).join("") : "<tr><td colspan=\"7\">No cases match filters.</td></tr>";
+  tbody.querySelectorAll("[data-edit-disc]").forEach(function(btn) {
+    btn.addEventListener("click", function() { openDisciplineForm(btn.getAttribute("data-edit-disc")); });
+  });
+  tbody.querySelectorAll("[data-del-disc]").forEach(function(btn) {
+    btn.addEventListener("click", function() { deleteDisciplineCase(btn.getAttribute("data-del-disc")); });
+  });
+}
+
+async function openDisciplineForm(id) {
+  if (!isQaOfficer()) return;
+  document.getElementById("disciplineForm").reset();
+  document.getElementById("discId").value = id || "";
+  document.getElementById("disciplineModalTitle").textContent = id ? "Edit disciplinary case" : "New disciplinary case";
+  // datalist names
+  var dl = document.getElementById("discNameList");
+  if (dl) {
+    var students = await getAll("students");
+    var lecturers = await getAll("lecturers");
+    dl.innerHTML = students.map(function(s) { return '<option value="' + escapeHtml(s.name) + '">'; }).join("") +
+      lecturers.map(function(l) { return '<option value="' + escapeHtml(l.name) + '">'; }).join("");
+  }
+  if (id) {
+    var all = await getAll("discipline");
+    var d = all.find(function(x) { return x.id === id; });
+    if (d) {
+      document.getElementById("discSubjectType").value = d.subjectType || "student";
+      document.getElementById("discDate").value = d.date || "";
+      document.getElementById("discName").value = d.name || "";
+      document.getElementById("discSubjectRef").value = d.subjectRef || "";
+      document.getElementById("discSubjectId").value = d.subjectId || "";
+      document.getElementById("discType").value = d.type || "Written warning";
+      document.getElementById("discStatus").value = d.status || "Open";
+      document.getElementById("discSummary").value = d.summary || "";
+      document.getElementById("discOutcome").value = d.outcome || "";
+      document.getElementById("discRef").value = d.ref || "";
+    }
+  } else {
+    document.getElementById("discDate").value = new Date().toISOString().slice(0, 10);
+  }
+  var m = document.getElementById("disciplineModal");
+  if (m) { m.hidden = false; m.removeAttribute("hidden"); m.style.display = ""; }
+}
+
+function closeDisciplineForm() {
+  var m = document.getElementById("disciplineModal");
+  if (!m) return;
+  m.hidden = true; m.setAttribute("hidden", ""); m.style.display = "none";
+}
+
+async function saveDisciplineCase(e) {
+  e.preventDefault();
+  if (!isQaOfficer()) return;
+  var id = (document.getElementById("discId").value || "").trim() || null;
+  var ref = (document.getElementById("discRef").value || "").trim();
+  var name = (document.getElementById("discName").value || "").trim();
+  var summary = (document.getElementById("discSummary").value || "").trim();
+  if (!ref || !name || !summary) { alert("Name, summary and official REF are required."); return; }
+  var now = new Date().toISOString();
+  var rec = {
+    id: id || ("disc_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
+    subjectType: document.getElementById("discSubjectType").value || "student",
+    date: document.getElementById("discDate").value,
+    name: name,
+    subjectRef: (document.getElementById("discSubjectRef").value || "").trim(),
+    subjectId: (document.getElementById("discSubjectId").value || "").trim(),
+    type: document.getElementById("discType").value,
+    status: document.getElementById("discStatus").value,
+    summary: summary,
+    outcome: (document.getElementById("discOutcome").value || "").trim(),
+    ref: ref,
+    updatedAt: now
+  };
+  if (!id) rec.createdAt = now;
+  stampSessionFields(rec);
+  await put("discipline", rec);
+  await writeAudit({
+    action: id ? "update" : "create",
+    entity: "discipline",
+    entityId: rec.id,
+    externalRef: ref,
+    reason: id ? "Disciplinary case updated" : "Disciplinary case opened",
+    details: { name: name, subjectType: rec.subjectType, type: rec.type, status: rec.status }
+  });
+  markDirty("discipline");
+  closeDisciplineForm();
+  await renderDisciplineTable();
+}
+
+async function deleteDisciplineCase(id) {
+  if (!isQaOfficer()) return;
+  var ref = prompt("Official REF to delete this case:", "REF/EOCNS/DSA/");
+  if (!ref || !String(ref).trim()) return;
+  if (!confirm("Delete this disciplinary case?")) return;
+  await del("discipline", id);
+  await writeAudit({ action: "delete", entity: "discipline", entityId: id, externalRef: String(ref).trim(), reason: "Disciplinary case deleted" });
+  markDirty("discipline");
+  await renderDisciplineTable();
+}
+
+async function printDisciplineRegister() {
+  if (!isQaOfficer()) return;
+  var list = await getAll("discipline");
+  list.sort(function(a, b) { return String(b.date || "").localeCompare(String(a.date || "")); });
+  var w = window.open("", "_blank");
+  if (!w) return;
+  var rows = list.map(function(d, i) {
+    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(d.date || "") + "</td><td>" + escapeHtml(d.subjectType || "") +
+      "</td><td>" + escapeHtml(d.name || "") + "</td><td>" + escapeHtml(d.type || "") + "</td><td>" +
+      escapeHtml(d.status || "") + "</td><td>" + escapeHtml(d.ref || "") + "</td></tr>";
+  }).join("");
+  w.document.write("<!DOCTYPE html><html><head><title>Discipline register</title><style>body{font-family:Georgia,serif;padding:24px}table{border-collapse:collapse;width:100%;font-size:0.9rem}th,td{border:1px solid #ccc;padding:6px;text-align:left}h1{color:#0d9488}</style></head><body>" +
+    "<h1>EOCNS Disciplinary Register</h1>" +
+    (ACTIVE_SESSION ? "<p>Session: " + escapeHtml(ACTIVE_SESSION.name) + "</p>" : "") +
+    "<table><thead><tr><th>#</th><th>Date</th><th>Subject</th><th>Name</th><th>Type</th><th>Status</th><th>REF</th></tr></thead><tbody>" +
+    (rows || "<tr><td colspan=7>No cases</td></tr>") + "</tbody></table>" +
+    "<p style=\"margin-top:16px;font-size:0.85rem;color:#64748b\">Generated " + new Date().toLocaleString() + " · Officer-only register</p></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 300);
 }
 
 })();
@@ -2819,6 +3583,7 @@ const DATA_FILES = {
   remedial_timetable: "data/remedial_timetable.json",
   remedial_logs: "data/remedial_logs.json",
   config: "data/config.json",
+  discipline: "data/discipline.json",
 };
 
 // ========== ACTIVE ACADEMIC SESSION CONTEXT ==========
@@ -3194,6 +3959,7 @@ async function hydrateAllFromRepoIfEmpty() {
   await fillIfEmpty("sessions", DATA_FILES.sessions, "sessions");
   await fillIfEmpty("qa_entries", DATA_FILES.qa_entries, "lecture logs");
   await fillIfEmpty("audit", DATA_FILES.audit, "audit");
+  try { await fillIfEmpty("discipline", DATA_FILES.discipline, "discipline"); } catch (_) {}
   await fillIfEmpty("programmes", DATA_FILES.programmes, "programmes");
   await fillIfEmpty("levels", DATA_FILES.levels, "levels");
   await fillIfEmpty("courses", DATA_FILES.courses, "courses");
@@ -3357,6 +4123,7 @@ async function publishAllToRepo() {
     files[DATA_FILES.sessions] = JSON.stringify(await getAll("sessions"), null, 2);
     files[DATA_FILES.qa_entries] = JSON.stringify(await getAll("qa_entries"), null, 2);
     files[DATA_FILES.audit] = JSON.stringify(await getAll("audit"), null, 2);
+    try { files[DATA_FILES.discipline] = JSON.stringify(await getAll("discipline"), null, 2); } catch (_) {}
     files[DATA_FILES.programmes] = JSON.stringify(await getAll("programmes"), null, 2);
     files[DATA_FILES.levels] = JSON.stringify(await getAll("levels"), null, 2);
     files[DATA_FILES.courses] = JSON.stringify(await getAll("courses"), null, 2);
@@ -5820,7 +6587,7 @@ async function deleteRemedial() {}
 // ===== Full backup / restore, student delete, profile, handover =====
 async function collectFullBackupPayload() {
   await loadActiveSession();
-  var stores = ["students","lecturers","sessions","qa_entries","audit","programmes","levels","courses","attendance","hostel_runs","remedial","remedial_enrolment","remedial_assignments","remedial_logs"];
+  var stores = ["students","lecturers","sessions","qa_entries","audit","programmes","levels","courses","attendance","hostel_runs","remedial","remedial_enrolment","remedial_assignments","remedial_logs","discipline"];
   var data = {};
   for (var i = 0; i < stores.length; i++) {
     var name = stores[i];
@@ -5951,35 +6718,8 @@ async function deleteSelectedStudents() {
   await renderStudentsTable();
 }
 
-async function openStudentProfile(id) {
-  var all = await getAll("students");
-  var s = all.find(function(x) { return x.id === id; });
-  if (!s) return;
-  window.__profileStudentId = id;
-  document.getElementById("studentProfileTitle").textContent = s.name || "Student";
-  var rem = [];
-  try {
-    rem = (await getAll("remedial_enrolment")).filter(function(r) {
-      return r.matric === s.regNo || (r.name && s.name && r.name.toLowerCase() === s.name.toLowerCase());
-    });
-  } catch (_) {}
-  var body = document.getElementById("studentProfileBody");
-  body.innerHTML =
-    "<p><strong>Reg. No:</strong> " + escapeHtml(s.regNo || "—") + "</p>" +
-    "<p><strong>Programme / Level:</strong> " + escapeHtml(s.programme || "—") + " · " + escapeHtml(String(s.level || "—")) + "</p>" +
-    "<p><strong>Hostel:</strong> " + escapeHtml(s.hostel || "—") + "</p>" +
-    "<p><strong>Status:</strong> " + escapeHtml(s.status || "Active") + "</p>" +
-    "<p><strong>Gender / Phone:</strong> " + escapeHtml(s.gender || "—") + " · " + escapeHtml(s.phone || "—") + "</p>" +
-    "<p><strong>Active session scope:</strong> " + (ACTIVE_SESSION ? escapeHtml(ACTIVE_SESSION.name) : "—") + "</p>" +
-    "<p><strong>Remedial enrolment:</strong> " + (rem.length ? rem.map(function(r) { return escapeHtml((r.courses || []).join(", ")); }).join(" | ") : "None on file") + "</p>";
-  var drawer = document.getElementById("studentProfileDrawer");
-  if (drawer) {
-    drawer.hidden = false;
-    drawer.removeAttribute("hidden");
-    drawer.style.display = "";
-  }
-  bindStudentProfileCloseHandlers();
-}
+async function openStudentProfile_PLACEHOLDER(id) { /* replaced */ }
+
 
 
 function closeStudentProfile() {
@@ -6042,6 +6782,373 @@ function printOfficerHandoverSheet() {
     "</ol></div>" +
     "<p>Developer (service year): Fortunatus Alolote Fayeofori</p>" +
     "</body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 300);
+}
+
+
+// ========== Student photo + full record + Discipline (DSA) ==========
+function compressPassportImage(file, maxSide, quality) {
+  maxSide = maxSide || 480;
+  quality = quality || 0.72;
+  return new Promise(function(resolve, reject) {
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function() {
+      var w = img.width, h = img.height;
+      var scale = Math.min(1, maxSide / Math.max(w, h));
+      var cw = Math.max(1, Math.round(w * scale));
+      var ch = Math.max(1, Math.round(h * scale));
+      var canvas = document.createElement("canvas");
+      canvas.width = cw; canvas.height = ch;
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, cw, ch);
+      URL.revokeObjectURL(url);
+      var dataUrl = canvas.toDataURL("image/jpeg", quality);
+      // second pass if still large (>120KB)
+      if (dataUrl.length > 160000) {
+        dataUrl = canvas.toDataURL("image/jpeg", 0.55);
+      }
+      resolve(dataUrl);
+    };
+    img.onerror = function() { URL.revokeObjectURL(url); reject(new Error("Could not read image")); };
+    img.src = url;
+  });
+}
+
+async function saveStudentPassport(studentId, dataUrl) {
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === studentId; });
+  if (!s) throw new Error("Student not found");
+  s.photoDataUrl = dataUrl;
+  s.photoUpdatedAt = new Date().toISOString();
+  await put("students", s);
+  markDirty("student photo");
+  await writeAudit({
+    action: "update", entity: "students", entityId: studentId,
+    reason: "Passport photograph updated (auto-compressed)",
+    details: { bytesApprox: dataUrl.length }
+  });
+  return s;
+}
+
+async function openStudentProfile(id) {
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === id; });
+  if (!s) return;
+  window.__profileStudentId = id;
+  document.getElementById("studentProfileTitle").textContent = s.name || "Student";
+  var rem = [];
+  try {
+    rem = (await getAll("remedial_enrolment")).filter(function(r) {
+      return r.matric === s.regNo || (r.name && s.name && r.name.toLowerCase() === s.name.toLowerCase());
+    });
+  } catch (_) {}
+  var disc = [];
+  try {
+    disc = (await getAll("discipline")).filter(function(d) {
+      return d.subjectId === s.id || (d.subjectRef && s.regNo && d.subjectRef === s.regNo) ||
+        (d.name && s.name && d.name.toLowerCase() === s.name.toLowerCase());
+    });
+  } catch (_) {}
+  var initials = (s.name || "?").split(/\s+/).map(function(p) { return p[0]; }).join("").slice(0, 2).toUpperCase();
+  var photoHtml = s.photoDataUrl
+    ? '<div class="passport-frame"><img src="' + s.photoDataUrl + '" alt="Passport" /></div>'
+    : '<div class="passport-frame" title="No photo">' + escapeHtml(initials) + "</div>";
+  var body = document.getElementById("studentProfileBody");
+  body.innerHTML =
+    '<div class="profile-layout">' + photoHtml +
+    '<div class="profile-meta">' +
+    "<p><strong>Reg. No:</strong> " + escapeHtml(s.regNo || "—") + "</p>" +
+    "<p><strong>Programme / Level:</strong> " + escapeHtml(s.programme || "—") + " · " + escapeHtml(String(s.level || "—")) + "</p>" +
+    "<p><strong>Hostel:</strong> " + escapeHtml(s.hostel || "—") + "</p>" +
+    "<p><strong>Status:</strong> " + escapeHtml(s.status || "Active") + "</p>" +
+    "<p><strong>Gender / Phone:</strong> " + escapeHtml(s.gender || "—") + " · " + escapeHtml(s.phone || "—") + "</p>" +
+    "<p><strong>Active session:</strong> " + (ACTIVE_SESSION ? escapeHtml(ACTIVE_SESSION.name) : "—") + "</p>" +
+    "<p><strong>Remedial:</strong> " + (rem.length ? rem.map(function(r) { return escapeHtml((r.courses || r.courseCodes || []).join(", ") || "enrolled"); }).join(" | ") : "None on file") + "</p>" +
+    "<p><strong>Discipline cases:</strong> " + (disc.length ? disc.length + " on file" : "None on file") + "</p>" +
+    "</div></div>";
+  var drawer = document.getElementById("studentProfileDrawer");
+  if (drawer) {
+    drawer.hidden = false;
+    drawer.removeAttribute("hidden");
+    drawer.style.display = "";
+  }
+  bindStudentProfileCloseHandlers();
+}
+
+async function handleProfilePhotoUpload(file) {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to set passport photos."); return; }
+  var id = window.__profileStudentId;
+  if (!id || !file) return;
+  try {
+    var dataUrl = await compressPassportImage(file, 480, 0.72);
+    await saveStudentPassport(id, dataUrl);
+    await openStudentProfile(id);
+    alert("Passport photo saved (automatically compressed for clean storage). Publish when ready.");
+  } catch (err) {
+    alert("Photo failed: " + (err.message || String(err)));
+  }
+}
+
+async function buildStudentFullRecord(id) {
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === id; });
+  if (!s) return null;
+  var qa = await getAll("qa_entries");
+  var absents = [];
+  qa.forEach(function(e) {
+    var hit = false;
+    if (Array.isArray(e.absentDetails)) {
+      hit = e.absentDetails.some(function(d) { return d.id === s.id || d.regNo === s.regNo || (d.name && d.name === s.name); });
+    }
+    if (!hit && Array.isArray(e.absent)) {
+      hit = e.absent.some(function(a) {
+        var t = String(a).toLowerCase();
+        return (s.name && t.indexOf(s.name.toLowerCase()) >= 0) || (s.regNo && t.indexOf(String(s.regNo).toLowerCase()) >= 0);
+      });
+    }
+    if (hit) absents.push(e);
+  });
+  var rem = [];
+  try {
+    rem = (await getAll("remedial_enrolment")).filter(function(r) {
+      return r.matric === s.regNo || (r.name && s.name && r.name.toLowerCase() === s.name.toLowerCase());
+    });
+  } catch (_) {}
+  var disc = [];
+  try {
+    disc = (await getAll("discipline")).filter(function(d) {
+      return d.subjectId === s.id || (d.subjectRef && s.regNo && d.subjectRef === s.regNo) ||
+        (d.name && s.name && d.name.toLowerCase() === s.name.toLowerCase());
+    });
+  } catch (_) {}
+  var audit = [];
+  try {
+    audit = (await getAll("audit")).filter(function(a) {
+      return a.entityId === s.id || (a.details && (a.details.regNo === s.regNo || a.details.name === s.name));
+    }).slice(0, 40);
+  } catch (_) {}
+  return { student: s, absents: absents, remedial: rem, discipline: disc, audit: audit };
+}
+
+async function openStudentFullRecord(id) {
+  id = id || window.__profileStudentId;
+  if (!id) return;
+  var data = await buildStudentFullRecord(id);
+  if (!data) return;
+  var s = data.student;
+  document.getElementById("studentFullRecordTitle").textContent = "Full record — " + (s.name || "");
+  var photo = s.photoDataUrl
+    ? '<div class="passport-frame" style="margin-bottom:12px"><img src="' + s.photoDataUrl + '" alt="" /></div>'
+    : "";
+  function listBlock(title, items, rowFn) {
+    if (!items.length) return '<div class="record-section"><h4>' + title + '</h4><p class="muted-note">None on file</p></div>';
+    return '<div class="record-section"><h4>' + title + " (" + items.length + ")</h4><ul style=\"padding-left:18px;margin:0\">" +
+      items.map(rowFn).join("") + "</ul></div>";
+  }
+  var body = document.getElementById("studentFullRecordBody");
+  body.innerHTML = photo +
+    "<p><strong>" + escapeHtml(s.name) + "</strong> · " + escapeHtml(s.regNo || "—") + " · " +
+    escapeHtml(s.programme || "") + " " + escapeHtml(String(s.level || "")) + " · Hostel: " + escapeHtml(s.hostel || "—") + "</p>" +
+    listBlock("Lecture absences (from QA logs)", data.absents, function(e) {
+      return "<li>" + escapeHtml(e.date || "") + " · " + escapeHtml(e.course || "") + " · " + escapeHtml(e.status || "") + "</li>";
+    }) +
+    listBlock("Remedial enrolment", data.remedial, function(r) {
+      return "<li>" + escapeHtml((r.courses || r.courseCodes || []).join(", ") || "enrolled") +
+        (r.sessionName ? " · " + escapeHtml(r.sessionName) : "") + "</li>";
+    }) +
+    listBlock("Disciplinary cases", data.discipline, function(d) {
+      return "<li>" + escapeHtml(d.date || "") + " · " + escapeHtml(d.type || "") + " · " +
+        escapeHtml(d.status || "") + " · " + escapeHtml(d.ref || "") + "</li>";
+    }) +
+    listBlock("Recent audit touches", data.audit, function(a) {
+      return "<li>" + escapeHtml(a.at || a.createdAt || "") + " · " + escapeHtml(a.action || "") + " · " +
+        escapeHtml(a.reason || "") + "</li>";
+    });
+  window.__fullRecordStudentId = id;
+  var m = document.getElementById("studentFullRecordModal");
+  if (m) { m.hidden = false; m.removeAttribute("hidden"); m.style.display = ""; }
+}
+
+function closeStudentFullRecord() {
+  var m = document.getElementById("studentFullRecordModal");
+  if (!m) return;
+  m.hidden = true; m.setAttribute("hidden", ""); m.style.display = "none";
+}
+
+async function printStudentSummary() {
+  var id = window.__fullRecordStudentId || window.__profileStudentId;
+  if (!id) return;
+  var data = await buildStudentFullRecord(id);
+  if (!data) return;
+  var s = data.student;
+  var w = window.open("", "_blank");
+  if (!w) return;
+  var photo = s.photoDataUrl ? '<img src="' + s.photoDataUrl + '" style="width:90px;height:110px;object-fit:cover;border:1px solid #ccc"/>' : "";
+  w.document.write("<!DOCTYPE html><html><head><title>Student summary</title><style>body{font-family:Georgia,serif;padding:24px;color:#0f172a}h1{color:#0d9488;font-size:1.3rem}table{border-collapse:collapse;width:100%;font-size:0.9rem}td,th{border:1px solid #cbd5e1;padding:6px;text-align:left}.muted{color:#64748b;font-size:0.85rem}</style></head><body>" +
+    "<h1>EOCNS — Student Affairs summary</h1>" +
+    (ACTIVE_SESSION ? "<p class=\"muted\">Session: " + escapeHtml(ACTIVE_SESSION.name) + "</p>" : "") +
+    "<div style=\"display:flex;gap:16px\">" + photo + "<div><p><strong>" + escapeHtml(s.name) + "</strong></p>" +
+    "<p>Reg: " + escapeHtml(s.regNo || "—") + "<br/>" + escapeHtml(s.programme || "") + " · Level " + escapeHtml(String(s.level || "")) +
+    "<br/>Hostel: " + escapeHtml(s.hostel || "—") + "</p></div></div>" +
+    "<h3>Disciplinary cases</h3><table><thead><tr><th>Date</th><th>Type</th><th>Status</th><th>REF</th></tr></thead><tbody>" +
+    (data.discipline.length ? data.discipline.map(function(d) {
+      return "<tr><td>" + escapeHtml(d.date||"") + "</td><td>" + escapeHtml(d.type||"") + "</td><td>" + escapeHtml(d.status||"") + "</td><td>" + escapeHtml(d.ref||"") + "</td></tr>";
+    }).join("") : "<tr><td colspan=4>None on file</td></tr>") +
+    "</tbody></table>" +
+    "<h3>Lecture absences logged</h3><p class=\"muted\">" + data.absents.length + " linked QA absence mark(s)</p>" +
+    "<p class=\"muted\">Generated " + new Date().toLocaleString() + " · Officer system summary</p></body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 300);
+}
+
+async function renderDisciplineTable() {
+  var tbody = document.getElementById("disciplineTableBody");
+  if (!tbody) return;
+  if (!isQaOfficer()) {
+    tbody.innerHTML = "<tr><td colspan=\"7\">Sign in as QA Officer to view and manage the disciplinary register.</td></tr>";
+    return;
+  }
+  var list = await getAll("discipline");
+  var sub = (document.getElementById("discFilterSubject") && document.getElementById("discFilterSubject").value) || "";
+  var st = (document.getElementById("discFilterStatus") && document.getElementById("discFilterStatus").value) || "";
+  var q = ((document.getElementById("discSearch") && document.getElementById("discSearch").value) || "").toLowerCase().trim();
+  list = list.filter(function(d) {
+    if (sub && d.subjectType !== sub) return false;
+    if (st && d.status !== st) return false;
+    if (q) {
+      var blob = ((d.name || "") + " " + (d.ref || "") + " " + (d.summary || "") + " " + (d.subjectRef || "")).toLowerCase();
+      if (blob.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+  list.sort(function(a, b) { return String(b.date || "").localeCompare(String(a.date || "")); });
+  var count = document.getElementById("discCount");
+  if (count) count.textContent = list.length + " case" + (list.length !== 1 ? "s" : "");
+  tbody.innerHTML = list.length ? list.map(function(d) {
+    return "<tr><td>" + escapeHtml(d.date || "—") + "</td><td>" + escapeHtml(d.subjectType || "") +
+      "</td><td>" + escapeHtml(d.name || "—") + "</td><td>" + escapeHtml(d.type || "—") +
+      "</td><td>" + escapeHtml(d.status || "—") + "</td><td>" + escapeHtml(d.ref || "—") +
+      '</td><td class="qa-edit-only"><button type="button" class="icon-btn-sm" data-edit-disc="' + d.id + '">Edit</button> ' +
+      '<button type="button" class="icon-btn-sm" data-del-disc="' + d.id + '">Del</button></td></tr>';
+  }).join("") : "<tr><td colspan=\"7\">No cases match filters.</td></tr>";
+  tbody.querySelectorAll("[data-edit-disc]").forEach(function(btn) {
+    btn.addEventListener("click", function() { openDisciplineForm(btn.getAttribute("data-edit-disc")); });
+  });
+  tbody.querySelectorAll("[data-del-disc]").forEach(function(btn) {
+    btn.addEventListener("click", function() { deleteDisciplineCase(btn.getAttribute("data-del-disc")); });
+  });
+}
+
+async function openDisciplineForm(id) {
+  if (!isQaOfficer()) return;
+  document.getElementById("disciplineForm").reset();
+  document.getElementById("discId").value = id || "";
+  document.getElementById("disciplineModalTitle").textContent = id ? "Edit disciplinary case" : "New disciplinary case";
+  // datalist names
+  var dl = document.getElementById("discNameList");
+  if (dl) {
+    var students = await getAll("students");
+    var lecturers = await getAll("lecturers");
+    dl.innerHTML = students.map(function(s) { return '<option value="' + escapeHtml(s.name) + '">'; }).join("") +
+      lecturers.map(function(l) { return '<option value="' + escapeHtml(l.name) + '">'; }).join("");
+  }
+  if (id) {
+    var all = await getAll("discipline");
+    var d = all.find(function(x) { return x.id === id; });
+    if (d) {
+      document.getElementById("discSubjectType").value = d.subjectType || "student";
+      document.getElementById("discDate").value = d.date || "";
+      document.getElementById("discName").value = d.name || "";
+      document.getElementById("discSubjectRef").value = d.subjectRef || "";
+      document.getElementById("discSubjectId").value = d.subjectId || "";
+      document.getElementById("discType").value = d.type || "Written warning";
+      document.getElementById("discStatus").value = d.status || "Open";
+      document.getElementById("discSummary").value = d.summary || "";
+      document.getElementById("discOutcome").value = d.outcome || "";
+      document.getElementById("discRef").value = d.ref || "";
+    }
+  } else {
+    document.getElementById("discDate").value = new Date().toISOString().slice(0, 10);
+  }
+  var m = document.getElementById("disciplineModal");
+  if (m) { m.hidden = false; m.removeAttribute("hidden"); m.style.display = ""; }
+}
+
+function closeDisciplineForm() {
+  var m = document.getElementById("disciplineModal");
+  if (!m) return;
+  m.hidden = true; m.setAttribute("hidden", ""); m.style.display = "none";
+}
+
+async function saveDisciplineCase(e) {
+  e.preventDefault();
+  if (!isQaOfficer()) return;
+  var id = (document.getElementById("discId").value || "").trim() || null;
+  var ref = (document.getElementById("discRef").value || "").trim();
+  var name = (document.getElementById("discName").value || "").trim();
+  var summary = (document.getElementById("discSummary").value || "").trim();
+  if (!ref || !name || !summary) { alert("Name, summary and official REF are required."); return; }
+  var now = new Date().toISOString();
+  var rec = {
+    id: id || ("disc_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
+    subjectType: document.getElementById("discSubjectType").value || "student",
+    date: document.getElementById("discDate").value,
+    name: name,
+    subjectRef: (document.getElementById("discSubjectRef").value || "").trim(),
+    subjectId: (document.getElementById("discSubjectId").value || "").trim(),
+    type: document.getElementById("discType").value,
+    status: document.getElementById("discStatus").value,
+    summary: summary,
+    outcome: (document.getElementById("discOutcome").value || "").trim(),
+    ref: ref,
+    updatedAt: now
+  };
+  if (!id) rec.createdAt = now;
+  stampSessionFields(rec);
+  await put("discipline", rec);
+  await writeAudit({
+    action: id ? "update" : "create",
+    entity: "discipline",
+    entityId: rec.id,
+    externalRef: ref,
+    reason: id ? "Disciplinary case updated" : "Disciplinary case opened",
+    details: { name: name, subjectType: rec.subjectType, type: rec.type, status: rec.status }
+  });
+  markDirty("discipline");
+  closeDisciplineForm();
+  await renderDisciplineTable();
+}
+
+async function deleteDisciplineCase(id) {
+  if (!isQaOfficer()) return;
+  var ref = prompt("Official REF to delete this case:", "REF/EOCNS/DSA/");
+  if (!ref || !String(ref).trim()) return;
+  if (!confirm("Delete this disciplinary case?")) return;
+  await del("discipline", id);
+  await writeAudit({ action: "delete", entity: "discipline", entityId: id, externalRef: String(ref).trim(), reason: "Disciplinary case deleted" });
+  markDirty("discipline");
+  await renderDisciplineTable();
+}
+
+async function printDisciplineRegister() {
+  if (!isQaOfficer()) return;
+  var list = await getAll("discipline");
+  list.sort(function(a, b) { return String(b.date || "").localeCompare(String(a.date || "")); });
+  var w = window.open("", "_blank");
+  if (!w) return;
+  var rows = list.map(function(d, i) {
+    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(d.date || "") + "</td><td>" + escapeHtml(d.subjectType || "") +
+      "</td><td>" + escapeHtml(d.name || "") + "</td><td>" + escapeHtml(d.type || "") + "</td><td>" +
+      escapeHtml(d.status || "") + "</td><td>" + escapeHtml(d.ref || "") + "</td></tr>";
+  }).join("");
+  w.document.write("<!DOCTYPE html><html><head><title>Discipline register</title><style>body{font-family:Georgia,serif;padding:24px}table{border-collapse:collapse;width:100%;font-size:0.9rem}th,td{border:1px solid #ccc;padding:6px;text-align:left}h1{color:#0d9488}</style></head><body>" +
+    "<h1>EOCNS Disciplinary Register</h1>" +
+    (ACTIVE_SESSION ? "<p>Session: " + escapeHtml(ACTIVE_SESSION.name) + "</p>" : "") +
+    "<table><thead><tr><th>#</th><th>Date</th><th>Subject</th><th>Name</th><th>Type</th><th>Status</th><th>REF</th></tr></thead><tbody>" +
+    (rows || "<tr><td colspan=7>No cases</td></tr>") + "</tbody></table>" +
+    "<p style=\"margin-top:16px;font-size:0.85rem;color:#64748b\">Generated " + new Date().toLocaleString() + " · Officer-only register</p></body></html>");
   w.document.close();
   setTimeout(function() { w.print(); }, 300);
 }

@@ -25,6 +25,7 @@ const ALLOWED_PATHS = new Set([
   "data/remedial_enrolment.json",
   "data/remedial_meta.json",
   "data/config.json",
+  "data/discipline.json",
 ]);
 
 function corsHeaders(origin) {

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=32" />
+  <link rel="stylesheet" href="style.css?v=35" />
 </head>
 <body class="role-viewer">
   <div id="dirtyBanner" class="dirty-banner" hidden role="status"></div>
@@ -32,6 +32,7 @@
           <a href="#" class="nav-item" data-view="students">Students</a>
           <a href="#" class="nav-item" data-view="lecturers">Lecturers</a>
           <a href="#" class="nav-item" data-view="hostel">Hostel</a>
+          <a href="#" class="nav-item" data-view="discipline">Discipline</a>
           <a href="#" class="nav-item" data-view="attendance">Attendance sheets</a>
           <a href="#" class="nav-item" data-view="sessions">Sessions</a>
         </div>
@@ -120,6 +121,40 @@
             </div></div>
           </div>
         </section>
+        
+        <section class="view" id="view-discipline">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <select id="discFilterSubject" class="select">
+                <option value="">All subjects</option>
+                <option value="student">Students</option>
+                <option value="staff">Staff</option>
+              </select>
+              <select id="discFilterStatus" class="select">
+                <option value="">All statuses</option>
+                <option value="Open">Open</option>
+                <option value="Under review">Under review</option>
+                <option value="Closed">Closed</option>
+              </select>
+              <input type="search" id="discSearch" placeholder="Search name, REF, case…" class="select" style="min-width:180px" />
+            </div>
+            <div class="page-toolbar__right">
+              <span class="count-pill" id="discCount">0 cases</span>
+              <button type="button" class="btn btn--ghost qa-edit-only" id="btnPrintDiscRegister">Print register</button>
+              <button type="button" class="btn btn--primary qa-edit-only" id="btnAddDiscipline">+ New case</button>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Date</th><th>Subject</th><th>Name</th><th>Type</th><th>Status</th><th>REF</th><th></th></tr></thead>
+                <tbody id="disciplineTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <p class="muted-note">Disciplinary records are officer-only to create or edit. Viewers see a restricted message. Always use official REF.</p>
+        </section>
+
         <section class="view" id="view-students">
           <div class="page-toolbar">
             <div class="page-toolbar__left">
@@ -945,19 +980,86 @@
 
     <div class="modal" id="studentProfileDrawer" hidden>
     <div class="modal__backdrop" id="studentProfileBackdrop"></div>
-    <div class="modal__dialog" style="max-width:560px">
+    <div class="modal__dialog" style="max-width:720px">
       <div class="modal__header"><h3 id="studentProfileTitle">Student profile</h3><button type="button" class="icon-btn" id="btnCloseStudentProfile" aria-label="Close">&times;</button></div>
       <div class="modal__body" id="studentProfileBody"></div>
-      <div class="modal__footer">
+      <div class="modal__footer" style="flex-wrap:wrap;gap:8px">
+        <button type="button" class="btn btn--ghost" id="btnProfileFullRecord">Full record</button>
+        <button type="button" class="btn btn--ghost qa-edit-only" id="btnProfilePhoto">Passport photo</button>
         <button type="button" class="btn btn--ghost qa-edit-only" id="btnProfileEdit">Edit</button>
         <button type="button" class="btn btn--ghost qa-edit-only" id="btnProfileDelete" style="color:#b91c1c">Delete…</button>
         <button type="button" class="btn btn--primary" id="btnCloseStudentProfile2">Close</button>
+        <input type="file" id="profilePhotoInput" accept="image/*" hidden />
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="modal" id="disciplineModal" hidden>
+    <div class="modal__backdrop" id="disciplineModalBackdrop"></div>
+    <div class="modal__dialog" style="max-width:640px">
+      <div class="modal__header"><h3 id="disciplineModalTitle">Disciplinary case</h3><button type="button" class="icon-btn" id="btnCloseDiscipline">&times;</button></div>
+      <form id="disciplineForm" class="modal__body">
+        <input type="hidden" id="discId" />
+        <div class="form-grid">
+          <label class="field"><span class="field__label">Subject type <span class="req">*</span></span>
+            <select id="discSubjectType" required><option value="student">Student</option><option value="staff">Staff</option></select>
+          </label>
+          <label class="field"><span class="field__label">Date <span class="req">*</span></span><input type="date" id="discDate" required /></label>
+          <label class="field field--full"><span class="field__label">Full name <span class="req">*</span></span><input type="text" id="discName" required list="discNameList" /></label>
+          <datalist id="discNameList"></datalist>
+          <label class="field"><span class="field__label">Reg. no / Staff ID</span><input type="text" id="discSubjectRef" /></label>
+          <label class="field"><span class="field__label">Linked record id</span><input type="text" id="discSubjectId" placeholder="Optional student/lecturer id" /></label>
+          <label class="field"><span class="field__label">Case type <span class="req">*</span></span>
+            <select id="discType" required>
+              <option>Verbal warning</option>
+              <option>Written warning</option>
+              <option>Query</option>
+              <option>Suspension</option>
+              <option>Referral</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label class="field"><span class="field__label">Status <span class="req">*</span></span>
+            <select id="discStatus" required>
+              <option>Open</option>
+              <option>Under review</option>
+              <option>Closed</option>
+            </select>
+          </label>
+          <label class="field field--full"><span class="field__label">Summary of allegation / incident <span class="req">*</span></span>
+            <textarea id="discSummary" rows="3" required></textarea>
+          </label>
+          <label class="field field--full"><span class="field__label">Action taken / outcome</span>
+            <textarea id="discOutcome" rows="2"></textarea>
+          </label>
+          <label class="field field--full"><span class="field__label">Official REF <span class="req">*</span></span>
+            <input type="text" id="discRef" required placeholder="REF/EOCNS/DSA/####" />
+          </label>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" id="btnCancelDiscipline">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save case</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  
+  <div class="modal" id="studentFullRecordModal" hidden>
+    <div class="modal__backdrop" id="studentFullRecordBackdrop"></div>
+    <div class="modal__dialog" style="max-width:860px">
+      <div class="modal__header"><h3 id="studentFullRecordTitle">Student full record</h3><button type="button" class="icon-btn" id="btnCloseFullRecord">&times;</button></div>
+      <div class="modal__body" id="studentFullRecordBody" style="max-height:70vh;overflow:auto"></div>
+      <div class="modal__footer">
+        <button type="button" class="btn btn--ghost" id="btnPrintStudentSummary">Print summary</button>
+        <button type="button" class="btn btn--primary" id="btnCloseFullRecord2">Close</button>
       </div>
     </div>
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=34"></script>
+  <script src="app.js?v=35"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>
