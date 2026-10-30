@@ -407,6 +407,9 @@ async function openStudentForm(id) {
   document.getElementById("studentId").value = "";
   document.getElementById("auditReason").value = "";
   document.getElementById("auditRef").value = "";
+  if (document.getElementById("studentPhotoDataUrl")) document.getElementById("studentPhotoDataUrl").value = "";
+  if (document.getElementById("studentPhotoPreview")) document.getElementById("studentPhotoPreview").innerHTML = "—";
+  if (document.getElementById("studentPhotoInput")) document.getElementById("studentPhotoInput").value = "";
   const showAudit = !!id;
   ["auditReasonGroup", "auditRefGroup"].forEach(gid => {
     const el = document.getElementById(gid);
@@ -443,6 +446,7 @@ async function saveStudent(e) {
   const hostel = document.getElementById("studentHostel").value.trim();
   const status = document.getElementById("studentStatus").value || "Active";
   const phone = document.getElementById("studentPhone").value.trim();
+  const photoDataUrl = (document.getElementById("studentPhotoDataUrl") && document.getElementById("studentPhotoDataUrl").value) || "";
   const reason = document.getElementById("auditReason").value.trim();
   const officialRef = document.getElementById("auditRef").value.trim();
   if (!name) { alert("Student name is required."); return; }
@@ -457,11 +461,13 @@ async function saveStudent(e) {
   const now = new Date().toISOString();
   if (id) {
     const existing = studentsCache.find(s => s.id === id);
-    const student = Object.assign({}, existing, { name, regNo, programme, level: level ? Number(level) : null, gender, hostel, status, phone, updatedAt: now });
+    const student = Object.assign({}, existing, { name, regNo, programme, level: level ? Number(level) : null, gender, hostel, status, phone, photoDataUrl: photoDataUrl || existing.photoDataUrl || "", updatedAt: now });
+    if (photoDataUrl) student.photoUpdatedAt = now;
     await writeAudit({ action: "update", entity: "students", entityId: id, reason, details: { before: existing, after: student }, externalRef: officialRef });
     await put("students", student);
   } else {
-    const student = { id: generateId("stu"), name, regNo, programme, level: level ? Number(level) : null, gender, hostel, status, phone, createdAt: now, updatedAt: now };
+    const student = { id: generateId("stu"), name, regNo, programme, level: level ? Number(level) : null, gender, hostel, status, phone, photoDataUrl: photoDataUrl || "", createdAt: now, updatedAt: now };
+    if (photoDataUrl) student.photoUpdatedAt = now;
     await writeAudit({ action: "create", entity: "students", entityId: student.id, reason: "New student registration", details: { student } });
     await put("students", student);
   }
@@ -1327,6 +1333,24 @@ openDB().then(async () => {
   });
   try { await refreshSessionChrome(); } catch (e) { console.warn("session chrome", e); }
   document.getElementById("btnAddStudent")?.addEventListener("click", () => openStudentForm());
+
+  document.getElementById("studentPhotoInput")?.addEventListener("change", async function(e) {
+    var f = e.target.files && e.target.files[0];
+    if (!f) return;
+    try {
+      var dataUrl = await compressPassportImage(f, 480, 0.72);
+      if (document.getElementById("studentPhotoDataUrl")) document.getElementById("studentPhotoDataUrl").value = dataUrl;
+      if (document.getElementById("studentPhotoPreview")) document.getElementById("studentPhotoPreview").innerHTML = '<img src="' + dataUrl + '" alt="" style="width:100%;height:100%;object-fit:cover" />';
+    } catch (err) {
+      alert("Could not process photo: " + (err.message || String(err)));
+    }
+  });
+  document.getElementById("btnClearStudentPhoto")?.addEventListener("click", function() {
+    if (document.getElementById("studentPhotoDataUrl")) document.getElementById("studentPhotoDataUrl").value = "";
+    if (document.getElementById("studentPhotoPreview")) document.getElementById("studentPhotoPreview").innerHTML = "—";
+    if (document.getElementById("studentPhotoInput")) document.getElementById("studentPhotoInput").value = "";
+  });
+
   document.getElementById("studentForm")?.addEventListener("submit", saveStudent);
   document.getElementById("btnCancelStudent")?.addEventListener("click", closeStudentForm);
   document.getElementById("btnCancelStudent2")?.addEventListener("click", closeStudentForm);
@@ -1345,6 +1369,7 @@ openDB().then(async () => {
   document.getElementById("btnSessionAddLevel")?.addEventListener("click", async () => { await addLevelPrompt(); LEVELS_CACHE = await getAll("levels"); renderSessionChipBoxes(Array.from(document.querySelectorAll('input[name="sessionProgramme"]:checked')).map(el => el.value), Array.from(document.querySelectorAll('input[name="sessionLevel"]:checked')).map(el => el.value)); await fillProgrammeLevelSelects(); });
   document.getElementById("btnBulkMove")?.addEventListener("click", bulkMoveStudents);
   document.getElementById("btnBulkDeactivate")?.addEventListener("click", bulkDeactivateStudents);
+  document.getElementById("btnBulkDeleteStudents")?.addEventListener("click", function() { deleteSelectedStudents(); });
   document.getElementById("filterProgramme")?.addEventListener("change", renderStudentsTable);
   document.getElementById("filterLevel")?.addEventListener("change", renderStudentsTable);
   document.getElementById("selectAllStudents")?.addEventListener("change", function(e) {
@@ -6772,30 +6797,48 @@ async function deleteStudentById(id) {
 }
 
 async function deleteSelectedStudents() {
-  if (!isQaOfficer()) return;
-  var ids = Array.prototype.map.call(document.querySelectorAll(".stu-select:checked"), function(el) { return el.value; });
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to delete students."); return; }
+  var ids = Array.prototype.map.call(document.querySelectorAll(".stu-select:checked"), function(el) { return el.value; }).filter(Boolean);
   if (!ids.length) { alert("Select at least one student."); return; }
   var ref = prompt("Official REF for bulk delete of " + ids.length + " student(s):", "REF/EOCNS/QA/");
-  if (!ref || !String(ref).trim()) return;
+  if (ref == null) return;
+  ref = String(ref).trim();
+  if (!ref) { alert("REF is required for bulk delete."); return; }
   var reason = prompt("Reason for bulk deletion:", "Bulk removal from master list");
-  if (!reason || !String(reason).trim()) return;
-  if (!confirm("Permanently delete " + ids.length + " student(s)?")) return;
+  if (reason == null) return;
+  reason = String(reason).trim();
+  if (!reason) { alert("A reason is required."); return; }
+  if (!confirm("Permanently delete " + ids.length + " student(s) from the master list? This cannot be undone except via backup restore.")) return;
+  var all = await getAll("students");
+  var byId = {};
+  all.forEach(function(s) { byId[s.id] = s; });
+  var deleted = 0;
   for (var i = 0; i < ids.length; i++) {
-    var list = await getAll("students");
-    var s = list.find(function(x) { return x.id === ids[i]; });
-    await del("students", ids[i]);
-    await writeAudit({
-      action: "delete",
-      entity: "students",
-      entityId: ids[i],
-      externalRef: String(ref).trim(),
-      reason: String(reason).trim() + " (bulk)",
-      details: { name: s && s.name, regNo: s && s.regNo }
-    });
+    var sid = ids[i];
+    var s = byId[sid];
+    try {
+      await del("students", sid);
+      deleted++;
+      await writeAudit({
+        action: "delete",
+        entity: "students",
+        entityId: sid,
+        externalRef: ref,
+        reason: reason + " (bulk)",
+        details: { name: s && s.name, regNo: s && s.regNo }
+      });
+    } catch (err) {
+      console.warn("delete failed", sid, err);
+    }
   }
   markDirty("student bulk delete");
+  var selAll = document.getElementById("selectAllStudents");
+  if (selAll) selAll.checked = false;
   await renderStudentsTable();
+  try { refreshDashboardStats(); } catch (_) {}
+  alert("Deleted " + deleted + " student(s). Publish when ready.");
 }
+
 
 async function openStudentProfile_PLACEHOLDER(id) { /* replaced */ }
 

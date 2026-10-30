@@ -850,6 +850,18 @@
           </label>
           <label class="field"><span class="field__label">Status</span><select id="studentStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></label>
           <label class="field"><span class="field__label">Phone</span><input type="tel" id="studentPhone" /></label>
+          <div class="field field--full" id="studentPhotoField">
+            <span class="field__label">Passport photograph</span>
+            <p class="muted-note" style="margin:4px 0 8px">Optional. Image is auto-compressed before save (same as profile upload).</p>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+              <div class="passport-frame" id="studentPhotoPreview" style="width:96px;height:120px">—</div>
+              <div>
+                <input type="file" id="studentPhotoInput" accept="image/*" />
+                <button type="button" class="btn btn--ghost btn--sm" id="btnClearStudentPhoto" style="margin-top:8px">Clear photo</button>
+              </div>
+            </div>
+            <input type="hidden" id="studentPhotoDataUrl" value="" />
+          </div>
           <label class="field field--full" id="auditReasonGroup" hidden><span class="field__label">Reason for change <span class="req">*</span></span><textarea id="auditReason" rows="2"></textarea></label>
           <label class="field field--full" id="auditRefGroup" hidden><span class="field__label">Official Reference Number <span class="req">*</span></span><input type="text" id="auditRef" placeholder="REF/EOCNS/QA/0042" /></label>
         </div>
@@ -1059,7 +1071,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=36"></script>
+  <script src="app.js?v=37"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>
