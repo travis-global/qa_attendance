@@ -1270,6 +1270,7 @@ openDB().then(async () => {
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
   try { refreshDashboardStats(); } catch (e) { console.warn("stats", e); }
   initQaOfficerUI();
+  try { bindStudentProfileCloseHandlers(); } catch (_) {}
   document.getElementById("globalSessionSelect")?.addEventListener("change", function() {
     setActiveSessionId(this.value);
   });
@@ -5950,12 +5951,50 @@ async function openStudentProfile(id) {
     "<p><strong>Gender / Phone:</strong> " + escapeHtml(s.gender || "—") + " · " + escapeHtml(s.phone || "—") + "</p>" +
     "<p><strong>Active session scope:</strong> " + (ACTIVE_SESSION ? escapeHtml(ACTIVE_SESSION.name) : "—") + "</p>" +
     "<p><strong>Remedial enrolment:</strong> " + (rem.length ? rem.map(function(r) { return escapeHtml((r.courses || []).join(", ")); }).join(" | ") : "None on file") + "</p>";
-  document.getElementById("studentProfileDrawer").hidden = false;
+  var drawer = document.getElementById("studentProfileDrawer");
+  if (drawer) {
+    drawer.hidden = false;
+    drawer.removeAttribute("hidden");
+    drawer.style.display = "";
+  }
+  bindStudentProfileCloseHandlers();
 }
 
+
 function closeStudentProfile() {
-  document.getElementById("studentProfileDrawer").hidden = true;
+  var el = document.getElementById("studentProfileDrawer");
+  if (!el) return;
+  el.hidden = true;
+  el.setAttribute("hidden", "");
+  el.style.display = "none";
 }
+
+function bindStudentProfileCloseHandlers() {
+  if (window.__profileCloseBound) return;
+  window.__profileCloseBound = true;
+  function wire(id, fn) {
+    var n = document.getElementById(id);
+    if (n) n.addEventListener("click", function(e) { e.preventDefault(); e.stopPropagation(); fn(); });
+  }
+  wire("btnCloseStudentProfile", closeStudentProfile);
+  wire("btnCloseStudentProfile2", closeStudentProfile);
+  wire("studentProfileBackdrop", closeStudentProfile);
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") {
+      var d = document.getElementById("studentProfileDrawer");
+      if (d && !d.hidden) closeStudentProfile();
+    }
+  });
+  var edit = document.getElementById("btnProfileEdit");
+  if (edit) edit.addEventListener("click", function() {
+    if (window.__profileStudentId) { closeStudentProfile(); openStudentForm(window.__profileStudentId); }
+  });
+  var del = document.getElementById("btnProfileDelete");
+  if (del) del.addEventListener("click", function() {
+    if (window.__profileStudentId) { closeStudentProfile(); deleteStudentById(window.__profileStudentId); }
+  });
+}
+
 
 function sessionCoverHtml() {
   if (!ACTIVE_SESSION) return "<div class=\"sub\">No active session selected</div>";

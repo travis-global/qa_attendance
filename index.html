@@ -943,8 +943,21 @@
     </div>
   </div>
 
+    <div class="modal" id="studentProfileDrawer" hidden>
+    <div class="modal__backdrop" id="studentProfileBackdrop"></div>
+    <div class="modal__dialog" style="max-width:560px">
+      <div class="modal__header"><h3 id="studentProfileTitle">Student profile</h3><button type="button" class="icon-btn" id="btnCloseStudentProfile" aria-label="Close">&times;</button></div>
+      <div class="modal__body" id="studentProfileBody"></div>
+      <div class="modal__footer">
+        <button type="button" class="btn btn--ghost qa-edit-only" id="btnProfileEdit">Edit</button>
+        <button type="button" class="btn btn--ghost qa-edit-only" id="btnProfileDelete" style="color:#b91c1c">Delete…</button>
+        <button type="button" class="btn btn--primary" id="btnCloseStudentProfile2">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=32"></script>
+  <script src="app.js?v=33"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>
@@ -1001,20 +1014,5 @@
       </form>
     </div>
   </div>
-
-
-  <div class="modal" id="studentProfileDrawer" hidden>
-    <div class="modal__backdrop" id="studentProfileBackdrop"></div>
-    <div class="modal__dialog" style="max-width:560px">
-      <div class="modal__header"><h3 id="studentProfileTitle">Student profile</h3><button type="button" class="icon-btn" id="btnCloseStudentProfile">&times;</button></div>
-      <div class="modal__body" id="studentProfileBody"></div>
-      <div class="modal__footer qa-edit-only">
-        <button type="button" class="btn btn--ghost" id="btnProfileEdit">Edit</button>
-        <button type="button" class="btn btn--ghost" id="btnProfileDelete" style="color:#b91c1c">Delete…</button>
-        <button type="button" class="btn btn--primary" id="btnCloseStudentProfile2">Close</button>
-      </div>
-    </div>
-  </div>
-
 </body>
 </html>
