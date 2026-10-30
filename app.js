@@ -1618,7 +1618,7 @@ async function importFullSnapshot(file) {
 
 
 
-function eocnsReportStyles() {
+function eocnsReportStyles() { /* amend-footer supported via amendmentFooterHtml() */
   return "body{font-family:'Segoe UI',system-ui,Georgia,serif;color:#1a1a2e;padding:28px;max-width:960px;margin:0 auto;line-height:1.45}" +
     "h1{color:#1B3A6B;text-align:center;margin:0 0 4px;font-size:1.45rem;letter-spacing:0.02em}" +
     "h1 .gold{color:#c9a227;display:block;font-size:0.95rem;font-weight:600;margin-top:4px}" +
@@ -1755,7 +1755,7 @@ async function printDailyLectureReport() {
     (absentList.length ? ("<table><thead class=\"absent-head\"><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
       absentList.map(function(a) { return "<tr><td>" + escapeHtml(String(a.sn)) + "</td><td>" + escapeHtml(a.name) + "</td></tr>"; }).join("") +
       "</tbody></table>") : "<p>No absentees recorded in lecture logs for this day.</p>") +
-    "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + " · EOCNS QA System</div>" +
+    amendmentFooterHtml(typeof entries !== "undefined" ? entries : (window.__lastQaReportEntries || [])) + "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + " · EOCNS QA System</div>" +
     "</body></html>");
   w.document.close();
   setTimeout(function() { w.print(); }, 400);
@@ -2052,7 +2052,7 @@ function printLecturerHoursPack() {
     "<div class=\"sub\">Delivered hours from regular lecture logs only. Remedial system hours are reported separately.</div><hr class=\"rule\"/>" +
     "<table><thead><tr><th>#</th><th>Lecturer</th><th>Staff ID</th><th>Contract</th><th>Delivered</th><th>Variance</th><th>Status</th></tr></thead><tbody>" +
     rows + "</tbody></table>" +
-    "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + "</div></body></html>");
+    amendmentFooterHtml(typeof entries !== "undefined" ? entries : (window.__lastQaReportEntries || [])) + "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + "</div></body></html>");
   w.document.close();
   setTimeout(function() { w.print(); }, 300);
 }
@@ -2465,7 +2465,7 @@ function printRemWeeklyPack() {
     "<table><thead><tr><th>Lecturer</th><th>Courses</th><th>Hrs Taught</th><th>Hrs Missed</th></tr></thead><tbody>" +
     (lecRows || "<tr><td colspan=\"4\">No logs</td></tr>") + "</tbody></table>" +
     progTables +
-    "<div class=\"footer\">Report prepared by Quality Assurance Department · Generated " + new Date().toLocaleString() + "<br/>— End of Report —</div></body></html>");
+    amendmentFooterHtml(d.logsIn || []) + "<div class=\"footer\">Report prepared by Quality Assurance Department · Generated " + new Date().toLocaleString() + "<br/>— End of Report —</div></body></html>");
   w.document.close();
   setTimeout(function() { w.print(); }, 400);
 }
@@ -2533,6 +2533,30 @@ async function openRemedialForm() { showRemTab("logging"); }
 function closeRemedialForm() {}
 async function saveRemedial(e) { if (e && e.preventDefault) e.preventDefault(); }
 async function deleteRemedial() {}
+
+
+// Ensure QA print packs include amendment transparency footer
+(function() {
+  function withAmendFooter(html) {
+    var foot = "";
+    try { foot = amendmentFooterHtml(window.__lastQaReportEntries || []); } catch (_) {}
+    if (!foot) return html;
+    if (html.indexOf("</body>") >= 0) return html.replace("</body>", foot + "</body>");
+    return html + foot;
+  }
+  var _open = window.open;
+  // soft: patch known print functions if defined later - already have amendmentFooterHtml on remedial
+})();
+
+async function printQaPackWithAmendments(title, bodyHtml) {
+  var w = window.open("", "_blank");
+  if (!w) return;
+  var html = "<!DOCTYPE html><html><head><title>" + title + "</title><style>" + eocnsReportStyles() + "</style></head><body>" +
+    bodyHtml + amendmentFooterHtml(window.__lastQaReportEntries || []) + "</body></html>";
+  w.document.write(html);
+  w.document.close();
+  setTimeout(function() { w.print(); }, 350);
+}
 
 })();
   if (document.getElementById("qaDailyDate") && !document.getElementById("qaDailyDate").value) {
@@ -3394,28 +3418,34 @@ function calcQaDurationMinutes() {
 async function getQaEntries() {
   var all = await getAll("qa_entries");
   await loadActiveSession();
-  return all.filter(entryInActiveSession);
+  var filtered = all.filter(entryInActiveSession);
+  window.__lastQaReportEntries = filtered;
+  return filtered;
 }
 
 async function openQaEntryForm(id) {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to log lectures."); return; }
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to log or edit lectures."); return; }
+  if (!requireActiveSession("Lecture logging")) return;
   await seedQaDatalists();
   var form = document.getElementById("qaEntryForm");
   if (form) form.reset();
   document.getElementById("qaEntryId").value = id || "";
+  var amend = document.getElementById("qaEntryAmendBlock");
+  if (amend) amend.hidden = !id;
+  var saveBtn = document.getElementById("qaEntrySaveBtn");
+  if (saveBtn) saveBtn.textContent = id ? "Save changes to master sheet" : "Save entry";
   var dailyDate = document.getElementById("qaDailyDate") && document.getElementById("qaDailyDate").value;
   var dailyClass = document.getElementById("qaDailyClass") && document.getElementById("qaDailyClass").value;
   document.getElementById("qaEntryDate").value = dailyDate || new Date().toISOString().slice(0, 10);
   if (dailyClass) document.getElementById("qaEntryClass").value = dailyClass;
-  document.getElementById("qaEntryModalTitle").textContent = id ? "Edit lecture log" : "Log lecture";
+  document.getElementById("qaEntryModalTitle").textContent = id ? "Edit lecture log (active session)" : "Log lecture";
   if (id) {
-    var entries = await getQaEntries();
-    var ent = entries.find(function(x) { return x.id === id; });
+    var all = await getAll("qa_entries");
+    var ent = all.find(function(x) { return x.id === id; });
     if (ent) {
       document.getElementById("qaEntryDate").value = ent.date || "";
       document.getElementById("qaEntryClass").value = ent.classKey || "";
       await seedQaDatalists();
-      // course/lecturer as option values
       var courseSel = document.getElementById("qaEntryCourse");
       var lecSel = document.getElementById("qaEntryLecturer");
       if (courseSel && ent.course) {
@@ -3436,13 +3466,15 @@ async function openQaEntryForm(id) {
       document.getElementById("qaEntryDuration").value = ent.duration != null ? ent.duration : "";
       if (document.getElementById("qaEntryTopic")) document.getElementById("qaEntryTopic").value = ent.topic || "";
       if (document.getElementById("qaEntryObjectives")) document.getElementById("qaEntryObjectives").value = ent.objectives || "";
-      if (document.getElementById("qaEntrySummary")) document.getElementById("qaEntrySummary").value = ent.lectureSummary || "";
+      if (document.getElementById("qaEntrySummary")) document.getElementById("qaEntrySummary").value = ent.lectureSummary || ent.summary || "";
       if (document.getElementById("qaEntryAssignment")) document.getElementById("qaEntryAssignment").value = ent.assignment || "";
       if (document.getElementById("qaEntryRemark")) document.getElementById("qaEntryRemark").value = ent.remark || "";
       if (document.getElementById("qaEntryAbsent")) document.getElementById("qaEntryAbsent").value = Array.isArray(ent.absent) ? ent.absent.join(", ") : (ent.absent || "");
-      calcQaDurationMinutes();
+      if (document.getElementById("qaEntryEditRef")) document.getElementById("qaEntryEditRef").value = "";
+      if (document.getElementById("qaEntryEditReason")) document.getElementById("qaEntryEditReason").value = "";
     }
   }
+  calcQaDurationMinutes();
   document.getElementById("qaEntryModal").hidden = false;
 }
 
@@ -3451,9 +3483,44 @@ function closeQaEntryForm() {
   if (modal) modal.hidden = true;
 }
 
+
+function collectAmendmentsFromEntries(entries) {
+  var notes = [];
+  (entries || []).forEach(function(e) {
+    (e.amendments || []).forEach(function(a) {
+      notes.push({
+        course: e.course || "",
+        date: e.date || "",
+        at: a.at || a.dateLabel || "",
+        dateLabel: a.dateLabel || (a.at ? new Date(a.at).toLocaleString() : ""),
+        ref: a.ref || e.lastAmendedRef || "",
+        reason: a.reason || e.lastAmendedReason || "",
+        officer: a.officer || "QA Officer"
+      });
+    });
+  });
+  return notes;
+}
+
+function amendmentFooterHtml(entries) {
+  var notes = collectAmendmentsFromEntries(entries);
+  if (!notes.length) return "";
+  var lines = notes.map(function(n, i) {
+    return (i + 1) + ". " + (n.date ? n.date + " · " : "") + (n.course ? n.course + " · " : "") +
+      "Changed by " + (n.officer || "QA Officer") + " on " + (n.dateLabel || n.at || "—") +
+      (n.ref ? (" · REF " + n.ref) : "") +
+      (n.reason ? (" — " + n.reason) : "");
+  }).join("<br/>");
+  return "<div class=\"amend-footer\" style=\"margin-top:18px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;font-size:0.82rem;color:#475569\">" +
+    "<strong style=\"color:#0f766e\">Record amendments (transparency)</strong><br/>" +
+    "The following lecture log(s) in this report range were edited after first save. Values shown are the current master-sheet values." +
+    "<br/><br/>" + lines + "</div>";
+}
+
 async function saveQaEntry(e) {
   e.preventDefault();
   if (!isQaOfficer()) { alert("Sign in as QA Officer to log lectures."); return; }
+  if (!requireActiveSession("Lecture logging")) return;
   calcQaDurationMinutes();
   var id = document.getElementById("qaEntryId").value || null;
   var date = document.getElementById("qaEntryDate").value;
@@ -3475,6 +3542,17 @@ async function saveQaEntry(e) {
     alert("Date, course, lecturer, start time and end time are required.");
     return;
   }
+  var editRef = "";
+  var editReason = "";
+  var existing = null;
+  if (id) {
+    editRef = (document.getElementById("qaEntryEditRef") && document.getElementById("qaEntryEditRef").value || "").trim();
+    editReason = (document.getElementById("qaEntryEditReason") && document.getElementById("qaEntryEditReason").value || "").trim();
+    if (!editRef) { alert("Official REF is required to edit a saved lecture log."); return; }
+    if (!editReason) { alert("A reason is required to edit a saved lecture log."); return; }
+    var all = await getAll("qa_entries");
+    existing = all.find(function(x) { return x.id === id; }) || null;
+  }
   var now = new Date().toISOString();
   var entry = {
     id: id || ("qa_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
@@ -3482,16 +3560,42 @@ async function saveQaEntry(e) {
     duration: duration, start: start, end: end, topic: topic, objectives: objectives,
     lectureSummary: summary, assignment: assignment, remark: remark, absent: absent, updatedAt: now
   };
-  if (!id) entry.createdAt = now;
-  else {
-    var existing = (await getQaEntries()).find(function(x) { return x.id === id; });
-    if (existing && existing.createdAt) entry.createdAt = existing.createdAt;
+  if (!id) {
+    entry.createdAt = now;
+    entry.amendments = [];
+  } else {
+    entry.createdAt = (existing && existing.createdAt) || now;
+    entry.amendments = (existing && Array.isArray(existing.amendments)) ? existing.amendments.slice() : [];
+    entry.amendments.push({
+      at: now,
+      dateLabel: new Date(now).toLocaleString(),
+      ref: editRef,
+      reason: editReason,
+      officer: "QA Officer",
+      before: existing ? {
+        status: existing.status, lecturer: existing.lecturer, course: existing.course,
+        start: existing.start, end: existing.end, duration: existing.duration, topic: existing.topic
+      } : null
+    });
+    entry.lastAmendedAt = now;
+    entry.lastAmendedRef = editRef;
+    entry.lastAmendedReason = editReason;
   }
-  stampSessionFields(entry); await put("qa_entries", entry);
-  await writeAudit({ action: id ? "update" : "create", entity: "qa_entries", entityId: entry.id, reason: id ? "Lecture log updated" : "Lecture logged", details: { date: date, course: course, status: status, classKey: classKey } });
-  markDirty("lecture log");
+  stampSessionFields(entry);
+  await put("qa_entries", entry);
+  await writeAudit({
+    action: id ? "update" : "create",
+    entity: "qa_entries",
+    entityId: entry.id,
+    externalRef: id ? editRef : undefined,
+    reason: id ? editReason : "Lecture logged",
+    details: { date: date, course: course, status: status, classKey: classKey, amended: !!id }
+  });
+  markDirty("qa_entries");
   document.getElementById("qaEntryModal").hidden = true;
-  await renderQaDaily();
+  try { await renderQaDaily(); } catch (_) {}
+  try { refreshDashboardStats(); } catch (_) {}
+  if (id) alert("Lecture log updated on the master sheet. Publish when ready so other devices see the change.");
 }
 
 async function deleteQaEntry(id) {
@@ -3655,7 +3759,10 @@ async function renderQaDaily() {
       : '<td class="qa-edit-only"></td>';
     return "<tr><td>" + escapeHtml(slot.start + "–" + slot.end) + "</td><td>" + escapeHtml(courseName(slot.code)) +
       "</td><td>" + slot.hours + "</td><td><span class=\"badge " + badge + "\">" + escapeHtml(status) + "</span></td><td>" +
-      escapeHtml(lecturer) + "</td><td>" + mins + "</td>" + editCell + "</tr>";
+      escapeHtml(lecturer) + "</td><td>" + mins + "</td>" + (isQaOfficer() && ent
+        ? ('<td class="qa-edit-only"><button type="button" class="icon-btn-sm" data-edit-qa="' + ent.id + '">Edit</button> ' +
+           '<button type="button" class="icon-btn-sm" data-report-qa="' + escapeHtml(ent.id) + '">Report</button></td>')
+        : editCell) + "</tr>";
   });
   entries.forEach(function(e) {
     var onTt = slots.some(function(s) { return e.course && e.course.indexOf(s.code) >= 0; });
@@ -3665,7 +3772,7 @@ async function renderQaDaily() {
     var badge = e.status === "Held" ? "badge--green" : e.status === "Missed" ? "badge--amber" : "badge--muted";
     rows.push("<tr><td>—</td><td>" + escapeHtml(e.course) + " <span class=\"cell-sub\">extra</span></td><td>—</td><td><span class=\"badge " + badge + "\">" +
       escapeHtml(e.status) + "</span></td><td>" + escapeHtml(e.lecturer || "—") + "</td><td>" + (e.duration != null ? e.duration : "—") +
-      "</td><td class=\"qa-edit-only\"></td></tr>");
+      '</td><td class="qa-edit-only">' + (isQaOfficer() ? ('<button type="button" class="icon-btn-sm" data-edit-qa="' + e.id + '">Edit</button>') : "") + "</td></tr>");
   });
   if (!rows.length) {
     tbody.innerHTML = "";
@@ -3675,6 +3782,9 @@ async function renderQaDaily() {
   }
   if (empty) empty.hidden = true;
   tbody.innerHTML = rows.join("");
+  tbody.querySelectorAll("[data-edit-qa]").forEach(function(btn) {
+    btn.addEventListener("click", function() { openQaEntryForm(btn.getAttribute("data-edit-qa")); });
+  });
   tbody.querySelectorAll("[data-log-slot]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
       var parts = btn.getAttribute("data-log-slot").split("|");
@@ -4630,7 +4740,7 @@ async function printDailyLectureReport() {
     (absentList.length ? ("<table><thead class=\"absent-head\"><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
       absentList.map(function(a) { return "<tr><td>" + escapeHtml(String(a.sn)) + "</td><td>" + escapeHtml(a.name) + "</td></tr>"; }).join("") +
       "</tbody></table>") : "<p>No absentees recorded in lecture logs for this day.</p>") +
-    "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + " · EOCNS QA System</div>" +
+    amendmentFooterHtml(typeof entries !== "undefined" ? entries : (window.__lastQaReportEntries || [])) + "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + " · EOCNS QA System</div>" +
     "</body></html>");
   w.document.close();
   setTimeout(function() { w.print(); }, 400);
@@ -4935,7 +5045,7 @@ function printLecturerHoursPack() {
     "<div class=\"sub\">Delivered hours = lecture log durations (Held/Partial) + remedial hours for the month.</div><hr class=\"rule\"/>" +
     "<table><thead><tr><th>#</th><th>Lecturer</th><th>Staff ID</th><th>Contract</th><th>Delivered</th><th>Remedial</th><th>Variance</th><th>Status</th></tr></thead><tbody>" +
     rows + "</tbody></table>" +
-    "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + "</div></body></html>");
+    amendmentFooterHtml(typeof entries !== "undefined" ? entries : (window.__lastQaReportEntries || [])) + "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + "</div></body></html>");
   w.document.close();
   setTimeout(function() { w.print(); }, 300);
 }
@@ -5348,7 +5458,7 @@ function printRemWeeklyPack() {
     "<table><thead><tr><th>Lecturer</th><th>Courses</th><th>Hrs Taught</th><th>Hrs Missed</th></tr></thead><tbody>" +
     (lecRows || "<tr><td colspan=\"4\">No logs</td></tr>") + "</tbody></table>" +
     progTables +
-    "<div class=\"footer\">Report prepared by Quality Assurance Department · Generated " + new Date().toLocaleString() + "<br/>— End of Report —</div></body></html>");
+    amendmentFooterHtml(d.logsIn || []) + "<div class=\"footer\">Report prepared by Quality Assurance Department · Generated " + new Date().toLocaleString() + "<br/>— End of Report —</div></body></html>");
   w.document.close();
   setTimeout(function() { w.print(); }, 400);
 }
@@ -5654,6 +5764,30 @@ function printOfficerHandoverSheet() {
       }
     });
   };
+
+// Ensure QA print packs include amendment transparency footer
+(function() {
+  function withAmendFooter(html) {
+    var foot = "";
+    try { foot = amendmentFooterHtml(window.__lastQaReportEntries || []); } catch (_) {}
+    if (!foot) return html;
+    if (html.indexOf("</body>") >= 0) return html.replace("</body>", foot + "</body>");
+    return html + foot;
+  }
+  var _open = window.open;
+  // soft: patch known print functions if defined later - already have amendmentFooterHtml on remedial
+})();
+
+async function printQaPackWithAmendments(title, bodyHtml) {
+  var w = window.open("", "_blank");
+  if (!w) return;
+  var html = "<!DOCTYPE html><html><head><title>" + title + "</title><style>" + eocnsReportStyles() + "</style></head><body>" +
+    bodyHtml + amendmentFooterHtml(window.__lastQaReportEntries || []) + "</body></html>";
+  w.document.write(html);
+  w.document.close();
+  setTimeout(function() { w.print(); }, 350);
+}
+
 })();
 
 // Wire UI
@@ -5681,5 +5815,29 @@ document.getElementById("btnPrintHandoverPack") && document.getElementById("btnP
 // Alias legacy snapshot buttons to full backup
 document.getElementById("btnExportSnapshot") && document.getElementById("btnExportSnapshot").addEventListener("click", downloadFullBackup);
 document.getElementById("btnExportStudents") && document.getElementById("btnExportStudents").addEventListener("click", downloadFullBackup);
+
+
+// Ensure QA print packs include amendment transparency footer
+(function() {
+  function withAmendFooter(html) {
+    var foot = "";
+    try { foot = amendmentFooterHtml(window.__lastQaReportEntries || []); } catch (_) {}
+    if (!foot) return html;
+    if (html.indexOf("</body>") >= 0) return html.replace("</body>", foot + "</body>");
+    return html + foot;
+  }
+  var _open = window.open;
+  // soft: patch known print functions if defined later - already have amendmentFooterHtml on remedial
+})();
+
+async function printQaPackWithAmendments(title, bodyHtml) {
+  var w = window.open("", "_blank");
+  if (!w) return;
+  var html = "<!DOCTYPE html><html><head><title>" + title + "</title><style>" + eocnsReportStyles() + "</style></head><body>" +
+    bodyHtml + amendmentFooterHtml(window.__lastQaReportEntries || []) + "</body></html>";
+  w.document.write(html);
+  w.document.close();
+  setTimeout(function() { w.print(); }, 350);
+}
 
 })();
