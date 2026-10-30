@@ -10082,5 +10082,45 @@
     "user": "QA Officer",
     "source": "official-letter",
     "id": 528
+  },
+  {
+    "ref": "REF/EOCNS/QA/0002",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvs9r9mcnoi4p",
+    "reason": "Updated the Reg No.",
+    "details": {
+      "before": {
+        "id": "stu_mvs9r9mcnoi4p",
+        "name": "OKE DIAOKE",
+        "regNo": "EOCNS/26/042/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:28:24.180Z",
+        "updatedAt": "2026-10-28T15:28:24.180Z"
+      },
+      "after": {
+        "id": "stu_mvs9r9mcnoi4p",
+        "name": "OKE DIAOKE",
+        "regNo": "EOCNS/26/0042/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:28:24.180Z",
+        "updatedAt": "2026-10-30T09:32:23.206Z",
+        "photoDataUrl": ""
+      }
+    },
+    "timestamp": "2026-10-30T09:32:23.206Z",
+    "user": "QA Officer",
+    "source": "official-letter",
+    "id": 529
   }
 ]
