@@ -306,25 +306,46 @@ async function renderStudentsTable() {
   }
   if (empty) empty.hidden = true;
   tbody.innerHTML = list.map(function(s) {
-    var actions = isQaOfficer()
-      ? ('<button type="button" class="icon-btn-sm" data-edit-stu="' + s.id + '">Edit</button>')
-      : "";
+    var id = s.id;
     var cb = isQaOfficer()
-      ? ('<td class="qa-edit-only"><input type="checkbox" class="stu-select" value="' + s.id + '" /></td>')
+      ? ('<td class="qa-edit-only"><input type="checkbox" class="stu-select" value="' + id + '" /></td>')
       : '<td class="qa-edit-only"></td>';
-    return "<tr>" + cb + "<td><div class=\"cell-main\">" + escapeHtml(s.name) + "</div></td><td>" + escapeHtml(s.regNo || "—") +
-      "</td><td>" + escapeHtml(s.programme || "—") + "</td><td>" + escapeHtml(String(s.level || "—")) +
-      "</td><td>" + escapeHtml(s.hostel || "—") + "</td><td><span class=\"badge " + (s.status === "Active" ? "badge--green" : "badge--muted") + "\">" +
-      escapeHtml(s.status || "Active") + "</span></td><td class=\"qa-edit-only\">" + actions + "</td></tr>";
+    // View is always available (not qa-edit-only)
+    var actions = '<button type="button" class="icon-btn-sm" data-profile-stu="' + id + '">View</button>';
+    if (isQaOfficer()) {
+      actions += ' <button type="button" class="icon-btn-sm qa-edit-only" data-edit-stu="' + id + '">Edit</button>' +
+        ' <button type="button" class="icon-btn-sm qa-edit-only" data-del-stu="' + id + '">Del</button>';
+    }
+    return "<tr data-stu-id=\"" + id + "\">" + cb +
+      "<td><div class=\"cell-main\" data-profile-stu=\"" + id + "\" style=\"cursor:pointer\" title=\"Open profile\">" + escapeHtml(s.name) + "</div></td>" +
+      "<td>" + escapeHtml(s.regNo || "—") + "</td>" +
+      "<td>" + escapeHtml(s.programme || "—") + "</td>" +
+      "<td>" + escapeHtml(String(s.level || "—")) + "</td>" +
+      "<td>" + escapeHtml(s.hostel || "—") + "</td>" +
+      "<td><span class=\"badge " + (s.status === "Active" ? "badge--green" : "badge--muted") + "\">" +
+      escapeHtml(s.status || "Active") + "</span></td>" +
+      "<td>" + actions + "</td></tr>";
   }).join("");
+
+  tbody.querySelectorAll("[data-profile-stu]").forEach(function(btn) {
+    btn.addEventListener("click", function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      openStudentProfile(btn.getAttribute("data-profile-stu"));
+    });
+  });
   tbody.querySelectorAll("[data-edit-stu]").forEach(function(btn) {
     btn.addEventListener("click", function() { openStudentForm(btn.getAttribute("data-edit-stu")); });
+  });
+  tbody.querySelectorAll("[data-del-stu]").forEach(function(btn) {
+    btn.addEventListener("click", function() { deleteStudentById(btn.getAttribute("data-del-stu")); });
   });
   tbody.querySelectorAll(".stu-select").forEach(function(cb) {
     cb.addEventListener("change", updateBulkSelectedCount);
   });
-  updateBulkSelectedCount();
+  try { updateBulkSelectedCount(); } catch (_) {}
 }
+
 function updateBulkSelectedCount() {
   var n = document.querySelectorAll(".stu-select:checked").length;
   var el = document.getElementById("bulkSelectedCount");
@@ -6023,126 +6044,6 @@ function printOfficerHandoverSheet() {
     "</body></html>");
   w.document.close();
   setTimeout(function() { w.print(); }, 300);
-}
-
-// Patch student table actions: View + Delete
-(function patchStudentRender() {
-  var prev = renderStudentsTable;
-  if (typeof prev !== "function") return;
-  renderStudentsTable = async function() {
-    await prev.apply(this, arguments);
-    var tbody = document.getElementById("studentsTableBody");
-    if (!tbody || !isQaOfficer()) {
-      // still allow profile view for viewers via name click if we add data-profile
-    }
-    if (!tbody) return;
-    // Re-bind richer actions on last column
-    tbody.querySelectorAll("tr").forEach(function(tr) {
-      var cb = tr.querySelector(".stu-select");
-      var id = cb && cb.value;
-      if (!id) return;
-      var act = tr.querySelector("td.qa-edit-only:last-child");
-      if (!act) return;
-      act.innerHTML =
-        '<button type="button" class="icon-btn-sm" data-profile-stu="' + id + '">View</button> ' +
-        '<button type="button" class="icon-btn-sm" data-edit-stu="' + id + '">Edit</button> ' +
-        '<button type="button" class="icon-btn-sm" data-del-stu="' + id + '">Del</button>';
-    });
-    tbody.querySelectorAll("[data-profile-stu]").forEach(function(btn) {
-      btn.addEventListener("click", function() { openStudentProfile(btn.getAttribute("data-profile-stu")); });
-    });
-    tbody.querySelectorAll("[data-edit-stu]").forEach(function(btn) {
-      btn.addEventListener("click", function() { openStudentForm(btn.getAttribute("data-edit-stu")); });
-    });
-    tbody.querySelectorAll("[data-del-stu]").forEach(function(btn) {
-      btn.addEventListener("click", function() { deleteStudentById(btn.getAttribute("data-del-stu")); });
-    });
-    // Name click → profile for everyone
-    tbody.querySelectorAll("tr").forEach(function(tr) {
-      var cb = tr.querySelector(".stu-select");
-      var id = cb && cb.value;
-      var main = tr.querySelector(".cell-main");
-      if (main && id) {
-        main.style.cursor = "pointer";
-        main.title = "Open profile";
-        main.addEventListener("click", function() { openStudentProfile(id); });
-      }
-    });
-  };
-
-// Ensure QA print packs include amendment transparency footer
-(function() {
-  function withAmendFooter(html) {
-    var foot = "";
-    try { foot = amendmentFooterHtml(window.__lastQaReportEntries || []); } catch (_) {}
-    if (!foot) return html;
-    if (html.indexOf("</body>") >= 0) return html.replace("</body>", foot + "</body>");
-    return html + foot;
-  }
-  var _open = window.open;
-  // soft: patch known print functions if defined later - already have amendmentFooterHtml on remedial
-})();
-
-async function printQaPackWithAmendments(title, bodyHtml) {
-  var w = window.open("", "_blank");
-  if (!w) return;
-  var html = "<!DOCTYPE html><html><head><title>" + title + "</title><style>" + eocnsReportStyles() + "</style></head><body>" +
-    bodyHtml + amendmentFooterHtml(window.__lastQaReportEntries || []) + "</body></html>";
-  w.document.write(html);
-  w.document.close();
-  setTimeout(function() { w.print(); }, 350);
-}
-
-})();
-
-// Wire UI
-document.getElementById("btnFullBackupDownload") && document.getElementById("btnFullBackupDownload").addEventListener("click", downloadFullBackup);
-document.getElementById("btnFullBackupRestore") && document.getElementById("btnFullBackupRestore").addEventListener("click", function() {
-  document.getElementById("fullBackupFileInput") && document.getElementById("fullBackupFileInput").click();
-});
-document.getElementById("fullBackupFileInput") && document.getElementById("fullBackupFileInput").addEventListener("change", function(e) {
-  var f = e.target.files && e.target.files[0];
-  if (f) restoreFullBackupFromFile(f);
-  e.target.value = "";
-});
-document.getElementById("btnBulkDeleteStudents") && document.getElementById("btnBulkDeleteStudents").addEventListener("click", deleteSelectedStudents);
-document.getElementById("btnCloseStudentProfile") && document.getElementById("btnCloseStudentProfile").addEventListener("click", closeStudentProfile);
-document.getElementById("btnCloseStudentProfile2") && document.getElementById("btnCloseStudentProfile2").addEventListener("click", closeStudentProfile);
-document.getElementById("studentProfileBackdrop") && document.getElementById("studentProfileBackdrop").addEventListener("click", closeStudentProfile);
-document.getElementById("btnProfileEdit") && document.getElementById("btnProfileEdit").addEventListener("click", function() {
-  if (window.__profileStudentId) { closeStudentProfile(); openStudentForm(window.__profileStudentId); }
-});
-document.getElementById("btnProfileDelete") && document.getElementById("btnProfileDelete").addEventListener("click", function() {
-  if (window.__profileStudentId) { closeStudentProfile(); deleteStudentById(window.__profileStudentId); }
-});
-document.getElementById("btnPrintHandoverPack") && document.getElementById("btnPrintHandoverPack").addEventListener("click", printOfficerHandoverSheet);
-
-// Alias legacy snapshot buttons to full backup
-document.getElementById("btnExportSnapshot") && document.getElementById("btnExportSnapshot").addEventListener("click", downloadFullBackup);
-document.getElementById("btnExportStudents") && document.getElementById("btnExportStudents").addEventListener("click", downloadFullBackup);
-
-
-// Ensure QA print packs include amendment transparency footer
-(function() {
-  function withAmendFooter(html) {
-    var foot = "";
-    try { foot = amendmentFooterHtml(window.__lastQaReportEntries || []); } catch (_) {}
-    if (!foot) return html;
-    if (html.indexOf("</body>") >= 0) return html.replace("</body>", foot + "</body>");
-    return html + foot;
-  }
-  var _open = window.open;
-  // soft: patch known print functions if defined later - already have amendmentFooterHtml on remedial
-})();
-
-async function printQaPackWithAmendments(title, bodyHtml) {
-  var w = window.open("", "_blank");
-  if (!w) return;
-  var html = "<!DOCTYPE html><html><head><title>" + title + "</title><style>" + eocnsReportStyles() + "</style></head><body>" +
-    bodyHtml + amendmentFooterHtml(window.__lastQaReportEntries || []) + "</body></html>";
-  w.document.write(html);
-  w.document.close();
-  setTimeout(function() { w.print(); }, 350);
 }
 
 })();
