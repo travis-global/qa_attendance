@@ -11432,5 +11432,21 @@
     "user": "QA Officer",
     "source": "system",
     "id": 577
+  },
+  {
+    "ref": "REF/EOCNS/QA/1575",
+    "action": "delete",
+    "entity": "pending_students",
+    "entityId": "pend_mvuva1xtfoo1",
+    "reason": "Rejected self-registration: Passport photo is unclear. Please resubmit a clearer passport photograph.",
+    "details": {
+      "email": "alemfort12@gmail.com",
+      "regNo": "EOCNS/26/0147/GNS",
+      "name": "ALOLOTE FORTUNATUS"
+    },
+    "timestamp": "2026-10-30T11:08:07.894Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 578
   }
 ]
