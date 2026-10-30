@@ -11490,5 +11490,22 @@
     "user": "QA Officer",
     "source": "system",
     "id": 580
+  },
+  {
+    "ref": "REF/EOCNS/QA/1578",
+    "action": "delete",
+    "entity": "pending_students",
+    "entityId": "pend_mvuva1xtfoo1",
+    "reason": "Rejected self-registration: Passport photo or details need correction. Applicant may resubmit via the registration page.",
+    "details": {
+      "email": "alemfort12@gmail.com",
+      "regNo": "EOCNS/26/0147/GNS",
+      "name": "ALOLOTE FORTUNATUS",
+      "notify": "manual_only"
+    },
+    "timestamp": "2026-10-30T11:37:31.270Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 581
   }
 ]
