@@ -4490,5 +4490,109 @@
     "user": "QA Officer",
     "source": "system",
     "id": 196
+  },
+  {
+    "ref": "REF/EOCNS/QA/1197",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvuqnhqvy2qjq",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvuqnhqvy2qjq",
+        "name": "NWUZOR ONYINYECHI A.",
+        "regNo": "TMP-EOCNS/26/0002/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-30T08:56:53.911Z",
+        "updatedAt": "2026-10-30T08:56:53.911Z"
+      }
+    },
+    "timestamp": "2026-10-30T08:56:53.912Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 197
+  },
+  {
+    "ref": "REF/EOCNS/QA/1198",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvuqo9eva0kwf",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvuqo9eva0kwf",
+        "name": "OKONYE PROMISE CHINELO",
+        "regNo": "TMP-EOCNS/26/0003/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-30T08:57:29.767Z",
+        "updatedAt": "2026-10-30T08:57:29.767Z"
+      }
+    },
+    "timestamp": "2026-10-30T08:57:29.771Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 198
+  },
+  {
+    "ref": "REF/EOCNS/QA/1199",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvuqp5gp9bco2",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-30T08:58:11.305Z",
+        "updatedAt": "2026-10-30T08:58:11.305Z"
+      }
+    },
+    "timestamp": "2026-10-30T08:58:11.306Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 199
+  },
+  {
+    "ref": "REF/EOCNS/QA/1200",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvuqpqlvpn2fl",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvuqpqlvpn2fl",
+        "name": "UGWU LOVINA IFUNAYA",
+        "regNo": "TMP-EOCNS/26/0005/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-30T08:58:38.707Z",
+        "updatedAt": "2026-10-30T08:58:38.707Z"
+      }
+    },
+    "timestamp": "2026-10-30T08:58:38.711Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 200
   }
 ]
