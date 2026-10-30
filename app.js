@@ -2451,7 +2451,7 @@ function printRemWeeklyPack() {
     ".pill{display:inline-block;padding:10px 14px;margin:4px;border-radius:8px;border:1px solid #c5cdd8;text-align:center;min-width:90px}" +
     ".pill strong{display:block;font-size:1.3rem}</style></head><body>" +
     "<div class=\"sub\">EOCNS Quality Assurance Department · Remedial Classes Report · Confidential</div>" +
-    "<h1>EOCNS QUALITY ASSURANCE REPORT<span class=\"gold\">FOR THE REMEDIAL CLASSES</span></h1>" +
+    "<h1>EOCNS QUALITY ASSURANCE REPORT<span class=\"gold\">FOR THE REMEDIAL CLASSES</span></h1>" + sessionCoverHtml() +
     "<div class=\"sub\">" + escapeHtml(d.start) + " – " + escapeHtml(d.end) + "<br/>Course-Specific Student &amp; Lecturer Attendance Analysis</div><hr class=\"rule\"/>" +
     "<h2>EXECUTIVE SUMMARY</h2>" +
     "<div class=\"kpi\">" +
@@ -5334,7 +5334,7 @@ function printRemWeeklyPack() {
     ".pill{display:inline-block;padding:10px 14px;margin:4px;border-radius:8px;border:1px solid #c5cdd8;text-align:center;min-width:90px}" +
     ".pill strong{display:block;font-size:1.3rem}</style></head><body>" +
     "<div class=\"sub\">EOCNS Quality Assurance Department · Remedial Classes Report · Confidential</div>" +
-    "<h1>EOCNS QUALITY ASSURANCE REPORT<span class=\"gold\">FOR THE REMEDIAL CLASSES</span></h1>" +
+    "<h1>EOCNS QUALITY ASSURANCE REPORT<span class=\"gold\">FOR THE REMEDIAL CLASSES</span></h1>" + sessionCoverHtml() +
     "<div class=\"sub\">" + escapeHtml(d.start) + " – " + escapeHtml(d.end) + "<br/>Course-Specific Student &amp; Lecturer Attendance Analysis</div><hr class=\"rule\"/>" +
     "<h2>EXECUTIVE SUMMARY</h2>" +
     "<div class=\"kpi\">" +
@@ -5416,5 +5416,270 @@ async function openRemedialForm() { showRemTab("logging"); }
 function closeRemedialForm() {}
 async function saveRemedial(e) { if (e && e.preventDefault) e.preventDefault(); }
 async function deleteRemedial() {}
+
+
+
+// ===== Full backup / restore, student delete, profile, handover =====
+async function collectFullBackupPayload() {
+  await loadActiveSession();
+  var stores = ["students","lecturers","sessions","qa_entries","audit","programmes","levels","courses","attendance","hostel_runs","remedial","remedial_enrolment","remedial_assignments","remedial_logs"];
+  var data = {};
+  for (var i = 0; i < stores.length; i++) {
+    var name = stores[i];
+    try { data[name] = await getAll(name); } catch (_) { data[name] = []; }
+  }
+  try {
+    var rm = await getAll("remedial_meta");
+    data.remedial_meta = (rm[0] && rm[0].value) || { sessionId: "", programmes: [], levels: [] };
+  } catch (_) { data.remedial_meta = {}; }
+  try {
+    var rt = await getAll("remedial_timetable");
+    data.remedial_timetable = (rt[0] && rt[0].value) || { slots: [] };
+  } catch (_) { data.remedial_timetable = { slots: [] }; }
+  data.timetables = TIMETABLES_CACHE || {};
+  data.config = Object.assign({}, APP_CONFIG || {});
+  // never put secrets that don't belong - publishWorkerKey is already in config by design
+  return {
+    format: "eocns-full-backup",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    activeSessionId: ACTIVE_SESSION && ACTIVE_SESSION.id || null,
+    site: "https://travis-global.github.io/qa_attendance/",
+    data: data
+  };
+}
+
+async function downloadFullBackup() {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to download a full backup."); return; }
+  var payload = await collectFullBackupPayload();
+  var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "EOCNS_full_backup_" + new Date().toISOString().slice(0, 10) + ".json";
+  document.body.appendChild(a); a.click();
+  setTimeout(function() { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  try {
+    await writeAudit({ action: "export", entity: "backup", entityId: "full", reason: "Full system backup downloaded" });
+  } catch (_) {}
+  var st = document.getElementById("fullBackupStatus");
+  if (st) { st.hidden = false; st.textContent = "Backup downloaded. Store it offline securely."; st.style.color = "#0f766e"; }
+}
+
+async function restoreFullBackupFromFile(file) {
+  if (!isQaOfficer()) return;
+  if (!file) return;
+  if (!confirm("Restore will overwrite local data with the backup file. You should Publish afterwards so the repository matches. Continue?")) return;
+  var text = await file.text();
+  var payload;
+  try { payload = JSON.parse(text); } catch (e) { alert("Invalid JSON file."); return; }
+  var data = payload.data || payload;
+  async function rep(store, rows) {
+    if (!Array.isArray(rows)) return;
+    // clear + put
+    var existing = await getAll(store);
+    for (var i = 0; i < existing.length; i++) {
+      try { await del(store, existing[i].id != null ? existing[i].id : existing[i].key); } catch (_) {}
+    }
+    for (var j = 0; j < rows.length; j++) {
+      try { await put(store, rows[j]); } catch (err) { console.warn(store, err); }
+    }
+  }
+  var listStores = ["students","lecturers","sessions","qa_entries","audit","programmes","levels","courses","attendance","hostel_runs","remedial","remedial_enrolment","remedial_assignments","remedial_logs"];
+  for (var i = 0; i < listStores.length; i++) {
+    if (data[listStores[i]]) await rep(listStores[i], data[listStores[i]]);
+  }
+  if (data.remedial_meta) await put("remedial_meta", { key: "main", value: data.remedial_meta });
+  if (data.remedial_timetable) await put("remedial_timetable", { key: "main", value: data.remedial_timetable });
+  if (data.timetables) TIMETABLES_CACHE = data.timetables;
+  if (data.config && data.config.qaPin) {
+    APP_CONFIG = Object.assign({}, APP_CONFIG, data.config);
+  }
+  markDirty("full restore");
+  try {
+    await writeAudit({ action: "import", entity: "backup", entityId: "full", reason: "Full system restore from backup file", details: { exportedAt: payload.exportedAt } });
+  } catch (_) {}
+  await refreshSessionChrome();
+  try { await renderStudentsTable(); } catch (_) {}
+  var st = document.getElementById("fullBackupStatus");
+  if (st) { st.hidden = false; st.textContent = "Restore complete locally. Publish to repository when ready."; st.style.color = "#0f766e"; }
+  alert("Restore complete. Publish from Settings so the repository matches this backup.");
+}
+
+async function deleteStudentById(id) {
+  if (!isQaOfficer()) return;
+  var ref = prompt("Official REF to delete this student:", "REF/EOCNS/QA/");
+  if (!ref || !String(ref).trim()) return;
+  var reason = prompt("Reason for deletion:", "Removed from master list");
+  if (!reason || !String(reason).trim()) return;
+  if (!confirm("Permanently delete this student from the master list?")) return;
+  var list = await getAll("students");
+  var s = list.find(function(x) { return x.id === id; });
+  await del("students", id);
+  await writeAudit({
+    action: "delete",
+    entity: "students",
+    entityId: id,
+    externalRef: String(ref).trim(),
+    reason: String(reason).trim(),
+    details: { name: s && s.name, regNo: s && s.regNo }
+  });
+  markDirty("student delete");
+  await renderStudentsTable();
+}
+
+async function deleteSelectedStudents() {
+  if (!isQaOfficer()) return;
+  var ids = Array.prototype.map.call(document.querySelectorAll(".stu-select:checked"), function(el) { return el.value; });
+  if (!ids.length) { alert("Select at least one student."); return; }
+  var ref = prompt("Official REF for bulk delete of " + ids.length + " student(s):", "REF/EOCNS/QA/");
+  if (!ref || !String(ref).trim()) return;
+  var reason = prompt("Reason for bulk deletion:", "Bulk removal from master list");
+  if (!reason || !String(reason).trim()) return;
+  if (!confirm("Permanently delete " + ids.length + " student(s)?")) return;
+  for (var i = 0; i < ids.length; i++) {
+    var list = await getAll("students");
+    var s = list.find(function(x) { return x.id === ids[i]; });
+    await del("students", ids[i]);
+    await writeAudit({
+      action: "delete",
+      entity: "students",
+      entityId: ids[i],
+      externalRef: String(ref).trim(),
+      reason: String(reason).trim() + " (bulk)",
+      details: { name: s && s.name, regNo: s && s.regNo }
+    });
+  }
+  markDirty("student bulk delete");
+  await renderStudentsTable();
+}
+
+async function openStudentProfile(id) {
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === id; });
+  if (!s) return;
+  window.__profileStudentId = id;
+  document.getElementById("studentProfileTitle").textContent = s.name || "Student";
+  var rem = [];
+  try {
+    rem = (await getAll("remedial_enrolment")).filter(function(r) {
+      return r.matric === s.regNo || (r.name && s.name && r.name.toLowerCase() === s.name.toLowerCase());
+    });
+  } catch (_) {}
+  var body = document.getElementById("studentProfileBody");
+  body.innerHTML =
+    "<p><strong>Reg. No:</strong> " + escapeHtml(s.regNo || "—") + "</p>" +
+    "<p><strong>Programme / Level:</strong> " + escapeHtml(s.programme || "—") + " · " + escapeHtml(String(s.level || "—")) + "</p>" +
+    "<p><strong>Hostel:</strong> " + escapeHtml(s.hostel || "—") + "</p>" +
+    "<p><strong>Status:</strong> " + escapeHtml(s.status || "Active") + "</p>" +
+    "<p><strong>Gender / Phone:</strong> " + escapeHtml(s.gender || "—") + " · " + escapeHtml(s.phone || "—") + "</p>" +
+    "<p><strong>Active session scope:</strong> " + (ACTIVE_SESSION ? escapeHtml(ACTIVE_SESSION.name) : "—") + "</p>" +
+    "<p><strong>Remedial enrolment:</strong> " + (rem.length ? rem.map(function(r) { return escapeHtml((r.courses || []).join(", ")); }).join(" | ") : "None on file") + "</p>";
+  document.getElementById("studentProfileDrawer").hidden = false;
+}
+
+function closeStudentProfile() {
+  document.getElementById("studentProfileDrawer").hidden = true;
+}
+
+function sessionCoverHtml() {
+  if (!ACTIVE_SESSION) return "<div class=\"sub\">No active session selected</div>";
+  return "<div class=\"sub\"><strong>Academic session:</strong> " + escapeHtml(ACTIVE_SESSION.name) +
+    (ACTIVE_SESSION.startDate ? (" · From " + escapeHtml(ACTIVE_SESSION.startDate)) : "") +
+    "<br/><strong>Programmes:</strong> " + escapeHtml((ACTIVE_SESSION.programmes || []).join(", ")) +
+    " · <strong>Levels:</strong> " + escapeHtml((ACTIVE_SESSION.levels || []).join(", ")) + "</div>";
+}
+
+function printOfficerHandoverSheet() {
+  var w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write("<!DOCTYPE html><html><head><title>Officer Handover</title><style>body{font-family:Georgia,serif;max-width:720px;margin:24px auto;padding:12px;color:#0f172a}h1{color:#0d9488;font-size:1.4rem}li{margin:6px 0}.box{border:1px solid #cbd5e1;padding:12px;border-radius:8px;background:#f8fafc}</style></head><body>" +
+    "<h1>EOCNS QA System — Quick Officer Handover</h1>" +
+    "<p>Live site: https://travis-global.github.io/qa_attendance/</p>" +
+    "<div class=\"box\"><ol>" +
+    "<li>Open Settings → sign in with the officer PIN.</li>" +
+    "<li>Top bar → select the correct <b>Active session</b>.</li>" +
+    "<li>Students / Lecturers: maintain master lists (edits need REF when prompted).</li>" +
+    "<li>Daily QA → log lectures; Weekly/Monthly → build &amp; print packs.</li>" +
+    "<li>After major changes → Settings → Publish all data to repository.</li>" +
+    "<li>Weekly: Download full backup and store offline.</li>" +
+    "<li>Full manuals: Settings → Documentation &amp; handover (PDF package).</li>" +
+    "</ol></div>" +
+    "<p>Developer (service year): Fortunatus Alolote Fayeofori</p>" +
+    "</body></html>");
+  w.document.close();
+  setTimeout(function() { w.print(); }, 300);
+}
+
+// Patch student table actions: View + Delete
+(function patchStudentRender() {
+  var prev = renderStudentsTable;
+  if (typeof prev !== "function") return;
+  renderStudentsTable = async function() {
+    await prev.apply(this, arguments);
+    var tbody = document.getElementById("studentsTableBody");
+    if (!tbody || !isQaOfficer()) {
+      // still allow profile view for viewers via name click if we add data-profile
+    }
+    if (!tbody) return;
+    // Re-bind richer actions on last column
+    tbody.querySelectorAll("tr").forEach(function(tr) {
+      var cb = tr.querySelector(".stu-select");
+      var id = cb && cb.value;
+      if (!id) return;
+      var act = tr.querySelector("td.qa-edit-only:last-child");
+      if (!act) return;
+      act.innerHTML =
+        '<button type="button" class="icon-btn-sm" data-profile-stu="' + id + '">View</button> ' +
+        '<button type="button" class="icon-btn-sm" data-edit-stu="' + id + '">Edit</button> ' +
+        '<button type="button" class="icon-btn-sm" data-del-stu="' + id + '">Del</button>';
+    });
+    tbody.querySelectorAll("[data-profile-stu]").forEach(function(btn) {
+      btn.addEventListener("click", function() { openStudentProfile(btn.getAttribute("data-profile-stu")); });
+    });
+    tbody.querySelectorAll("[data-edit-stu]").forEach(function(btn) {
+      btn.addEventListener("click", function() { openStudentForm(btn.getAttribute("data-edit-stu")); });
+    });
+    tbody.querySelectorAll("[data-del-stu]").forEach(function(btn) {
+      btn.addEventListener("click", function() { deleteStudentById(btn.getAttribute("data-del-stu")); });
+    });
+    // Name click → profile for everyone
+    tbody.querySelectorAll("tr").forEach(function(tr) {
+      var cb = tr.querySelector(".stu-select");
+      var id = cb && cb.value;
+      var main = tr.querySelector(".cell-main");
+      if (main && id) {
+        main.style.cursor = "pointer";
+        main.title = "Open profile";
+        main.addEventListener("click", function() { openStudentProfile(id); });
+      }
+    });
+  };
+})();
+
+// Wire UI
+document.getElementById("btnFullBackupDownload") && document.getElementById("btnFullBackupDownload").addEventListener("click", downloadFullBackup);
+document.getElementById("btnFullBackupRestore") && document.getElementById("btnFullBackupRestore").addEventListener("click", function() {
+  document.getElementById("fullBackupFileInput") && document.getElementById("fullBackupFileInput").click();
+});
+document.getElementById("fullBackupFileInput") && document.getElementById("fullBackupFileInput").addEventListener("change", function(e) {
+  var f = e.target.files && e.target.files[0];
+  if (f) restoreFullBackupFromFile(f);
+  e.target.value = "";
+});
+document.getElementById("btnBulkDeleteStudents") && document.getElementById("btnBulkDeleteStudents").addEventListener("click", deleteSelectedStudents);
+document.getElementById("btnCloseStudentProfile") && document.getElementById("btnCloseStudentProfile").addEventListener("click", closeStudentProfile);
+document.getElementById("btnCloseStudentProfile2") && document.getElementById("btnCloseStudentProfile2").addEventListener("click", closeStudentProfile);
+document.getElementById("studentProfileBackdrop") && document.getElementById("studentProfileBackdrop").addEventListener("click", closeStudentProfile);
+document.getElementById("btnProfileEdit") && document.getElementById("btnProfileEdit").addEventListener("click", function() {
+  if (window.__profileStudentId) { closeStudentProfile(); openStudentForm(window.__profileStudentId); }
+});
+document.getElementById("btnProfileDelete") && document.getElementById("btnProfileDelete").addEventListener("click", function() {
+  if (window.__profileStudentId) { closeStudentProfile(); deleteStudentById(window.__profileStudentId); }
+});
+document.getElementById("btnPrintHandoverPack") && document.getElementById("btnPrintHandoverPack").addEventListener("click", printOfficerHandoverSheet);
+
+// Alias legacy snapshot buttons to full backup
+document.getElementById("btnExportSnapshot") && document.getElementById("btnExportSnapshot").addEventListener("click", downloadFullBackup);
+document.getElementById("btnExportStudents") && document.getElementById("btnExportStudents").addEventListener("click", downloadFullBackup);
 
 })();
