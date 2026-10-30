@@ -3257,71 +3257,46 @@ async function approvePendingStudent(id) {
   closePendingReview();
   await renderPendingRegistrations();
   await renderStudentsTable();
-  alert("Approved onto master list. Publish to repository so other devices and the registration checks stay in sync.");
-}
-
-async function rejectPendingStudent(id) {
-  if (!isQaOfficer()) return;
-  id = id || window.__pendingReviewId;
-  if (!id) return;
-  var list = await getAll("pending_students");
-  var p = list.find(function(x) { return x.id === id; });
-  if (!p) return;
-  var reason = prompt("Reason for rejection (will be sent to the student if email is configured):", "Passport photo is unclear. Please resubmit a clearer passport photograph.");
-  if (reason == null) return;
-  reason = String(reason).trim();
-  if (!reason) { alert("A reason is required."); return; }
-  var pin = prompt("Enter officer PIN to confirm rejection:");
-  if (pin == null) return;
-  if (String(pin).trim() !== String((APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA")) {
-    alert("Incorrect PIN.");
-    return;
-  }
-  await del("pending_students", id);
-  await writeAudit({
-    action: "delete",
-    entity: "pending_students",
-    entityId: id,
-    reason: "Rejected self-registration: " + reason,
-    details: { email: p.email, regNo: p.regNo, name: p.name }
-  });
-  markDirty("pending reject");
-  // try email via worker
-  var emailed = false;
   try {
-    var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
-    var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
-    if (workerUrl && p.email) {
-      var res = await fetch(workerUrl.replace(/\/$/, ""), {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-EOCNS-Key": key },
-        body: JSON.stringify({
-          action: "reject_email",
-          publishKey: key,
-          to: p.email,
-          studentName: p.name,
-          regNo: p.regNo,
-          reason: reason
-        })
-      });
-      var body = await res.json().catch(function() { return {}; });
-      emailed = !!(body && body.emailed);
-      if (!emailed) {
-        var mailto = "mailto:" + encodeURIComponent(p.email) +
-          "?subject=" + encodeURIComponent("EOCNS registration update — " + (p.regNo || "")) +
-          "&body=" + encodeURIComponent("Dear " + p.name + ",\n\nYour registration could not be approved yet.\n\nReason:\n" + reason + "\n\nPlease correct and resubmit via the registration page.\n\nEOCNS Registry Desk");
-        if (confirm("Rejection saved. Automatic email was not sent (" + (body.message || body.error || "no mail provider") + "). Open a draft email to the student?")) {
-          window.location.href = mailto;
-        }
-      }
-    }
+    await publishPendingListToRepo("Approve registration — update pending list");
   } catch (err) {
     console.warn(err);
   }
-  closePendingReview();
-  await renderPendingRegistrations();
-  alert(emailed ? "Rejected and email sent to the student." : "Rejected. Publish pending list when ready.");
+  alert("Approved onto master list and removed from pending. Publish full data when convenient so students.json is on the repository.");
 }
+
+
+async function publishPendingListToRepo(message) {
+  var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
+  var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
+  if (!workerUrl) throw new Error("publishWorkerUrl missing in config");
+  var list = await getAll("pending_students");
+  // only keep pending or all remaining records
+  list = list.filter(function(p) { return p && p.id; });
+  var files = {};
+  files[DATA_FILES.pending_students] = JSON.stringify(list, null, 2);
+  var headers = { "Content-Type": "application/json" };
+  if (key) headers["X-EOCNS-Key"] = key;
+  var res = await fetch(workerUrl.replace(/\/$/, ""), {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify({
+      action: "publish",
+      publishKey: key,
+      message: message || "Update pending student registrations",
+      files: files
+    })
+  });
+  var body = {};
+  try { body = await res.json(); } catch (_) {}
+  if (!res.ok) throw new Error(body.error || ("Worker HTTP " + res.status));
+  return body;
+}
+
+/*dup removed*/
+
+
+
 
 })();
 
@@ -3839,71 +3814,44 @@ async function approvePendingStudent(id) {
   closePendingReview();
   await renderPendingRegistrations();
   await renderStudentsTable();
-  alert("Approved onto master list. Publish to repository so other devices and the registration checks stay in sync.");
-}
-
-async function rejectPendingStudent(id) {
-  if (!isQaOfficer()) return;
-  id = id || window.__pendingReviewId;
-  if (!id) return;
-  var list = await getAll("pending_students");
-  var p = list.find(function(x) { return x.id === id; });
-  if (!p) return;
-  var reason = prompt("Reason for rejection (will be sent to the student if email is configured):", "Passport photo is unclear. Please resubmit a clearer passport photograph.");
-  if (reason == null) return;
-  reason = String(reason).trim();
-  if (!reason) { alert("A reason is required."); return; }
-  var pin = prompt("Enter officer PIN to confirm rejection:");
-  if (pin == null) return;
-  if (String(pin).trim() !== String((APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA")) {
-    alert("Incorrect PIN.");
-    return;
-  }
-  await del("pending_students", id);
-  await writeAudit({
-    action: "delete",
-    entity: "pending_students",
-    entityId: id,
-    reason: "Rejected self-registration: " + reason,
-    details: { email: p.email, regNo: p.regNo, name: p.name }
-  });
-  markDirty("pending reject");
-  // try email via worker
-  var emailed = false;
   try {
-    var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
-    var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
-    if (workerUrl && p.email) {
-      var res = await fetch(workerUrl.replace(/\/$/, ""), {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-EOCNS-Key": key },
-        body: JSON.stringify({
-          action: "reject_email",
-          publishKey: key,
-          to: p.email,
-          studentName: p.name,
-          regNo: p.regNo,
-          reason: reason
-        })
-      });
-      var body = await res.json().catch(function() { return {}; });
-      emailed = !!(body && body.emailed);
-      if (!emailed) {
-        var mailto = "mailto:" + encodeURIComponent(p.email) +
-          "?subject=" + encodeURIComponent("EOCNS registration update — " + (p.regNo || "")) +
-          "&body=" + encodeURIComponent("Dear " + p.name + ",\n\nYour registration could not be approved yet.\n\nReason:\n" + reason + "\n\nPlease correct and resubmit via the registration page.\n\nEOCNS Registry Desk");
-        if (confirm("Rejection saved. Automatic email was not sent (" + (body.message || body.error || "no mail provider") + "). Open a draft email to the student?")) {
-          window.location.href = mailto;
-        }
-      }
-    }
+    await publishPendingListToRepo("Approve registration — update pending list");
   } catch (err) {
     console.warn(err);
   }
-  closePendingReview();
-  await renderPendingRegistrations();
-  alert(emailed ? "Rejected and email sent to the student." : "Rejected. Publish pending list when ready.");
+  alert("Approved onto master list and removed from pending. Publish full data when convenient so students.json is on the repository.");
 }
+
+
+async function publishPendingListToRepo(message) {
+  var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
+  var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
+  if (!workerUrl) throw new Error("publishWorkerUrl missing in config");
+  var list = await getAll("pending_students");
+  // only keep pending or all remaining records
+  list = list.filter(function(p) { return p && p.id; });
+  var files = {};
+  files[DATA_FILES.pending_students] = JSON.stringify(list, null, 2);
+  var headers = { "Content-Type": "application/json" };
+  if (key) headers["X-EOCNS-Key"] = key;
+  var res = await fetch(workerUrl.replace(/\/$/, ""), {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify({
+      action: "publish",
+      publishKey: key,
+      message: message || "Update pending student registrations",
+      files: files
+    })
+  });
+  var body = {};
+  try { body = await res.json(); } catch (_) {}
+  if (!res.ok) throw new Error(body.error || ("Worker HTTP " + res.status));
+  return body;
+}
+
+/*dup removed*/
+
 
 })();
   if (document.getElementById("qaDailyDate") && !document.getElementById("qaDailyDate").value) {
@@ -7880,70 +7828,43 @@ async function approvePendingStudent(id) {
   closePendingReview();
   await renderPendingRegistrations();
   await renderStudentsTable();
-  alert("Approved onto master list. Publish to repository so other devices and the registration checks stay in sync.");
-}
-
-async function rejectPendingStudent(id) {
-  if (!isQaOfficer()) return;
-  id = id || window.__pendingReviewId;
-  if (!id) return;
-  var list = await getAll("pending_students");
-  var p = list.find(function(x) { return x.id === id; });
-  if (!p) return;
-  var reason = prompt("Reason for rejection (will be sent to the student if email is configured):", "Passport photo is unclear. Please resubmit a clearer passport photograph.");
-  if (reason == null) return;
-  reason = String(reason).trim();
-  if (!reason) { alert("A reason is required."); return; }
-  var pin = prompt("Enter officer PIN to confirm rejection:");
-  if (pin == null) return;
-  if (String(pin).trim() !== String((APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA")) {
-    alert("Incorrect PIN.");
-    return;
-  }
-  await del("pending_students", id);
-  await writeAudit({
-    action: "delete",
-    entity: "pending_students",
-    entityId: id,
-    reason: "Rejected self-registration: " + reason,
-    details: { email: p.email, regNo: p.regNo, name: p.name }
-  });
-  markDirty("pending reject");
-  // try email via worker
-  var emailed = false;
   try {
-    var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
-    var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
-    if (workerUrl && p.email) {
-      var res = await fetch(workerUrl.replace(/\/$/, ""), {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-EOCNS-Key": key },
-        body: JSON.stringify({
-          action: "reject_email",
-          publishKey: key,
-          to: p.email,
-          studentName: p.name,
-          regNo: p.regNo,
-          reason: reason
-        })
-      });
-      var body = await res.json().catch(function() { return {}; });
-      emailed = !!(body && body.emailed);
-      if (!emailed) {
-        var mailto = "mailto:" + encodeURIComponent(p.email) +
-          "?subject=" + encodeURIComponent("EOCNS registration update — " + (p.regNo || "")) +
-          "&body=" + encodeURIComponent("Dear " + p.name + ",\n\nYour registration could not be approved yet.\n\nReason:\n" + reason + "\n\nPlease correct and resubmit via the registration page.\n\nEOCNS Registry Desk");
-        if (confirm("Rejection saved. Automatic email was not sent (" + (body.message || body.error || "no mail provider") + "). Open a draft email to the student?")) {
-          window.location.href = mailto;
-        }
-      }
-    }
+    await publishPendingListToRepo("Approve registration — update pending list");
   } catch (err) {
     console.warn(err);
   }
-  closePendingReview();
-  await renderPendingRegistrations();
-  alert(emailed ? "Rejected and email sent to the student." : "Rejected. Publish pending list when ready.");
+  alert("Approved onto master list and removed from pending. Publish full data when convenient so students.json is on the repository.");
 }
+
+
+async function publishPendingListToRepo(message) {
+  var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
+  var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
+  if (!workerUrl) throw new Error("publishWorkerUrl missing in config");
+  var list = await getAll("pending_students");
+  // only keep pending or all remaining records
+  list = list.filter(function(p) { return p && p.id; });
+  var files = {};
+  files[DATA_FILES.pending_students] = JSON.stringify(list, null, 2);
+  var headers = { "Content-Type": "application/json" };
+  if (key) headers["X-EOCNS-Key"] = key;
+  var res = await fetch(workerUrl.replace(/\/$/, ""), {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify({
+      action: "publish",
+      publishKey: key,
+      message: message || "Update pending student registrations",
+      files: files
+    })
+  });
+  var body = {};
+  try { body = await res.json(); } catch (_) {}
+  if (!res.ok) throw new Error(body.error || ("Worker HTTP " + res.status));
+  return body;
+}
+
+/*dup removed*/
+
 
 })();

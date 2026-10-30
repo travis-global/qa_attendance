@@ -181,24 +181,83 @@ async function handleRejectEmail(env, request, payload, cors) {
   const studentName = String(payload.studentName || "Applicant").trim();
   const reason = String(payload.reason || "").trim();
   const regNo = String(payload.regNo || "").trim();
+  const programme = String(payload.programme || "").trim();
+  const level = String(payload.level || "").trim();
   if (!to || !reason) return json({ error: "to and reason required" }, 400, cors);
+
+  const safeReason = reason
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br/>");
+
+  const subject = `Eastern Oak College of Nursing Sciences — Registration review update${regNo ? " (" + regNo + ")" : ""}`;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:Georgia,'Times New Roman',serif;color:#0f172a;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f1f5f9;padding:24px 12px;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;">
+        <tr>
+          <td style="background:linear-gradient(135deg,#0f766e,#0d9488);padding:22px 28px;text-align:center;">
+            <div style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#ccfbf1;font-family:Arial,sans-serif;">Eastern Oak College of Nursing Sciences</div>
+            <div style="font-size:20px;font-weight:700;color:#ffffff;margin-top:8px;font-family:Arial,sans-serif;">Student Registration Desk</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:28px 28px 8px;font-size:16px;line-height:1.55;">
+            <p style="margin:0 0 14px;">Dear <strong>${studentName}</strong>,</p>
+            <p style="margin:0 0 14px;">Thank you for submitting your registration details to <strong>Eastern Oak College of Nursing Sciences</strong>.</p>
+            <p style="margin:0 0 14px;">Following review by the Quality Assurance / Student Affairs desk, this submission <strong>could not be approved at this time</strong>.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 28px 8px;">
+            <table role="presentation" width="100%" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;">
+              <tr><td style="padding:14px 16px;font-family:Arial,sans-serif;font-size:13px;color:#475569;">
+                ${regNo ? "<div><strong>Registration number:</strong> " + regNo + "</div>" : ""}
+                ${programme || level ? "<div><strong>Programme / Level:</strong> " + (programme || "—") + (level ? " · " + level : "") + "</div>" : ""}
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:16px 28px;">
+            <div style="font-family:Arial,sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#0d9488;margin-bottom:8px;">Reason for this decision</div>
+            <div style="background:#fffbeb;border-left:4px solid #b45309;padding:14px 16px;font-size:15px;line-height:1.5;">${safeReason}</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:8px 28px 24px;font-size:15px;line-height:1.55;">
+            <p style="margin:0 0 14px;">You are welcome to <strong>correct the issue</strong> and submit again through the official student registration page. If you need clarification, please contact the Quality Assurance or Student Affairs office of the College.</p>
+            <p style="margin:0 0 6px;">Yours faithfully,</p>
+            <p style="margin:0;"><strong>Quality Assurance / Student Affairs Desk</strong><br/>Eastern Oak College of Nursing Sciences</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#0f172a;padding:14px 28px;font-family:Arial,sans-serif;font-size:11px;color:#94a3b8;text-align:center;line-height:1.4;">
+            This message was sent regarding your registration review. Please do not reply with sensitive credentials.
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
 
   if (!env.RESEND_API_KEY) {
     return json({
       ok: false,
       emailed: false,
-      message: "RESEND_API_KEY not configured on worker. Share the rejection reason manually.",
-      mailtoBody: reason,
+      message: "RESEND_API_KEY not configured on worker.",
+      mailtoSubject: subject,
+      mailtoBody: `Dear ${studentName},\n\nThank you for submitting your registration details to Eastern Oak College of Nursing Sciences.\n\nFollowing review, this submission could not be approved at this time.\n\nReason:\n${reason}\n\nYou may correct the issue and submit again through the official registration page, or contact QA / Student Affairs.\n\nYours faithfully,\nQuality Assurance / Student Affairs Desk\nEastern Oak College of Nursing Sciences`,
     }, 200, cors);
   }
+
   const from = env.MAIL_FROM || "EOCNS Registry <onboarding@resend.dev>";
-  const subject = `EOCNS registration update — ${regNo || "application"}`;
-  const html = `<p>Dear ${studentName},</p>
-<p>Thank you for submitting your student registration details for Eastern Oak College of Nursing Sciences.</p>
-<p>After review, this submission could not be approved yet.</p>
-<p><strong>Reason:</strong><br/>${reason.replace(/\n/g, "<br/>")}</p>
-<p>You may correct the issue and submit again through the registration page, or contact the Quality Assurance / Student Affairs office for guidance.</p>
-<p>Regards,<br/>EOCNS Registry Desk</p>`;
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -209,7 +268,7 @@ async function handleRejectEmail(env, request, payload, cors) {
   });
   if (!res.ok) {
     const t = await res.text();
-    return json({ ok: false, emailed: false, error: t.slice(0, 300) }, 502, cors);
+    return json({ ok: false, emailed: false, error: t.slice(0, 400) }, 502, cors);
   }
   return json({ ok: true, emailed: true }, 200, cors);
 }
