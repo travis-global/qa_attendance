@@ -11507,5 +11507,22 @@
     "user": "QA Officer",
     "source": "system",
     "id": 581
+  },
+  {
+    "ref": "REF/EOCNS/QA/1579",
+    "action": "delete",
+    "entity": "pending_students",
+    "entityId": "pend_mvuva1xtfoo1",
+    "reason": "Rejected self-registration: Reg No already exists",
+    "details": {
+      "email": "alemfort12@gmail.com",
+      "regNo": "EOCNS/26/0147/GNS",
+      "name": "ALOLOTE FORTUNATUS",
+      "notify": "manual_only"
+    },
+    "timestamp": "2026-10-30T11:40:10.133Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 582
   }
 ]
