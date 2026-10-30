@@ -3266,6 +3266,55 @@ async function approvePendingStudent(id) {
 }
 
 
+
+async function rejectPendingStudent(id) {
+  if (!isQaOfficer()) return;
+  id = id || window.__pendingReviewId;
+  if (!id) return;
+  var list = await getAll("pending_students");
+  var p = list.find(function(x) { return x.id === id; });
+  if (!p) { alert("Submission not found (it may already have been removed)."); await renderPendingRegistrations(); return; }
+  var reason = prompt("Reason for rejection (stored in the audit log for the office):", "Passport photo or details need correction. Applicant may resubmit via the registration page.");
+  if (reason == null) return;
+  reason = String(reason).trim();
+  if (!reason) { alert("A reason is required."); return; }
+  var pin = prompt("Enter officer PIN to confirm rejection and remove this submission from the pending list:");
+  if (pin == null) return;
+  if (String(pin).trim() !== String((APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA")) {
+    alert("Incorrect PIN. Submission was not rejected.");
+    return;
+  }
+
+  try { await del("pending_students", id); } catch (_) {}
+  try {
+    var left = await getAll("pending_students");
+    for (var i = 0; i < left.length; i++) {
+      if (left[i].id === id) { try { await del("pending_students", id); } catch (_) {} }
+    }
+  } catch (_) {}
+
+  await writeAudit({
+    action: "delete",
+    entity: "pending_students",
+    entityId: id,
+    reason: "Rejected self-registration: " + reason,
+    details: { email: p.email, regNo: p.regNo, name: p.name, notify: "manual_only" }
+  });
+  markDirty("pending reject");
+  closePendingReview();
+  await renderPendingRegistrations();
+
+  try {
+    await publishPendingListToRepo("Reject registration " + (p.regNo || id) + " — remove from pending list");
+  } catch (err) {
+    console.error(err);
+    alert("Removed locally, but failed to update the repository pending list: " + (err.message || err) + "\nPublish from Settings when you can.");
+    return;
+  }
+  alert("Rejected and removed from the pending list (synced to repository).\n\nNo automatic email was sent. Contact the applicant offline if needed.\nReason logged: " + reason);
+}
+
+
 async function publishPendingListToRepo(message) {
   var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
   var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
@@ -3293,7 +3342,7 @@ async function publishPendingListToRepo(message) {
   return body;
 }
 
-/*dup removed*/
+
 
 
 
@@ -3850,7 +3899,7 @@ async function publishPendingListToRepo(message) {
   return body;
 }
 
-/*dup removed*/
+
 
 
 })();
@@ -7864,7 +7913,7 @@ async function publishPendingListToRepo(message) {
   return body;
 }
 
-/*dup removed*/
+
 
 
 })();
