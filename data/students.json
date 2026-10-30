@@ -92,6 +92,19 @@
   },
   {
     "serial": "",
+    "name": "ALOLOTE FORTUNATUS",
+    "programme": "Midwifery",
+    "level": 100,
+    "code": "MID",
+    "regNo": "EOCNS/26/0147/GNS",
+    "hostel": "Hostel 1",
+    "status": "Active",
+    "gender": "Male",
+    "phone": "",
+    "id": "stu_mvuvud1olx5d9"
+  },
+  {
+    "serial": "",
     "name": "AMADI CHUKWUKAYIMA ASSUMPTA",
     "programme": "General Nursing",
     "level": 100,
