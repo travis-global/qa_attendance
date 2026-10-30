@@ -2,87 +2,137 @@
   {
     "ref": "REF/EOCNS/QA/1001",
     "action": "create",
-    "entity": "students",
-    "entityId": "bulk-seed",
-    "reason": "Loaded official class list (327 new records)",
-    "details": {
-      "added": 327
-    },
-    "timestamp": "2026-10-27T20:38:00.152Z",
+    "entity": "programmes",
+    "entityId": "Public Health",
+    "reason": "New programme Public Health",
+    "details": {},
+    "timestamp": "2026-10-28T10:40:42.345Z",
     "user": "QA Officer",
     "source": "system",
     "id": 1
   },
   {
-    "ref": "REF/EOCNS/QA/001",
-    "action": "update",
-    "entity": "students",
-    "entityId": "stu_mvr5dj8mjwx5t",
-    "reason": "She has been promoted",
+    "ref": "REF/EOCNS/QA/1002",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mvrzl49lolixb",
+    "reason": "New lecturer registration",
     "details": {
-      "before": {
-        "id": "stu_mvr5dj8mjwx5t",
-        "name": "Vivian Ogunne Arua",
-        "regNo": "EOCNS/100/0066/GNS",
-        "programme": "Nursing",
-        "level": "100",
-        "gender": "",
-        "hostel": "",
-        "status": "Active",
+      "lec": {
+        "id": "lec_mvrzl49lolixb",
+        "name": "Jane Doe",
+        "staffId": "001",
         "phone": "",
-        "serial": "66",
-        "createdAt": "2026-10-27T20:37:58.481Z",
-        "updatedAt": "2026-10-27T20:37:58.481Z"
-      },
-      "after": {
-        "id": "stu_mvr5dj8mjwx5t",
-        "name": "Vivian Ogunne Arua",
-        "regNo": "EOCNS/100/0066/GNS",
-        "programme": "Nursing",
-        "level": 200,
-        "gender": "Female",
-        "hostel": "",
+        "courses": [
+          "History"
+        ],
         "status": "Active",
-        "phone": "",
-        "serial": "66",
-        "createdAt": "2026-10-27T20:37:58.481Z",
-        "updatedAt": "2026-10-27T20:39:30.807Z"
+        "createdAt": "2026-10-28T10:43:41.145Z",
+        "updatedAt": "2026-10-28T10:43:41.145Z"
       }
     },
-    "timestamp": "2026-10-27T20:39:30.842Z",
+    "timestamp": "2026-10-28T10:43:41.153Z",
     "user": "QA Officer",
-    "source": "official-letter",
+    "source": "system",
     "id": 2
   },
   {
-    "ref": "REF/EOCNS/QA/1002",
-    "action": "create",
-    "entity": "levels",
-    "entityId": "400 level",
-    "reason": "New level 400 level",
-    "details": {},
-    "timestamp": "2026-10-28T11:17:34.698Z",
+    "ref": "REF/EOCNS/QA/1003",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa70ues3",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0026/GNS",
+      "name": "Abigail Akachukwu Nwonyi"
+    },
+    "timestamp": "2026-10-28T13:20:50.829Z",
     "user": "QA Officer",
     "source": "system",
     "id": 3
   },
   {
-    "ref": "REF/EOCNS/QA/1003",
-    "action": "create",
-    "entity": "programmes",
-    "entityId": "Public health",
-    "reason": "New programme Public health",
-    "details": {},
-    "timestamp": "2026-10-28T11:17:51.068Z",
+    "ref": "REF/EOCNS/QA/1004",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaauxf8d6",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0094/GNS",
+      "name": "Abigail Oka Ojong"
+    },
+    "timestamp": "2026-10-28T13:20:50.831Z",
     "user": "QA Officer",
     "source": "system",
     "id": 4
   },
   {
-    "ref": "REF/EOCNS/QA/1004",
+    "ref": "REF/EOCNS/QA/1005",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5djwzv2236",
+    "entityId": "stu_mvrzdacjgg19i",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Public Health",
+        "level": "200"
+      },
+      "regNo": "EOCNS/200/0038/MID",
+      "name": "Angela Ezinne Igwe"
+    },
+    "timestamp": "2026-10-28T13:21:24.018Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 5
+  },
+  {
+    "ref": "REF/EOCNS/QA/1006",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaakqjkkg",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Public Health",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0060/GNS",
+      "name": "Anita Ifunanya Nnaemeka"
+    },
+    "timestamp": "2026-10-28T13:21:24.023Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 6
+  },
+  {
+    "ref": "REF/EOCNS/QA/1007",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabpes46t",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
@@ -90,1736 +140,4355 @@
         "level": "200"
       },
       "after": {
-        "programme": "Midwifery",
+        "programme": "Public Health",
         "level": "200"
       },
-      "regNo": "EOCNS/200/0072/GNS",
-      "name": "Wonderful Nmesoma Vasco"
+      "regNo": "EOCNS/200/0024/GNS",
+      "name": "Annabel Kosarachi Aliozor"
     },
-    "timestamp": "2026-10-28T12:00:47.901Z",
-    "user": "QA Officer",
-    "source": "system",
-    "id": 5
-  },
-  {
-    "ref": "REF/EOCNS/QA/1005",
-    "action": "create",
-    "entity": "students",
-    "entityId": "bulk-seed",
-    "reason": "Loaded official class list (15 new records)",
-    "details": {
-      "added": 15
-    },
-    "timestamp": "2026-10-28T19:18:03.381Z",
-    "user": "QA Officer",
-    "source": "system",
-    "id": 6
-  },
-  {
-    "ref": "REF/EOCNS/QA/1006",
-    "action": "update",
-    "entity": "config",
-    "entityId": "qaPin",
-    "reason": "QA officer PIN rotated",
-    "details": {
-      "rotatedAt": "2026-10-29T08:01:54.222Z"
-    },
-    "timestamp": "2026-10-29T08:01:59.251Z",
+    "timestamp": "2026-10-28T13:21:24.026Z",
     "user": "QA Officer",
     "source": "system",
     "id": 7
   },
   {
-    "ref": "REF/EOCNS/QA/1007",
-    "action": "update",
-    "entity": "students",
-    "entityId": "stu_mvr5dk3zntpfl",
-    "reason": "Programme/level move (upgrade or transfer)",
-    "details": {
-      "before": {
-        "programme": "Midwifery",
-        "level": "200"
-      },
-      "after": {
-        "programme": "Midwifery",
-        "level": "300"
-      },
-      "regNo": "EOCNS/200/0032/MID",
-      "name": "Amarachi Nwuguru Okeh"
-    },
-    "timestamp": "2026-10-29T08:04:58.462Z",
+    "ref": "REF/EOCNS/QA/1008",
+    "action": "delete",
+    "entity": "courses",
+    "entityId": "ECA",
+    "reason": "Course removed",
+    "details": {},
+    "timestamp": "2026-10-28T13:45:14.563Z",
     "user": "QA Officer",
     "source": "system",
     "id": 8
   },
   {
-    "ref": "REF/EOCNS/QA/1008",
+    "ref": "REF/EOCNS/QA/1009",
     "action": "update",
-    "entity": "students",
-    "entityId": "stu_mvr5dk46wem1p",
-    "reason": "Programme/level move (upgrade or transfer)",
-    "details": {
-      "before": {
-        "programme": "Midwifery",
-        "level": "200"
-      },
-      "after": {
-        "programme": "Midwifery",
-        "level": "300"
-      },
-      "regNo": "EOCNS/200/0034/MID",
-      "name": "Amarachi Precious Obioha"
-    },
-    "timestamp": "2026-10-29T08:04:58.504Z",
+    "entity": "timetables",
+    "entityId": "200_nursing",
+    "reason": "Timetable edited for 200_nursing",
+    "details": {},
+    "timestamp": "2026-10-28T13:56:44.795Z",
     "user": "QA Officer",
     "source": "system",
     "id": 9
   },
   {
-    "ref": "REF/EOCNS/QA/1009",
-    "action": "update",
-    "entity": "students",
-    "entityId": "stu_mvr5dk6ist9f9",
-    "reason": "Programme/level move (upgrade or transfer)",
-    "details": {
-      "before": {
-        "programme": "Midwifery",
-        "level": "200"
-      },
-      "after": {
-        "programme": "Midwifery",
-        "level": "300"
-      },
-      "regNo": "EOCNS/200/0053/MID",
-      "name": "Amarachukwu Judith Chijioke"
-    },
-    "timestamp": "2026-10-29T08:04:58.533Z",
+    "ref": "REF/EOCNS/QA/1010",
+    "action": "create",
+    "entity": "courses",
+    "entityId": "RAD 342",
+    "reason": "New course RAD 342",
+    "details": {},
+    "timestamp": "2026-10-28T13:59:31.888Z",
     "user": "QA Officer",
     "source": "system",
     "id": 10
   },
   {
-    "ref": "REF/EOCNS/QA/1010",
-    "action": "update",
-    "entity": "students",
-    "entityId": "stu_mvr5dk4m51ey7",
-    "reason": "Programme/level move (upgrade or transfer)",
+    "ref": "REF/EOCNS/QA/1011",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mvs6v3xxasxs",
+    "reason": "Lecture logged",
     "details": {
-      "before": {
-        "programme": "Midwifery",
-        "level": "200"
-      },
-      "after": {
-        "programme": "Midwifery",
-        "level": "300"
-      },
-      "regNo": "EOCNS/200/0038/MID",
-      "name": "Angela Ezinne Igwe"
+      "date": "2026-10-28",
+      "course": "INF 201 — Infant I",
+      "status": "Held",
+      "classKey": "100_nursing"
     },
-    "timestamp": "2026-10-29T08:04:58.550Z",
+    "timestamp": "2026-10-28T14:07:24.611Z",
     "user": "QA Officer",
     "source": "system",
     "id": 11
   },
   {
-    "ref": "REF/EOCNS/QA/1011",
+    "ref": "REF/EOCNS/QA/1012",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk1vv7vap",
+    "entityId": "stu_mvrzdaadw6eph",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0012/MID",
-      "name": "Annastecia Promise Otuonye"
+      "regNo": "EOCNS/100/0043/GNS",
+      "name": "Adaeze Esther Benjamin"
     },
-    "timestamp": "2026-10-29T08:04:58.566Z",
+    "timestamp": "2026-10-28T15:09:53.002Z",
     "user": "QA Officer",
     "source": "system",
     "id": 12
   },
   {
-    "ref": "REF/EOCNS/QA/1012",
+    "ref": "REF/EOCNS/QA/1013",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk39afh4x",
+    "entityId": "stu_mvrzdaamv2ham",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0025/MID",
-      "name": "Blessing Chidere Izukanma"
+      "regNo": "EOCNS/100/0067/GNS",
+      "name": "Amaka Gift Emeka"
     },
-    "timestamp": "2026-10-29T08:04:58.581Z",
+    "timestamp": "2026-10-28T15:09:53.004Z",
     "user": "QA Officer",
     "source": "system",
     "id": 13
   },
   {
-    "ref": "REF/EOCNS/QA/1013",
+    "ref": "REF/EOCNS/QA/1014",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk2fq999l",
+    "entityId": "stu_mvrzdaackdor3",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0017/MID",
-      "name": "Blessing Ngozi Ali"
+      "regNo": "EOCNS/100/0039/GNS",
+      "name": "Amaka Godness Israel"
     },
-    "timestamp": "2026-10-29T08:04:58.593Z",
+    "timestamp": "2026-10-28T15:09:53.005Z",
     "user": "QA Officer",
     "source": "system",
     "id": 14
   },
   {
-    "ref": "REF/EOCNS/QA/1014",
+    "ref": "REF/EOCNS/QA/1015",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk2732lvy",
+    "entityId": "stu_mvrzdaabiouhk",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0015/MID",
-      "name": "Blessing Ngozi Nwigbo"
+      "regNo": "EOCNS/100/0037/GNS",
+      "name": "Amarachi Chijioke"
     },
-    "timestamp": "2026-10-29T08:04:58.602Z",
+    "timestamp": "2026-10-28T15:09:53.006Z",
     "user": "QA Officer",
     "source": "system",
     "id": 15
   },
   {
-    "ref": "REF/EOCNS/QA/1015",
+    "ref": "REF/EOCNS/QA/1016",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk933u04d",
+    "entityId": "stu_mvrzdaa2j4m62",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0071/MID",
-      "name": "Blessing Nnenna Nwankwo"
+      "regNo": "EOCNS/100/0010/GNS",
+      "name": "Amarachi Esther Ogharu"
     },
-    "timestamp": "2026-10-29T08:04:58.611Z",
+    "timestamp": "2026-10-28T15:09:53.007Z",
     "user": "QA Officer",
     "source": "system",
     "id": 16
   },
   {
-    "ref": "REF/EOCNS/QA/1016",
+    "ref": "REF/EOCNS/QA/1017",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk3ki5nis",
+    "entityId": "stu_mvrzdaat1hr3s",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0028/MID",
-      "name": "Charity Charis Ajah"
+      "regNo": "EOCNS/100/0088/GNS",
+      "name": "Amarachi Juliet Anusi"
     },
-    "timestamp": "2026-10-29T08:04:58.618Z",
+    "timestamp": "2026-10-28T15:09:53.008Z",
     "user": "QA Officer",
     "source": "system",
     "id": 17
   },
   {
-    "ref": "REF/EOCNS/QA/1017",
+    "ref": "REF/EOCNS/QA/1018",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk6ync7fe",
+    "entityId": "stu_mvrzdaafq3xw0",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0055/MID",
-      "name": "Chiamaka Grace Okoro"
+      "regNo": "EOCNS/100/0050/GNS",
+      "name": "Angela Chisom Nwaji"
     },
-    "timestamp": "2026-10-29T08:04:58.627Z",
+    "timestamp": "2026-10-28T15:09:53.009Z",
     "user": "QA Officer",
     "source": "system",
     "id": 18
   },
   {
-    "ref": "REF/EOCNS/QA/1018",
+    "ref": "REF/EOCNS/QA/1019",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk0pf0fag",
+    "entityId": "stu_mvrzdaamy0m9i",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0003/MID",
-      "name": "Chiamaka Precious Onwe"
+      "regNo": "EOCNS/100/0065/GNS",
+      "name": "Anne Helen Njoku"
     },
-    "timestamp": "2026-10-29T08:04:58.636Z",
+    "timestamp": "2026-10-28T15:09:53.010Z",
     "user": "QA Officer",
     "source": "system",
     "id": 19
   },
   {
-    "ref": "REF/EOCNS/QA/1019",
+    "ref": "REF/EOCNS/QA/1020",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk1y0s0gv",
+    "entityId": "stu_mvrzdaaxw62l1",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0013/MID",
-      "name": "Chidimma Esther Okechukwu"
+      "regNo": "EOCNS/100/0102/GNS",
+      "name": "Anthonia Amaka Chukwu"
     },
-    "timestamp": "2026-10-29T08:04:58.646Z",
+    "timestamp": "2026-10-28T15:09:53.015Z",
     "user": "QA Officer",
     "source": "system",
     "id": 20
   },
   {
-    "ref": "REF/EOCNS/QA/1020",
+    "ref": "REF/EOCNS/QA/1021",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk8lgx9vb",
+    "entityId": "stu_mvrzdaauflhp5",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0067/MID",
-      "name": "Chidubem Okoli"
+      "regNo": "EOCNS/100/0091/GNS",
+      "name": "Augustina Ogochukwu Ilochi"
     },
-    "timestamp": "2026-10-29T08:04:58.657Z",
+    "timestamp": "2026-10-28T15:09:53.016Z",
     "user": "QA Officer",
     "source": "system",
     "id": 21
   },
   {
-    "ref": "REF/EOCNS/QA/1021",
+    "ref": "REF/EOCNS/QA/1022",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk7lkmogp",
+    "entityId": "stu_mvrzdaal631wc",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0059/MID",
-      "name": "Chinaza Misharck Ikenna"
+      "regNo": "EOCNS/100/0064/GNS",
+      "name": "Benita Chinyere Ezeokoli"
     },
-    "timestamp": "2026-10-29T08:04:58.668Z",
+    "timestamp": "2026-10-28T15:09:53.017Z",
     "user": "QA Officer",
     "source": "system",
     "id": 22
   },
   {
-    "ref": "REF/EOCNS/QA/1022",
+    "ref": "REF/EOCNS/QA/1023",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk2m4b3v0",
+    "entityId": "stu_mvrzdaayguiu9",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0019/MID",
-      "name": "Chinecherem Dominic Usuio"
+      "regNo": "EOCNS/100/0106/GNS",
+      "name": "Blessing Chinasa Obayi"
     },
-    "timestamp": "2026-10-29T08:04:58.678Z",
+    "timestamp": "2026-10-28T15:09:53.018Z",
     "user": "QA Officer",
     "source": "system",
     "id": 23
   },
   {
-    "ref": "REF/EOCNS/QA/1023",
+    "ref": "REF/EOCNS/QA/1024",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk4ak0u4u",
+    "entityId": "stu_mvrzdabb1lw02",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0035/MID",
-      "name": "Chinedu Francis Ekwe"
+      "regNo": "EOCNS/100/0148/GNS",
+      "name": "Blessing Eje Obasi"
     },
-    "timestamp": "2026-10-29T08:04:58.686Z",
+    "timestamp": "2026-10-28T15:09:53.019Z",
     "user": "QA Officer",
     "source": "system",
     "id": 24
   },
   {
-    "ref": "REF/EOCNS/QA/1024",
+    "ref": "REF/EOCNS/QA/1025",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk189t8vu",
+    "entityId": "stu_mvrzdaa32y377",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0006/MID",
-      "name": "Chinelo Glory Orji"
+      "regNo": "EOCNS/100/0015/GNS",
+      "name": "Blessing Ekunyi Eze"
     },
-    "timestamp": "2026-10-29T08:04:58.696Z",
+    "timestamp": "2026-10-28T15:09:53.020Z",
     "user": "QA Officer",
     "source": "system",
     "id": 25
   },
   {
-    "ref": "REF/EOCNS/QA/1025",
+    "ref": "REF/EOCNS/QA/1026",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk5g9lsfh",
+    "entityId": "stu_mvrzdab7s7wdx",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0045/MID",
-      "name": "Chinemerem Deborah Okpuru"
+      "regNo": "EOCNS/100/0135/GNS",
+      "name": "Blessing Ezinne Chukwu"
     },
-    "timestamp": "2026-10-29T08:04:58.705Z",
+    "timestamp": "2026-10-28T15:09:53.021Z",
     "user": "QA Officer",
     "source": "system",
     "id": 26
   },
   {
-    "ref": "REF/EOCNS/QA/1026",
+    "ref": "REF/EOCNS/QA/1027",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk84py01t",
+    "entityId": "stu_mvrzdaalwf20t",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0063/MID",
-      "name": "Chinemerem Precious Onyebuchi"
+      "regNo": "EOCNS/100/0063/GNS",
+      "name": "Blessing Ifesinachi Chukwu"
     },
-    "timestamp": "2026-10-29T08:04:58.716Z",
+    "timestamp": "2026-10-28T15:09:53.022Z",
     "user": "QA Officer",
     "source": "system",
     "id": 27
   },
   {
-    "ref": "REF/EOCNS/QA/1027",
+    "ref": "REF/EOCNS/QA/1028",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk2zrijxb",
+    "entityId": "stu_mvrzda9zm7ef1",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0022/MID",
-      "name": "Chinenye Cynthia Omeh"
+      "regNo": "EOCNS/100/0005/GNS",
+      "name": "Blessing Osinachi Samuel"
     },
-    "timestamp": "2026-10-29T08:04:58.728Z",
+    "timestamp": "2026-10-28T15:09:53.023Z",
     "user": "QA Officer",
     "source": "system",
     "id": 28
   },
   {
-    "ref": "REF/EOCNS/QA/1028",
+    "ref": "REF/EOCNS/QA/1029",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk1fzhbi6",
+    "entityId": "stu_mvrzdaa4m9i6f",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0008/MID",
-      "name": "Chioma Blessing Chinedu"
+      "regNo": "EOCNS/100/0018/GNS",
+      "name": "Chiamaka Bliss Nwachukwu"
     },
-    "timestamp": "2026-10-29T08:04:58.739Z",
+    "timestamp": "2026-10-28T15:09:53.024Z",
     "user": "QA Officer",
     "source": "system",
     "id": 29
   },
   {
-    "ref": "REF/EOCNS/QA/1029",
+    "ref": "REF/EOCNS/QA/1030",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk8tqksvj",
+    "entityId": "stu_mvrzdab07v2ax",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0069/MID",
-      "name": "Chioma Favour Onuoha"
+      "regNo": "EOCNS/100/0112/GNS",
+      "name": "Chiamaka Jenny Israel"
     },
-    "timestamp": "2026-10-29T08:04:58.750Z",
+    "timestamp": "2026-10-28T15:09:53.025Z",
     "user": "QA Officer",
     "source": "system",
     "id": 30
   },
   {
-    "ref": "REF/EOCNS/QA/1030",
+    "ref": "REF/EOCNS/QA/1031",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk1bpnb5h",
+    "entityId": "stu_mvrzdaa2cpzcw",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0007/MID",
-      "name": "Chioma Gladys Okeoma"
+      "regNo": "EOCNS/100/0011/GNS",
+      "name": "Chiamaka Maryann Nwaobodo"
     },
-    "timestamp": "2026-10-29T08:04:58.759Z",
+    "timestamp": "2026-10-28T15:09:53.026Z",
     "user": "QA Officer",
     "source": "system",
     "id": 31
   },
   {
-    "ref": "REF/EOCNS/QA/1031",
+    "ref": "REF/EOCNS/QA/1032",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk8dtk8nh",
+    "entityId": "stu_mvrzdaaalzs29",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0065/MID",
-      "name": "Chisimdi Joy Aruma"
+      "regNo": "EOCNS/100/0033/GNS",
+      "name": "Chiamaka Treasure Offor"
     },
-    "timestamp": "2026-10-29T08:04:58.766Z",
+    "timestamp": "2026-10-28T15:09:53.027Z",
     "user": "QA Officer",
     "source": "system",
     "id": 32
   },
   {
-    "ref": "REF/EOCNS/QA/1032",
+    "ref": "REF/EOCNS/QA/1033",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk0jb32kl",
+    "entityId": "stu_mvrzdaa1je63o",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0002/MID",
-      "name": "Chisom Favour Udeh"
+      "regNo": "EOCNS/100/0008/GNS",
+      "name": "Chicheta Sarah Nworie"
     },
-    "timestamp": "2026-10-29T08:04:58.782Z",
+    "timestamp": "2026-10-28T15:09:53.029Z",
     "user": "QA Officer",
     "source": "system",
     "id": 33
   },
   {
-    "ref": "REF/EOCNS/QA/1033",
+    "ref": "REF/EOCNS/QA/1034",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk2q791z2",
+    "entityId": "stu_mvrzdaa625pv2",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0020/MID",
-      "name": "Chizoba Assumpta Ikeme"
+      "regNo": "EOCNS/100/0021/GNS",
+      "name": "Chidera Divine Iteshi"
     },
-    "timestamp": "2026-10-29T08:04:58.791Z",
+    "timestamp": "2026-10-28T15:09:53.029Z",
     "user": "QA Officer",
     "source": "system",
     "id": 34
   },
   {
-    "ref": "REF/EOCNS/QA/1034",
+    "ref": "REF/EOCNS/QA/1035",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk75dngea",
+    "entityId": "stu_mvrzdabchrwnk",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0056/MID",
-      "name": "Christabel Ginika Okwor"
+      "regNo": "EOCNS/100/0152/GNS",
+      "name": "Chidera Gloria Enyigwe"
     },
-    "timestamp": "2026-10-29T08:04:58.801Z",
+    "timestamp": "2026-10-28T15:09:53.030Z",
     "user": "QA Officer",
     "source": "system",
     "id": 35
   },
   {
-    "ref": "REF/EOCNS/QA/1035",
+    "ref": "REF/EOCNS/QA/1036",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk6rkei70",
+    "entityId": "stu_mvrzdab9s0rkl",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0054/MID",
-      "name": "Cynthia Chizaram Eze"
+      "regNo": "EOCNS/100/0144/GNS",
+      "name": "Chidera Precious Ome"
     },
-    "timestamp": "2026-10-29T08:04:58.809Z",
+    "timestamp": "2026-10-28T15:09:53.032Z",
     "user": "QA Officer",
     "source": "system",
     "id": 36
   },
   {
-    "ref": "REF/EOCNS/QA/1036",
+    "ref": "REF/EOCNS/QA/1037",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk7zq75t0",
+    "entityId": "stu_mvrzdaaclxqg0",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0062/MID",
-      "name": "Daniella Chiwendu Obiahu"
+      "regNo": "EOCNS/100/0038/GNS",
+      "name": "Chidiebube Deborah Ugah"
     },
-    "timestamp": "2026-10-29T08:04:58.818Z",
+    "timestamp": "2026-10-28T15:09:53.033Z",
     "user": "QA Officer",
     "source": "system",
     "id": 37
   },
   {
-    "ref": "REF/EOCNS/QA/1037",
+    "ref": "REF/EOCNS/QA/1038",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk4i5muly",
+    "entityId": "stu_mvrzdaaq2j5p0",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0037/MID",
-      "name": "Emmanuel Chiemeka Obinka"
+      "regNo": "EOCNS/100/0078/GNS",
+      "name": "Chidiebube Jennifer Charles"
     },
-    "timestamp": "2026-10-29T08:04:58.829Z",
+    "timestamp": "2026-10-28T15:09:53.034Z",
     "user": "QA Officer",
     "source": "system",
     "id": 38
   },
   {
-    "ref": "REF/EOCNS/QA/1038",
+    "ref": "REF/EOCNS/QA/1039",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk3o92g33",
+    "entityId": "stu_mvrzdab9wdjz3",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0029/MID",
-      "name": "Emmanuel Chinemerem Onyebuchi"
+      "regNo": "EOCNS/100/0142/GNS",
+      "name": "Chidimma Mercy John"
     },
-    "timestamp": "2026-10-29T08:04:58.838Z",
+    "timestamp": "2026-10-28T15:09:53.035Z",
     "user": "QA Officer",
     "source": "system",
     "id": 39
   },
   {
-    "ref": "REF/EOCNS/QA/1039",
+    "ref": "REF/EOCNS/QA/1040",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk5yhh1of",
+    "entityId": "stu_mvrzdab1yxkfm",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0049/MID",
-      "name": "Esther Chidalu Michael"
+      "regNo": "EOCNS/100/0116/GNS",
+      "name": "Chidimma Precious Ntoka"
     },
-    "timestamp": "2026-10-29T08:04:58.847Z",
+    "timestamp": "2026-10-28T15:09:53.037Z",
     "user": "QA Officer",
     "source": "system",
     "id": 40
   },
   {
-    "ref": "REF/EOCNS/QA/1040",
+    "ref": "REF/EOCNS/QA/1041",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk5bh6upa",
+    "entityId": "stu_mvrzdaawy8mws",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0044/MID",
-      "name": "Eunice Chinagorom Nwankwo"
+      "regNo": "EOCNS/100/0098/GNS",
+      "name": "Chidiogo Caroline Ileagu"
     },
-    "timestamp": "2026-10-29T08:04:58.858Z",
+    "timestamp": "2026-10-28T15:09:53.038Z",
     "user": "QA Officer",
     "source": "system",
     "id": 41
   },
   {
-    "ref": "REF/EOCNS/QA/1041",
+    "ref": "REF/EOCNS/QA/1042",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk2jbolq9",
+    "entityId": "stu_mvrzdaatld1j4",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0018/MID",
-      "name": "Fatima Adaeze Haruna"
+      "regNo": "EOCNS/100/0090/GNS",
+      "name": "Chiemelie Joy Chinyereugo"
     },
-    "timestamp": "2026-10-29T08:04:58.868Z",
+    "timestamp": "2026-10-28T15:09:53.039Z",
     "user": "QA Officer",
     "source": "system",
     "id": 42
   },
   {
-    "ref": "REF/EOCNS/QA/1042",
+    "ref": "REF/EOCNS/QA/1043",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk65syog3",
+    "entityId": "stu_mvrzdaauxt5rn",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0051/MID",
-      "name": "Favour Chizaram Awuzie"
+      "regNo": "EOCNS/100/0092/GNS",
+      "name": "Chinaza Abigail Ugbo"
     },
-    "timestamp": "2026-10-29T08:04:58.878Z",
+    "timestamp": "2026-10-28T15:09:53.040Z",
     "user": "QA Officer",
     "source": "system",
     "id": 43
   },
   {
-    "ref": "REF/EOCNS/QA/1043",
+    "ref": "REF/EOCNS/QA/1044",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk8gjyxmu",
+    "entityId": "stu_mvrzdab4vhhhe",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0066/MID",
-      "name": "Gideon Ugah Odoh"
+      "regNo": "EOCNS/100/0127/GNS",
+      "name": "Chinecherem Alexandra Ma"
     },
-    "timestamp": "2026-10-29T08:04:58.891Z",
+    "timestamp": "2026-10-28T15:09:53.041Z",
     "user": "QA Officer",
     "source": "system",
     "id": 44
   },
   {
-    "ref": "REF/EOCNS/QA/1044",
+    "ref": "REF/EOCNS/QA/1045",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk1ndco7m",
+    "entityId": "stu_mvrzdaaxxf5n6",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0010/MID",
-      "name": "Grace Mmesoma Okafor"
+      "regNo": "EOCNS/100/0104/GNS",
+      "name": "Chinenye Annastecia Okafor"
     },
-    "timestamp": "2026-10-29T08:04:58.901Z",
+    "timestamp": "2026-10-28T15:09:53.042Z",
     "user": "QA Officer",
     "source": "system",
     "id": 45
   },
   {
-    "ref": "REF/EOCNS/QA/1045",
+    "ref": "REF/EOCNS/QA/1046",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk97w483s",
+    "entityId": "stu_mvrzdaavdc84o",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0072/MID",
-      "name": "Ifedirichukwu Christopher Ezeabia"
+      "regNo": "EOCNS/100/0096/GNS",
+      "name": "Chinenye Eunice Ocho"
     },
-    "timestamp": "2026-10-29T08:04:58.911Z",
+    "timestamp": "2026-10-28T15:09:53.043Z",
     "user": "QA Officer",
     "source": "system",
     "id": 46
   },
   {
-    "ref": "REF/EOCNS/QA/1046",
+    "ref": "REF/EOCNS/QA/1047",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk7g4i8lb",
+    "entityId": "stu_mvrzdaa7jdvb5",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0058/MID",
-      "name": "Jennifer Chinecherem Emeka"
+      "regNo": "EOCNS/100/0024/GNS",
+      "name": "Chinenye Success Igwe"
     },
-    "timestamp": "2026-10-29T08:04:58.921Z",
+    "timestamp": "2026-10-28T15:09:53.044Z",
     "user": "QA Officer",
     "source": "system",
     "id": 47
   },
   {
-    "ref": "REF/EOCNS/QA/1047",
+    "ref": "REF/EOCNS/QA/1048",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk7pepfcj",
+    "entityId": "stu_mvrzdabh1po8o",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0060/MID",
-      "name": "John Chukwu Ube"
+      "regNo": "EOCNS/100/0167/GNS",
+      "name": "Chinweotito Loveline Mbanuzo"
     },
-    "timestamp": "2026-10-29T08:04:58.933Z",
+    "timestamp": "2026-10-28T15:09:53.045Z",
     "user": "QA Officer",
     "source": "system",
     "id": 48
   },
   {
-    "ref": "REF/EOCNS/QA/1048",
+    "ref": "REF/EOCNS/QA/1049",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk429euq0",
+    "entityId": "stu_mvrzdaaf87y72",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0033/MID",
-      "name": "John Janet Otaka"
+      "regNo": "EOCNS/100/0047/GNS",
+      "name": "Chioma Christiana Nwagbo"
     },
-    "timestamp": "2026-10-29T08:04:58.942Z",
+    "timestamp": "2026-10-28T15:09:53.047Z",
     "user": "QA Officer",
     "source": "system",
     "id": 49
   },
   {
-    "ref": "REF/EOCNS/QA/1049",
+    "ref": "REF/EOCNS/QA/1050",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk4w8fb8t",
+    "entityId": "stu_mvrzdaake8d89",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0041/MID",
-      "name": "Joy Adaobi Ifeanyi"
+      "regNo": "EOCNS/100/0061/GNS",
+      "name": "Chioma Chukwu Agu"
     },
-    "timestamp": "2026-10-29T08:04:58.952Z",
+    "timestamp": "2026-10-28T15:09:53.048Z",
     "user": "QA Officer",
     "source": "system",
     "id": 50
   },
   {
-    "ref": "REF/EOCNS/QA/1050",
+    "ref": "REF/EOCNS/QA/1051",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk4p82jek",
+    "entityId": "stu_mvrzdaa9peg9v",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0039/MID",
-      "name": "Joy Onyekachi Ucha"
+      "regNo": "EOCNS/100/0031/GNS",
+      "name": "Chioma Confidence Omoha"
     },
-    "timestamp": "2026-10-29T08:04:58.962Z",
+    "timestamp": "2026-10-28T15:09:53.050Z",
     "user": "QA Officer",
     "source": "system",
     "id": 51
   },
   {
-    "ref": "REF/EOCNS/QA/1051",
+    "ref": "REF/EOCNS/QA/1052",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk5nz0utv",
+    "entityId": "stu_mvrzdab3k3j34",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0047/MID",
-      "name": "Makuochukwu Divine-Gift Obasi"
+      "regNo": "EOCNS/100/0122/GNS",
+      "name": "Chioma Francisca Oluga"
     },
-    "timestamp": "2026-10-29T08:04:58.972Z",
+    "timestamp": "2026-10-28T15:09:53.051Z",
     "user": "QA Officer",
     "source": "system",
     "id": 52
   },
   {
-    "ref": "REF/EOCNS/QA/1052",
+    "ref": "REF/EOCNS/QA/1053",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk501uqg5",
+    "entityId": "stu_mvrzdaawk8z1c",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0042/MID",
-      "name": "Mary Chisom Ugwu"
+      "regNo": "EOCNS/100/0099/GNS",
+      "name": "Chioma Godswill Chibueze"
     },
-    "timestamp": "2026-10-29T08:04:58.981Z",
+    "timestamp": "2026-10-28T15:09:53.052Z",
     "user": "QA Officer",
     "source": "system",
     "id": 53
   },
   {
-    "ref": "REF/EOCNS/QA/1053",
+    "ref": "REF/EOCNS/QA/1054",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk88nnjp9",
+    "entityId": "stu_mvrzdabb17pqw",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0064/MID",
-      "name": "Miracle Chioma Egbe"
+      "regNo": "EOCNS/100/0150/GNS",
+      "name": "Chioma Jessica Ezumah"
     },
-    "timestamp": "2026-10-29T08:04:58.991Z",
+    "timestamp": "2026-10-28T15:09:53.053Z",
     "user": "QA Officer",
     "source": "system",
     "id": 54
   },
   {
-    "ref": "REF/EOCNS/QA/1054",
+    "ref": "REF/EOCNS/QA/1055",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk7cykoo2",
+    "entityId": "stu_mvrzdab2jwynb",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0057/MID",
-      "name": "Mmesoma Emmanuella Okeke"
+      "regNo": "EOCNS/100/0117/GNS",
+      "name": "Chioma Pauline Anibueze"
     },
-    "timestamp": "2026-10-29T08:04:59.003Z",
+    "timestamp": "2026-10-28T15:09:53.054Z",
     "user": "QA Officer",
     "source": "system",
     "id": 55
   },
   {
-    "ref": "REF/EOCNS/QA/1055",
+    "ref": "REF/EOCNS/QA/1056",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk5t4njql",
+    "entityId": "stu_mvrzdaabpgxqq",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0048/MID",
-      "name": "Ngozi Virginia Aloh"
+      "regNo": "EOCNS/100/0036/GNS",
+      "name": "Chisom Anulika Udeh"
     },
-    "timestamp": "2026-10-29T08:04:59.015Z",
+    "timestamp": "2026-10-28T15:09:53.055Z",
     "user": "QA Officer",
     "source": "system",
     "id": 56
   },
   {
-    "ref": "REF/EOCNS/QA/1056",
+    "ref": "REF/EOCNS/QA/1057",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk1kx4ec7",
+    "entityId": "stu_mvrzdaa8zkxlx",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0009/MID",
-      "name": "Ogochukwu Judith Esiaka"
+      "regNo": "EOCNS/100/0027/GNS",
+      "name": "Chisom Loveth Okorouneke"
     },
-    "timestamp": "2026-10-29T08:04:59.025Z",
+    "timestamp": "2026-10-28T15:09:53.057Z",
     "user": "QA Officer",
     "source": "system",
     "id": 57
   },
   {
-    "ref": "REF/EOCNS/QA/1057",
+    "ref": "REF/EOCNS/QA/1058",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk1s7727k",
+    "entityId": "stu_mvrzdaaubpkst",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0011/MID",
-      "name": "Oluchi Philomina Nwafor"
+      "regNo": "EOCNS/100/0093/GNS",
+      "name": "Chisom Martha Mgbuga"
     },
-    "timestamp": "2026-10-29T08:04:59.035Z",
+    "timestamp": "2026-10-28T15:09:53.058Z",
     "user": "QA Officer",
     "source": "system",
     "id": 58
   },
   {
-    "ref": "REF/EOCNS/QA/1058",
+    "ref": "REF/EOCNS/QA/1059",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk0vq4es2",
+    "entityId": "stu_mvrzdaa3ra7r2",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0004/MID",
-      "name": "Onyinyechi Miracle Nduka"
+      "regNo": "EOCNS/100/0014/GNS",
+      "name": "Chisom Precious Okoli"
     },
-    "timestamp": "2026-10-29T08:04:59.044Z",
+    "timestamp": "2026-10-28T15:09:53.059Z",
     "user": "QA Officer",
     "source": "system",
     "id": 59
   },
   {
-    "ref": "REF/EOCNS/QA/1059",
+    "ref": "REF/EOCNS/QA/1060",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk0zsbt8x",
+    "entityId": "stu_mvrzdaao4mjqv",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0005/MID",
-      "name": "Ozioma Faith Udeh"
+      "regNo": "EOCNS/100/0071/GNS",
+      "name": "Christabel Mmesoma Louis"
     },
-    "timestamp": "2026-10-29T08:04:59.055Z",
+    "timestamp": "2026-10-28T15:09:53.060Z",
     "user": "QA Officer",
     "source": "system",
     "id": 60
   },
   {
-    "ref": "REF/EOCNS/QA/1060",
+    "ref": "REF/EOCNS/QA/1061",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk69ouvws",
+    "entityId": "stu_mvrzdabcp3f50",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0052/MID",
-      "name": "Peace Chidera Agu"
+      "regNo": "EOCNS/100/0154/GNS",
+      "name": "Chukwuma Innocent Aghaegbuna"
     },
-    "timestamp": "2026-10-29T08:04:59.065Z",
+    "timestamp": "2026-10-28T15:09:53.062Z",
     "user": "QA Officer",
     "source": "system",
     "id": 61
   },
   {
-    "ref": "REF/EOCNS/QA/1061",
+    "ref": "REF/EOCNS/QA/1062",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk3ek28lc",
+    "entityId": "stu_mvrzdaba6g3ed",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0026/MID",
-      "name": "Portia Miracle Godson"
+      "regNo": "EOCNS/100/0145/GNS",
+      "name": "Clementina Chisom Opara"
     },
-    "timestamp": "2026-10-29T08:04:59.079Z",
+    "timestamp": "2026-10-28T15:09:53.063Z",
     "user": "QA Officer",
     "source": "system",
     "id": 62
   },
   {
-    "ref": "REF/EOCNS/QA/1062",
+    "ref": "REF/EOCNS/QA/1063",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk2vjug9f",
+    "entityId": "stu_mvrzdaatpe4ff",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0021/MID",
-      "name": "Precious Chiamaka Nwogidi"
+      "regNo": "EOCNS/100/0089/GNS",
+      "name": "Clinton Ekuma Otu"
     },
-    "timestamp": "2026-10-29T08:04:59.088Z",
+    "timestamp": "2026-10-28T15:09:53.065Z",
     "user": "QA Officer",
     "source": "system",
     "id": 63
   },
   {
-    "ref": "REF/EOCNS/QA/1063",
+    "ref": "REF/EOCNS/QA/1064",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk4tysdg5",
+    "entityId": "stu_mvrzdabeqky7n",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0040/MID",
-      "name": "Precious Chinwendu Uzoma"
+      "regNo": "EOCNS/100/0160/GNS",
+      "name": "Confidence Ogba"
     },
-    "timestamp": "2026-10-29T08:04:59.100Z",
+    "timestamp": "2026-10-28T15:09:53.066Z",
     "user": "QA Officer",
     "source": "system",
     "id": 64
   },
   {
-    "ref": "REF/EOCNS/QA/1064",
+    "ref": "REF/EOCNS/QA/1065",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk6100too",
+    "entityId": "stu_mvrzdaawl11uw",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0050/MID",
-      "name": "Precious Mmesoma Ezeehukwu"
+      "regNo": "EOCNS/100/0100/GNS",
+      "name": "Cordelia Mmesoma Nwabuisi"
     },
-    "timestamp": "2026-10-29T08:04:59.111Z",
+    "timestamp": "2026-10-28T15:09:53.067Z",
     "user": "QA Officer",
     "source": "system",
     "id": 65
   },
   {
-    "ref": "REF/EOCNS/QA/1065",
+    "ref": "REF/EOCNS/QA/1066",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk3wj6vu7",
+    "entityId": "stu_mvrzdaal2cmi8",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0031/MID",
-      "name": "Precious Ogochukwu Chukwuma"
+      "regNo": "EOCNS/100/0062/GNS",
+      "name": "Curtis Onyedikachi Ezeoke"
     },
-    "timestamp": "2026-10-29T08:04:59.123Z",
+    "timestamp": "2026-10-28T15:09:53.069Z",
     "user": "QA Officer",
     "source": "system",
     "id": 66
   },
   {
-    "ref": "REF/EOCNS/QA/1066",
+    "ref": "REF/EOCNS/QA/1067",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk32ongsu",
+    "entityId": "stu_mvrzdaa6ex7fe",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0023/MID",
-      "name": "Promise Amaka Ikechukwu"
+      "regNo": "EOCNS/100/0022/GNS",
+      "name": "Cynthia Nmesoma Odo"
     },
-    "timestamp": "2026-10-29T08:04:59.134Z",
+    "timestamp": "2026-10-28T15:09:53.070Z",
     "user": "QA Officer",
     "source": "system",
     "id": 67
   },
   {
-    "ref": "REF/EOCNS/QA/1067",
+    "ref": "REF/EOCNS/QA/1068",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk3hrqcn7",
+    "entityId": "stu_mvrzdaaeo2wqz",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0027/MID",
-      "name": "Promise Chinasa Aneh"
+      "regNo": "EOCNS/100/0046/GNS",
+      "name": "Deborah Chat John"
     },
-    "timestamp": "2026-10-29T08:04:59.143Z",
+    "timestamp": "2026-10-28T15:09:53.071Z",
     "user": "QA Officer",
     "source": "system",
     "id": 68
   },
   {
-    "ref": "REF/EOCNS/QA/1068",
+    "ref": "REF/EOCNS/QA/1069",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk55jnpz0",
+    "entityId": "stu_mvrzdaa2cxgti",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0043/MID",
-      "name": "Queen Ojonoda Dibiagwu"
+      "regNo": "EOCNS/100/0012/GNS",
+      "name": "Deborah Chioma Egwuatu"
     },
-    "timestamp": "2026-10-29T08:04:59.153Z",
+    "timestamp": "2026-10-28T15:09:53.072Z",
     "user": "QA Officer",
     "source": "system",
     "id": 69
   },
   {
-    "ref": "REF/EOCNS/QA/1069",
+    "ref": "REF/EOCNS/QA/1070",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk35wpive",
+    "entityId": "stu_mvrzdaasas171",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0024/MID",
-      "name": "Rechael Chidiogo Chibuzor"
+      "regNo": "EOCNS/100/0085/GNS",
+      "name": "Deborah Oluwakemi Adesanya"
     },
-    "timestamp": "2026-10-29T08:04:59.163Z",
+    "timestamp": "2026-10-28T15:09:53.073Z",
     "user": "QA Officer",
     "source": "system",
     "id": 70
   },
   {
-    "ref": "REF/EOCNS/QA/1070",
+    "ref": "REF/EOCNS/QA/1071",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk8z5bqgu",
+    "entityId": "stu_mvrzdab12jees",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0070/MID",
-      "name": "Rita Ebubechi Egbere"
+      "regNo": "EOCNS/100/0114/GNS",
+      "name": "Destiny Ifeyinwa Nnamani"
     },
-    "timestamp": "2026-10-29T08:04:59.173Z",
+    "timestamp": "2026-10-28T15:09:53.074Z",
     "user": "QA Officer",
     "source": "system",
     "id": 71
   },
   {
-    "ref": "REF/EOCNS/QA/1071",
+    "ref": "REF/EOCNS/QA/1072",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk20kkbzq",
+    "entityId": "stu_mvrzda9y8p6nd",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0014/MID",
-      "name": "Sarah Ifunanya Chukwma"
+      "regNo": "EOCNS/100/0001/GNS",
+      "name": "Divine Chinecherem Adoke"
     },
-    "timestamp": "2026-10-29T08:04:59.183Z",
+    "timestamp": "2026-10-28T15:09:53.075Z",
     "user": "QA Officer",
     "source": "system",
     "id": 72
   },
   {
-    "ref": "REF/EOCNS/QA/1072",
+    "ref": "REF/EOCNS/QA/1073",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk2bfc4mh",
+    "entityId": "stu_mvrzdabhzm309",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0016/MID",
-      "name": "Stephanie Nneoma Ojimba"
+      "regNo": "EOCNS/100/0168/GNS",
+      "name": "Divine Chinecherem Ignatius"
     },
-    "timestamp": "2026-10-29T08:04:59.194Z",
+    "timestamp": "2026-10-28T15:09:53.075Z",
     "user": "QA Officer",
     "source": "system",
     "id": 73
   },
   {
-    "ref": "REF/EOCNS/QA/1073",
+    "ref": "REF/EOCNS/QA/1074",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk4ekw7zt",
+    "entityId": "stu_mvrzdaa8putne",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0036/MID",
-      "name": "Success Ifeoma Ofmat"
+      "regNo": "EOCNS/100/0028/GNS",
+      "name": "Ebube Nice Okwor"
     },
-    "timestamp": "2026-10-29T08:04:59.203Z",
+    "timestamp": "2026-10-28T15:09:53.076Z",
     "user": "QA Officer",
     "source": "system",
     "id": 74
   },
   {
-    "ref": "REF/EOCNS/QA/1074",
+    "ref": "REF/EOCNS/QA/1075",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk3s3devm",
+    "entityId": "stu_mvrzdaailh60p",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0030/MID",
-      "name": "Success Onyinyechi Nwankwo"
+      "regNo": "EOCNS/100/0056/GNS",
+      "name": "Eja Treasure Samuel"
     },
-    "timestamp": "2026-10-29T08:04:59.214Z",
+    "timestamp": "2026-10-28T15:09:53.077Z",
     "user": "QA Officer",
     "source": "system",
     "id": 75
   },
   {
-    "ref": "REF/EOCNS/QA/1075",
+    "ref": "REF/EOCNS/QA/1076",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk7uigvmy",
+    "entityId": "stu_mvrzdaapvs8cw",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0061/MID",
-      "name": "Uchechi Glory Emeka"
+      "regNo": "EOCNS/100/0075/GNS",
+      "name": "Emmanuel Akachukwu Idika"
     },
-    "timestamp": "2026-10-29T08:04:59.225Z",
+    "timestamp": "2026-10-28T15:09:53.079Z",
     "user": "QA Officer",
     "source": "system",
     "id": 76
   },
   {
-    "ref": "REF/EOCNS/QA/1076",
+    "ref": "REF/EOCNS/QA/1077",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk5jaynpd",
+    "entityId": "stu_mvrzda9zm5w77",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0046/MID",
-      "name": "Uchenna Ozo Arua"
+      "regNo": "EOCNS/100/0003/GNS",
+      "name": "Emmanuel Chijioke Chukwu"
     },
-    "timestamp": "2026-10-29T08:04:59.235Z",
+    "timestamp": "2026-10-28T15:09:53.081Z",
     "user": "QA Officer",
     "source": "system",
     "id": 77
   },
   {
-    "ref": "REF/EOCNS/QA/1077",
+    "ref": "REF/EOCNS/QA/1078",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk8o1vkio",
+    "entityId": "stu_mvrzdaaowfkkg",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0068/MID",
-      "name": "Ujunwa Victory Nwanonyelum"
+      "regNo": "EOCNS/100/0072/GNS",
+      "name": "Emmanuel Chinaemerem Ihekwoaba"
     },
-    "timestamp": "2026-10-29T08:04:59.247Z",
+    "timestamp": "2026-10-28T15:09:53.083Z",
     "user": "QA Officer",
     "source": "system",
     "id": 78
   },
   {
-    "ref": "REF/EOCNS/QA/1078",
+    "ref": "REF/EOCNS/QA/1079",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5dk0c20y2d",
+    "entityId": "stu_mvrzdabgluihd",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0001/MID",
-      "name": "Winner Ifeoma Joseph"
+      "regNo": "EOCNS/100/0166/GNS",
+      "name": "Emmanuel Ugochukwu Ogbonna"
     },
-    "timestamp": "2026-10-29T08:04:59.256Z",
+    "timestamp": "2026-10-28T15:09:53.084Z",
     "user": "QA Officer",
     "source": "system",
     "id": 79
   },
   {
-    "ref": "REF/EOCNS/QA/1079",
+    "ref": "REF/EOCNS/QA/1080",
     "action": "update",
     "entity": "students",
-    "entityId": "stu_mvr5djwzv2236",
+    "entityId": "stu_mvrzdabgo6oap",
     "reason": "Programme/level move (upgrade or transfer)",
     "details": {
       "before": {
-        "programme": "Midwifery",
-        "level": "200"
+        "programme": "Nursing",
+        "level": "100"
       },
       "after": {
-        "programme": "Midwifery",
-        "level": "300"
+        "programme": "Nursing",
+        "level": "200"
       },
-      "regNo": "EOCNS/200/0072/GNS",
-      "name": "Wonderful Nmesoma Vasco"
+      "regNo": "EOCNS/100/0164/GNS",
+      "name": "Emmanuella Chinyere Chukwunonyerem"
     },
-    "timestamp": "2026-10-29T08:04:59.266Z",
+    "timestamp": "2026-10-28T15:09:53.086Z",
     "user": "QA Officer",
     "source": "system",
     "id": 80
   },
   {
-    "ref": "REF/EOCNS/QA/1080",
-    "action": "create",
-    "entity": "sessions",
-    "entityId": "sess_mvt9hjbtg2q3o",
-    "reason": "New academic session",
+    "ref": "REF/EOCNS/QA/1081",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabc9cwow",
+    "reason": "Programme/level move (upgrade or transfer)",
     "details": {
-      "name": "2026/2027 SESSION"
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0153/GNS",
+      "name": "Emmanuella Ebubechi Sunday"
     },
-    "timestamp": "2026-10-29T08:08:36.443Z",
+    "timestamp": "2026-10-28T15:09:53.087Z",
     "user": "QA Officer",
     "source": "system",
     "id": 81
+  },
+  {
+    "ref": "REF/EOCNS/QA/1082",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaa079rs",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0035/GNS",
+      "name": "Ezinwanne Claudia Welibe"
+    },
+    "timestamp": "2026-10-28T15:09:53.088Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 82
+  },
+  {
+    "ref": "REF/EOCNS/QA/1083",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabbgmwwl",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0151/GNS",
+      "name": "Faith Chidera Idoko"
+    },
+    "timestamp": "2026-10-28T15:09:53.089Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 83
+  },
+  {
+    "ref": "REF/EOCNS/QA/1084",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabf3f3cs",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0162/GNS",
+      "name": "Favour Chioma Nzewi"
+    },
+    "timestamp": "2026-10-28T15:09:53.090Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 84
+  },
+  {
+    "ref": "REF/EOCNS/QA/1085",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaadagvaq",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0041/GNS",
+      "name": "Favour Eteng Ubi"
+    },
+    "timestamp": "2026-10-28T15:09:53.091Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 85
+  },
+  {
+    "ref": "REF/EOCNS/QA/1086",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaar5de7n",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0081/GNS",
+      "name": "Favour Ezinne Nwakpa"
+    },
+    "timestamp": "2026-10-28T15:09:53.092Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 86
+  },
+  {
+    "ref": "REF/EOCNS/QA/1087",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaakzwbga",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0059/GNS",
+      "name": "Favour Munachimso Ezeike"
+    },
+    "timestamp": "2026-10-28T15:09:53.093Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 87
+  },
+  {
+    "ref": "REF/EOCNS/QA/1088",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab4oxrti",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0125/GNS",
+      "name": "Favour Nkeiruka Onah"
+    },
+    "timestamp": "2026-10-28T15:09:53.094Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 88
+  },
+  {
+    "ref": "REF/EOCNS/QA/1089",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab12j03u",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0115/GNS",
+      "name": "Favour Omobewaji Taiwo"
+    },
+    "timestamp": "2026-10-28T15:09:53.095Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 89
+  },
+  {
+    "ref": "REF/EOCNS/QA/1090",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaagemg49",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0052/GNS",
+      "name": "Favour Ugomma Arua"
+    },
+    "timestamp": "2026-10-28T15:09:53.096Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 90
+  },
+  {
+    "ref": "REF/EOCNS/QA/1091",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab8mqw2j",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0140/GNS",
+      "name": "Francisca Mmerichukwu Ofodile"
+    },
+    "timestamp": "2026-10-28T15:09:53.098Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 91
+  },
+  {
+    "ref": "REF/EOCNS/QA/1092",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaansle7l",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0068/GNS",
+      "name": "Francisca Onyinyechi Akpede"
+    },
+    "timestamp": "2026-10-28T15:09:53.099Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 92
+  },
+  {
+    "ref": "REF/EOCNS/QA/1093",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa99xoma",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0032/GNS",
+      "name": "Gift Chiamaka Igboke"
+    },
+    "timestamp": "2026-10-28T15:09:53.100Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 93
+  },
+  {
+    "ref": "REF/EOCNS/QA/1094",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab8uogft",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0139/GNS",
+      "name": "Gloria Chidimma Ejimbe"
+    },
+    "timestamp": "2026-10-28T15:09:53.101Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 94
+  },
+  {
+    "ref": "REF/EOCNS/QA/1095",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab4aj4lh",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0124/GNS",
+      "name": "Goodness Chinaecherem Anaeto"
+    },
+    "timestamp": "2026-10-28T15:09:53.102Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 95
+  },
+  {
+    "ref": "REF/EOCNS/QA/1096",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab6wm6ts",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0134/GNS",
+      "name": "Great Chika Eze"
+    },
+    "timestamp": "2026-10-28T15:09:53.104Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 96
+  },
+  {
+    "ref": "REF/EOCNS/QA/1097",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabd7b7di",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0156/GNS",
+      "name": "Harmony Ginikanwa Nwaneri"
+    },
+    "timestamp": "2026-10-28T15:09:53.105Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 97
+  },
+  {
+    "ref": "REF/EOCNS/QA/1098",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabg58m28",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0165/GNS",
+      "name": "Henry Chidera Igwe-Nomeh"
+    },
+    "timestamp": "2026-10-28T15:09:53.106Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 98
+  },
+  {
+    "ref": "REF/EOCNS/QA/1099",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaveguej",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0095/GNS",
+      "name": "Ifunanya Gift Chukwu"
+    },
+    "timestamp": "2026-10-28T15:09:53.107Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 99
+  },
+  {
+    "ref": "REF/EOCNS/QA/1100",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa1u9t09",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0009/GNS",
+      "name": "Ifunanya Vivian Ogbonna"
+    },
+    "timestamp": "2026-10-28T15:09:53.107Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 100
+  },
+  {
+    "ref": "REF/EOCNS/QA/1101",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaok939d",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0073/GNS",
+      "name": "Immaculata Chiamaka Enyenwa"
+    },
+    "timestamp": "2026-10-28T15:09:53.109Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 101
+  },
+  {
+    "ref": "REF/EOCNS/QA/1102",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabeprz2g",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0161/GNS",
+      "name": "Jacinta Chioma Igwe"
+    },
+    "timestamp": "2026-10-28T15:09:53.109Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 102
+  },
+  {
+    "ref": "REF/EOCNS/QA/1103",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaayhklpo",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0107/GNS",
+      "name": "Jane Chidimma Onwuka"
+    },
+    "timestamp": "2026-10-28T15:09:53.111Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 103
+  },
+  {
+    "ref": "REF/EOCNS/QA/1104",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab6xa8mn",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0131/GNS",
+      "name": "Jennifer Chiamaka Nwufoh"
+    },
+    "timestamp": "2026-10-28T15:09:53.115Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 104
+  },
+  {
+    "ref": "REF/EOCNS/QA/1105",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaq17on1",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0077/GNS",
+      "name": "Joseph Chisomaga Ihekwoaba"
+    },
+    "timestamp": "2026-10-28T15:09:53.117Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 105
+  },
+  {
+    "ref": "REF/EOCNS/QA/1106",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabeiydbi",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0159/GNS",
+      "name": "Joy Chioma Onwo"
+    },
+    "timestamp": "2026-10-28T15:09:53.118Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 106
+  },
+  {
+    "ref": "REF/EOCNS/QA/1107",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa9rdw6r",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0030/GNS",
+      "name": "Juliet Chukwuma Anyalagu"
+    },
+    "timestamp": "2026-10-28T15:09:53.120Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 107
+  },
+  {
+    "ref": "REF/EOCNS/QA/1108",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab5htzhe",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0129/GNS",
+      "name": "Kasarachi Rejoice Vincent"
+    },
+    "timestamp": "2026-10-28T15:09:53.121Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 108
+  },
+  {
+    "ref": "REF/EOCNS/QA/1109",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabhbp1c4",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0169/GNS",
+      "name": "Kosarachi Icha Ogeh"
+    },
+    "timestamp": "2026-10-28T15:09:53.122Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 109
+  },
+  {
+    "ref": "REF/EOCNS/QA/1110",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabdpb2hr",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0157/GNS",
+      "name": "Lebechi Lilian Nwancho"
+    },
+    "timestamp": "2026-10-28T15:09:53.123Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 110
+  },
+  {
+    "ref": "REF/EOCNS/QA/1111",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabi45wlk",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0170/GNS",
+      "name": "Linda Nkechinyere Okowkwo"
+    },
+    "timestamp": "2026-10-28T15:09:53.124Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 111
+  },
+  {
+    "ref": "REF/EOCNS/QA/1112",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaartl5cn",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0083/GNS",
+      "name": "Loveth Ifebuche Agbo"
+    },
+    "timestamp": "2026-10-28T15:09:53.125Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 112
+  },
+  {
+    "ref": "REF/EOCNS/QA/1113",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab5o55or",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0128/GNS",
+      "name": "Lucy Chinenye Nwachukwu"
+    },
+    "timestamp": "2026-10-28T15:09:53.125Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 113
+  },
+  {
+    "ref": "REF/EOCNS/QA/1114",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaagk4vhl",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0051/GNS",
+      "name": "Makuochukwu Christiana Onyenuma"
+    },
+    "timestamp": "2026-10-28T15:09:53.126Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 114
+  },
+  {
+    "ref": "REF/EOCNS/QA/1115",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaq4ug6x",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0079/GNS",
+      "name": "Marycynthia Chiziterem Mkpuma"
+    },
+    "timestamp": "2026-10-28T15:09:53.127Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 115
+  },
+  {
+    "ref": "REF/EOCNS/QA/1116",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabbuj2p3",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0149/GNS",
+      "name": "Maureen Nmanna Oko"
+    },
+    "timestamp": "2026-10-28T15:09:53.133Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 116
+  },
+  {
+    "ref": "REF/EOCNS/QA/1117",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabdnqymk",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0155/GNS",
+      "name": "Melody Chiamaka Ogeome"
+    },
+    "timestamp": "2026-10-28T15:09:53.134Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 117
+  },
+  {
+    "ref": "REF/EOCNS/QA/1118",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa4per2x",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0016/GNS",
+      "name": "Miracle Ifunanya Uche"
+    },
+    "timestamp": "2026-10-28T15:09:53.135Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 118
+  },
+  {
+    "ref": "REF/EOCNS/QA/1119",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaahspm19",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0054/GNS",
+      "name": "Miracle Oluebube Nwankwo"
+    },
+    "timestamp": "2026-10-28T15:09:53.136Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 119
+  },
+  {
+    "ref": "REF/EOCNS/QA/1120",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaax30yfg",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0103/GNS",
+      "name": "Miracle Uchechukwu Asomba"
+    },
+    "timestamp": "2026-10-28T15:09:53.137Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 120
+  },
+  {
+    "ref": "REF/EOCNS/QA/1121",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaytllff",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0105/GNS",
+      "name": "Mmesoma Rubeka Nwogbu"
+    },
+    "timestamp": "2026-10-28T15:09:53.138Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 121
+  },
+  {
+    "ref": "REF/EOCNS/QA/1122",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab6c3pjf",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0133/GNS",
+      "name": "Nelson Igwe Eleke"
+    },
+    "timestamp": "2026-10-28T15:09:53.138Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 122
+  },
+  {
+    "ref": "REF/EOCNS/QA/1123",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaazr0qhg",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0110/GNS",
+      "name": "Nkechinyere Ude Irem"
+    },
+    "timestamp": "2026-10-28T15:09:53.139Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 123
+  },
+  {
+    "ref": "REF/EOCNS/QA/1124",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaajmpsqt",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0057/GNS",
+      "name": "Nmachi Nwali"
+    },
+    "timestamp": "2026-10-28T15:09:53.140Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 124
+  },
+  {
+    "ref": "REF/EOCNS/QA/1125",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab4uz8jl",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0126/GNS",
+      "name": "Nnabuike Goodluck Ozokonkwo"
+    },
+    "timestamp": "2026-10-28T15:09:53.141Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 125
+  },
+  {
+    "ref": "REF/EOCNS/QA/1126",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzda9yw41vu",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0002/GNS",
+      "name": "Nnachi Anya Nnachi"
+    },
+    "timestamp": "2026-10-28T15:09:53.142Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 126
+  },
+  {
+    "ref": "REF/EOCNS/QA/1127",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaasndesf",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0084/GNS",
+      "name": "Nnedinma Miracle Chima"
+    },
+    "timestamp": "2026-10-28T15:09:53.143Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 127
+  },
+  {
+    "ref": "REF/EOCNS/QA/1128",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab3rouy0",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0120/GNS",
+      "name": "Noheemot Oluwafunmi Soneye"
+    },
+    "timestamp": "2026-10-28T15:09:53.143Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 128
+  },
+  {
+    "ref": "REF/EOCNS/QA/1129",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab8z9498",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0138/GNS",
+      "name": "Odinakachukwu Hannah Eze"
+    },
+    "timestamp": "2026-10-28T15:09:53.145Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 129
+  },
+  {
+    "ref": "REF/EOCNS/QA/1130",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaawyed1k",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0101/GNS",
+      "name": "Ogechi Annastecia Orogwu"
+    },
+    "timestamp": "2026-10-28T15:09:53.150Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 130
+  },
+  {
+    "ref": "REF/EOCNS/QA/1131",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab3w3waa",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0121/GNS",
+      "name": "Ogechi Blessing Anyairo"
+    },
+    "timestamp": "2026-10-28T15:09:53.151Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 131
+  },
+  {
+    "ref": "REF/EOCNS/QA/1132",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaih59vk",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0055/GNS",
+      "name": "Ogechi Preciousrita Ugwunta"
+    },
+    "timestamp": "2026-10-28T15:09:53.153Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 132
+  },
+  {
+    "ref": "REF/EOCNS/QA/1133",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabda3vp6",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0158/GNS",
+      "name": "Ogochukwu Kennedy Okafor"
+    },
+    "timestamp": "2026-10-28T15:09:53.154Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 133
+  },
+  {
+    "ref": "REF/EOCNS/QA/1134",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaasqn7bz",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0087/GNS",
+      "name": "Oluchi Precious Okonkwo"
+    },
+    "timestamp": "2026-10-28T15:09:53.155Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 134
+  },
+  {
+    "ref": "REF/EOCNS/QA/1135",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaas8icte",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0086/GNS",
+      "name": "Oluebube Cynthia Nwafor"
+    },
+    "timestamp": "2026-10-28T15:09:53.156Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 135
+  },
+  {
+    "ref": "REF/EOCNS/QA/1136",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabajuesb",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0146/GNS",
+      "name": "Oluebube Dominica Usulor"
+    },
+    "timestamp": "2026-10-28T15:09:53.157Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 136
+  },
+  {
+    "ref": "REF/EOCNS/QA/1137",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabfdq2qd",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0163/GNS",
+      "name": "Oluebube Sharon Demian"
+    },
+    "timestamp": "2026-10-28T15:09:53.158Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 137
+  },
+  {
+    "ref": "REF/EOCNS/QA/1138",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab5fiqe8",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0130/GNS",
+      "name": "Onyinyechi Mary Benjamin"
+    },
+    "timestamp": "2026-10-28T15:09:53.159Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 138
+  },
+  {
+    "ref": "REF/EOCNS/QA/1139",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab2n0aoy",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0118/GNS",
+      "name": "Pavelina Oluchukwu James"
+    },
+    "timestamp": "2026-10-28T15:09:53.160Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 139
+  },
+  {
+    "ref": "REF/EOCNS/QA/1140",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa0toqsm",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0007/GNS",
+      "name": "Peace Chibusomma Ani"
+    },
+    "timestamp": "2026-10-28T15:09:53.161Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 140
+  },
+  {
+    "ref": "REF/EOCNS/QA/1141",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaazyao6w",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0109/GNS",
+      "name": "Peace Chisom Okolo"
+    },
+    "timestamp": "2026-10-28T15:09:53.163Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 141
+  },
+  {
+    "ref": "REF/EOCNS/QA/1142",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa67uqqo",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0023/GNS",
+      "name": "Perpetua Chioma Maduka"
+    },
+    "timestamp": "2026-10-28T15:09:53.165Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 142
+  },
+  {
+    "ref": "REF/EOCNS/QA/1143",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaav5o7sk",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0097/GNS",
+      "name": "Philomina Ola Akani"
+    },
+    "timestamp": "2026-10-28T15:09:53.166Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 143
+  },
+  {
+    "ref": "REF/EOCNS/QA/1144",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab02akfw",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0111/GNS",
+      "name": "Precious Amarachi Oko-Uche"
+    },
+    "timestamp": "2026-10-28T15:09:53.167Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 144
+  },
+  {
+    "ref": "REF/EOCNS/QA/1145",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab9pzk7e",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0143/GNS",
+      "name": "Precious Chidimma Omenihu"
+    },
+    "timestamp": "2026-10-28T15:09:53.168Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 145
+  },
+  {
+    "ref": "REF/EOCNS/QA/1146",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa0re64l",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0006/GNS",
+      "name": "Precious Chioma Iganga"
+    },
+    "timestamp": "2026-10-28T15:09:53.169Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 146
+  },
+  {
+    "ref": "REF/EOCNS/QA/1147",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa397wjf",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0013/GNS",
+      "name": "Precious Kosisochukwu Agbo"
+    },
+    "timestamp": "2026-10-28T15:09:53.170Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 147
+  },
+  {
+    "ref": "REF/EOCNS/QA/1148",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa4c7nch",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0017/GNS",
+      "name": "Precious Nmesoma Philip"
+    },
+    "timestamp": "2026-10-28T15:09:53.171Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 148
+  },
+  {
+    "ref": "REF/EOCNS/QA/1149",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaafmkn68",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0048/GNS",
+      "name": "Precious Ogechi Eze"
+    },
+    "timestamp": "2026-10-28T15:09:53.172Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 149
+  },
+  {
+    "ref": "REF/EOCNS/QA/1150",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa7c0vi9",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0025/GNS",
+      "name": "Precious Owora Ikwor"
+    },
+    "timestamp": "2026-10-28T15:09:53.174Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 150
+  },
+  {
+    "ref": "REF/EOCNS/QA/1151",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa8gyyk6",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0029/GNS",
+      "name": "Pretty Mmesoma Okoro"
+    },
+    "timestamp": "2026-10-28T15:09:53.175Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 151
+  },
+  {
+    "ref": "REF/EOCNS/QA/1152",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaf1g1xt",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0049/GNS",
+      "name": "Princess Chinemerem Duke"
+    },
+    "timestamp": "2026-10-28T15:09:53.175Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 152
+  },
+  {
+    "ref": "REF/EOCNS/QA/1153",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabaxizdb",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0147/GNS",
+      "name": "Prisca Ulumma Oko"
+    },
+    "timestamp": "2026-10-28T15:09:53.176Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 153
+  },
+  {
+    "ref": "REF/EOCNS/QA/1154",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaar8xwoz",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0082/GNS",
+      "name": "Priscilla Faith Nweke"
+    },
+    "timestamp": "2026-10-28T15:09:53.177Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 154
+  },
+  {
+    "ref": "REF/EOCNS/QA/1155",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaqzhbw4",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0080/GNS",
+      "name": "Promise Nzubechi Orih"
+    },
+    "timestamp": "2026-10-28T15:09:53.179Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 155
+  },
+  {
+    "ref": "REF/EOCNS/QA/1156",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaapmoo6m",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0074/GNS",
+      "name": "Raphael Ebubechukwu Ugwu"
+    },
+    "timestamp": "2026-10-28T15:09:53.180Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 156
+  },
+  {
+    "ref": "REF/EOCNS/QA/1157",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaacpvflr",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0040/GNS",
+      "name": "Rejoice Eteng Ubi"
+    },
+    "timestamp": "2026-10-28T15:09:53.181Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 157
+  },
+  {
+    "ref": "REF/EOCNS/QA/1158",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab9opq8f",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0141/GNS",
+      "name": "Rejoice Olamma Chika"
+    },
+    "timestamp": "2026-10-28T15:09:53.182Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 158
+  },
+  {
+    "ref": "REF/EOCNS/QA/1159",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaazj4oes",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0108/GNS",
+      "name": "Salomie Kamsiyochukwu Ugwunta"
+    },
+    "timestamp": "2026-10-28T15:09:53.183Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 159
+  },
+  {
+    "ref": "REF/EOCNS/QA/1160",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaadxsnvj",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0042/GNS",
+      "name": "Samuel Emeka"
+    },
+    "timestamp": "2026-10-28T15:09:53.184Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 160
+  },
+  {
+    "ref": "REF/EOCNS/QA/1161",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzda9zou78g",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0004/GNS",
+      "name": "Sarah Onyinyechi Ohaji"
+    },
+    "timestamp": "2026-10-28T15:09:53.185Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 161
+  },
+  {
+    "ref": "REF/EOCNS/QA/1162",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa53kb93",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0019/GNS",
+      "name": "Sharon Chinonso Onwuka"
+    },
+    "timestamp": "2026-10-28T15:09:53.186Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 162
+  },
+  {
+    "ref": "REF/EOCNS/QA/1163",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaan53vi5",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0070/GNS",
+      "name": "Shulamite Modestus Nzubechi"
+    },
+    "timestamp": "2026-10-28T15:09:53.186Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 163
+  },
+  {
+    "ref": "REF/EOCNS/QA/1164",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab3ajpjt",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0123/GNS",
+      "name": "Somkene Abigail Amuzie"
+    },
+    "timestamp": "2026-10-28T15:09:53.187Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 164
+  },
+  {
+    "ref": "REF/EOCNS/QA/1165",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaahy4bl0",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0053/GNS",
+      "name": "Stella Chubiyojo James"
+    },
+    "timestamp": "2026-10-28T15:09:53.188Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 165
+  },
+  {
+    "ref": "REF/EOCNS/QA/1166",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab60q534",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0132/GNS",
+      "name": "Tochukwu Salvation Ogba"
+    },
+    "timestamp": "2026-10-28T15:09:53.189Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 166
+  },
+  {
+    "ref": "REF/EOCNS/QA/1167",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaa3ua3r",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0034/GNS",
+      "name": "Trinitas Chioma Dike"
+    },
+    "timestamp": "2026-10-28T15:09:53.190Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 167
+  },
+  {
+    "ref": "REF/EOCNS/QA/1168",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaegsrss",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0045/GNS",
+      "name": "Udochukwu Gift Chiemezie"
+    },
+    "timestamp": "2026-10-28T15:09:53.191Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 168
+  },
+  {
+    "ref": "REF/EOCNS/QA/1169",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaang29my",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0069/GNS",
+      "name": "Udochukwu Peace Akuru"
+    },
+    "timestamp": "2026-10-28T15:09:53.191Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 169
+  },
+  {
+    "ref": "REF/EOCNS/QA/1170",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaapnyr4l",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0076/GNS",
+      "name": "Udokanma Osuagwu"
+    },
+    "timestamp": "2026-10-28T15:09:53.192Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 170
+  },
+  {
+    "ref": "REF/EOCNS/QA/1171",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab73kdy5",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0136/GNS",
+      "name": "Ugochi Miracle Celestine"
+    },
+    "timestamp": "2026-10-28T15:09:53.193Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 171
+  },
+  {
+    "ref": "REF/EOCNS/QA/1172",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab7kc7w0",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0137/GNS",
+      "name": "Ugonna Clara Simon"
+    },
+    "timestamp": "2026-10-28T15:09:53.194Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 172
+  },
+  {
+    "ref": "REF/EOCNS/QA/1173",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa5f7ckp",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0020/GNS",
+      "name": "Ukamaka Ebere Eze"
+    },
+    "timestamp": "2026-10-28T15:09:53.196Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 173
+  },
+  {
+    "ref": "REF/EOCNS/QA/1174",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaajevu2t",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0058/GNS",
+      "name": "Ukamaka Favour Ugochukwu"
+    },
+    "timestamp": "2026-10-28T15:09:53.197Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 174
+  },
+  {
+    "ref": "REF/EOCNS/QA/1175",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab04sh6c",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0113/GNS",
+      "name": "Victory Chiamaka Ndubuisi"
+    },
+    "timestamp": "2026-10-28T15:09:53.198Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 175
+  },
+  {
+    "ref": "REF/EOCNS/QA/1176",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab2hakd3",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0119/GNS",
+      "name": "Victory Chidera Ndubueze"
+    },
+    "timestamp": "2026-10-28T15:09:53.199Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 176
+  },
+  {
+    "ref": "REF/EOCNS/QA/1177",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaeg7qkp",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0044/GNS",
+      "name": "Victory Nzubechi Ezenwa"
+    },
+    "timestamp": "2026-10-28T15:09:53.200Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 177
+  },
+  {
+    "ref": "REF/EOCNS/QA/1178",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaam0wpc0",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "regNo": "EOCNS/100/0066/GNS",
+      "name": "Vivian Ogunne Arua"
+    },
+    "timestamp": "2026-10-28T15:09:53.201Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 178
+  },
+  {
+    "ref": "REF/EOCNS/QA/1179",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvs97qu2t30of",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvs97qu2t30of",
+        "name": "ODEMELEM GODSTIME",
+        "regNo": "EOCNS/26/0010/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Male",
+        "hostel": "1",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:13:13.370Z",
+        "updatedAt": "2026-10-28T15:13:13.370Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:13:13.392Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 179
+  },
+  {
+    "ref": "REF/EOCNS/QA/1180",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvs98wh5p9wl4",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvs98wh5p9wl4",
+        "name": "JENNIFER AIKHIONBARE",
+        "regNo": "EOCNS/26/0005/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:14:07.337Z",
+        "updatedAt": "2026-10-28T15:14:07.337Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:14:07.389Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 180
+  },
+  {
+    "ref": "REF/EOCNS/QA/1181",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvs9r9mcnoi4p",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvs9r9mcnoi4p",
+        "name": "OKE DIAOKE",
+        "regNo": "EOCNS/26/042/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:28:24.180Z",
+        "updatedAt": "2026-10-28T15:28:24.180Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:28:24.187Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 181
+  },
+  {
+    "ref": "REF/EOCNS/QA/1182",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvs9sf0ar5n1h",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvs9sf0ar5n1h",
+        "name": "AGASHI PRECIOUS I.",
+        "regNo": "EOCNS/26/0021/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:29:17.818Z",
+        "updatedAt": "2026-10-28T15:29:17.818Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:29:17.843Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 182
+  },
+  {
+    "ref": "REF/EOCNS/QA/1183",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvs9t8ea938j5",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvs9t8ea938j5",
+        "name": "CHUKWU CHIDERA UKA",
+        "regNo": "EOCNS/26/0024/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:29:55.906Z",
+        "updatedAt": "2026-10-28T15:29:55.906Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:29:55.931Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 183
+  },
+  {
+    "ref": "REF/EOCNS/QA/1184",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvs9upequhniy",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvs9upequhniy",
+        "name": "CLEMENT OMOLARA FLORENCE",
+        "regNo": "EOCNS/26/0016/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:31:04.610Z",
+        "updatedAt": "2026-10-28T15:31:04.610Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:31:04.628Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 184
+  },
+  {
+    "ref": "REF/EOCNS/QA/1185",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvs9vfeplwhks",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvs9vfeplwhks",
+        "name": "IFEANYI NGOZI",
+        "regNo": "EOCNS/26/0027/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:31:38.305Z",
+        "updatedAt": "2026-10-28T15:31:38.305Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:31:38.333Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 185
+  },
+  {
+    "ref": "REF/EOCNS/QA/1186",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvs9weg9bwro3",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvs9weg9bwro3",
+        "name": "AGU CHIOMA AKUABATA",
+        "regNo": "EOCNS/26/0058/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:32:23.721Z",
+        "updatedAt": "2026-10-28T15:32:23.721Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:32:23.751Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 186
+  },
+  {
+    "ref": "REF/EOCNS/QA/1187",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvs9x0s03o79p",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvs9x0s03o79p",
+        "name": "CHIBUZOR CHIOMA PRAISE",
+        "regNo": "EOCNS/26/0050/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:32:52.656Z",
+        "updatedAt": "2026-10-28T15:32:52.656Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:32:52.705Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 187
+  },
+  {
+    "ref": "REF/EOCNS/QA/1188",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvs9y1k88z8na",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvs9y1k88z8na",
+        "name": "IDOMOBAZI EKO OTTO",
+        "regNo": "EOCNS/26/0041/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:33:40.328Z",
+        "updatedAt": "2026-10-28T15:33:40.328Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:33:40.363Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 188
+  },
+  {
+    "ref": "REF/EOCNS/QA/1189",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvs9ypcwwrc67",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvs9ypcwwrc67",
+        "name": "FRIDAY FAVOUR AGATHA",
+        "regNo": "EOCNS/26/0014/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:34:11.168Z",
+        "updatedAt": "2026-10-28T15:34:11.168Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:34:11.218Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 189
+  },
+  {
+    "ref": "REF/EOCNS/QA/1190",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvs9zw3zonn45",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvs9zw3zonn45",
+        "name": "ARUA ESTHER KALU",
+        "regNo": "EOCNS/26/0001/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:35:06.575Z",
+        "updatedAt": "2026-10-28T15:35:06.575Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:35:06.591Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 190
+  },
+  {
+    "ref": "REF/EOCNS/QA/1191",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvsa1ixajo7p5",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvsa1ixajo7p5",
+        "name": "AKABUOBI ESTHER ROTANA",
+        "regNo": "EOCNS/26/0030/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:36:22.798Z",
+        "updatedAt": "2026-10-28T15:36:22.798Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:36:22.818Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 191
+  },
+  {
+    "ref": "REF/EOCNS/QA/1192",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvsa27y634fx7",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvsa27y634fx7",
+        "name": "JOY CHINAZAEKPERE ASOJUA",
+        "regNo": "EOCNS/26/0049/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:36:55.230Z",
+        "updatedAt": "2026-10-28T15:36:55.230Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:36:55.273Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 192
+  },
+  {
+    "ref": "REF/EOCNS/QA/1193",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvsa3h5h69t45",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvsa3h5h69t45",
+        "name": "PRECIOUS AMARACHI LUCKY",
+        "regNo": "EOCNS/26/0036/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-28T15:37:53.813Z",
+        "updatedAt": "2026-10-28T15:37:53.813Z"
+      }
+    },
+    "timestamp": "2026-10-28T15:37:53.836Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 193
+  },
+  {
+    "ref": "REF/EOCNS/QA/1194",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa70ues3",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Abigail Akachukwu Nwonyi",
+      "regNo": "EOCNS/100/0026/GNS"
+    },
+    "timestamp": "2026-10-28T16:08:15.293Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 194
+  },
+  {
+    "ref": "REF/EOCNS/QA/1195",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaauxf8d6",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Abigail Oka Ojong",
+      "regNo": "EOCNS/100/0094/GNS"
+    },
+    "timestamp": "2026-10-28T16:08:15.295Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 195
+  },
+  {
+    "ref": "REF/EOCNS/QA/1196",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvuqkwj4jxpg4",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvuqkwj4jxpg4",
+        "name": "AGEH CHARITY EKUNYI",
+        "regNo": "TMP-EOCNS/26/0001/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-10-30T08:54:53.104Z",
+        "updatedAt": "2026-10-30T08:54:53.104Z"
+      }
+    },
+    "timestamp": "2026-10-30T08:54:53.105Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 196
   }
 ]
