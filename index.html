@@ -1105,8 +1105,29 @@
     </div>
   </div>
 
+  
+  <div class="modal" id="pendingRejectModal" hidden>
+    <div class="modal__backdrop" id="pendingRejectBackdrop"></div>
+    <div class="modal__dialog" style="max-width:480px">
+      <div class="modal__header"><h3>Reject registration</h3><button type="button" class="icon-btn" id="btnClosePendingRejectModal">&times;</button></div>
+      <div class="modal__body">
+        <p class="muted-note" id="pendingRejectSummary">—</p>
+        <label class="field field--full"><span class="field__label">Reason (audit log) <span class="req">*</span></span>
+          <textarea id="pendingRejectReason" rows="3" placeholder="Why this submission is rejected…"></textarea>
+        </label>
+        <label class="field field--full"><span class="field__label">Officer PIN <span class="req">*</span></span>
+          <input type="password" id="pendingRejectPin" autocomplete="current-password" placeholder="QA officer PIN" />
+        </label>
+      </div>
+      <div class="modal__footer">
+        <button type="button" class="btn btn--ghost" id="btnCancelPendingReject">Cancel</button>
+        <button type="button" class="btn btn--primary" id="btnConfirmPendingReject" style="background:#b91c1c;border-color:#b91c1c">Confirm reject &amp; remove</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=41"></script>
+  <script src="app.js?v=42"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>
