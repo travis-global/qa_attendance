@@ -1145,3 +1145,7 @@ body.role-viewer #viewerModeBanner { display: block; }
   display: inline-flex; align-items: center; gap: 6px;
 }
 .absent-tag button { border: none; background: none; cursor: pointer; color: #b91c1c; font-size: 1rem; line-height: 1; padding: 0; }
+
+/* REF/reason only on edit — form-grid display must not override [hidden] */
+#qaEntryAmendBlock[hidden] { display: none !important; }
+#qaEntryAmendBlock:not([hidden]) { display: grid; }

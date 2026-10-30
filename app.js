@@ -3648,11 +3648,34 @@ async function openQaEntryForm(id) {
   await seedQaDatalists();
   var form = document.getElementById("qaEntryForm");
   if (form) form.reset();
+  // Normalise id: click handlers sometimes pass Event; only real string ids mean "edit"
+  if (id && typeof id === "object") id = null;
+  if (id != null) id = String(id).trim() || null;
   document.getElementById("qaEntryId").value = id || "";
   var amend = document.getElementById("qaEntryAmendBlock");
-  if (amend) amend.hidden = !id;
+  var isEdit = !!id;
+  if (amend) {
+    amend.hidden = !isEdit;
+    if (!isEdit) {
+      amend.setAttribute("hidden", "");
+      amend.style.display = "none";
+      if (document.getElementById("qaEntryEditRef")) {
+        document.getElementById("qaEntryEditRef").value = "";
+        document.getElementById("qaEntryEditRef").required = false;
+      }
+      if (document.getElementById("qaEntryEditReason")) {
+        document.getElementById("qaEntryEditReason").value = "";
+        document.getElementById("qaEntryEditReason").required = false;
+      }
+    } else {
+      amend.removeAttribute("hidden");
+      amend.style.display = "";
+      if (document.getElementById("qaEntryEditRef")) document.getElementById("qaEntryEditRef").required = true;
+      if (document.getElementById("qaEntryEditReason")) document.getElementById("qaEntryEditReason").required = true;
+    }
+  }
   var saveBtn = document.getElementById("qaEntrySaveBtn");
-  if (saveBtn) saveBtn.textContent = id ? "Save changes to master sheet" : "Save entry";
+  if (saveBtn) saveBtn.textContent = isEdit ? "Save changes to master sheet" : "Save entry";
   var dailyDate = document.getElementById("qaDailyDate") && document.getElementById("qaDailyDate").value;
   var dailyClass = document.getElementById("qaDailyClass") && document.getElementById("qaDailyClass").value;
   document.getElementById("qaEntryDate").value = dailyDate || new Date().toISOString().slice(0, 10);
@@ -3762,7 +3785,7 @@ async function saveQaEntry(e) {
   if (!isQaOfficer()) { alert("Sign in as QA Officer to log lectures."); return; }
   if (!requireActiveSession("Lecture logging")) return;
   calcQaDurationMinutes();
-  var id = document.getElementById("qaEntryId").value || null;
+  var id = (document.getElementById("qaEntryId") && document.getElementById("qaEntryId").value || "").trim() || null;
   var date = document.getElementById("qaEntryDate").value;
   var classKey = document.getElementById("qaEntryClass").value;
   var course = document.getElementById("qaEntryCourse").value.trim();
