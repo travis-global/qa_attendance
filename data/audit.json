@@ -11448,5 +11448,32 @@
     "user": "QA Officer",
     "source": "system",
     "id": 578
+  },
+  {
+    "ref": "REF/EOCNS/QA/1576",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvuvhs537c9h1",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mvuvhs537c9h1",
+        "name": "NWOKARA UKAMAKA ANTHONIA",
+        "regNo": "EOCNS/26/0038/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "photoDataUrl": "",
+        "createdAt": "2026-10-30T11:12:25.527Z",
+        "updatedAt": "2026-10-30T11:12:25.527Z"
+      }
+    },
+    "timestamp": "2026-10-30T11:12:25.551Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 579
   }
 ]
