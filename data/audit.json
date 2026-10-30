@@ -11475,5 +11475,20 @@
     "user": "QA Officer",
     "source": "system",
     "id": 579
+  },
+  {
+    "ref": "REF/EOCNS/QA/1577",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mvuvud1olx5d9",
+    "reason": "Approved self-registration EOCNS/26/0147/GNS",
+    "details": {
+      "pendingId": "pend_mvuva1xtfoo1",
+      "email": "alemfort12@gmail.com"
+    },
+    "timestamp": "2026-10-30T11:22:12.496Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 580
   }
 ]
