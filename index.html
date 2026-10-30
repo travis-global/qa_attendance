@@ -741,7 +741,7 @@
           <div class="card" style="margin-bottom:16px">
             <div class="card__header"><h3>Full backup &amp; restore</h3></div>
             <div class="card__body">
-              <p class="muted-note">Download <strong>all</strong> operational data (students, lecturers, sessions, QA, audit, remedial, timetables, attendance, hostel, programmes, levels, courses, config snapshot metadata). Store the file safely. Restore by uploading the same file.</p>
+              <p class="muted-note">Download <strong>all</strong> operational data including students <em>with passport photos</em>, discipline cases, lecturers, sessions, QA logs, audit, remedial, timetables, attendance, hostel, programmes, levels, courses, and config. Restore uploads the same file and rebuilds local stores so the system matches this backup version — then <strong>Publish</strong> so the repository matches.</p>
               <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
                 <button type="button" class="btn btn--primary qa-edit-only" id="btnFullBackupDownload">Download full backup</button>
                 <button type="button" class="btn btn--ghost qa-edit-only" id="btnFullBackupRestore">Restore from backup file</button>
@@ -1059,7 +1059,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=35"></script>
+  <script src="app.js?v=36"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

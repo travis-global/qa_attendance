@@ -6589,9 +6589,16 @@ async function collectFullBackupPayload() {
   await loadActiveSession();
   var stores = ["students","lecturers","sessions","qa_entries","audit","programmes","levels","courses","attendance","hostel_runs","remedial","remedial_enrolment","remedial_assignments","remedial_logs","discipline"];
   var data = {};
+  var counts = {};
   for (var i = 0; i < stores.length; i++) {
     var name = stores[i];
-    try { data[name] = await getAll(name); } catch (_) { data[name] = []; }
+    try {
+      data[name] = await getAll(name);
+      counts[name] = Array.isArray(data[name]) ? data[name].length : 0;
+    } catch (_) {
+      data[name] = [];
+      counts[name] = 0;
+    }
   }
   try {
     var rm = await getAll("remedial_meta");
@@ -6603,13 +6610,25 @@ async function collectFullBackupPayload() {
   } catch (_) { data.remedial_timetable = { slots: [] }; }
   data.timetables = TIMETABLES_CACHE || {};
   data.config = Object.assign({}, APP_CONFIG || {});
-  // never put secrets that don't belong - publishWorkerKey is already in config by design
+  var photoCount = 0;
+  (data.students || []).forEach(function(s) { if (s && s.photoDataUrl) photoCount++; });
+  counts.studentPassports = photoCount;
+  counts.discipline = (data.discipline || []).length;
   return {
     format: "eocns-full-backup",
-    version: 1,
+    version: 2,
+    features: {
+      discipline: true,
+      studentPassports: true,
+      remedial: true,
+      hostel: true,
+      sessionScope: true,
+      audit: true
+    },
     exportedAt: new Date().toISOString(),
     activeSessionId: ACTIVE_SESSION && ACTIVE_SESSION.id || null,
     site: "https://travis-global.github.io/qa_attendance/",
+    counts: counts,
     data: data
   };
 }
@@ -6620,54 +6639,114 @@ async function downloadFullBackup() {
   var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   var a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "EOCNS_full_backup_" + new Date().toISOString().slice(0, 10) + ".json";
+  a.download = "EOCNS_full_backup_v2_" + new Date().toISOString().slice(0, 10) + ".json";
   document.body.appendChild(a); a.click();
   setTimeout(function() { URL.revokeObjectURL(a.href); a.remove(); }, 500);
   try {
-    await writeAudit({ action: "export", entity: "backup", entityId: "full", reason: "Full system backup downloaded" });
+    await writeAudit({
+      action: "export",
+      entity: "backup",
+      entityId: "full",
+      reason: "Full system backup downloaded (v2)",
+      details: { counts: payload.counts, features: payload.features }
+    });
   } catch (_) {}
   var st = document.getElementById("fullBackupStatus");
-  if (st) { st.hidden = false; st.textContent = "Backup downloaded. Store it offline securely."; st.style.color = "#0f766e"; }
+  if (st) {
+    st.hidden = false;
+    st.textContent = "Backup v2 downloaded · includes discipline, passports, QA, remedial, sessions, audit. Store offline securely.";
+    st.style.color = "#0f766e";
+  }
 }
 
 async function restoreFullBackupFromFile(file) {
   if (!isQaOfficer()) return;
   if (!file) return;
-  if (!confirm("Restore will overwrite local data with the backup file. You should Publish afterwards so the repository matches. Continue?")) return;
+  if (!confirm("Restore will overwrite local data with the backup file (students + photos, discipline, QA, remedial, sessions, etc.). Publish afterwards so the repository matches. Continue?")) return;
   var text = await file.text();
   var payload;
   try { payload = JSON.parse(text); } catch (e) { alert("Invalid JSON file."); return; }
   var data = payload.data || payload;
+  if (!data || typeof data !== "object") { alert("Backup file has no data payload."); return; }
+
+  async function clearStore(store) {
+    try {
+      var existing = await getAll(store);
+      for (var i = 0; i < existing.length; i++) {
+        var key = existing[i].id != null ? existing[i].id : existing[i].key;
+        try { await del(store, key); } catch (_) {}
+      }
+    } catch (_) {}
+  }
   async function rep(store, rows) {
-    if (!Array.isArray(rows)) return;
-    // clear + put
-    var existing = await getAll(store);
-    for (var i = 0; i < existing.length; i++) {
-      try { await del(store, existing[i].id != null ? existing[i].id : existing[i].key); } catch (_) {}
-    }
+    if (!Array.isArray(rows)) return 0;
+    await clearStore(store);
+    var n = 0;
     for (var j = 0; j < rows.length; j++) {
-      try { await put(store, rows[j]); } catch (err) { console.warn(store, err); }
+      try { await put(store, rows[j]); n++; } catch (err) { console.warn(store, err); }
     }
+    return n;
   }
-  var listStores = ["students","lecturers","sessions","qa_entries","audit","programmes","levels","courses","attendance","hostel_runs","remedial","remedial_enrolment","remedial_assignments","remedial_logs"];
+
+  var listStores = ["students","lecturers","sessions","qa_entries","audit","programmes","levels","courses","attendance","hostel_runs","remedial","remedial_enrolment","remedial_assignments","remedial_logs","discipline"];
+  var restored = {};
   for (var i = 0; i < listStores.length; i++) {
-    if (data[listStores[i]]) await rep(listStores[i], data[listStores[i]]);
+    var sn = listStores[i];
+    if (data[sn] != null) restored[sn] = await rep(sn, data[sn]);
   }
-  if (data.remedial_meta) await put("remedial_meta", { key: "main", value: data.remedial_meta });
-  if (data.remedial_timetable) await put("remedial_timetable", { key: "main", value: data.remedial_timetable });
-  if (data.timetables) TIMETABLES_CACHE = data.timetables;
-  if (data.config && data.config.qaPin) {
+  if (data.remedial_meta) {
+    await clearStore("remedial_meta");
+    await put("remedial_meta", { key: "main", value: data.remedial_meta });
+    restored.remedial_meta = 1;
+  }
+  if (data.remedial_timetable) {
+    await clearStore("remedial_timetable");
+    await put("remedial_timetable", { key: "main", value: data.remedial_timetable });
+    restored.remedial_timetable = 1;
+  }
+  if (data.timetables) {
+    TIMETABLES_CACHE = data.timetables;
+    restored.timetables = 1;
+  }
+  if (data.config && typeof data.config === "object") {
     APP_CONFIG = Object.assign({}, APP_CONFIG, data.config);
+    restored.config = 1;
   }
-  markDirty("full restore");
+  if (payload.activeSessionId) {
+    try { localStorage.setItem(ACTIVE_SESSION_KEY, payload.activeSessionId); } catch (_) {}
+  }
+  markDirty("full restore v" + (payload.version || "?"));
   try {
-    await writeAudit({ action: "import", entity: "backup", entityId: "full", reason: "Full system restore from backup file", details: { exportedAt: payload.exportedAt } });
+    await writeAudit({
+      action: "import",
+      entity: "backup",
+      entityId: "full",
+      reason: "Full system restore from backup file",
+      details: {
+        exportedAt: payload.exportedAt,
+        backupVersion: payload.version,
+        features: payload.features || {},
+        restored: restored
+      }
+    });
   } catch (_) {}
   await refreshSessionChrome();
   try { await renderStudentsTable(); } catch (_) {}
+  try { await renderDisciplineTable(); } catch (_) {}
+  try { await renderLecturersTable(); } catch (_) {}
+  try { refreshDashboardStats(); } catch (_) {}
+  var photoN = 0;
+  try {
+    (await getAll("students")).forEach(function(s) { if (s.photoDataUrl) photoN++; });
+  } catch (_) {}
+  var discN = restored.discipline || 0;
   var st = document.getElementById("fullBackupStatus");
-  if (st) { st.hidden = false; st.textContent = "Restore complete locally. Publish to repository when ready."; st.style.color = "#0f766e"; }
-  alert("Restore complete. Publish from Settings so the repository matches this backup.");
+  var msg = "Restore complete · students " + (restored.students || 0) +
+    " (passports " + photoN + ") · discipline " + discN +
+    " · QA " + (restored.qa_entries || 0) +
+    ". Publish to repository when ready.";
+  if (st) { st.hidden = false; st.textContent = msg; st.style.color = "#0f766e"; }
+  alert(msg);
 }
 
 async function deleteStudentById(id) {
