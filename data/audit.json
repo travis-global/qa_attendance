@@ -4594,5 +4594,5493 @@
     "user": "QA Officer",
     "source": "system",
     "id": 200
+  },
+  {
+    "ref": "REF/EOCNS/QA/1201",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac7jzp9s",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0001/MID",
+      "name": "Winner Ifeoma Joseph"
+    },
+    "timestamp": "2026-10-30T09:14:09.343Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 201
+  },
+  {
+    "ref": "REF/EOCNS/QA/1202",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac82qi9z",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0002/MID",
+      "name": "Chisom Favour Udeh"
+    },
+    "timestamp": "2026-10-30T09:14:09.345Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 202
+  },
+  {
+    "ref": "REF/EOCNS/QA/1203",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac8leuhu",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0004/MID",
+      "name": "Onyinyechi Miracle Nduka"
+    },
+    "timestamp": "2026-10-30T09:14:09.348Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 203
+  },
+  {
+    "ref": "REF/EOCNS/QA/1204",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac8q3req",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0003/MID",
+      "name": "Chiamaka Precious Onwe"
+    },
+    "timestamp": "2026-10-30T09:14:09.349Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 204
+  },
+  {
+    "ref": "REF/EOCNS/QA/1205",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac98xsdi",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0008/MID",
+      "name": "Chioma Blessing Chinedu"
+    },
+    "timestamp": "2026-10-30T09:14:09.350Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 205
+  },
+  {
+    "ref": "REF/EOCNS/QA/1206",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac9fx74v",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0006/MID",
+      "name": "Chinelo Glory Orji"
+    },
+    "timestamp": "2026-10-30T09:14:09.351Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 206
+  },
+  {
+    "ref": "REF/EOCNS/QA/1207",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac9k90w1",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0007/MID",
+      "name": "Chioma Gladys Okeoma"
+    },
+    "timestamp": "2026-10-30T09:14:09.352Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 207
+  },
+  {
+    "ref": "REF/EOCNS/QA/1208",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac9nlhud",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0005/MID",
+      "name": "Ozioma Faith Udeh"
+    },
+    "timestamp": "2026-10-30T09:14:09.354Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 208
+  },
+  {
+    "ref": "REF/EOCNS/QA/1209",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaca2nvyk",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0011/MID",
+      "name": "Oluchi Philomina Nwafor"
+    },
+    "timestamp": "2026-10-30T09:14:09.355Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 209
+  },
+  {
+    "ref": "REF/EOCNS/QA/1210",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacamifn8",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0009/MID",
+      "name": "Ogochukwu Judith Esiaka"
+    },
+    "timestamp": "2026-10-30T09:14:09.356Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 210
+  },
+  {
+    "ref": "REF/EOCNS/QA/1211",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacanbgyn",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0010/MID",
+      "name": "Grace Mmesoma Okafor"
+    },
+    "timestamp": "2026-10-30T09:14:09.357Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 211
+  },
+  {
+    "ref": "REF/EOCNS/QA/1212",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacb9ybem",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0013/MID",
+      "name": "Chidimma Esther Okechukwu"
+    },
+    "timestamp": "2026-10-30T09:14:09.358Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 212
+  },
+  {
+    "ref": "REF/EOCNS/QA/1213",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacbd3ah0",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0012/MID",
+      "name": "Annastecia Promise Otuonye"
+    },
+    "timestamp": "2026-10-30T09:14:09.359Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 213
+  },
+  {
+    "ref": "REF/EOCNS/QA/1214",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacbg992e",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0014/MID",
+      "name": "Sarah Ifunanya Chukwma"
+    },
+    "timestamp": "2026-10-30T09:14:09.360Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 214
+  },
+  {
+    "ref": "REF/EOCNS/QA/1215",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaccorrl8",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0016/MID",
+      "name": "Stephanie Nneoma Ojimba"
+    },
+    "timestamp": "2026-10-30T09:14:09.361Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 215
+  },
+  {
+    "ref": "REF/EOCNS/QA/1216",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaccp539e",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0015/MID",
+      "name": "Blessing Ngozi Nwigbo"
+    },
+    "timestamp": "2026-10-30T09:14:09.362Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 216
+  },
+  {
+    "ref": "REF/EOCNS/QA/1217",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaccyvwcj",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0017/MID",
+      "name": "Blessing Ngozi Ali"
+    },
+    "timestamp": "2026-10-30T09:14:09.363Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 217
+  },
+  {
+    "ref": "REF/EOCNS/QA/1218",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacdgjitg",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0019/MID",
+      "name": "Chinecherem Dominic Usuio"
+    },
+    "timestamp": "2026-10-30T09:14:09.364Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 218
+  },
+  {
+    "ref": "REF/EOCNS/QA/1219",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacdnw9gh",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0018/MID",
+      "name": "Fatima Adaeze Haruna"
+    },
+    "timestamp": "2026-10-30T09:14:09.366Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 219
+  },
+  {
+    "ref": "REF/EOCNS/QA/1220",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdace5eqsw",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0022/MID",
+      "name": "Chinenye Cynthia Omeh"
+    },
+    "timestamp": "2026-10-30T09:14:09.367Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 220
+  },
+  {
+    "ref": "REF/EOCNS/QA/1221",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdace74bh7",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0021/MID",
+      "name": "Precious Chiamaka Nwogidi"
+    },
+    "timestamp": "2026-10-30T09:14:09.368Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 221
+  },
+  {
+    "ref": "REF/EOCNS/QA/1222",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacehprqe",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0023/MID",
+      "name": "Promise Amaka Ikechukwu"
+    },
+    "timestamp": "2026-10-30T09:14:09.369Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 222
+  },
+  {
+    "ref": "REF/EOCNS/QA/1223",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacei0dw3",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0020/MID",
+      "name": "Chizoba Assumpta Ikeme"
+    },
+    "timestamp": "2026-10-30T09:14:09.371Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 223
+  },
+  {
+    "ref": "REF/EOCNS/QA/1224",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacf2v41g",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0024/MID",
+      "name": "Rechael Chidiogo Chibuzor"
+    },
+    "timestamp": "2026-10-30T09:14:09.372Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 224
+  },
+  {
+    "ref": "REF/EOCNS/QA/1225",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacfkn0tn",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0025/MID",
+      "name": "Blessing Chidere Izukanma"
+    },
+    "timestamp": "2026-10-30T09:14:09.373Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 225
+  },
+  {
+    "ref": "REF/EOCNS/QA/1226",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacfq5dhv",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0026/MID",
+      "name": "Portia Miracle Godson"
+    },
+    "timestamp": "2026-10-30T09:14:09.374Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 226
+  },
+  {
+    "ref": "REF/EOCNS/QA/1227",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacg08aia",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0027/MID",
+      "name": "Promise Chinasa Aneh"
+    },
+    "timestamp": "2026-10-30T09:14:09.375Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 227
+  },
+  {
+    "ref": "REF/EOCNS/QA/1228",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacg31flp",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0029/MID",
+      "name": "Emmanuel Chinemerem Onyebuchi"
+    },
+    "timestamp": "2026-10-30T09:14:09.376Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 228
+  },
+  {
+    "ref": "REF/EOCNS/QA/1229",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacg4sae8",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0028/MID",
+      "name": "Charity Charis Ajah"
+    },
+    "timestamp": "2026-10-30T09:14:09.377Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 229
+  },
+  {
+    "ref": "REF/EOCNS/QA/1230",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacgqfr22",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0030/MID",
+      "name": "Success Onyinyechi Nwankwo"
+    },
+    "timestamp": "2026-10-30T09:14:09.378Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 230
+  },
+  {
+    "ref": "REF/EOCNS/QA/1231",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdach9mpa2",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0032/MID",
+      "name": "Amarachi Nwuguru Okeh"
+    },
+    "timestamp": "2026-10-30T09:14:09.379Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 231
+  },
+  {
+    "ref": "REF/EOCNS/QA/1232",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdachdxepl",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0031/MID",
+      "name": "Precious Ogochukwu Chukwuma"
+    },
+    "timestamp": "2026-10-30T09:14:09.381Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 232
+  },
+  {
+    "ref": "REF/EOCNS/QA/1233",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdachqxkye",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0033/MID",
+      "name": "John Janet Otaka"
+    },
+    "timestamp": "2026-10-30T09:14:09.382Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 233
+  },
+  {
+    "ref": "REF/EOCNS/QA/1234",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaci05e3p",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0035/MID",
+      "name": "Chinedu Francis Ekwe"
+    },
+    "timestamp": "2026-10-30T09:14:09.383Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 234
+  },
+  {
+    "ref": "REF/EOCNS/QA/1235",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacifi3up",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0036/MID",
+      "name": "Success Ifeoma Ofmat"
+    },
+    "timestamp": "2026-10-30T09:14:09.384Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 235
+  },
+  {
+    "ref": "REF/EOCNS/QA/1236",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaciga39e",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0037/MID",
+      "name": "Emmanuel Chiemeka Obinka"
+    },
+    "timestamp": "2026-10-30T09:14:09.385Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 236
+  },
+  {
+    "ref": "REF/EOCNS/QA/1237",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacikidli",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0034/MID",
+      "name": "Amarachi Precious Obioha"
+    },
+    "timestamp": "2026-10-30T09:14:09.386Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 237
+  },
+  {
+    "ref": "REF/EOCNS/QA/1238",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacjavm2e",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0040/MID",
+      "name": "Precious Chinwendu Uzoma"
+    },
+    "timestamp": "2026-10-30T09:14:09.387Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 238
+  },
+  {
+    "ref": "REF/EOCNS/QA/1239",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacje8tsn",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0039/MID",
+      "name": "Joy Onyekachi Ucha"
+    },
+    "timestamp": "2026-10-30T09:14:09.388Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 239
+  },
+  {
+    "ref": "REF/EOCNS/QA/1240",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacki4wjo",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0043/MID",
+      "name": "Queen Ojonoda Dibiagwu"
+    },
+    "timestamp": "2026-10-30T09:14:09.389Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 240
+  },
+  {
+    "ref": "REF/EOCNS/QA/1241",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacksgwcs",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0042/MID",
+      "name": "Mary Chisom Ugwu"
+    },
+    "timestamp": "2026-10-30T09:14:09.390Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 241
+  },
+  {
+    "ref": "REF/EOCNS/QA/1242",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdackzk8m3",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0041/MID",
+      "name": "Joy Adaobi Ifeanyi"
+    },
+    "timestamp": "2026-10-30T09:14:09.391Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 242
+  },
+  {
+    "ref": "REF/EOCNS/QA/1243",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacl50nzb",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0046/MID",
+      "name": "Uchenna Ozo Arua"
+    },
+    "timestamp": "2026-10-30T09:14:09.392Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 243
+  },
+  {
+    "ref": "REF/EOCNS/QA/1244",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaclb96tu",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0047/MID",
+      "name": "Makuochukwu Divine-Gift Obasi"
+    },
+    "timestamp": "2026-10-30T09:14:09.393Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 244
+  },
+  {
+    "ref": "REF/EOCNS/QA/1245",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacldcr9n",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0044/MID",
+      "name": "Eunice Chinagorom Nwankwo"
+    },
+    "timestamp": "2026-10-30T09:14:09.393Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 245
+  },
+  {
+    "ref": "REF/EOCNS/QA/1246",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacldpf3b",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0045/MID",
+      "name": "Chinemerem Deborah Okpuru"
+    },
+    "timestamp": "2026-10-30T09:14:09.395Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 246
+  },
+  {
+    "ref": "REF/EOCNS/QA/1247",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacm0vm38",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0048/MID",
+      "name": "Ngozi Virginia Aloh"
+    },
+    "timestamp": "2026-10-30T09:14:09.397Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 247
+  },
+  {
+    "ref": "REF/EOCNS/QA/1248",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacmwo1ln",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0050/MID",
+      "name": "Precious Mmesoma Ezeehukwu"
+    },
+    "timestamp": "2026-10-30T09:14:09.398Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 248
+  },
+  {
+    "ref": "REF/EOCNS/QA/1249",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacmzduyr",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0049/MID",
+      "name": "Esther Chidalu Michael"
+    },
+    "timestamp": "2026-10-30T09:14:09.399Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 249
+  },
+  {
+    "ref": "REF/EOCNS/QA/1250",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacn2nxla",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0053/MID",
+      "name": "Amarachukwu Judith Chijioke"
+    },
+    "timestamp": "2026-10-30T09:14:09.400Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 250
+  },
+  {
+    "ref": "REF/EOCNS/QA/1251",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacni6oyy",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0051/MID",
+      "name": "Favour Chizaram Awuzie"
+    },
+    "timestamp": "2026-10-30T09:14:09.401Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 251
+  },
+  {
+    "ref": "REF/EOCNS/QA/1252",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacnmw0qu",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0052/MID",
+      "name": "Peace Chidera Agu"
+    },
+    "timestamp": "2026-10-30T09:14:09.403Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 252
+  },
+  {
+    "ref": "REF/EOCNS/QA/1253",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaco1opwx",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0055/MID",
+      "name": "Chiamaka Grace Okoro"
+    },
+    "timestamp": "2026-10-30T09:14:09.404Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 253
+  },
+  {
+    "ref": "REF/EOCNS/QA/1254",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacohrlsj",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0054/MID",
+      "name": "Cynthia Chizaram Eze"
+    },
+    "timestamp": "2026-10-30T09:14:09.405Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 254
+  },
+  {
+    "ref": "REF/EOCNS/QA/1255",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacoj4i46",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0056/MID",
+      "name": "Christabel Ginika Okwor"
+    },
+    "timestamp": "2026-10-30T09:14:09.406Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 255
+  },
+  {
+    "ref": "REF/EOCNS/QA/1256",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacpbsbsd",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0057/MID",
+      "name": "Mmesoma Emmanuella Okeke"
+    },
+    "timestamp": "2026-10-30T09:14:09.407Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 256
+  },
+  {
+    "ref": "REF/EOCNS/QA/1257",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacpn8cj5",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0058/MID",
+      "name": "Jennifer Chinecherem Emeka"
+    },
+    "timestamp": "2026-10-30T09:14:09.407Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 257
+  },
+  {
+    "ref": "REF/EOCNS/QA/1258",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacppx2hn",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0059/MID",
+      "name": "Chinaza Misharck Ikenna"
+    },
+    "timestamp": "2026-10-30T09:14:09.408Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 258
+  },
+  {
+    "ref": "REF/EOCNS/QA/1259",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacqif7ex",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0061/MID",
+      "name": "Uchechi Glory Emeka"
+    },
+    "timestamp": "2026-10-30T09:14:09.409Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 259
+  },
+  {
+    "ref": "REF/EOCNS/QA/1260",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacqoeexw",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0063/MID",
+      "name": "Chinemerem Precious Onyebuchi"
+    },
+    "timestamp": "2026-10-30T09:14:09.410Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 260
+  },
+  {
+    "ref": "REF/EOCNS/QA/1261",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacqp30ft",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0062/MID",
+      "name": "Daniella Chiwendu Obiahu"
+    },
+    "timestamp": "2026-10-30T09:14:09.411Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 261
+  },
+  {
+    "ref": "REF/EOCNS/QA/1262",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacqxi6oa",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0060/MID",
+      "name": "John Chukwu Ube"
+    },
+    "timestamp": "2026-10-30T09:14:09.413Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 262
+  },
+  {
+    "ref": "REF/EOCNS/QA/1263",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacr05m2j",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0065/MID",
+      "name": "Chisimdi Joy Aruma"
+    },
+    "timestamp": "2026-10-30T09:14:09.414Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 263
+  },
+  {
+    "ref": "REF/EOCNS/QA/1264",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacroebrp",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0066/MID",
+      "name": "Gideon Ugah Odoh"
+    },
+    "timestamp": "2026-10-30T09:14:09.415Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 264
+  },
+  {
+    "ref": "REF/EOCNS/QA/1265",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacrqvw23",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0064/MID",
+      "name": "Miracle Chioma Egbe"
+    },
+    "timestamp": "2026-10-30T09:14:09.416Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 265
+  },
+  {
+    "ref": "REF/EOCNS/QA/1266",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacsfieq1",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0068/MID",
+      "name": "Ujunwa Victory Nwanonyelum"
+    },
+    "timestamp": "2026-10-30T09:14:09.418Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 266
+  },
+  {
+    "ref": "REF/EOCNS/QA/1267",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacswa9nh",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0067/MID",
+      "name": "Chidubem Okoli"
+    },
+    "timestamp": "2026-10-30T09:14:09.419Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 267
+  },
+  {
+    "ref": "REF/EOCNS/QA/1268",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdact60iwr",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0071/MID",
+      "name": "Blessing Nnenna Nwankwo"
+    },
+    "timestamp": "2026-10-30T09:14:09.420Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 268
+  },
+  {
+    "ref": "REF/EOCNS/QA/1269",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdact8l3nk",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0070/MID",
+      "name": "Rita Ebubechi Egbere"
+    },
+    "timestamp": "2026-10-30T09:14:09.421Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 269
+  },
+  {
+    "ref": "REF/EOCNS/QA/1270",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdactoqmr1",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0069/MID",
+      "name": "Chioma Favour Onuoha"
+    },
+    "timestamp": "2026-10-30T09:14:09.422Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 270
+  },
+  {
+    "ref": "REF/EOCNS/QA/1271",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacurcvj0",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "regNo": "EOCNS/200/0072/MID",
+      "name": "Ifedirichukwu Christopher Ezeabia"
+    },
+    "timestamp": "2026-10-30T09:14:09.423Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 271
+  },
+  {
+    "ref": "REF/EOCNS/QA/1272",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzda9y8p6nd",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Divine Chinecherem Adoke",
+      "regNo": "EOCNS/100/0001/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.823Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 272
+  },
+  {
+    "ref": "REF/EOCNS/QA/1273",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzda9yw41vu",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Nnachi Anya Nnachi",
+      "regNo": "EOCNS/100/0002/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.825Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 273
+  },
+  {
+    "ref": "REF/EOCNS/QA/1274",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzda9zm5w77",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Emmanuel Chijioke Chukwu",
+      "regNo": "EOCNS/100/0003/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.827Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 274
+  },
+  {
+    "ref": "REF/EOCNS/QA/1275",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzda9zm7ef1",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Blessing Osinachi Samuel",
+      "regNo": "EOCNS/100/0005/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.828Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 275
+  },
+  {
+    "ref": "REF/EOCNS/QA/1276",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzda9zou78g",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Sarah Onyinyechi Ohaji",
+      "regNo": "EOCNS/100/0004/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.829Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 276
+  },
+  {
+    "ref": "REF/EOCNS/QA/1277",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa0re64l",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Precious Chioma Iganga",
+      "regNo": "EOCNS/100/0006/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.830Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 277
+  },
+  {
+    "ref": "REF/EOCNS/QA/1278",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa0toqsm",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Peace Chibusomma Ani",
+      "regNo": "EOCNS/100/0007/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.832Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 278
+  },
+  {
+    "ref": "REF/EOCNS/QA/1279",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa1je63o",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chicheta Sarah Nworie",
+      "regNo": "EOCNS/100/0008/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.833Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 279
+  },
+  {
+    "ref": "REF/EOCNS/QA/1280",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa1u9t09",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ifunanya Vivian Ogbonna",
+      "regNo": "EOCNS/100/0009/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.834Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 280
+  },
+  {
+    "ref": "REF/EOCNS/QA/1281",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa2cpzcw",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chiamaka Maryann Nwaobodo",
+      "regNo": "EOCNS/100/0011/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.835Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 281
+  },
+  {
+    "ref": "REF/EOCNS/QA/1282",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa2cxgti",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Deborah Chioma Egwuatu",
+      "regNo": "EOCNS/100/0012/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.837Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 282
+  },
+  {
+    "ref": "REF/EOCNS/QA/1283",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa2j4m62",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Amarachi Esther Ogharu",
+      "regNo": "EOCNS/100/0010/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.838Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 283
+  },
+  {
+    "ref": "REF/EOCNS/QA/1284",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa32y377",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Blessing Ekunyi Eze",
+      "regNo": "EOCNS/100/0015/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.840Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 284
+  },
+  {
+    "ref": "REF/EOCNS/QA/1285",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa397wjf",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Precious Kosisochukwu Agbo",
+      "regNo": "EOCNS/100/0013/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.841Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 285
+  },
+  {
+    "ref": "REF/EOCNS/QA/1286",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa3ra7r2",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chisom Precious Okoli",
+      "regNo": "EOCNS/100/0014/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.842Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 286
+  },
+  {
+    "ref": "REF/EOCNS/QA/1287",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa4c7nch",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Precious Nmesoma Philip",
+      "regNo": "EOCNS/100/0017/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.843Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 287
+  },
+  {
+    "ref": "REF/EOCNS/QA/1288",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa4m9i6f",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chiamaka Bliss Nwachukwu",
+      "regNo": "EOCNS/100/0018/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.844Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 288
+  },
+  {
+    "ref": "REF/EOCNS/QA/1289",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa4per2x",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Miracle Ifunanya Uche",
+      "regNo": "EOCNS/100/0016/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.845Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 289
+  },
+  {
+    "ref": "REF/EOCNS/QA/1290",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa53kb93",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Sharon Chinonso Onwuka",
+      "regNo": "EOCNS/100/0019/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.846Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 290
+  },
+  {
+    "ref": "REF/EOCNS/QA/1291",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa5f7ckp",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ukamaka Ebere Eze",
+      "regNo": "EOCNS/100/0020/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.847Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 291
+  },
+  {
+    "ref": "REF/EOCNS/QA/1292",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa625pv2",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chidera Divine Iteshi",
+      "regNo": "EOCNS/100/0021/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.847Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 292
+  },
+  {
+    "ref": "REF/EOCNS/QA/1293",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa67uqqo",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Perpetua Chioma Maduka",
+      "regNo": "EOCNS/100/0023/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.848Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 293
+  },
+  {
+    "ref": "REF/EOCNS/QA/1294",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa6ex7fe",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Cynthia Nmesoma Odo",
+      "regNo": "EOCNS/100/0022/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.849Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 294
+  },
+  {
+    "ref": "REF/EOCNS/QA/1295",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa70ues3",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Abigail Akachukwu Nwonyi",
+      "regNo": "EOCNS/100/0026/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.850Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 295
+  },
+  {
+    "ref": "REF/EOCNS/QA/1296",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa7c0vi9",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Precious Owora Ikwor",
+      "regNo": "EOCNS/100/0025/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.851Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 296
+  },
+  {
+    "ref": "REF/EOCNS/QA/1297",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa7jdvb5",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chinenye Success Igwe",
+      "regNo": "EOCNS/100/0024/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.852Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 297
+  },
+  {
+    "ref": "REF/EOCNS/QA/1298",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa8gyyk6",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Pretty Mmesoma Okoro",
+      "regNo": "EOCNS/100/0029/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.854Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 298
+  },
+  {
+    "ref": "REF/EOCNS/QA/1299",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa8putne",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ebube Nice Okwor",
+      "regNo": "EOCNS/100/0028/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.855Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 299
+  },
+  {
+    "ref": "REF/EOCNS/QA/1300",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa8zkxlx",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chisom Loveth Okorouneke",
+      "regNo": "EOCNS/100/0027/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.856Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 300
+  },
+  {
+    "ref": "REF/EOCNS/QA/1301",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa99xoma",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Gift Chiamaka Igboke",
+      "regNo": "EOCNS/100/0032/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.857Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 301
+  },
+  {
+    "ref": "REF/EOCNS/QA/1302",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa9peg9v",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chioma Confidence Omoha",
+      "regNo": "EOCNS/100/0031/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.859Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 302
+  },
+  {
+    "ref": "REF/EOCNS/QA/1303",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaa9rdw6r",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Juliet Chukwuma Anyalagu",
+      "regNo": "EOCNS/100/0030/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.860Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 303
+  },
+  {
+    "ref": "REF/EOCNS/QA/1304",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaa079rs",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ezinwanne Claudia Welibe",
+      "regNo": "EOCNS/100/0035/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.861Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 304
+  },
+  {
+    "ref": "REF/EOCNS/QA/1305",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaa3ua3r",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Trinitas Chioma Dike",
+      "regNo": "EOCNS/100/0034/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.862Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 305
+  },
+  {
+    "ref": "REF/EOCNS/QA/1306",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaalzs29",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chiamaka Treasure Offor",
+      "regNo": "EOCNS/100/0033/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.863Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 306
+  },
+  {
+    "ref": "REF/EOCNS/QA/1307",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaabiouhk",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Amarachi Chijioke",
+      "regNo": "EOCNS/100/0037/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.864Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 307
+  },
+  {
+    "ref": "REF/EOCNS/QA/1308",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaabpgxqq",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chisom Anulika Udeh",
+      "regNo": "EOCNS/100/0036/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.865Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 308
+  },
+  {
+    "ref": "REF/EOCNS/QA/1309",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaackdor3",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Amaka Godness Israel",
+      "regNo": "EOCNS/100/0039/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.866Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 309
+  },
+  {
+    "ref": "REF/EOCNS/QA/1310",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaclxqg0",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chidiebube Deborah Ugah",
+      "regNo": "EOCNS/100/0038/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.867Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 310
+  },
+  {
+    "ref": "REF/EOCNS/QA/1311",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaacpvflr",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Rejoice Eteng Ubi",
+      "regNo": "EOCNS/100/0040/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.868Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 311
+  },
+  {
+    "ref": "REF/EOCNS/QA/1312",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaadagvaq",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Favour Eteng Ubi",
+      "regNo": "EOCNS/100/0041/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.870Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 312
+  },
+  {
+    "ref": "REF/EOCNS/QA/1313",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaadw6eph",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Adaeze Esther Benjamin",
+      "regNo": "EOCNS/100/0043/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.871Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 313
+  },
+  {
+    "ref": "REF/EOCNS/QA/1314",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaadxsnvj",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Samuel Emeka",
+      "regNo": "EOCNS/100/0042/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.873Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 314
+  },
+  {
+    "ref": "REF/EOCNS/QA/1315",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaeg7qkp",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Victory Nzubechi Ezenwa",
+      "regNo": "EOCNS/100/0044/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.874Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 315
+  },
+  {
+    "ref": "REF/EOCNS/QA/1316",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaegsrss",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Udochukwu Gift Chiemezie",
+      "regNo": "EOCNS/100/0045/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.875Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 316
+  },
+  {
+    "ref": "REF/EOCNS/QA/1317",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaeo2wqz",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Deborah Chat John",
+      "regNo": "EOCNS/100/0046/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.876Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 317
+  },
+  {
+    "ref": "REF/EOCNS/QA/1318",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaf1g1xt",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Princess Chinemerem Duke",
+      "regNo": "EOCNS/100/0049/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.877Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 318
+  },
+  {
+    "ref": "REF/EOCNS/QA/1319",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaf87y72",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chioma Christiana Nwagbo",
+      "regNo": "EOCNS/100/0047/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.878Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 319
+  },
+  {
+    "ref": "REF/EOCNS/QA/1320",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaafmkn68",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Precious Ogechi Eze",
+      "regNo": "EOCNS/100/0048/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.879Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 320
+  },
+  {
+    "ref": "REF/EOCNS/QA/1321",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaafq3xw0",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Angela Chisom Nwaji",
+      "regNo": "EOCNS/100/0050/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.880Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 321
+  },
+  {
+    "ref": "REF/EOCNS/QA/1322",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaagemg49",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Favour Ugomma Arua",
+      "regNo": "EOCNS/100/0052/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.881Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 322
+  },
+  {
+    "ref": "REF/EOCNS/QA/1323",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaagk4vhl",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Makuochukwu Christiana Onyenuma",
+      "regNo": "EOCNS/100/0051/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.882Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 323
+  },
+  {
+    "ref": "REF/EOCNS/QA/1324",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaahspm19",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Miracle Oluebube Nwankwo",
+      "regNo": "EOCNS/100/0054/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.883Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 324
+  },
+  {
+    "ref": "REF/EOCNS/QA/1325",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaahy4bl0",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Stella Chubiyojo James",
+      "regNo": "EOCNS/100/0053/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.884Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 325
+  },
+  {
+    "ref": "REF/EOCNS/QA/1326",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaih59vk",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ogechi Preciousrita Ugwunta",
+      "regNo": "EOCNS/100/0055/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.886Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 326
+  },
+  {
+    "ref": "REF/EOCNS/QA/1327",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaailh60p",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Eja Treasure Samuel",
+      "regNo": "EOCNS/100/0056/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.887Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 327
+  },
+  {
+    "ref": "REF/EOCNS/QA/1328",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaajevu2t",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ukamaka Favour Ugochukwu",
+      "regNo": "EOCNS/100/0058/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.888Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 328
+  },
+  {
+    "ref": "REF/EOCNS/QA/1329",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaajmpsqt",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Nmachi Nwali",
+      "regNo": "EOCNS/100/0057/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.889Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 329
+  },
+  {
+    "ref": "REF/EOCNS/QA/1330",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaake8d89",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chioma Chukwu Agu",
+      "regNo": "EOCNS/100/0061/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.890Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 330
+  },
+  {
+    "ref": "REF/EOCNS/QA/1331",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaakqjkkg",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Anita Ifunanya Nnaemeka",
+      "regNo": "EOCNS/100/0060/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.891Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 331
+  },
+  {
+    "ref": "REF/EOCNS/QA/1332",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaakzwbga",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Favour Munachimso Ezeike",
+      "regNo": "EOCNS/100/0059/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.892Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 332
+  },
+  {
+    "ref": "REF/EOCNS/QA/1333",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaal2cmi8",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Curtis Onyedikachi Ezeoke",
+      "regNo": "EOCNS/100/0062/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.893Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 333
+  },
+  {
+    "ref": "REF/EOCNS/QA/1334",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaal631wc",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Benita Chinyere Ezeokoli",
+      "regNo": "EOCNS/100/0064/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.894Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 334
+  },
+  {
+    "ref": "REF/EOCNS/QA/1335",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaalwf20t",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Blessing Ifesinachi Chukwu",
+      "regNo": "EOCNS/100/0063/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.895Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 335
+  },
+  {
+    "ref": "REF/EOCNS/QA/1336",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaam0wpc0",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Vivian Ogunne Arua",
+      "regNo": "EOCNS/100/0066/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.896Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 336
+  },
+  {
+    "ref": "REF/EOCNS/QA/1337",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaamv2ham",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Amaka Gift Emeka",
+      "regNo": "EOCNS/100/0067/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.897Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 337
+  },
+  {
+    "ref": "REF/EOCNS/QA/1338",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaamy0m9i",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Anne Helen Njoku",
+      "regNo": "EOCNS/100/0065/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.898Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 338
+  },
+  {
+    "ref": "REF/EOCNS/QA/1339",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaan53vi5",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Shulamite Modestus Nzubechi",
+      "regNo": "EOCNS/100/0070/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.899Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 339
+  },
+  {
+    "ref": "REF/EOCNS/QA/1340",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaang29my",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Udochukwu Peace Akuru",
+      "regNo": "EOCNS/100/0069/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.900Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 340
+  },
+  {
+    "ref": "REF/EOCNS/QA/1341",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaansle7l",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Francisca Onyinyechi Akpede",
+      "regNo": "EOCNS/100/0068/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.900Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 341
+  },
+  {
+    "ref": "REF/EOCNS/QA/1342",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaao4mjqv",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Christabel Mmesoma Louis",
+      "regNo": "EOCNS/100/0071/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.902Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 342
+  },
+  {
+    "ref": "REF/EOCNS/QA/1343",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaok939d",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Immaculata Chiamaka Enyenwa",
+      "regNo": "EOCNS/100/0073/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.903Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 343
+  },
+  {
+    "ref": "REF/EOCNS/QA/1344",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaowfkkg",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Emmanuel Chinaemerem Ihekwoaba",
+      "regNo": "EOCNS/100/0072/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.904Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 344
+  },
+  {
+    "ref": "REF/EOCNS/QA/1345",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaapmoo6m",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Raphael Ebubechukwu Ugwu",
+      "regNo": "EOCNS/100/0074/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.905Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 345
+  },
+  {
+    "ref": "REF/EOCNS/QA/1346",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaapnyr4l",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Udokanma Osuagwu",
+      "regNo": "EOCNS/100/0076/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.906Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 346
+  },
+  {
+    "ref": "REF/EOCNS/QA/1347",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaapvs8cw",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Emmanuel Akachukwu Idika",
+      "regNo": "EOCNS/100/0075/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.908Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 347
+  },
+  {
+    "ref": "REF/EOCNS/QA/1348",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaq17on1",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Joseph Chisomaga Ihekwoaba",
+      "regNo": "EOCNS/100/0077/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.909Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 348
+  },
+  {
+    "ref": "REF/EOCNS/QA/1349",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaq2j5p0",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chidiebube Jennifer Charles",
+      "regNo": "EOCNS/100/0078/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.910Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 349
+  },
+  {
+    "ref": "REF/EOCNS/QA/1350",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaq4ug6x",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Marycynthia Chiziterem Mkpuma",
+      "regNo": "EOCNS/100/0079/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.911Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 350
+  },
+  {
+    "ref": "REF/EOCNS/QA/1351",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaqzhbw4",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Promise Nzubechi Orih",
+      "regNo": "EOCNS/100/0080/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.911Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 351
+  },
+  {
+    "ref": "REF/EOCNS/QA/1352",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaar5de7n",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Favour Ezinne Nwakpa",
+      "regNo": "EOCNS/100/0081/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.912Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 352
+  },
+  {
+    "ref": "REF/EOCNS/QA/1353",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaar8xwoz",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Priscilla Faith Nweke",
+      "regNo": "EOCNS/100/0082/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.913Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 353
+  },
+  {
+    "ref": "REF/EOCNS/QA/1354",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaartl5cn",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Loveth Ifebuche Agbo",
+      "regNo": "EOCNS/100/0083/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.914Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 354
+  },
+  {
+    "ref": "REF/EOCNS/QA/1355",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaas8icte",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Oluebube Cynthia Nwafor",
+      "regNo": "EOCNS/100/0086/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.915Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 355
+  },
+  {
+    "ref": "REF/EOCNS/QA/1356",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaasas171",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Deborah Oluwakemi Adesanya",
+      "regNo": "EOCNS/100/0085/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.916Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 356
+  },
+  {
+    "ref": "REF/EOCNS/QA/1357",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaasndesf",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Nnedinma Miracle Chima",
+      "regNo": "EOCNS/100/0084/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.917Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 357
+  },
+  {
+    "ref": "REF/EOCNS/QA/1358",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaasqn7bz",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Oluchi Precious Okonkwo",
+      "regNo": "EOCNS/100/0087/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.918Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 358
+  },
+  {
+    "ref": "REF/EOCNS/QA/1359",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaat1hr3s",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Amarachi Juliet Anusi",
+      "regNo": "EOCNS/100/0088/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.920Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 359
+  },
+  {
+    "ref": "REF/EOCNS/QA/1360",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaatld1j4",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chiemelie Joy Chinyereugo",
+      "regNo": "EOCNS/100/0090/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.921Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 360
+  },
+  {
+    "ref": "REF/EOCNS/QA/1361",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaatpe4ff",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Clinton Ekuma Otu",
+      "regNo": "EOCNS/100/0089/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.922Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 361
+  },
+  {
+    "ref": "REF/EOCNS/QA/1362",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaubpkst",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chisom Martha Mgbuga",
+      "regNo": "EOCNS/100/0093/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.923Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 362
+  },
+  {
+    "ref": "REF/EOCNS/QA/1363",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaauflhp5",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Augustina Ogochukwu Ilochi",
+      "regNo": "EOCNS/100/0091/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.925Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 363
+  },
+  {
+    "ref": "REF/EOCNS/QA/1364",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaauxf8d6",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Abigail Oka Ojong",
+      "regNo": "EOCNS/100/0094/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.926Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 364
+  },
+  {
+    "ref": "REF/EOCNS/QA/1365",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaauxt5rn",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chinaza Abigail Ugbo",
+      "regNo": "EOCNS/100/0092/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.927Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 365
+  },
+  {
+    "ref": "REF/EOCNS/QA/1366",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaav5o7sk",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Philomina Ola Akani",
+      "regNo": "EOCNS/100/0097/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.927Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 366
+  },
+  {
+    "ref": "REF/EOCNS/QA/1367",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaavdc84o",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chinenye Eunice Ocho",
+      "regNo": "EOCNS/100/0096/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.928Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 367
+  },
+  {
+    "ref": "REF/EOCNS/QA/1368",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaveguej",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ifunanya Gift Chukwu",
+      "regNo": "EOCNS/100/0095/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.929Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 368
+  },
+  {
+    "ref": "REF/EOCNS/QA/1369",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaawk8z1c",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chioma Godswill Chibueze",
+      "regNo": "EOCNS/100/0099/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.930Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 369
+  },
+  {
+    "ref": "REF/EOCNS/QA/1370",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaawl11uw",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Cordelia Mmesoma Nwabuisi",
+      "regNo": "EOCNS/100/0100/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.931Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 370
+  },
+  {
+    "ref": "REF/EOCNS/QA/1371",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaawy8mws",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chidiogo Caroline Ileagu",
+      "regNo": "EOCNS/100/0098/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.932Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 371
+  },
+  {
+    "ref": "REF/EOCNS/QA/1372",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaawyed1k",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ogechi Annastecia Orogwu",
+      "regNo": "EOCNS/100/0101/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.933Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 372
+  },
+  {
+    "ref": "REF/EOCNS/QA/1373",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaax30yfg",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Miracle Uchechukwu Asomba",
+      "regNo": "EOCNS/100/0103/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.934Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 373
+  },
+  {
+    "ref": "REF/EOCNS/QA/1374",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaxw62l1",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Anthonia Amaka Chukwu",
+      "regNo": "EOCNS/100/0102/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.936Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 374
+  },
+  {
+    "ref": "REF/EOCNS/QA/1375",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaxxf5n6",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chinenye Annastecia Okafor",
+      "regNo": "EOCNS/100/0104/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.937Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 375
+  },
+  {
+    "ref": "REF/EOCNS/QA/1376",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaayguiu9",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Blessing Chinasa Obayi",
+      "regNo": "EOCNS/100/0106/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.938Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 376
+  },
+  {
+    "ref": "REF/EOCNS/QA/1377",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaayhklpo",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Jane Chidimma Onwuka",
+      "regNo": "EOCNS/100/0107/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.939Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 377
+  },
+  {
+    "ref": "REF/EOCNS/QA/1378",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaaytllff",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Mmesoma Rubeka Nwogbu",
+      "regNo": "EOCNS/100/0105/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.940Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 378
+  },
+  {
+    "ref": "REF/EOCNS/QA/1379",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaazj4oes",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Salomie Kamsiyochukwu Ugwunta",
+      "regNo": "EOCNS/100/0108/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.941Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 379
+  },
+  {
+    "ref": "REF/EOCNS/QA/1380",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaazr0qhg",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Nkechinyere Ude Irem",
+      "regNo": "EOCNS/100/0110/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.942Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 380
+  },
+  {
+    "ref": "REF/EOCNS/QA/1381",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaazyao6w",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Peace Chisom Okolo",
+      "regNo": "EOCNS/100/0109/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.943Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 381
+  },
+  {
+    "ref": "REF/EOCNS/QA/1382",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab02akfw",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Precious Amarachi Oko-Uche",
+      "regNo": "EOCNS/100/0111/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.944Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 382
+  },
+  {
+    "ref": "REF/EOCNS/QA/1383",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab04sh6c",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Victory Chiamaka Ndubuisi",
+      "regNo": "EOCNS/100/0113/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.945Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 383
+  },
+  {
+    "ref": "REF/EOCNS/QA/1384",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab07v2ax",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chiamaka Jenny Israel",
+      "regNo": "EOCNS/100/0112/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.946Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 384
+  },
+  {
+    "ref": "REF/EOCNS/QA/1385",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab12j03u",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Favour Omobewaji Taiwo",
+      "regNo": "EOCNS/100/0115/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.946Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 385
+  },
+  {
+    "ref": "REF/EOCNS/QA/1386",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab12jees",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Destiny Ifeyinwa Nnamani",
+      "regNo": "EOCNS/100/0114/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.947Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 386
+  },
+  {
+    "ref": "REF/EOCNS/QA/1387",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab1yxkfm",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chidimma Precious Ntoka",
+      "regNo": "EOCNS/100/0116/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.948Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 387
+  },
+  {
+    "ref": "REF/EOCNS/QA/1388",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab2hakd3",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Victory Chidera Ndubueze",
+      "regNo": "EOCNS/100/0119/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.949Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 388
+  },
+  {
+    "ref": "REF/EOCNS/QA/1389",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab2jwynb",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chioma Pauline Anibueze",
+      "regNo": "EOCNS/100/0117/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.950Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 389
+  },
+  {
+    "ref": "REF/EOCNS/QA/1390",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab2n0aoy",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Pavelina Oluchukwu James",
+      "regNo": "EOCNS/100/0118/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.951Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 390
+  },
+  {
+    "ref": "REF/EOCNS/QA/1391",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab3ajpjt",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Somkene Abigail Amuzie",
+      "regNo": "EOCNS/100/0123/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.953Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 391
+  },
+  {
+    "ref": "REF/EOCNS/QA/1392",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab3k3j34",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chioma Francisca Oluga",
+      "regNo": "EOCNS/100/0122/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.955Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 392
+  },
+  {
+    "ref": "REF/EOCNS/QA/1393",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab3rouy0",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Noheemot Oluwafunmi Soneye",
+      "regNo": "EOCNS/100/0120/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.956Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 393
+  },
+  {
+    "ref": "REF/EOCNS/QA/1394",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab3w3waa",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ogechi Blessing Anyairo",
+      "regNo": "EOCNS/100/0121/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.957Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 394
+  },
+  {
+    "ref": "REF/EOCNS/QA/1395",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab4aj4lh",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Goodness Chinaecherem Anaeto",
+      "regNo": "EOCNS/100/0124/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.958Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 395
+  },
+  {
+    "ref": "REF/EOCNS/QA/1396",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab4oxrti",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Favour Nkeiruka Onah",
+      "regNo": "EOCNS/100/0125/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.959Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 396
+  },
+  {
+    "ref": "REF/EOCNS/QA/1397",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab4uz8jl",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Nnabuike Goodluck Ozokonkwo",
+      "regNo": "EOCNS/100/0126/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.960Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 397
+  },
+  {
+    "ref": "REF/EOCNS/QA/1398",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab4vhhhe",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chinecherem Alexandra Ma",
+      "regNo": "EOCNS/100/0127/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.961Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 398
+  },
+  {
+    "ref": "REF/EOCNS/QA/1399",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab5fiqe8",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Onyinyechi Mary Benjamin",
+      "regNo": "EOCNS/100/0130/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.962Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 399
+  },
+  {
+    "ref": "REF/EOCNS/QA/1400",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab5htzhe",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Kasarachi Rejoice Vincent",
+      "regNo": "EOCNS/100/0129/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.963Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 400
+  },
+  {
+    "ref": "REF/EOCNS/QA/1401",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab5o55or",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Lucy Chinenye Nwachukwu",
+      "regNo": "EOCNS/100/0128/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.964Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 401
+  },
+  {
+    "ref": "REF/EOCNS/QA/1402",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab60q534",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Tochukwu Salvation Ogba",
+      "regNo": "EOCNS/100/0132/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.965Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 402
+  },
+  {
+    "ref": "REF/EOCNS/QA/1403",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab6c3pjf",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Nelson Igwe Eleke",
+      "regNo": "EOCNS/100/0133/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.965Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 403
+  },
+  {
+    "ref": "REF/EOCNS/QA/1404",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab6wm6ts",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Great Chika Eze",
+      "regNo": "EOCNS/100/0134/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.966Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 404
+  },
+  {
+    "ref": "REF/EOCNS/QA/1405",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab6xa8mn",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Jennifer Chiamaka Nwufoh",
+      "regNo": "EOCNS/100/0131/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.967Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 405
+  },
+  {
+    "ref": "REF/EOCNS/QA/1406",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab73kdy5",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ugochi Miracle Celestine",
+      "regNo": "EOCNS/100/0136/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.968Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 406
+  },
+  {
+    "ref": "REF/EOCNS/QA/1407",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab7kc7w0",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ugonna Clara Simon",
+      "regNo": "EOCNS/100/0137/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.969Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 407
+  },
+  {
+    "ref": "REF/EOCNS/QA/1408",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab7s7wdx",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Blessing Ezinne Chukwu",
+      "regNo": "EOCNS/100/0135/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.975Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 408
+  },
+  {
+    "ref": "REF/EOCNS/QA/1409",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab8mqw2j",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Francisca Mmerichukwu Ofodile",
+      "regNo": "EOCNS/100/0140/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.976Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 409
+  },
+  {
+    "ref": "REF/EOCNS/QA/1410",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab8uogft",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Gloria Chidimma Ejimbe",
+      "regNo": "EOCNS/100/0139/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.977Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 410
+  },
+  {
+    "ref": "REF/EOCNS/QA/1411",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab8z9498",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Odinakachukwu Hannah Eze",
+      "regNo": "EOCNS/100/0138/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.978Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 411
+  },
+  {
+    "ref": "REF/EOCNS/QA/1412",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab9opq8f",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Rejoice Olamma Chika",
+      "regNo": "EOCNS/100/0141/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.978Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 412
+  },
+  {
+    "ref": "REF/EOCNS/QA/1413",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab9pzk7e",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Precious Chidimma Omenihu",
+      "regNo": "EOCNS/100/0143/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.979Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 413
+  },
+  {
+    "ref": "REF/EOCNS/QA/1414",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab9s0rkl",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chidera Precious Ome",
+      "regNo": "EOCNS/100/0144/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.980Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 414
+  },
+  {
+    "ref": "REF/EOCNS/QA/1415",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdab9wdjz3",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chidimma Mercy John",
+      "regNo": "EOCNS/100/0142/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.981Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 415
+  },
+  {
+    "ref": "REF/EOCNS/QA/1416",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaba6g3ed",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Clementina Chisom Opara",
+      "regNo": "EOCNS/100/0145/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.982Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 416
+  },
+  {
+    "ref": "REF/EOCNS/QA/1417",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabajuesb",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Oluebube Dominica Usulor",
+      "regNo": "EOCNS/100/0146/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.983Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 417
+  },
+  {
+    "ref": "REF/EOCNS/QA/1418",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabaxizdb",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Prisca Ulumma Oko",
+      "regNo": "EOCNS/100/0147/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.984Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 418
+  },
+  {
+    "ref": "REF/EOCNS/QA/1419",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabb17pqw",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chioma Jessica Ezumah",
+      "regNo": "EOCNS/100/0150/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.984Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 419
+  },
+  {
+    "ref": "REF/EOCNS/QA/1420",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabb1lw02",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Blessing Eje Obasi",
+      "regNo": "EOCNS/100/0148/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.986Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 420
+  },
+  {
+    "ref": "REF/EOCNS/QA/1421",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabbgmwwl",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Faith Chidera Idoko",
+      "regNo": "EOCNS/100/0151/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.988Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 421
+  },
+  {
+    "ref": "REF/EOCNS/QA/1422",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabbuj2p3",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Maureen Nmanna Oko",
+      "regNo": "EOCNS/100/0149/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.989Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 422
+  },
+  {
+    "ref": "REF/EOCNS/QA/1423",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabc9cwow",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Emmanuella Ebubechi Sunday",
+      "regNo": "EOCNS/100/0153/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.991Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 423
+  },
+  {
+    "ref": "REF/EOCNS/QA/1424",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabchrwnk",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chidera Gloria Enyigwe",
+      "regNo": "EOCNS/100/0152/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.992Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 424
+  },
+  {
+    "ref": "REF/EOCNS/QA/1425",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabcp3f50",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chukwuma Innocent Aghaegbuna",
+      "regNo": "EOCNS/100/0154/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.992Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 425
+  },
+  {
+    "ref": "REF/EOCNS/QA/1426",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabd7b7di",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Harmony Ginikanwa Nwaneri",
+      "regNo": "EOCNS/100/0156/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.993Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 426
+  },
+  {
+    "ref": "REF/EOCNS/QA/1427",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabda3vp6",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ogochukwu Kennedy Okafor",
+      "regNo": "EOCNS/100/0158/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.994Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 427
+  },
+  {
+    "ref": "REF/EOCNS/QA/1428",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabdnqymk",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Melody Chiamaka Ogeome",
+      "regNo": "EOCNS/100/0155/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.995Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 428
+  },
+  {
+    "ref": "REF/EOCNS/QA/1429",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabdpb2hr",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Lebechi Lilian Nwancho",
+      "regNo": "EOCNS/100/0157/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.996Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 429
+  },
+  {
+    "ref": "REF/EOCNS/QA/1430",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabeiydbi",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Joy Chioma Onwo",
+      "regNo": "EOCNS/100/0159/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.997Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 430
+  },
+  {
+    "ref": "REF/EOCNS/QA/1431",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabeprz2g",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Jacinta Chioma Igwe",
+      "regNo": "EOCNS/100/0161/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.997Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 431
+  },
+  {
+    "ref": "REF/EOCNS/QA/1432",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabeqky7n",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Confidence Ogba",
+      "regNo": "EOCNS/100/0160/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.999Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 432
+  },
+  {
+    "ref": "REF/EOCNS/QA/1433",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabf3f3cs",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Favour Chioma Nzewi",
+      "regNo": "EOCNS/100/0162/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:03.999Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 433
+  },
+  {
+    "ref": "REF/EOCNS/QA/1434",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabfdq2qd",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Oluebube Sharon Demian",
+      "regNo": "EOCNS/100/0163/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.000Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 434
+  },
+  {
+    "ref": "REF/EOCNS/QA/1435",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabg58m28",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Henry Chidera Igwe-Nomeh",
+      "regNo": "EOCNS/100/0165/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.001Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 435
+  },
+  {
+    "ref": "REF/EOCNS/QA/1436",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabgluihd",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Emmanuel Ugochukwu Ogbonna",
+      "regNo": "EOCNS/100/0166/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.002Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 436
+  },
+  {
+    "ref": "REF/EOCNS/QA/1437",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabgo6oap",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Emmanuella Chinyere Chukwunonyerem",
+      "regNo": "EOCNS/100/0164/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.004Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 437
+  },
+  {
+    "ref": "REF/EOCNS/QA/1438",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabh1po8o",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chinweotito Loveline Mbanuzo",
+      "regNo": "EOCNS/100/0167/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.005Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 438
+  },
+  {
+    "ref": "REF/EOCNS/QA/1439",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabhbp1c4",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Kosarachi Icha Ogeh",
+      "regNo": "EOCNS/100/0169/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.006Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 439
+  },
+  {
+    "ref": "REF/EOCNS/QA/1440",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabhzm309",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Divine Chinecherem Ignatius",
+      "regNo": "EOCNS/100/0168/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.007Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 440
+  },
+  {
+    "ref": "REF/EOCNS/QA/1441",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabi45wlk",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Linda Nkechinyere Okowkwo",
+      "regNo": "EOCNS/100/0170/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.008Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 441
+  },
+  {
+    "ref": "REF/EOCNS/QA/1442",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabias20w",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Amarachukwu Maryjane Chukwuemeka",
+      "regNo": "EOCNS/200/0001/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.009Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 442
+  },
+  {
+    "ref": "REF/EOCNS/QA/1443",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabiupi5l",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Euphemia Chisimdi Obinka",
+      "regNo": "EOCNS/200/0002/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.010Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 443
+  },
+  {
+    "ref": "REF/EOCNS/QA/1444",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabj8cez7",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chidera Helen Oko",
+      "regNo": "EOCNS/200/0003/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.011Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 444
+  },
+  {
+    "ref": "REF/EOCNS/QA/1445",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabjljsvp",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Lois Lala Peter",
+      "regNo": "EOCNS/200/0004/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.012Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 445
+  },
+  {
+    "ref": "REF/EOCNS/QA/1446",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabjq9jt2",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Gift Akor Eneh",
+      "regNo": "EOCNS/200/0005/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.013Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 446
+  },
+  {
+    "ref": "REF/EOCNS/QA/1447",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabkdzoy9",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Sandra Nneoma Okeh",
+      "regNo": "EOCNS/200/0008/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.014Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 447
+  },
+  {
+    "ref": "REF/EOCNS/QA/1448",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabkhoxpw",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Juliana Omasirichi Odum",
+      "regNo": "EOCNS/200/0007/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.015Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 448
+  },
+  {
+    "ref": "REF/EOCNS/QA/1449",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabkkl6ix",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Henrietta Ujunwa Ochigbo",
+      "regNo": "EOCNS/200/0006/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.016Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 449
+  },
+  {
+    "ref": "REF/EOCNS/QA/1450",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabl97udf",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Oluebube Daniella Duru",
+      "regNo": "EOCNS/200/0009/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.016Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 450
+  },
+  {
+    "ref": "REF/EOCNS/QA/1451",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdablacktb",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chidera Benedine Nwachukwu",
+      "regNo": "EOCNS/200/0012/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.017Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 451
+  },
+  {
+    "ref": "REF/EOCNS/QA/1452",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdablsqj6m",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ngozi Emeoha",
+      "regNo": "EOCNS/200/0011/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.018Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 452
+  },
+  {
+    "ref": "REF/EOCNS/QA/1453",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabluvyb1",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Kosisoachukwu Divinefavour Anusionwu",
+      "regNo": "EOCNS/200/0010/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.019Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 453
+  },
+  {
+    "ref": "REF/EOCNS/QA/1454",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabm3zt0w",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ozioma Lynda Onuwa",
+      "regNo": "EOCNS/200/0015/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.021Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 454
+  },
+  {
+    "ref": "REF/EOCNS/QA/1455",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabm72k46",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Gladys Nwamaka Igboke",
+      "regNo": "EOCNS/200/0013/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.021Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 455
+  },
+  {
+    "ref": "REF/EOCNS/QA/1456",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabmaeq2v",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Esther Chisom Ituma",
+      "regNo": "EOCNS/200/0014/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.023Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 456
+  },
+  {
+    "ref": "REF/EOCNS/QA/1457",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabngjsbq",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Promise Chinedum Ibe",
+      "regNo": "EOCNS/200/0016/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.023Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 457
+  },
+  {
+    "ref": "REF/EOCNS/QA/1458",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabnilbx5",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Odochi Ogbu Chukwu",
+      "regNo": "EOCNS/200/0019/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.024Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 458
+  },
+  {
+    "ref": "REF/EOCNS/QA/1459",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabnp2hbc",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Blessing Chinasa Stanley",
+      "regNo": "EOCNS/200/0018/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.025Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 459
+  },
+  {
+    "ref": "REF/EOCNS/QA/1460",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabntzq1i",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Miracle Nneoma Ekoyo",
+      "regNo": "EOCNS/200/0017/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.026Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 460
+  },
+  {
+    "ref": "REF/EOCNS/QA/1461",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabo7f8hf",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ifechukwu Marycynthia Okoye",
+      "regNo": "EOCNS/200/0021/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.027Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 461
+  },
+  {
+    "ref": "REF/EOCNS/QA/1462",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaboogeje",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chukwuebuka Kasie Okeke",
+      "regNo": "EOCNS/200/0022/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.028Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 462
+  },
+  {
+    "ref": "REF/EOCNS/QA/1463",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabovh8aw",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Miracle Chinedu Chika",
+      "regNo": "EOCNS/200/0020/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.029Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 463
+  },
+  {
+    "ref": "REF/EOCNS/QA/1464",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabp1iyns",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Promise Mmesoma Obiemenzie",
+      "regNo": "EOCNS/200/0025/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.029Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 464
+  },
+  {
+    "ref": "REF/EOCNS/QA/1465",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabpes46t",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Annabel Kosarachi Aliozor",
+      "regNo": "EOCNS/200/0024/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.030Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 465
+  },
+  {
+    "ref": "REF/EOCNS/QA/1466",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabpift1q",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Fortunate Nnabuchi Nwani",
+      "regNo": "EOCNS/200/0023/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.031Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 466
+  },
+  {
+    "ref": "REF/EOCNS/QA/1467",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabpnfnf3",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Precious Ogayi Onah",
+      "regNo": "EOCNS/200/0026/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.032Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 467
+  },
+  {
+    "ref": "REF/EOCNS/QA/1468",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabq42zui",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Peace Chinemerem Anaga",
+      "regNo": "EOCNS/200/0028/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.033Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 468
+  },
+  {
+    "ref": "REF/EOCNS/QA/1469",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabq5ugyk",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Daberechi Rebecca Okoroafor",
+      "regNo": "EOCNS/200/0027/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.034Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 469
+  },
+  {
+    "ref": "REF/EOCNS/QA/1470",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabqip4yh",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Esther Joy Chibueze",
+      "regNo": "EOCNS/200/0029/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.035Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 470
+  },
+  {
+    "ref": "REF/EOCNS/QA/1471",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabr5dtxt",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Favour Chidera Chibueze",
+      "regNo": "EOCNS/200/0030/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.036Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 471
+  },
+  {
+    "ref": "REF/EOCNS/QA/1472",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabr7iil1",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chidera Princess Nwachukwu",
+      "regNo": "EOCNS/200/0032/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.037Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 472
+  },
+  {
+    "ref": "REF/EOCNS/QA/1473",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabryrhhw",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Onyinyechi Annastecia Chilaka",
+      "regNo": "EOCNS/200/0031/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.038Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 473
+  },
+  {
+    "ref": "REF/EOCNS/QA/1474",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabs2bi71",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Blessing Chinenye Kelechi",
+      "regNo": "EOCNS/200/0035/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.039Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 474
+  },
+  {
+    "ref": "REF/EOCNS/QA/1475",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabs6by2r",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "David Ugwechi Uchendu",
+      "regNo": "EOCNS/200/0034/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.040Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 475
+  },
+  {
+    "ref": "REF/EOCNS/QA/1476",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabsiou7i",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Divinepeace Umeh",
+      "regNo": "EOCNS/200/0033/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.041Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 476
+  },
+  {
+    "ref": "REF/EOCNS/QA/1477",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabtsm9vb",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chinyere Precious Ezugwu",
+      "regNo": "EOCNS/200/0036/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.042Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 477
+  },
+  {
+    "ref": "REF/EOCNS/QA/1478",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabtu7vjz",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Onyinyechi Miracle Igwilo",
+      "regNo": "EOCNS/200/0037/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.043Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 478
+  },
+  {
+    "ref": "REF/EOCNS/QA/1479",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabtysak8",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Miracle Chinonyerem Uzobuonyi",
+      "regNo": "EOCNS/200/0038/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.043Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 479
+  },
+  {
+    "ref": "REF/EOCNS/QA/1480",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabu520vp",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Stephanie Oluebube Nwankwo",
+      "regNo": "EOCNS/200/0039/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.044Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 480
+  },
+  {
+    "ref": "REF/EOCNS/QA/1481",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabu8jp1x",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Mary FearGod Ituma",
+      "regNo": "EOCNS/200/0041/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.045Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 481
+  },
+  {
+    "ref": "REF/EOCNS/QA/1482",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabuiggno",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Blessing Marycynthia Nwoye",
+      "regNo": "EOCNS/200/0040/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.046Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 482
+  },
+  {
+    "ref": "REF/EOCNS/QA/1483",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabvj4tm1",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Goodluck Chimamanda Chijioke",
+      "regNo": "EOCNS/200/0043/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.047Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 483
+  },
+  {
+    "ref": "REF/EOCNS/QA/1484",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabvnn45y",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Amarachi Josephine Alo-Onyebuchi",
+      "regNo": "EOCNS/200/0044/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.048Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 484
+  },
+  {
+    "ref": "REF/EOCNS/QA/1485",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabvvbjv6",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Benedicta Okpor Ogeh",
+      "regNo": "EOCNS/200/0042/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.049Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 485
+  },
+  {
+    "ref": "REF/EOCNS/QA/1486",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabwbbt2j",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Kelechi Glory Simon",
+      "regNo": "EOCNS/200/0046/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.049Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 486
+  },
+  {
+    "ref": "REF/EOCNS/QA/1487",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabwqhal2",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Oghenekome Christiana Idoro",
+      "regNo": "EOCNS/200/0045/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.050Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 487
+  },
+  {
+    "ref": "REF/EOCNS/QA/1488",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabwyah7c",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Victor Ifeanyichukwu Eke",
+      "regNo": "EOCNS/200/0047/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.051Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 488
+  },
+  {
+    "ref": "REF/EOCNS/QA/1489",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabx7nf4i",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Paschaline Onyinyechi Nnaji",
+      "regNo": "EOCNS/200/0049/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.052Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 489
+  },
+  {
+    "ref": "REF/EOCNS/QA/1490",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabx89uqb",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Fortunate Ogba Omeh",
+      "regNo": "EOCNS/200/0050/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.053Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 490
+  },
+  {
+    "ref": "REF/EOCNS/QA/1491",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabxu2y8q",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Silvalyne Chidera Ugorji",
+      "regNo": "EOCNS/200/0048/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.055Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 491
+  },
+  {
+    "ref": "REF/EOCNS/QA/1492",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaby8jd5d",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Marycynthia Mmesoma Umenwaka",
+      "regNo": "EOCNS/200/0052/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.056Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 492
+  },
+  {
+    "ref": "REF/EOCNS/QA/1493",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabyffbdm",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Blessing Ngozi Okpara",
+      "regNo": "EOCNS/200/0053/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.057Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 493
+  },
+  {
+    "ref": "REF/EOCNS/QA/1494",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabynisxx",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Munachimso Precious Ezekiel",
+      "regNo": "EOCNS/200/0051/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.057Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 494
+  },
+  {
+    "ref": "REF/EOCNS/QA/1495",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabz6ox9l",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Victory Orie Ukaegbu",
+      "regNo": "EOCNS/200/0055/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.058Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 495
+  },
+  {
+    "ref": "REF/EOCNS/QA/1496",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabzpg49w",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Faith Ossai",
+      "regNo": "EOCNS/200/0054/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.059Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 496
+  },
+  {
+    "ref": "REF/EOCNS/QA/1497",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabzwl7yf",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Joycey Munachimso Okechukwu",
+      "regNo": "EOCNS/200/0056/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.060Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 497
+  },
+  {
+    "ref": "REF/EOCNS/QA/1498",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdabzzxhxr",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Treasure Chimara Ekene",
+      "regNo": "EOCNS/200/0057/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.061Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 498
+  },
+  {
+    "ref": "REF/EOCNS/QA/1499",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac0bq006",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Orie Ajaude",
+      "regNo": "EOCNS/200/0059/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.062Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 499
+  },
+  {
+    "ref": "REF/EOCNS/QA/1500",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac0dm6x2",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Favour Ifunanya Ozioko",
+      "regNo": "EOCNS/200/0060/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.063Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 500
+  },
+  {
+    "ref": "REF/EOCNS/QA/1501",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac0k44d7",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chukwudumebi Daniella Okafor",
+      "regNo": "EOCNS/200/0058/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.064Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 501
+  },
+  {
+    "ref": "REF/EOCNS/QA/1502",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac0p3pzb",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Thelma Dumebi Ugwumba",
+      "regNo": "EOCNS/200/0061/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.065Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 502
+  },
+  {
+    "ref": "REF/EOCNS/QA/1503",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac118dhw",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Israel Akachukwu Prince Martins",
+      "regNo": "EOCNS/200/0062/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.066Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 503
+  },
+  {
+    "ref": "REF/EOCNS/QA/1504",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac17g3cw",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chiemerie Jovita Enem",
+      "regNo": "EOCNS/200/0064/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.066Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 504
+  },
+  {
+    "ref": "REF/EOCNS/QA/1505",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac1h7h7t",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Loveth Sopuruchukwu Okolo",
+      "regNo": "EOCNS/200/0063/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.067Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 505
+  },
+  {
+    "ref": "REF/EOCNS/QA/1506",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac2amsz8",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Onyinye Favour Egeonu",
+      "regNo": "EOCNS/200/0065/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.068Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 506
+  },
+  {
+    "ref": "REF/EOCNS/QA/1507",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac2cu4wy",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Favour Chiamaka Nwaorgu",
+      "regNo": "EOCNS/200/0067/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.069Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 507
+  },
+  {
+    "ref": "REF/EOCNS/QA/1508",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac2x13r2",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chinemerem Benjamin Ajaegbu",
+      "regNo": "EOCNS/200/0068/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.070Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 508
+  },
+  {
+    "ref": "REF/EOCNS/QA/1509",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac2xmsgq",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Marvellous Chimdumeji Ikpor",
+      "regNo": "EOCNS/200/0066/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.071Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 509
+  },
+  {
+    "ref": "REF/EOCNS/QA/1510",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac373w5t",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Favour Adamma Eni",
+      "regNo": "EOCNS/200/0069/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.072Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 510
+  },
+  {
+    "ref": "REF/EOCNS/QA/1511",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac3908rt",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ifesinachi Juliet Barnabas",
+      "regNo": "EOCNS/200/0071/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.073Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 511
+  },
+  {
+    "ref": "REF/EOCNS/QA/1512",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac3obr35",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Chison Francisca Chikwendu",
+      "regNo": "EOCNS/200/0070/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.074Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 512
+  },
+  {
+    "ref": "REF/EOCNS/QA/1513",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac45sn27",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Happiness Ifeoma Chima",
+      "regNo": "EOCNS/200/0074/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.075Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 513
+  },
+  {
+    "ref": "REF/EOCNS/QA/1514",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac4u7jvp",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Wonderful Nmesoma Vasco",
+      "regNo": "EOCNS/200/0072/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.075Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 514
+  },
+  {
+    "ref": "REF/EOCNS/QA/1515",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac4ujywv",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Rosemary Ngozi Ayogu",
+      "regNo": "EOCNS/200/0073/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.076Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 515
+  },
+  {
+    "ref": "REF/EOCNS/QA/1516",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac4yt7re",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Joseph Chiedozi Igwe-Nomeh",
+      "regNo": "EOCNS/200/0075/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.077Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 516
+  },
+  {
+    "ref": "REF/EOCNS/QA/1517",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac516ecw",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Angela Chisom Chinenye",
+      "regNo": "EOCNS/200/0078/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.078Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 517
+  },
+  {
+    "ref": "REF/EOCNS/QA/1518",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac58ux0n",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Lucy Kosirisoichi Nnabugo",
+      "regNo": "EOCNS/200/0077/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.079Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 518
+  },
+  {
+    "ref": "REF/EOCNS/QA/1519",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac5bn0i4",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Mary Anya Agwu",
+      "regNo": "EOCNS/200/0079/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.080Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 519
+  },
+  {
+    "ref": "REF/EOCNS/QA/1520",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac5jpjbo",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Rosemary Chinazaakpere Okoye",
+      "regNo": "EOCNS/200/0076/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.129Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 520
+  },
+  {
+    "ref": "REF/EOCNS/QA/1521",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac60v8ib",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Emmanuel Onyedikachi Amakaeze",
+      "regNo": "EOCNS/200/0082/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.131Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 521
+  },
+  {
+    "ref": "REF/EOCNS/QA/1522",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac6f58qd",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Jennifer Tobechi Okoro",
+      "regNo": "EOCNS/200/0081/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.132Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 522
+  },
+  {
+    "ref": "REF/EOCNS/QA/1523",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac6zns7o",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Ijeoma Gift Njoku",
+      "regNo": "EOCNS/200/0080/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.132Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 523
+  },
+  {
+    "ref": "REF/EOCNS/QA/1524",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac7fwfue",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Emmanuel Ituma",
+      "regNo": "EOCNS/200/0085/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.133Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 524
+  },
+  {
+    "ref": "REF/EOCNS/QA/1525",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac7o0la9",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "David Ognugua Okoro",
+      "regNo": "EOCNS/200/0084/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.134Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 525
+  },
+  {
+    "ref": "REF/EOCNS/QA/1526",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac7war2z",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Hannah Nwanyioma Nwibo",
+      "regNo": "EOCNS/200/0083/GNS"
+    },
+    "timestamp": "2026-10-30T09:15:04.135Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 526
+  },
+  {
+    "ref": "REF/EOCNS/QA/1527",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacjgg19i",
+    "reason": "Removed from active group (status Inactive)",
+    "details": {
+      "name": "Angela Ezinne Igwe",
+      "regNo": "EOCNS/200/0038/MID"
+    },
+    "timestamp": "2026-10-30T09:15:04.136Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 527
+  },
+  {
+    "ref": "REF/EOCNS/QA/0001",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzda9y8p6nd",
+    "reason": "Bulk removal from master list due to update of student data (bulk)",
+    "details": {
+      "name": "Divine Chinecherem Adoke",
+      "regNo": "EOCNS/100/0001/GNS"
+    },
+    "timestamp": "2026-10-30T09:27:38.514Z",
+    "user": "QA Officer",
+    "source": "official-letter",
+    "id": 528
   }
 ]
