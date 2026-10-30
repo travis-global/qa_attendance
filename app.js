@@ -1307,15 +1307,26 @@ openDB().then(async () => {
   document.getElementById("btnRefreshPending")?.addEventListener("click", function() { renderPendingRegistrations({ fromRepo: true }); });
   document.getElementById("btnClosePendingReview")?.addEventListener("click", closePendingReview);
   document.getElementById("pendingReviewBackdrop")?.addEventListener("click", closePendingReview);
-  document.getElementById("btnPendingApprove")?.addEventListener("click", function() { approvePendingStudent(); });
-  document.getElementById("btnPendingReject")?.addEventListener("click", function() { rejectPendingStudent(window.__pendingReviewId); });
-
-  window.rejectPendingStudent = rejectPendingStudent;
-  window.confirmRejectPendingStudent = confirmRejectPendingStudent;
-  document.getElementById("btnConfirmPendingReject")?.addEventListener("click", function() { confirmRejectPendingStudent(); });
-  document.getElementById("btnCancelPendingReject")?.addEventListener("click", closePendingRejectModal);
-  document.getElementById("btnClosePendingRejectModal")?.addEventListener("click", closePendingRejectModal);
-  document.getElementById("pendingRejectBackdrop")?.addEventListener("click", closePendingRejectModal);
+  document.getElementById("btnPendingApprove")?.addEventListener("click", function() {
+    if (typeof window.approvePendingStudent === "function") window.approvePendingStudent(window.__pendingReviewId);
+    else alert("Approve is not ready yet. Hard-refresh the page.");
+  });
+  document.getElementById("btnPendingReject")?.addEventListener("click", function() {
+    if (typeof window.rejectPendingStudent === "function") window.rejectPendingStudent(window.__pendingReviewId);
+    else alert("Reject is not ready yet. Hard-refresh the page.");
+  });
+  document.getElementById("btnConfirmPendingReject")?.addEventListener("click", function() {
+    if (typeof window.confirmRejectPendingStudent === "function") window.confirmRejectPendingStudent();
+  });
+  document.getElementById("btnCancelPendingReject")?.addEventListener("click", function() {
+    if (typeof window.closePendingRejectModal === "function") window.closePendingRejectModal();
+  });
+  document.getElementById("btnClosePendingRejectModal")?.addEventListener("click", function() {
+    if (typeof window.closePendingRejectModal === "function") window.closePendingRejectModal();
+  });
+  document.getElementById("pendingRejectBackdrop")?.addEventListener("click", function() {
+    if (typeof window.closePendingRejectModal === "function") window.closePendingRejectModal();
+  });
 
 
 
@@ -8214,5 +8225,270 @@ window.approvePendingStudent = approvePendingStudent;
 window.confirmRejectPendingStudent = confirmRejectPendingStudent;
 window.renderPendingRegistrations = renderPendingRegistrations;
 window.publishPendingListToRepo = publishPendingListToRepo;
+
+
+// ===== TOP-LEVEL pending registration API (must stay at IIFE root) =====
+async function removePendingRecordCompletely(id) {
+  if (!id) return;
+  try { await del("pending_students", id); } catch (_) {}
+  try {
+    var left = await getAll("pending_students");
+    for (var i = 0; i < left.length; i++) {
+      if (left[i] && left[i].id === id) {
+        try { await del("pending_students", id); } catch (_) {}
+      }
+    }
+  } catch (_) {}
+}
+
+async function publishPendingListToRepo(message) {
+  var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
+  var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
+  if (!workerUrl) throw new Error("publishWorkerUrl missing in config");
+  var list = await getAll("pending_students");
+  list = (list || []).filter(function(p) { return p && p.id; });
+  var files = {};
+  files[DATA_FILES.pending_students] = JSON.stringify(list, null, 2);
+  var headers = { "Content-Type": "application/json" };
+  if (key) headers["X-EOCNS-Key"] = key;
+  var res = await fetch(workerUrl.replace(/\/$/, ""), {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify({ action: "publish", publishKey: key, message: message || "Update pending student registrations", files: files })
+  });
+  var body = {};
+  try { body = await res.json(); } catch (_) {}
+  if (!res.ok) throw new Error(body.error || ("Worker HTTP " + res.status));
+  return body;
+}
+
+async function refreshPendingFromRepo() {
+  try {
+    var list = await fetchRepoJson(DATA_FILES.pending_students + "?t=" + Date.now());
+    if (!Array.isArray(list)) list = [];
+    var existing = await getAll("pending_students");
+    for (var i = 0; i < existing.length; i++) {
+      try { await del("pending_students", existing[i].id); } catch (_) {}
+    }
+    for (var j = 0; j < list.length; j++) {
+      try { await put("pending_students", list[j]); } catch (_) {}
+    }
+    return list;
+  } catch (err) {
+    console.warn("pending hydrate", err);
+    return getAll("pending_students");
+  }
+}
+
+async function renderPendingRegistrations(opts) {
+  opts = opts || {};
+  var tbody = document.getElementById("pendingTableBody");
+  if (!tbody) return;
+  if (!isQaOfficer()) {
+    tbody.innerHTML = "<tr><td colspan=\"7\">Sign in as QA Officer to review student self-registrations.</td></tr>";
+    return;
+  }
+  if (opts.fromRepo) {
+    try { await refreshPendingFromRepo(); } catch (err) { console.warn(err); }
+  }
+  var list = (await getAll("pending_students") || []).filter(function(p) {
+    return p && p.id && (!p.status || p.status === "pending");
+  });
+  list.sort(function(a, b) { return String(b.submittedAt || "").localeCompare(String(a.submittedAt || "")); });
+  var count = document.getElementById("pendingCount");
+  if (count) count.textContent = list.length + " pending";
+  if (!list.length) {
+    tbody.innerHTML = "<tr><td colspan=\"7\">No pending registrations. Share: <code>register.html</code></td></tr>";
+    return;
+  }
+  tbody.innerHTML = list.map(function(p) {
+    var thumb = p.photoDataUrl
+      ? '<img src="' + p.photoDataUrl + '" alt="" style="width:40px;height:50px;object-fit:cover;border-radius:4px;border:1px solid #cbd5e1" />'
+      : "—";
+    return "<tr><td>" + thumb + "</td><td>" + escapeHtml(p.name || "") + "</td><td>" + escapeHtml(p.regNo || "") +
+      "</td><td>" + escapeHtml(p.programme || "") + " / " + escapeHtml(String(p.level || "")) +
+      "</td><td>" + escapeHtml(p.email || "") + "</td><td>" + escapeHtml((p.submittedAt || "").slice(0, 16).replace("T", " ")) +
+      '</td><td class="qa-edit-only">' +
+      '<button type="button" class="icon-btn-sm" data-pend-view="' + p.id + '">Review</button> ' +
+      '<button type="button" class="icon-btn-sm" data-pend-ok="' + p.id + '">Approve</button> ' +
+      '<button type="button" class="icon-btn-sm" data-pend-no="' + p.id + '">Reject</button></td></tr>';
+  }).join("");
+  tbody.querySelectorAll("[data-pend-view]").forEach(function(btn) {
+    btn.addEventListener("click", function() { window.openPendingReview(btn.getAttribute("data-pend-view")); });
+  });
+  tbody.querySelectorAll("[data-pend-ok]").forEach(function(btn) {
+    btn.addEventListener("click", function() { window.approvePendingStudent(btn.getAttribute("data-pend-ok")); });
+  });
+  tbody.querySelectorAll("[data-pend-no]").forEach(function(btn) {
+    btn.addEventListener("click", function() { window.rejectPendingStudent(btn.getAttribute("data-pend-no")); });
+  });
+}
+
+async function openPendingReview(id) {
+  var list = await getAll("pending_students");
+  var p = list.find(function(x) { return x.id === id; });
+  if (!p) return;
+  window.__pendingReviewId = id;
+  window.__pendingRejectId = id;
+  var photo = p.photoDataUrl ? '<div class="passport-frame"><img src="' + p.photoDataUrl + '" alt="" /></div>' : "";
+  var body = document.getElementById("pendingReviewBody");
+  if (body) {
+    body.innerHTML = '<div class="profile-layout">' + photo + '<div class="profile-meta">' +
+      "<p><strong>" + escapeHtml(p.name) + "</strong></p>" +
+      "<p>Reg: " + escapeHtml(p.regNo || "—") + "</p>" +
+      "<p>Email: " + escapeHtml(p.email || "—") + "</p>" +
+      "<p>" + escapeHtml(p.programme || "") + " · Level " + escapeHtml(String(p.level || "")) + "</p>" +
+      "<p>Gender: " + escapeHtml(p.gender || "—") + " · Phone: " + escapeHtml(p.phone || "—") + "</p>" +
+      "<p>Hostel: " + escapeHtml(p.hostel || "—") + "</p></div></div>";
+  }
+  var m = document.getElementById("pendingReviewModal");
+  if (m) { m.hidden = false; m.removeAttribute("hidden"); m.style.display = ""; }
+}
+
+function closePendingReview() {
+  var m = document.getElementById("pendingReviewModal");
+  if (!m) return;
+  m.hidden = true; m.setAttribute("hidden", ""); m.style.display = "none";
+}
+
+function closePendingRejectModal() {
+  var m = document.getElementById("pendingRejectModal");
+  if (!m) return;
+  m.hidden = true; m.setAttribute("hidden", ""); m.style.display = "none";
+}
+
+async function rejectPendingStudent(id) {
+  try {
+    if (!isQaOfficer()) { alert("Sign in as QA Officer under Settings before rejecting."); return; }
+    id = id || window.__pendingReviewId || window.__pendingRejectId;
+    if (!id) { alert("No pending registration selected."); return; }
+    window.__pendingRejectId = id;
+    var list = await getAll("pending_students");
+    var p = list.find(function(x) { return x.id === id; });
+    if (!p) {
+      alert("Submission not found. Refreshing list…");
+      await renderPendingRegistrations({ fromRepo: false });
+      return;
+    }
+    var sum = document.getElementById("pendingRejectSummary");
+    if (sum) sum.textContent = (p.name || "Applicant") + " · " + (p.regNo || "") + " · " + (p.email || "");
+    var reasonEl = document.getElementById("pendingRejectReason");
+    if (reasonEl) reasonEl.value = "Passport photo or details need correction. Applicant may resubmit via the registration page.";
+    var pinEl = document.getElementById("pendingRejectPin");
+    if (pinEl) pinEl.value = "";
+    var m = document.getElementById("pendingRejectModal");
+    if (m) { m.hidden = false; m.removeAttribute("hidden"); m.style.display = ""; }
+    else await confirmRejectPendingStudent(id, null, null);
+  } catch (err) {
+    console.error(err);
+    alert("Could not open reject dialog: " + (err.message || String(err)));
+  }
+}
+
+async function confirmRejectPendingStudent(forcedId, forcedReason, forcedPin) {
+  try {
+    if (!isQaOfficer()) { alert("Sign in as QA Officer first."); return; }
+    var id = forcedId || window.__pendingRejectId || window.__pendingReviewId;
+    if (!id) { alert("No submission selected."); return; }
+    var reason = forcedReason != null ? forcedReason : ((document.getElementById("pendingRejectReason") && document.getElementById("pendingRejectReason").value) || "").trim();
+    if (!reason) { alert("A reason is required."); return; }
+    var pin = forcedPin != null ? forcedPin : ((document.getElementById("pendingRejectPin") && document.getElementById("pendingRejectPin").value) || "").trim();
+    if (!pin) { alert("Officer PIN is required."); return; }
+    if (String(pin).trim() !== String((APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA").trim()) {
+      alert("Incorrect PIN. Submission was not rejected.");
+      return;
+    }
+    var list = await getAll("pending_students");
+    var p = list.find(function(x) { return x.id === id; });
+    if (!p) {
+      alert("Submission not found (already removed?).");
+      closePendingRejectModal();
+      await renderPendingRegistrations({ fromRepo: false });
+      return;
+    }
+    await removePendingRecordCompletely(id);
+    try {
+      await writeAudit({
+        action: "delete", entity: "pending_students", entityId: id,
+        reason: "Rejected self-registration: " + reason,
+        details: { email: p.email, regNo: p.regNo, name: p.name, notify: "manual_only" }
+      });
+    } catch (_) {}
+    markDirty("pending reject");
+    closePendingRejectModal();
+    closePendingReview();
+    await renderPendingRegistrations({ fromRepo: false });
+    try {
+      await publishPendingListToRepo("Reject " + (p.regNo || id) + " — remove from pending list");
+      alert("Rejected and removed from the pending list (synced).");
+    } catch (err) {
+      alert("Removed locally, but repository sync failed:\n" + (err.message || err) + "\nPublish from Settings when you can.");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Reject failed: " + (err.message || String(err)));
+  }
+}
+
+async function approvePendingStudent(id) {
+  try {
+    if (!isQaOfficer()) { alert("Sign in as QA Officer first."); return; }
+    id = id || window.__pendingReviewId;
+    if (!id) { alert("No registration selected."); return; }
+    var pin = prompt("Enter officer PIN to approve this registration onto the master list:");
+    if (pin == null) return;
+    if (String(pin).trim() !== String((APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA").trim()) {
+      alert("Incorrect PIN. Not approved.");
+      return;
+    }
+    var list = await getAll("pending_students");
+    var p = list.find(function(x) { return x.id === id; });
+    if (!p) { alert("Submission not found."); await renderPendingRegistrations(); return; }
+    var students = await getAll("students");
+    if (students.some(function(s) { return s.regNo && p.regNo && String(s.regNo).toLowerCase() === String(p.regNo).toLowerCase(); })) {
+      alert("Reg. No already exists on master list.");
+      return;
+    }
+    var now = new Date().toISOString();
+    var student = {
+      id: generateId("stu"), name: p.name, regNo: p.regNo, programme: p.programme, level: p.level,
+      gender: p.gender || "", phone: p.phone || "", hostel: p.hostel || "", photoDataUrl: p.photoDataUrl || "",
+      status: "Active", email: p.email || "", createdAt: now, updatedAt: now, source: "self_registration", pendingId: p.id
+    };
+    if (student.photoDataUrl) student.photoUpdatedAt = now;
+    await put("students", student);
+    await removePendingRecordCompletely(id);
+    await writeAudit({
+      action: "create", entity: "students", entityId: student.id,
+      reason: "Approved self-registration " + (p.regNo || ""),
+      details: { pendingId: id, email: p.email }
+    });
+    markDirty("pending approve");
+    closePendingReview();
+    await renderPendingRegistrations({ fromRepo: false });
+    try { await renderStudentsTable(); } catch (_) {}
+    try {
+      await publishPendingListToRepo("Approve " + (p.regNo || id) + " — remove from pending list");
+    } catch (err) {
+      alert("Approved and removed locally, but pending list could not sync:\n" + (err.message || err));
+      return;
+    }
+    alert("Approved onto the master list and removed from pending (synced). Publish full data when ready for students.json.");
+  } catch (err) {
+    console.error(err);
+    alert("Approve failed: " + (err.message || String(err)));
+  }
+}
+
+window.removePendingRecordCompletely = removePendingRecordCompletely;
+window.publishPendingListToRepo = publishPendingListToRepo;
+window.refreshPendingFromRepo = refreshPendingFromRepo;
+window.renderPendingRegistrations = renderPendingRegistrations;
+window.openPendingReview = openPendingReview;
+window.closePendingReview = closePendingReview;
+window.closePendingRejectModal = closePendingRejectModal;
+window.rejectPendingStudent = rejectPendingStudent;
+window.confirmRejectPendingStudent = confirmRejectPendingStudent;
+window.approvePendingStudent = approvePendingStudent;
 
 })();
