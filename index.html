@@ -30,6 +30,7 @@
         <div class="nav-section">
           <p class="nav-section__label">Core Systems</p>
           <a href="#" class="nav-item" data-view="students">Students</a>
+          <a href="#" class="nav-item" data-view="pending">Pending registrations</a>
           <a href="#" class="nav-item" data-view="lecturers">Lecturers</a>
           <a href="#" class="nav-item" data-view="hostel">Hostel</a>
           <a href="#" class="nav-item" data-view="discipline">Discipline</a>
@@ -153,6 +154,27 @@
             </div>
           </div>
           <p class="muted-note">Disciplinary records are officer-only to create or edit. Viewers see a restricted message. Always use official REF.</p>
+        </section>
+
+        
+        <section class="view" id="view-pending">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Students submit via <a href="register.html" target="_blank" rel="noopener">register.html</a>. Review photos carefully before approving.</p>
+            </div>
+            <div class="page-toolbar__right">
+              <span class="count-pill" id="pendingCount">0 pending</span>
+              <button type="button" class="btn btn--ghost qa-edit-only" id="btnRefreshPending">Refresh from repo</button>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Photo</th><th>Name</th><th>Reg. No</th><th>Programme / Level</th><th>Email</th><th>Submitted</th><th class="qa-edit-only"></th></tr></thead>
+                <tbody id="pendingTableBody"></tbody>
+              </table>
+            </div>
+          </div>
         </section>
 
         <section class="view" id="view-students">
@@ -1070,8 +1092,21 @@
     </div>
   </div>
 
+  
+  <div class="modal" id="pendingReviewModal" hidden>
+    <div class="modal__backdrop" id="pendingReviewBackdrop"></div>
+    <div class="modal__dialog" style="max-width:640px">
+      <div class="modal__header"><h3>Review registration</h3><button type="button" class="icon-btn" id="btnClosePendingReview">&times;</button></div>
+      <div class="modal__body" id="pendingReviewBody"></div>
+      <div class="modal__footer qa-edit-only">
+        <button type="button" class="btn btn--ghost" id="btnPendingReject">Reject…</button>
+        <button type="button" class="btn btn--primary" id="btnPendingApprove">Approve to master list</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=37"></script>
+  <script src="app.js?v=38"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EOCNS Student Registration</title>
+  <link rel="icon" href="https://www.easternoak.org/images/Eastern-OAK-logo-201.png" />
+  <style>
+    :root { --teal:#0d9488; --navy:#0f172a; --muted:#64748b; --bg:#f1f5f9; --card:#fff; --err:#b91c1c; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, sans-serif; background: var(--bg); color: var(--navy); }
+    .wrap { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
+    header { text-align: center; margin-bottom: 24px; }
+    header img { width: 72px; height: 72px; object-fit: contain; }
+    h1 { font-size: 1.35rem; margin: 12px 0 6px; }
+    .sub { color: var(--muted); font-size: 0.92rem; line-height: 1.45; }
+    .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 24px rgba(15,23,42,.06); border: 1px solid #e2e8f0; }
+    label { display:block; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 12px 0 6px; }
+    input, select { width: 100%; padding: 11px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; }
+    input:focus, select:focus { outline: 2px solid rgba(13,148,136,.35); border-color: var(--teal); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width:560px) { .row { grid-template-columns: 1fr; } }
+    .photo { display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+    .frame { width: 100px; height: 125px; border-radius: 8px; border: 2px solid var(--teal); background: #e2e8f0; overflow:hidden; display:flex; align-items:center; justify-content:center; font-weight:700; color: var(--teal); }
+    .frame img { width:100%; height:100%; object-fit: cover; }
+    button { margin-top: 18px; width: 100%; padding: 14px; border:0; border-radius: 10px; background: var(--teal); color: #fff; font-weight: 600; font-size: 1rem; cursor: pointer; }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .note { font-size: 0.85rem; color: var(--muted); margin-top: 10px; line-height: 1.4; }
+    .msg { margin-top: 14px; padding: 12px; border-radius: 8px; font-size: 0.92rem; display:none; }
+    .msg.ok { display:block; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+    .msg.err { display:block; background: #fef2f2; color: var(--err); border: 1px solid #fecaca; }
+    .hp { position:absolute; left:-9999px; opacity:0; height:0; width:0; }
+    a.back { display:inline-block; margin-top: 16px; color: var(--teal); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img src="https://www.easternoak.org/images/Eastern-OAK-logo-201.png" alt="EOCNS" />
+      <h1>Student self-registration</h1>
+      <p class="sub">Eastern Oak College of Nursing Sciences<br/>Submit your details for QA / Student Affairs review. Approved records are added to the official master list — submissions are <strong>not</strong> live until approved.</p>
+    </header>
+    <form class="card" id="regForm">
+      <input class="hp" type="text" name="company" id="hpCompany" tabindex="-1" autocomplete="off" />
+      <label>Full name *</label>
+      <input id="name" required placeholder="As on official documents" />
+      <label>Email *</label>
+      <input id="email" type="email" required placeholder="For review notifications" />
+      <label>Registration number *</label>
+      <input id="regNo" required placeholder="Must be unique" />
+      <div class="row">
+        <div>
+          <label>Programme *</label>
+          <select id="programme" required>
+            <option value="">— Select —</option>
+            <option>Nursing</option>
+            <option>Midwifery</option>
+          </select>
+        </div>
+        <div>
+          <label>Level *</label>
+          <select id="level" required>
+            <option value="">—</option>
+            <option>100</option>
+            <option>200</option>
+            <option>300</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Gender</label>
+          <select id="gender"><option value="">—</option><option>Female</option><option>Male</option></select>
+        </div>
+        <div>
+          <label>Phone</label>
+          <input id="phone" type="tel" />
+        </div>
+      </div>
+      <label>Hostel</label>
+      <select id="hostel">
+        <option value="">— Not set —</option>
+        <option>Hostel 1</option>
+        <option>Hostel 2</option>
+        <option>Off-campus</option>
+      </select>
+      <label>Passport photograph *</label>
+      <div class="photo">
+        <div class="frame" id="preview">Photo</div>
+        <div>
+          <input type="file" id="photo" accept="image/*" required />
+          <p class="note">Clear passport-style photo. Compressed automatically before upload.</p>
+        </div>
+      </div>
+      <button type="submit" id="submitBtn">Submit for review</button>
+      <p class="note">By submitting you confirm the information is accurate. False details may delay clearance.</p>
+      <div class="msg" id="msg"></div>
+    </form>
+    <a class="back" href="./">← Back to EOCNS system</a>
+  </div>
+<script>
+const WORKER = "https://eocns-publish.alemfort12.workers.dev";
+let photoDataUrl = "";
+
+function compress(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const max = 480;
+      let w = img.width, h = img.height;
+      const scale = Math.min(1, max / Math.max(w, h));
+      w = Math.round(w * scale); h = Math.round(h * scale);
+      const c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      c.getContext("2d").drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      let data = c.toDataURL("image/jpeg", 0.72);
+      if (data.length > 160000) data = c.toDataURL("image/jpeg", 0.55);
+      resolve(data);
+    };
+    img.onerror = () => reject(new Error("Could not read image"));
+    img.src = url;
+  });
+}
+
+document.getElementById("photo").addEventListener("change", async (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  try {
+    photoDataUrl = await compress(f);
+    document.getElementById("preview").innerHTML = '<img src="' + photoDataUrl + '" alt="" />';
+  } catch (err) {
+    alert(err.message || "Photo failed");
+  }
+});
+
+document.getElementById("regForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (document.getElementById("hpCompany").value) return;
+  if (!photoDataUrl) { alert("Please upload a passport photograph."); return; }
+  const btn = document.getElementById("submitBtn");
+  const msg = document.getElementById("msg");
+  btn.disabled = true;
+  msg.className = "msg";
+  msg.textContent = "";
+  const student = {
+    name: document.getElementById("name").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    regNo: document.getElementById("regNo").value.trim(),
+    programme: document.getElementById("programme").value,
+    level: document.getElementById("level").value,
+    gender: document.getElementById("gender").value,
+    phone: document.getElementById("phone").value.trim(),
+    hostel: document.getElementById("hostel").value,
+    photoDataUrl,
+  };
+  try {
+    const res = await fetch(WORKER, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "submit_pending", student }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.error || res.statusText);
+    msg.className = "msg ok";
+    msg.textContent = body.message || "Submitted for review.";
+    e.target.reset();
+    photoDataUrl = "";
+    document.getElementById("preview").textContent = "Photo";
+  } catch (err) {
+    msg.className = "msg err";
+    msg.textContent = err.message || String(err);
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
