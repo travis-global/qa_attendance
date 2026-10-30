@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=30" />
+  <link rel="stylesheet" href="style.css?v=31" />
 </head>
 <body class="role-viewer">
   <div id="dirtyBanner" class="dirty-banner" hidden role="status"></div>
@@ -917,9 +917,14 @@
           <label class="field field--full"><span class="field__label">Lecture summary</span><textarea id="qaEntrySummary" rows="3" placeholder="What was covered…"></textarea></label>
           <label class="field"><span class="field__label">Assignment</span><textarea id="qaEntryAssignment" rows="2" placeholder="e.g. No assignment was given."></textarea></label>
           <label class="field"><span class="field__label">Remarks</span><textarea id="qaEntryRemark" rows="2" placeholder="Class participation, notes…"></textarea></label>
-          <label class="field field--full"><span class="field__label">Absent students (serials or names, comma-separated)</span>
-            <textarea id="qaEntryAbsent" rows="2" placeholder="e.g. 3, 7, 12 or paste names"></textarea>
-          </label>
+          <div class="field field--full" id="qaAbsentPickerWrap">
+            <span class="field__label">Absent students</span>
+            <p class="muted-note" style="margin:4px 0 8px">Pick from the master list for this programme &amp; level (same for timetable and extra lectures). First-time log does not need REF — only edits do.</p>
+            <input type="search" id="qaAbsentSearch" class="absent-search" placeholder="Search by name or reg. no…" autocomplete="off" />
+            <div class="student-list" id="qaAbsentStudentList" style="max-height:200px;overflow:auto;border:1px solid var(--border,#e2e8f0);border-radius:0 0 8px 8px;margin-top:-1px"></div>
+            <div class="absent-tags" id="qaAbsentTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:28px"></div>
+            <input type="hidden" id="qaEntryAbsent" value="" />
+          </div>
         </div>
           <div id="qaEntryAmendBlock" class="form-grid" hidden style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border, #e2e8f0)">
             <p class="muted-note field--full" style="margin:0">Editing a saved lecture requires an official REF and a reason. The change is written to the master QA sheet and noted on reports.</p>
@@ -939,7 +944,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=30"></script>
+  <script src="app.js?v=31"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

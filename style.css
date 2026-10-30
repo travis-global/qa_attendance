@@ -1125,3 +1125,23 @@ body.role-viewer #viewerModeBanner { display: block; }
 [data-theme="dark"] .viewer-mode-banner { background: #422006; color: #fde68a; }
 .lec-assign-row { display: grid; grid-template-columns: 1.2fr 1fr 0.8fr 0.6fr auto; gap: 8px; margin-bottom: 8px; align-items: end; }
 @media (max-width: 700px) { .lec-assign-row { grid-template-columns: 1fr 1fr; } }
+
+/* QA absent student picker */
+#qaAbsentPickerWrap .absent-search {
+  width: 100%; padding: 10px 12px; border-radius: 8px 8px 0 0;
+  border: 1px solid var(--border, #e2e8f0); background: var(--surface, #fff);
+}
+.qa-student-option {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; cursor: pointer; font-size: 0.9rem;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+}
+.qa-student-option:hover { background: rgba(13,148,136,0.08); }
+.qa-student-option.selected { background: rgba(185,28,28,0.08); }
+.qa-student-sn { font-size: 0.75rem; color: var(--muted, #64748b); min-width: 4rem; font-family: ui-monospace, monospace; }
+.absent-tag {
+  background: rgba(185,28,28,0.1); border: 1px solid rgba(185,28,28,0.3);
+  border-radius: 20px; padding: 3px 10px; font-size: 0.75rem;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.absent-tag button { border: none; background: none; cursor: pointer; color: #b91c1c; font-size: 1rem; line-height: 1; padding: 0; }

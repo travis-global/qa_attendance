@@ -3496,6 +3496,152 @@ async function getQaEntries() {
   return filtered;
 }
 
+
+// ===== Absent student picker (master list by programme + level) =====
+var QA_ABSENT_SELECTED = new Set(); // keys: student id
+var QA_ABSENT_ROSTER = []; // [{id, name, regNo, serial}]
+
+function classKeyToProgrammeLevel(classKey) {
+  // e.g. 100_nursing, 200_midwifery
+  var ck = String(classKey || "");
+  var level = "";
+  var prog = "";
+  var m = ck.match(/^(\d+)/);
+  if (m) level = m[1];
+  if (/nursing/i.test(ck)) prog = "Nursing";
+  else if (/midwifery/i.test(ck)) prog = "Midwifery";
+  else if (/gns/i.test(ck)) prog = "General Nursing";
+  else if (/mid/i.test(ck)) prog = "Midwifery";
+  return { programme: prog, level: level };
+}
+
+async function loadQaAbsentRoster(classKey) {
+  var pl = classKeyToProgrammeLevel(classKey);
+  var all = await getAll("students");
+  // Prefer active session filter then programme/level
+  var list = all.filter(function(s) {
+    if (s.status && s.status !== "Active") return false;
+    var okP = true, okL = true;
+    if (pl.programme) {
+      var sp = String(s.programme || "").toLowerCase();
+      var pp = pl.programme.toLowerCase();
+      okP = sp === pp || sp.indexOf(pp) >= 0 || pp.indexOf(sp) >= 0 ||
+        (pp.indexOf("nurs") >= 0 && sp.indexOf("nurs") >= 0) ||
+        (pp.indexOf("mid") >= 0 && sp.indexOf("mid") >= 0);
+    }
+    if (pl.level) {
+      var sl = String(s.level || "").replace(/level/ig, "").trim();
+      okL = sl === String(pl.level) || sl.indexOf(String(pl.level)) >= 0;
+    }
+    return okP && okL;
+  });
+  // sort by name
+  list.sort(function(a, b) { return String(a.name || "").localeCompare(String(b.name || "")); });
+  QA_ABSENT_ROSTER = list.map(function(s, i) {
+    return { id: s.id, name: s.name || "", regNo: s.regNo || "", serial: s.serial != null ? String(s.serial) : String(i + 1) };
+  });
+  return QA_ABSENT_ROSTER;
+}
+
+function renderQaAbsentList(query) {
+  var q = String(query || "").toLowerCase().trim();
+  var listEl = document.getElementById("qaAbsentStudentList");
+  if (!listEl) return;
+  var rows = QA_ABSENT_ROSTER.filter(function(s) {
+    if (!q) return true;
+    return (s.name || "").toLowerCase().indexOf(q) >= 0 ||
+      (s.regNo || "").toLowerCase().indexOf(q) >= 0 ||
+      (s.serial || "").indexOf(q) >= 0;
+  });
+  if (!rows.length) {
+    listEl.innerHTML = '<div style="padding:12px;color:var(--muted,#64748b);font-size:0.85rem;text-align:center">' +
+      (QA_ABSENT_ROSTER.length ? "No match" : "No students in master list for this programme/level") + "</div>";
+    return;
+  }
+  listEl.innerHTML = rows.map(function(s) {
+    var sel = QA_ABSENT_SELECTED.has(s.id);
+    return '<div class="qa-student-option' + (sel ? " selected" : "") + '" data-abs-id="' + escapeHtml(s.id) + '">' +
+      '<input type="checkbox"' + (sel ? " checked" : "") + ' />' +
+      '<span class="qa-student-sn">' + escapeHtml(s.serial || "") + '</span>' +
+      '<span>' + escapeHtml(s.name) + (s.regNo ? ' <span class="cell-sub">' + escapeHtml(s.regNo) + "</span>" : "") + "</span></div>";
+  }).join("");
+  listEl.querySelectorAll(".qa-student-option").forEach(function(row) {
+    row.addEventListener("click", function(ev) {
+      var id = row.getAttribute("data-abs-id");
+      toggleQaAbsent(id);
+      ev.preventDefault();
+    });
+  });
+}
+
+function toggleQaAbsent(id) {
+  if (QA_ABSENT_SELECTED.has(id)) QA_ABSENT_SELECTED.delete(id);
+  else QA_ABSENT_SELECTED.add(id);
+  renderQaAbsentList((document.getElementById("qaAbsentSearch") && document.getElementById("qaAbsentSearch").value) || "");
+  renderQaAbsentTags();
+  syncQaAbsentHidden();
+}
+
+function renderQaAbsentTags() {
+  var tags = document.getElementById("qaAbsentTags");
+  if (!tags) return;
+  var selected = QA_ABSENT_ROSTER.filter(function(s) { return QA_ABSENT_SELECTED.has(s.id); });
+  if (!selected.length) {
+    tags.innerHTML = '<span class="muted-note" style="font-size:0.8rem">No absentees marked</span>';
+    return;
+  }
+  tags.innerHTML = selected.map(function(s) {
+    return '<span class="absent-tag"><span>' + escapeHtml(s.serial ? s.serial + ". " : "") + escapeHtml(s.name) +
+      '</span><button type="button" data-abs-remove="' + escapeHtml(s.id) + '" aria-label="Remove">×</button></span>';
+  }).join("");
+  tags.querySelectorAll("[data-abs-remove]").forEach(function(btn) {
+    btn.addEventListener("click", function(e) {
+      e.preventDefault();
+      toggleQaAbsent(btn.getAttribute("data-abs-remove"));
+    });
+  });
+}
+
+function syncQaAbsentHidden() {
+  var selected = QA_ABSENT_ROSTER.filter(function(s) { return QA_ABSENT_SELECTED.has(s.id); });
+  // store as names (and serials) for report compatibility
+  var val = selected.map(function(s) {
+    return (s.serial ? s.serial + ". " : "") + s.name + (s.regNo ? " (" + s.regNo + ")" : "");
+  }).join(", ");
+  var hid = document.getElementById("qaEntryAbsent");
+  if (hid) hid.value = val;
+  window.__qaAbsentPayload = selected.map(function(s) {
+    return { id: s.id, name: s.name, regNo: s.regNo, serial: s.serial };
+  });
+}
+
+async function initQaAbsentPicker(classKey, preselected) {
+  QA_ABSENT_SELECTED = new Set();
+  await loadQaAbsentRoster(classKey);
+  if (Array.isArray(preselected) && preselected.length) {
+    // match by name, regNo, serial, or id
+    preselected.forEach(function(raw) {
+      var t = String(raw || "").toLowerCase().trim();
+      QA_ABSENT_ROSTER.forEach(function(s) {
+        if (s.id === raw || String(s.serial) === String(raw) ||
+            (s.name && t.indexOf(s.name.toLowerCase()) >= 0) ||
+            (s.regNo && t.indexOf(String(s.regNo).toLowerCase()) >= 0) ||
+            t === String(s.serial).toLowerCase()) {
+          QA_ABSENT_SELECTED.add(s.id);
+        }
+      });
+    });
+  }
+  var search = document.getElementById("qaAbsentSearch");
+  if (search) {
+    search.value = "";
+    search.oninput = function() { renderQaAbsentList(search.value); };
+  }
+  renderQaAbsentList("");
+  renderQaAbsentTags();
+  syncQaAbsentHidden();
+}
+
 async function openQaEntryForm(id) {
   if (!isQaOfficer()) { alert("Sign in as QA Officer to log or edit lectures."); return; }
   if (!requireActiveSession("Lecture logging")) return;
@@ -3546,6 +3692,27 @@ async function openQaEntryForm(id) {
       if (document.getElementById("qaEntryEditRef")) document.getElementById("qaEntryEditRef").value = "";
       if (document.getElementById("qaEntryEditReason")) document.getElementById("qaEntryEditReason").value = "";
     }
+  }
+  var classForAbsent = document.getElementById("qaEntryClass") && document.getElementById("qaEntryClass").value;
+  var preAbs = [];
+  if (id) {
+    var allE = await getAll("qa_entries");
+    var ent2 = allE.find(function(x) { return x.id === id; });
+    if (ent2) {
+      if (Array.isArray(ent2.absentDetails) && ent2.absentDetails.length) {
+        preAbs = ent2.absentDetails.map(function(d) { return d.id || d.name || d.regNo; });
+      } else if (Array.isArray(ent2.absent)) preAbs = ent2.absent;
+      else if (ent2.absent) preAbs = String(ent2.absent).split(/[,;\n]+/);
+    }
+  }
+  try { await initQaAbsentPicker(classForAbsent, preAbs); } catch (err) { console.warn("absent picker", err); }
+  // refresh roster when class changes
+  var classSel = document.getElementById("qaEntryClass");
+  if (classSel && !classSel._absentBound) {
+    classSel.addEventListener("change", function() {
+      initQaAbsentPicker(classSel.value, Array.from(QA_ABSENT_SELECTED));
+    });
+    classSel._absentBound = true;
   }
   calcQaDurationMinutes();
   document.getElementById("qaEntryModal").hidden = false;
@@ -3609,8 +3776,11 @@ async function saveQaEntry(e) {
   var summary = (document.getElementById("qaEntrySummary") && document.getElementById("qaEntrySummary").value.trim()) || "";
   var assignment = (document.getElementById("qaEntryAssignment") && document.getElementById("qaEntryAssignment").value.trim()) || "";
   var remark = (document.getElementById("qaEntryRemark") && document.getElementById("qaEntryRemark").value.trim()) || "";
-  var absentRaw = (document.getElementById("qaEntryAbsent") && document.getElementById("qaEntryAbsent").value.trim()) || "";
-  var absent = absentRaw ? absentRaw.split(/[,;\n]+/).map(function(s) { return s.trim(); }).filter(Boolean) : [];
+  syncQaAbsentHidden();
+  var absentDetails = window.__qaAbsentPayload || [];
+  var absent = absentDetails.length
+    ? absentDetails.map(function(d) { return (d.serial ? d.serial + ". " : "") + d.name; })
+    : ((document.getElementById("qaEntryAbsent") && document.getElementById("qaEntryAbsent").value.trim()) || "").split(/[,;\n]+/).map(function(s) { return s.trim(); }).filter(Boolean);
   if (!date || !course || !lecturer || !start || !end) {
     alert("Date, course, lecturer, start time and end time are required.");
     return;
@@ -3631,7 +3801,7 @@ async function saveQaEntry(e) {
     id: id || ("qa_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
     date: date, classKey: classKey, course: course, lecturer: lecturer, status: status,
     duration: duration, start: start, end: end, topic: topic, objectives: objectives,
-    lectureSummary: summary, assignment: assignment, remark: remark, absent: absent, updatedAt: now
+    lectureSummary: summary, assignment: assignment, remark: remark, absent: absent, absentDetails: absentDetails, updatedAt: now
   };
   if (!id) {
     entry.createdAt = now;
