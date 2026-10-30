@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=25" />
+  <link rel="stylesheet" href="style.css?v=30" />
 </head>
 <body class="role-viewer">
   <div id="dirtyBanner" class="dirty-banner" hidden role="status"></div>
@@ -77,6 +77,10 @@
         </div>
       </header>
       <main class="content" id="content">
+        <div id="viewerModeBanner" class="card viewer-mode-banner" style="margin-bottom:12px;padding:10px 14px;border-left:4px solid #b45309" hidden>
+          <strong>View only</strong>
+          <span class="muted-note" style="margin-left:8px">Contact QA to update records. Sign in under Settings if you are the QA officer.</span>
+        </div>
         <div id="sessionContextBanner" class="card" style="margin-bottom:12px;padding:10px 14px;border-left:4px solid #0d9488" hidden>
           <strong id="sessionContextTitle">No active session</strong>
           <span class="muted-note" id="sessionContextDetail" style="margin-left:8px"></span>
@@ -166,7 +170,7 @@
             </div>
           </div>
           <div class="table-card">
-            <table class="data-table"><thead><tr><th>Name</th><th>Staff ID</th><th>Courses</th><th>Contract hrs/mo</th><th>Phone</th><th>Status</th><th></th></tr></thead><tbody id="lecturersTableBody"></tbody></table>
+            <table class="data-table"><thead><tr><th>Name</th><th>Staff ID</th><th>Course assignments</th><th>Contract hrs/mo</th><th>Phone</th><th>Status</th><th class="qa-edit-only"></th></tr></thead><tbody id="lecturersTableBody"></tbody></table>
             <div class="empty-state" id="lecturersEmpty"><h3>No lecturers yet</h3><p>Click Add Lecturer to register staff and assign courses.</p></div>
           </div>
         </section>
@@ -828,7 +832,13 @@
           <label class="field field--full"><span class="field__label">Full Name <span class="req">*</span></span><input type="text" id="lecturerName" required /></label>
           <label class="field"><span class="field__label">Staff ID <span class="cell-sub">(auto)</span></span><input type="text" id="lecturerStaffId" readonly placeholder="EOCNS/STF/YYYY/####" /></label>
           <label class="field"><span class="field__label">Phone</span><input type="tel" id="lecturerPhone" /></label>
-          <label class="field field--full"><span class="field__label">Courses (comma separated)</span><input type="text" id="lecturerCourses" /></label>
+          <div class="field field--full">
+            <span class="field__label">Course assignments (programme × level)</span>
+            <p class="muted-note" style="margin:4px 0 8px">A lecturer can teach multiple courses across different programmes and levels in the same session. Add one row per assignment.</p>
+            <div id="lecturerAssignRows"></div>
+            <button type="button" class="btn btn--ghost btn--sm" id="btnAddLecturerAssign" style="margin-top:8px">+ Add course assignment</button>
+            <input type="hidden" id="lecturerCourses" />
+          </div>
           <label class="field"><span class="field__label">Contract hours / month</span>
             <input type="number" id="lecturerContractHours" min="0" step="0.5" placeholder="e.g. 40" />
           </label>
@@ -929,7 +939,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=29"></script>
+  <script src="app.js?v=30"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

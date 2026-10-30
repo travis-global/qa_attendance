@@ -457,7 +457,8 @@ async function renderLecturersTable() {
   var q = ((document.getElementById("lecturerSearch") && document.getElementById("lecturerSearch").value) || "").toLowerCase().trim();
   var list = lecturersCache.filter(function(l) {
     if (!q) return true;
-    return String(l.name || "").toLowerCase().indexOf(q) >= 0 || String(l.staffId || "").toLowerCase().indexOf(q) >= 0;
+    var blob = (l.name || "") + " " + (l.staffId || "") + " " + formatLecturerAssignments(l);
+    return blob.toLowerCase().indexOf(q) >= 0;
   });
   var tbody = document.getElementById("lecturersTableBody");
   if (!tbody) return;
@@ -467,7 +468,7 @@ async function renderLecturersTable() {
       ? ('<button type="button" class="icon-btn-sm" data-edit-lec="' + l.id + '">Edit</button> <button type="button" class="icon-btn-sm" data-del-lec="' + l.id + '">Del</button>')
       : "";
     return "<tr><td>" + escapeHtml(l.name) + "</td><td>" + escapeHtml(l.staffId || "") + "</td><td>" +
-      escapeHtml((l.courses || []).join(", ")) + "</td><td>" + escapeHtml(String(ch)) + "</td><td>" +
+      escapeHtml(formatLecturerAssignments(l)) + "</td><td>" + escapeHtml(String(ch)) + "</td><td>" +
       escapeHtml(l.phone || "") + "</td><td>" + escapeHtml(l.status || "Active") +
       "</td><td class=\"qa-edit-only\">" + actions + "</td></tr>";
   }).join("");
@@ -480,13 +481,80 @@ async function renderLecturersTable() {
   var count = document.getElementById("lecturersCount");
   if (count) count.textContent = list.length + " lecturers";
 }
+
+function formatLecturerAssignments(l) {
+  var rows = l.assignments || [];
+  if (rows.length) {
+    return rows.map(function(a) {
+      var bits = [a.code || a.course].filter(Boolean);
+      if (a.programme) bits.push(a.programme);
+      if (a.level) bits.push("L" + a.level);
+      return bits.join(" · ");
+    }).join("; ");
+  }
+  return (l.courses || []).join(", ") || "—";
+}
+
+function collectLecturerAssignmentsFromForm() {
+  var wrap = document.getElementById("lecturerAssignRows");
+  if (!wrap) return [];
+  var rows = [];
+  wrap.querySelectorAll(".lec-assign-row").forEach(function(row) {
+    var code = (row.querySelector("[data-la=code]") && row.querySelector("[data-la=code]").value || "").trim();
+    if (!code) return;
+    rows.push({
+      code: code,
+      programme: (row.querySelector("[data-la=programme]") && row.querySelector("[data-la=programme]").value || "").trim(),
+      level: (row.querySelector("[data-la=level]") && row.querySelector("[data-la=level]").value || "").trim(),
+      hours: Number(row.querySelector("[data-la=hours]") && row.querySelector("[data-la=hours]").value) || null
+    });
+  });
+  return rows;
+}
+
+async function addLecturerAssignRow(prefill) {
+  prefill = prefill || {};
+  var wrap = document.getElementById("lecturerAssignRows");
+  if (!wrap) return;
+  await loadActiveSession();
+  var progs = (ACTIVE_SESSION && ACTIVE_SESSION.programmes) || [];
+  try {
+    var allP = await getAll("programmes");
+    if (allP && allP.length) progs = allP.map(function(p) { return p.name || p.id; });
+  } catch (_) {}
+  var levels = (ACTIVE_SESSION && ACTIVE_SESSION.levels) || [];
+  try {
+    var allL = await getAll("levels");
+    if (allL && allL.length) levels = allL.map(function(l) { return String(l.value != null ? l.value : l.name); });
+  } catch (_) {}
+  var progOpts = '<option value="">Programme</option>' + progs.map(function(p) {
+    return '<option value="' + escapeHtml(p) + '"' + (prefill.programme === p ? " selected" : "") + ">" + escapeHtml(p) + "</option>";
+  }).join("");
+  var lvlOpts = '<option value="">Level</option>' + levels.map(function(l) {
+    return '<option value="' + escapeHtml(String(l)) + '"' + (String(prefill.level) === String(l) ? " selected" : "") + ">" + escapeHtml(String(l)) + "</option>";
+  }).join("");
+  var div = document.createElement("div");
+  div.className = "lec-assign-row";
+  div.innerHTML =
+    '<label class="field" style="margin:0"><span class="field__label">Course code</span><input type="text" data-la="code" placeholder="e.g. NUS 121" value="' + escapeHtml(prefill.code || prefill.course || "") + '" /></label>' +
+    '<label class="field" style="margin:0"><span class="field__label">Programme</span><select data-la="programme">' + progOpts + '</select></label>' +
+    '<label class="field" style="margin:0"><span class="field__label">Level</span><select data-la="level">' + lvlOpts + '</select></label>' +
+    '<label class="field" style="margin:0"><span class="field__label">Hrs</span><input type="number" data-la="hours" min="0" step="0.5" value="' + (prefill.hours != null ? prefill.hours : "") + '" /></label>' +
+    '<button type="button" class="icon-btn-sm lec-assign-del" title="Remove">×</button>';
+  wrap.appendChild(div);
+  div.querySelector(".lec-assign-del").addEventListener("click", function() { div.remove(); });
+}
+
 async function openLecturerForm(id) {
   if (!isQaOfficer()) { alert("Sign in as QA Officer to manage lecturers."); return; }
   document.getElementById("lecturerForm").reset();
   document.getElementById("lecturerId").value = id || "";
   document.getElementById("lecturerModalTitle").textContent = id ? "Edit lecturer" : "Add lecturer";
+  var wrap = document.getElementById("lecturerAssignRows");
+  if (wrap) wrap.innerHTML = "";
   if (!id) {
     document.getElementById("lecturerStaffId").value = await generateStaffId();
+    await addLecturerAssignRow({});
   } else {
     await loadLecturers();
     var l = lecturersCache.find(function(x) { return x.id === id; });
@@ -494,15 +562,12 @@ async function openLecturerForm(id) {
       document.getElementById("lecturerName").value = l.name || "";
       document.getElementById("lecturerStaffId").value = l.staffId || "";
       document.getElementById("lecturerPhone").value = l.phone || "";
-      document.getElementById("lecturerCourses").value = (l.courses || []).join(", ");
       document.getElementById("lecturerContractHours").value = l.contractHoursPerMonth != null ? l.contractHoursPerMonth : "";
       document.getElementById("lecturerStatus").value = l.status || "Active";
+      var assigns = l.assignments && l.assignments.length ? l.assignments : (l.courses || []).map(function(c) { return { code: c }; });
+      if (!assigns.length) assigns = [{}];
+      for (var i = 0; i < assigns.length; i++) await addLecturerAssignRow(assigns[i]);
     }
-  }
-  // show REF for edits
-  var refG = document.getElementById("lecturerAuditRefGroup");
-  if (!refG) {
-    // inject if missing - skip, use prompt on save for edit
   }
   document.getElementById("lecturerModal").hidden = false;
 }
@@ -518,7 +583,11 @@ async function saveLecturer(e) {
     if (!ref || !String(ref).trim()) { alert("REF is required for edits."); return; }
     ref = String(ref).trim();
   }
-  var courses = document.getElementById("lecturerCourses").value.split(",").map(function(c) { return c.trim(); }).filter(Boolean);
+  var assignments = collectLecturerAssignmentsFromForm();
+  var courses = assignments.map(function(a) { return a.code; }).filter(Boolean);
+  // legacy field also kept for older views
+  var legacy = (document.getElementById("lecturerCourses") && document.getElementById("lecturerCourses").value || "").split(",").map(function(c) { return c.trim(); }).filter(Boolean);
+  if (!courses.length && legacy.length) courses = legacy;
   var contractRaw = document.getElementById("lecturerContractHours").value;
   var contractHours = contractRaw === "" ? null : Number(contractRaw);
   var now = new Date().toISOString();
@@ -528,6 +597,7 @@ async function saveLecturer(e) {
     staffId: document.getElementById("lecturerStaffId").value.trim() || await generateStaffId(),
     phone: document.getElementById("lecturerPhone").value.trim(),
     courses: courses,
+    assignments: assignments,
     contractHoursPerMonth: contractHours,
     status: document.getElementById("lecturerStatus").value || "Active",
     updatedAt: now
@@ -543,8 +613,8 @@ async function saveLecturer(e) {
     entity: "lecturers",
     entityId: lec.id,
     externalRef: ref || undefined,
-    reason: id ? ("Lecturer updated · contract " + (contractHours != null ? contractHours + "h/mo" : "n/a")) : "Lecturer created",
-    details: { name: name, contractHoursPerMonth: contractHours, courses: courses }
+    reason: id ? ("Lecturer updated · " + assignments.length + " course assignment(s)") : "Lecturer created",
+    details: { name: name, contractHoursPerMonth: contractHours, courses: courses, assignments: assignments }
   });
   markDirty("lecturers");
   document.getElementById("lecturerModal").hidden = true;
@@ -1214,6 +1284,7 @@ openDB().then(async () => {
     document.getElementById(id)?.addEventListener("change", renderStudentsTable);
   });
   document.getElementById("btnAddLecturer")?.addEventListener("click", () => openLecturerForm(null));
+  document.getElementById("btnAddLecturerAssign")?.addEventListener("click", function() { addLecturerAssignRow({}); });
   document.getElementById("lecturerForm")?.addEventListener("submit", saveLecturer);
   document.getElementById("lecturerSearch")?.addEventListener("input", renderLecturersTable);
   document.getElementById("lecturerModalBackdrop")?.addEventListener("click", () => { document.getElementById("lecturerModal").hidden = true; });
@@ -2872,6 +2943,8 @@ function updateQaOfficerUI() {
   const inn = document.getElementById("qaAuthLoggedIn");
   if (out) out.hidden = loggedIn;
   if (inn) inn.hidden = !loggedIn;
+  var vb = document.getElementById("viewerModeBanner");
+  if (vb) vb.hidden = !!loggedIn;
 }
 
 

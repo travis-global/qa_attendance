@@ -1117,3 +1117,11 @@ body.role-officer th.qa-edit-only { display: table-cell; }
   padding: 8px 16px; font-size: 0.85rem; text-align: center;
 }
 .master-load-banner[hidden] { display: none !important; }
+
+/* Viewer mode banner */
+body.role-officer #viewerModeBanner { display: none !important; }
+body.role-viewer #viewerModeBanner { display: block; }
+.viewer-mode-banner { background: #fffbeb; }
+[data-theme="dark"] .viewer-mode-banner { background: #422006; color: #fde68a; }
+.lec-assign-row { display: grid; grid-template-columns: 1.2fr 1fr 0.8fr 0.6fr auto; gap: 8px; margin-bottom: 8px; align-items: end; }
+@media (max-width: 700px) { .lec-assign-row { grid-template-columns: 1fr 1fr; } }
