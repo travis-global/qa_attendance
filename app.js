@@ -3188,13 +3188,13 @@ async function renderPendingRegistrations() {
       '<button type="button" class="icon-btn-sm" data-pend-no="' + p.id + '">Reject</button></td></tr>';
   }).join("");
   tbody.querySelectorAll("[data-pend-view]").forEach(function(btn) {
-    btn.addEventListener("click", function() { openPendingReview(btn.getAttribute("data-pend-view")); });
+    btn.addEventListener("click", function() { if (window.openPendingReview) window.openPendingReview(btn.getAttribute("data-pend-view")); });
   });
   tbody.querySelectorAll("[data-pend-ok]").forEach(function(btn) {
-    btn.addEventListener("click", function() { approvePendingStudent(btn.getAttribute("data-pend-ok")); });
+    btn.addEventListener("click", function() { if (window.approvePendingStudent) window.approvePendingStudent(btn.getAttribute("data-pend-ok")); });
   });
   tbody.querySelectorAll("[data-pend-no]").forEach(function(btn) {
-    btn.addEventListener("click", function() { rejectPendingStudent(btn.getAttribute("data-pend-no")); });
+    btn.addEventListener("click", function() { if (window.rejectPendingStudent) window.rejectPendingStudent(btn.getAttribute("data-pend-no")); });
   });
 }
 
@@ -3871,13 +3871,13 @@ async function renderPendingRegistrations() {
       '<button type="button" class="icon-btn-sm" data-pend-no="' + p.id + '">Reject</button></td></tr>';
   }).join("");
   tbody.querySelectorAll("[data-pend-view]").forEach(function(btn) {
-    btn.addEventListener("click", function() { openPendingReview(btn.getAttribute("data-pend-view")); });
+    btn.addEventListener("click", function() { if (window.openPendingReview) window.openPendingReview(btn.getAttribute("data-pend-view")); });
   });
   tbody.querySelectorAll("[data-pend-ok]").forEach(function(btn) {
-    btn.addEventListener("click", function() { approvePendingStudent(btn.getAttribute("data-pend-ok")); });
+    btn.addEventListener("click", function() { if (window.approvePendingStudent) window.approvePendingStudent(btn.getAttribute("data-pend-ok")); });
   });
   tbody.querySelectorAll("[data-pend-no]").forEach(function(btn) {
-    btn.addEventListener("click", function() { rejectPendingStudent(btn.getAttribute("data-pend-no")); });
+    btn.addEventListener("click", function() { if (window.rejectPendingStudent) window.rejectPendingStudent(btn.getAttribute("data-pend-no")); });
   });
 }
 
@@ -7885,13 +7885,13 @@ async function renderPendingRegistrations() {
       '<button type="button" class="icon-btn-sm" data-pend-no="' + p.id + '">Reject</button></td></tr>';
   }).join("");
   tbody.querySelectorAll("[data-pend-view]").forEach(function(btn) {
-    btn.addEventListener("click", function() { openPendingReview(btn.getAttribute("data-pend-view")); });
+    btn.addEventListener("click", function() { if (window.openPendingReview) window.openPendingReview(btn.getAttribute("data-pend-view")); });
   });
   tbody.querySelectorAll("[data-pend-ok]").forEach(function(btn) {
-    btn.addEventListener("click", function() { approvePendingStudent(btn.getAttribute("data-pend-ok")); });
+    btn.addEventListener("click", function() { if (window.approvePendingStudent) window.approvePendingStudent(btn.getAttribute("data-pend-ok")); });
   });
   tbody.querySelectorAll("[data-pend-no]").forEach(function(btn) {
-    btn.addEventListener("click", function() { rejectPendingStudent(btn.getAttribute("data-pend-no")); });
+    btn.addEventListener("click", function() { if (window.rejectPendingStudent) window.rejectPendingStudent(btn.getAttribute("data-pend-no")); });
   });
 }
 
@@ -8093,13 +8093,13 @@ async function renderPendingRegistrations(opts) {
       '<button type="button" class="icon-btn-sm" data-pend-no="' + p.id + '">Reject</button></td></tr>';
   }).join("");
   tbody.querySelectorAll("[data-pend-view]").forEach(function(btn) {
-    btn.addEventListener("click", function() { openPendingReview(btn.getAttribute("data-pend-view")); });
+    btn.addEventListener("click", function() { if (window.openPendingReview) window.openPendingReview(btn.getAttribute("data-pend-view")); });
   });
   tbody.querySelectorAll("[data-pend-ok]").forEach(function(btn) {
-    btn.addEventListener("click", function() { approvePendingStudent(btn.getAttribute("data-pend-ok")); });
+    btn.addEventListener("click", function() { if (window.approvePendingStudent) window.approvePendingStudent(btn.getAttribute("data-pend-ok")); });
   });
   tbody.querySelectorAll("[data-pend-no]").forEach(function(btn) {
-    btn.addEventListener("click", function() { rejectPendingStudent(btn.getAttribute("data-pend-no")); });
+    btn.addEventListener("click", function() { if (window.rejectPendingStudent) window.rejectPendingStudent(btn.getAttribute("data-pend-no")); });
   });
 }
 
@@ -8220,12 +8220,6 @@ async function confirmRejectPendingStudent(forcedId, forcedReason, forcedPin) {
     alert("Reject failed: " + (err.message || String(err)));
   }
 }
-
-window.approvePendingStudent = approvePendingStudent;
-window.confirmRejectPendingStudent = confirmRejectPendingStudent;
-window.renderPendingRegistrations = renderPendingRegistrations;
-window.publishPendingListToRepo = publishPendingListToRepo;
-
 
 // ===== TOP-LEVEL pending registration API (must stay at IIFE root) =====
 async function removePendingRecordCompletely(id) {
@@ -8490,5 +8484,168 @@ window.closePendingRejectModal = closePendingRejectModal;
 window.rejectPendingStudent = rejectPendingStudent;
 window.confirmRejectPendingStudent = confirmRejectPendingStudent;
 window.approvePendingStudent = approvePendingStudent;
+
+
+// ===== Session-based class keys (programme × level) — no dummy classes =====
+function programmeSlug(name) {
+  var n = String(name || "").toLowerCase().trim();
+  if (/midwif/.test(n)) return "midwifery";
+  if (/nurs/.test(n)) return "nursing";
+  if (/public/.test(n)) return "public_health";
+  return n.replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "") || "general";
+}
+
+function makeClassKey(level, programme) {
+  var lv = String(level || "").replace(/level/ig, "").trim() || "100";
+  return lv + "_" + programmeSlug(programme);
+}
+
+function classLabelFromKey(key) {
+  var k = String(key || "");
+  var m = k.match(/^(\d+)_(.+)$/);
+  if (!m) return k || "—";
+  var prog = m[2].replace(/_/g, " ");
+  prog = prog.replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+  return m[1] + " LEVEL " + prog.toUpperCase();
+}
+
+async function sessionProgrammeLevelOptions() {
+  await loadActiveSession();
+  var progs = [];
+  var levels = [];
+  if (ACTIVE_SESSION) {
+    progs = (ACTIVE_SESSION.programmes || []).slice();
+    levels = (ACTIVE_SESSION.levels || []).map(String);
+  }
+  if (!progs.length) {
+    try {
+      var allP = await getAll("programmes");
+      progs = allP.filter(function(p) { return !p.status || p.status === "Active"; }).map(function(p) { return p.name; });
+    } catch (_) {}
+  }
+  if (!levels.length) {
+    try {
+      var allL = await getAll("levels");
+      levels = allL.filter(function(l) { return !l.status || l.status === "Active"; }).map(function(l) {
+        return String(l.value != null ? l.value : String(l.name || "").replace(/level/ig, "").trim());
+      });
+    } catch (_) {}
+  }
+  return { programmes: progs, levels: levels };
+}
+
+function fillSelectOptions(sel, items, placeholder) {
+  if (!sel) return;
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">' + (placeholder || "—") + "</option>" +
+    items.map(function(it) {
+      return '<option value="' + escapeHtml(String(it)) + '">' + escapeHtml(String(it)) + "</option>";
+    }).join("");
+  if (cur && items.map(String).indexOf(String(cur)) >= 0) sel.value = cur;
+}
+
+async function fillSessionClassSelectors() {
+  var opts = await sessionProgrammeLevelOptions();
+  fillSelectOptions(document.getElementById("ttBoardProgramme"), opts.programmes, "Programme");
+  fillSelectOptions(document.getElementById("ttBoardLevel"), opts.levels, "Level");
+  fillSelectOptions(document.getElementById("qaDailyProgramme"), opts.programmes, "Programme");
+  fillSelectOptions(document.getElementById("qaDailyLevel"), opts.levels, "Level");
+  fillSelectOptions(document.getElementById("ttEditProgramme"), opts.programmes, "Programme");
+  fillSelectOptions(document.getElementById("ttEditLevel"), opts.levels, "Level");
+  // defaults: prefer Nursing + 100 when available
+  function prefer(selId, preferVal) {
+    var s = document.getElementById(selId);
+    if (!s || s.value) return;
+    for (var i = 0; i < s.options.length; i++) {
+      if (String(s.options[i].value).toLowerCase() === String(preferVal).toLowerCase()) {
+        s.selectedIndex = i; break;
+      }
+    }
+  }
+  prefer("ttBoardProgramme", "Nursing");
+  prefer("ttBoardLevel", "100");
+  prefer("qaDailyProgramme", "Nursing");
+  prefer("qaDailyLevel", "100");
+  prefer("ttEditProgramme", "Nursing");
+  prefer("ttEditLevel", "100");
+  syncClassKeyFromPair("ttBoardProgramme", "ttBoardLevel", "ttBoardClass");
+  syncClassKeyFromPair("qaDailyProgramme", "qaDailyLevel", "qaDailyClass");
+  syncClassKeyFromPair("ttEditProgramme", "ttEditLevel", "ttClassKey");
+}
+
+function syncClassKeyFromPair(progId, levelId, hiddenId) {
+  var p = document.getElementById(progId);
+  var l = document.getElementById(levelId);
+  var h = document.getElementById(hiddenId);
+  if (!h) return;
+  var prog = p && p.value;
+  var lvl = l && l.value;
+  if (prog && lvl) h.value = makeClassKey(lvl, prog);
+}
+
+async function ensureTimetables() {
+  if (!TIMETABLES_CACHE || typeof TIMETABLES_CACHE !== "object") {
+    try { TIMETABLES_CACHE = await fetchRepoJson(DATA_FILES.timetables); } catch (_) { TIMETABLES_CACHE = {}; }
+  }
+  if (!TIMETABLES_CACHE || typeof TIMETABLES_CACHE !== "object") TIMETABLES_CACHE = {};
+  // never invent dummy class grids — only keys present in data
+  return TIMETABLES_CACHE;
+}
+
+// Wire programme/level → class key
+(function wireSessionClassSelects() {
+  function bind(progId, levelId, hiddenId, onChange) {
+    ["change", "input"].forEach(function(ev) {
+      var p = document.getElementById(progId);
+      var l = document.getElementById(levelId);
+      if (p) p.addEventListener(ev, function() {
+        syncClassKeyFromPair(progId, levelId, hiddenId);
+        if (typeof onChange === "function") onChange();
+      });
+      if (l) l.addEventListener(ev, function() {
+        syncClassKeyFromPair(progId, levelId, hiddenId);
+        if (typeof onChange === "function") onChange();
+      });
+    });
+  }
+  bind("ttBoardProgramme", "ttBoardLevel", "ttBoardClass", function() {
+    if (typeof renderTimetableBoard === "function") try { renderTimetableBoard(); } catch (_) {}
+  });
+  bind("qaDailyProgramme", "qaDailyLevel", "qaDailyClass", function() {
+    if (typeof renderQaDaily === "function") try { renderQaDaily(); } catch (_) {}
+  });
+  bind("ttEditProgramme", "ttEditLevel", "ttClassKey", function() {
+    if (typeof loadTimetableEditor === "function") try { loadTimetableEditor(); } catch (_) {}
+    else if (typeof renderTimetableEditor === "function") try { renderTimetableEditor(); } catch (_) {}
+  });
+})();
+
+// After session chrome refresh, refill class selectors
+var _prevRefreshSessionChrome = typeof refreshSessionChrome === "function" ? refreshSessionChrome : null;
+if (_prevRefreshSessionChrome) {
+  refreshSessionChrome = async function() {
+    await _prevRefreshSessionChrome.apply(this, arguments);
+    try { await fillSessionClassSelectors(); } catch (_) {}
+  };
+}
+
+// Boot fill when DOM ready path already ran — also call once
+setTimeout(function() {
+  try { if (typeof fillSessionClassSelectors === "function") fillSessionClassSelectors(); } catch (e) { console.warn("class selectors", e); }
+}, 800);
+// Final safety: never leave pending handlers undefined
+try {
+  if (typeof rejectPendingStudent === "function") window.rejectPendingStudent = rejectPendingStudent;
+  if (typeof confirmRejectPendingStudent === "function") window.confirmRejectPendingStudent = confirmRejectPendingStudent;
+  if (typeof approvePendingStudent === "function") window.approvePendingStudent = approvePendingStudent;
+  if (typeof renderPendingRegistrations === "function") window.renderPendingRegistrations = renderPendingRegistrations;
+  if (typeof openPendingReview === "function") window.openPendingReview = openPendingReview;
+} catch (e) { console.warn("pending bind", e); }
+
+
+window.makeClassKey = makeClassKey;
+window.classLabelFromKey = classLabelFromKey;
+window.fillSessionClassSelectors = fillSessionClassSelectors;
+window.ensureTimetables = ensureTimetables;
 
 })();

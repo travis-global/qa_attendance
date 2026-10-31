@@ -316,11 +316,9 @@
           <div class="page-toolbar">
             <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Weekly grid from saved timetables. Officers can open a slot to log a lecture.</p></div>
             <div class="page-toolbar__right">
-              <select id="ttBoardClass">
-                <option value="100_nursing">100 Level Nursing</option>
-                <option value="200_nursing">200 Level Nursing</option>
-                <option value="200_midwifery">200 Level Midwifery</option>
-              </select>
+              <select id="ttBoardProgramme" title="Programme"><option value="">Programme</option></select>
+              <select id="ttBoardLevel" title="Level"><option value="">Level</option></select>
+              <input type="hidden" id="ttBoardClass" value="100_nursing" />
               <button type="button" class="btn btn--primary" id="btnRenderTtBoard">Show week board</button>
             </div>
           </div>
@@ -340,13 +338,13 @@
             <div class="card__body">
               <div class="form-grid">
                 <label class="field"><span class="field__label">Date</span><input type="date" id="qaDailyDate" /></label>
-                <label class="field"><span class="field__label">Class</span>
-                  <select id="qaDailyClass">
-                    <option value="100_nursing">100 Level Nursing</option>
-                    <option value="200_nursing">200 Level Nursing</option>
-                    <option value="200_midwifery">200 Level Midwifery</option>
-                  </select>
+                <label class="field"><span class="field__label">Programme</span>
+                  <select id="qaDailyProgramme"><option value="">Programme</option></select>
                 </label>
+                <label class="field"><span class="field__label">Level</span>
+                  <select id="qaDailyLevel"><option value="">Level</option></select>
+                </label>
+                <input type="hidden" id="qaDailyClass" value="100_nursing" />
                 <label class="field"><span class="field__label">&nbsp;</span>
                   <button type="button" class="btn btn--primary" id="btnFilterQaDaily">Load day board</button>
                 </label>
@@ -828,11 +826,9 @@
             <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
               <h3 style="margin:0">Timetable editor</h3>
               <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-                <select id="ttClassKey" class="qa-edit-only">
-                  <option value="100_nursing">100 Level Nursing</option>
-                  <option value="200_nursing">200 Level Nursing</option>
-                  <option value="200_midwifery">200 Level Midwifery</option>
-                </select>
+                <select id="ttEditProgramme" class="qa-edit-only"><option value="">Programme</option></select>
+                <select id="ttEditLevel" class="qa-edit-only"><option value="">Level</option></select>
+                <input type="hidden" id="ttClassKey" value="100_nursing" />
                 <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnAddTimetableSlot">+ Slot</button>
                 <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnSaveTimetable">Save timetable</button>
               </div>
@@ -1127,7 +1123,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=44"></script>
+  <script src="app.js?v=46"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>
