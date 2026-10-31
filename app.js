@@ -8648,4 +8648,321 @@ window.classLabelFromKey = classLabelFromKey;
 window.fillSessionClassSelectors = fillSessionClassSelectors;
 window.ensureTimetables = ensureTimetables;
 
+
+// ===== Courses catalogue CRUD + timetable course checklist =====
+async function loadCoursesCache() {
+  COURSES_CACHE = await getAll("courses");
+  COURSES_CACHE.sort(function(a, b) { return String(a.code || "").localeCompare(String(b.code || "")); });
+  return COURSES_CACHE;
+}
+
+function courseOptionsHtml(selectedCode, classKey) {
+  var list = COURSES_CACHE || [];
+  var filtered = list;
+  if (classKey) {
+    var tagged = list.filter(function(c) {
+      return Array.isArray(c.classKeys) && c.classKeys.indexOf(classKey) >= 0;
+    });
+    if (tagged.length) filtered = tagged;
+  }
+  var opts = '<option value="">— Select course —</option>';
+  filtered.forEach(function(c) {
+    var sel = (selectedCode && String(c.code) === String(selectedCode)) ? " selected" : "";
+    opts += '<option value="' + escapeHtml(c.code) + '"' + sel + '>' +
+      escapeHtml(c.code) + (c.name ? (" — " + escapeHtml(c.name)) : "") + "</option>";
+  });
+  // if selected code not in list, still show it
+  if (selectedCode && !list.some(function(c) { return String(c.code) === String(selectedCode); })) {
+    opts += '<option value="' + escapeHtml(selectedCode) + '" selected>' + escapeHtml(selectedCode) + " (not in catalogue)</option>";
+  }
+  opts += '<option value="__other__">Other / not listed…</option>';
+  return opts;
+}
+
+async function ensureCourseInCatalogue(code, suggestedName) {
+  code = String(code || "").trim();
+  if (!code) return { ok: false, cancelled: true };
+  await loadCoursesCache();
+  var existing = COURSES_CACHE.find(function(c) { return String(c.code).toLowerCase() === code.toLowerCase(); });
+  if (existing) return { ok: true, course: existing, created: false };
+  if (!isQaOfficer()) {
+    alert("Course \"" + code + "\" is not in the catalogue. Sign in as QA Officer to add it, or pick an existing course.");
+    return { ok: false, cancelled: true };
+  }
+  var msg = "Course \"" + code + "\" is not in the official catalogue.\n\n" +
+    "• OK = add it now (you can set the title)\n" +
+    "• Cancel = stop and choose an existing course instead";
+  if (!confirm(msg)) return { ok: false, cancelled: true };
+  var title = prompt("Enter the official title for " + code + ":", suggestedName || "");
+  if (title == null) return { ok: false, cancelled: true };
+  title = String(title).trim();
+  if (!title) {
+    alert("A course title is required to add to the catalogue.");
+    return { ok: false, cancelled: true };
+  }
+  var classKey = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "";
+  var rec = { code: code, name: title, classKeys: classKey ? [classKey] : [] };
+  await put("courses", rec);
+  await writeAudit({ action: "create", entity: "courses", entityId: code, reason: "Course added from timetable/use: " + code });
+  markDirty("courses");
+  await loadCoursesCache();
+  if (typeof renderCoursesTable === "function") await renderCoursesTable();
+  if (typeof seedQaDatalists === "function") try { seedQaDatalists(); } catch (_) {}
+  return { ok: true, course: rec, created: true };
+}
+
+async function renderCoursesTable() {
+  await loadCoursesCache();
+  var tbody = document.getElementById("coursesTableBody");
+  if (!tbody) return;
+  if (!COURSES_CACHE.length) {
+    tbody.innerHTML = "<tr><td colspan=\"4\">No courses yet. Officers can add codes and titles here.</td></tr>";
+    return;
+  }
+  tbody.innerHTML = COURSES_CACHE.map(function(c) {
+    var keys = Array.isArray(c.classKeys) ? c.classKeys.join(", ") : "";
+    var actions = isQaOfficer()
+      ? ('<button type="button" class="icon-btn-sm" data-edit-course="' + escapeHtml(c.code) + '">Edit</button> ' +
+         '<button type="button" class="icon-btn-sm" data-del-course="' + escapeHtml(c.code) + '">Del</button>')
+      : "";
+    return "<tr><td><strong>" + escapeHtml(c.code) + "</strong></td><td>" + escapeHtml(c.name || "—") +
+      "</td><td class=\"muted-note\">" + escapeHtml(keys || "—") + "</td><td class=\"qa-edit-only\">" + actions + "</td></tr>";
+  }).join("");
+  tbody.querySelectorAll("[data-edit-course]").forEach(function(btn) {
+    btn.addEventListener("click", function() { openCourseForm(btn.getAttribute("data-edit-course")); });
+  });
+  tbody.querySelectorAll("[data-del-course]").forEach(function(btn) {
+    btn.addEventListener("click", function() { deleteCourse(btn.getAttribute("data-del-course")); });
+  });
+}
+
+function openCourseForm(code) {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to manage courses."); return; }
+  var form = document.getElementById("courseForm");
+  if (form) form.reset();
+  document.getElementById("courseEditOriginalCode").value = code || "";
+  document.getElementById("courseModalTitle").textContent = code ? "Edit course" : "Add course";
+  if (code) {
+    var c = (COURSES_CACHE || []).find(function(x) { return x.code === code; });
+    if (c) {
+      document.getElementById("courseCode").value = c.code || "";
+      document.getElementById("courseName").value = c.name || "";
+      document.getElementById("courseClassKeys").value = Array.isArray(c.classKeys) ? c.classKeys.join(", ") : "";
+    }
+  }
+  var m = document.getElementById("courseModal");
+  if (m) { m.hidden = false; m.removeAttribute("hidden"); m.style.display = ""; }
+}
+
+function closeCourseForm() {
+  var m = document.getElementById("courseModal");
+  if (!m) return;
+  m.hidden = true; m.setAttribute("hidden", ""); m.style.display = "none";
+}
+
+async function saveCourseForm(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  if (!isQaOfficer()) return;
+  var original = (document.getElementById("courseEditOriginalCode").value || "").trim();
+  var code = (document.getElementById("courseCode").value || "").trim();
+  var name = (document.getElementById("courseName").value || "").trim();
+  var keysRaw = (document.getElementById("courseClassKeys").value || "").trim();
+  if (!code || !name) { alert("Course code and title are required."); return; }
+  await loadCoursesCache();
+  var clash = COURSES_CACHE.find(function(c) {
+    return String(c.code).toLowerCase() === code.toLowerCase() && String(c.code) !== original;
+  });
+  if (clash) { alert("Another course already uses code " + code); return; }
+  var classKeys = keysRaw ? keysRaw.split(",").map(function(s) { return s.trim(); }).filter(Boolean) : [];
+  if (original && original !== code) {
+    try { await del("courses", original); } catch (_) {}
+  }
+  var rec = { code: code, name: name, classKeys: classKeys };
+  await put("courses", rec);
+  await writeAudit({
+    action: original ? "update" : "create",
+    entity: "courses",
+    entityId: code,
+    reason: original ? ("Course updated (" + original + " → " + code + ")") : ("Course added: " + code)
+  });
+  markDirty("courses");
+  closeCourseForm();
+  await renderCoursesTable();
+  if (typeof seedQaDatalists === "function") try { seedQaDatalists(); } catch (_) {}
+  try { await renderTimetableEditor(); } catch (_) {}
+  alert("Course saved. Publish when ready so the catalogue stays on the repository.");
+}
+
+async function deleteCourse(code) {
+  if (!isQaOfficer()) return;
+  if (!confirm("Remove course " + code + " from the catalogue?\nTimetable slots that still use this code will show as unknown until changed.")) return;
+  await del("courses", code);
+  await writeAudit({ action: "delete", entity: "courses", entityId: code, reason: "Course removed from catalogue" });
+  markDirty("courses");
+  await renderCoursesTable();
+  if (typeof seedQaDatalists === "function") try { seedQaDatalists(); } catch (_) {}
+  try { await renderTimetableEditor(); } catch (_) {}
+}
+
+async function addCoursePrompt() {
+  openCourseForm(null);
+}
+
+async function renderTimetableEditor() {
+  await ensureTimetables();
+  await loadCoursesCache();
+  // sync hidden class key from programme/level if present
+  try {
+    if (typeof syncClassKeyFromPair === "function") {
+      syncClassKeyFromPair("ttEditProgramme", "ttEditLevel", "ttClassKey");
+    }
+  } catch (_) {}
+  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+  var tt = TIMETABLES_CACHE[key] || { class_name: classLabelFromKey ? classLabelFromKey(key) : key, slots: [] };
+  if (!tt.slots) tt.slots = [];
+  TIMETABLES_CACHE[key] = tt;
+  var tbody = document.getElementById("timetableSlotsBody");
+  if (!tbody) return;
+  if (!tt.slots.length) {
+    tbody.innerHTML = "<tr><td colspan=\"6\">No slots — add one. Course codes come from the catalogue above.</td></tr>";
+    return;
+  }
+  tbody.innerHTML = tt.slots.map(function(s, idx) {
+    return "<tr>" +
+      "<td><input type=\"number\" min=\"0\" max=\"6\" data-tt-field=\"weekday\" data-tt-idx=\"" + idx + "\" value=\"" + (s.weekday != null ? s.weekday : 0) + "\" style=\"width:4rem\" /></td>" +
+      "<td><select data-tt-field=\"code\" data-tt-idx=\"" + idx + "\" style=\"min-width:12rem\">" + courseOptionsHtml(s.code || "", key) + "</select></td>" +
+      "<td><input type=\"time\" data-tt-field=\"start\" data-tt-idx=\"" + idx + "\" value=\"" + escapeHtml(s.start || "08:00") + "\" /></td>" +
+      "<td><input type=\"time\" data-tt-field=\"end\" data-tt-idx=\"" + idx + "\" value=\"" + escapeHtml(s.end || "10:00") + "\" /></td>" +
+      "<td><input type=\"number\" min=\"0\" step=\"0.5\" data-tt-field=\"hours\" data-tt-idx=\"" + idx + "\" value=\"" + (s.hours != null ? s.hours : 2) + "\" style=\"width:4.5rem\" /></td>" +
+      (isQaOfficer() ? ("<td><button type=\"button\" class=\"icon-btn-sm\" data-tt-del=\"" + idx + "\">Del</button></td>") : "<td></td>") +
+      "</tr>";
+  }).join("");
+
+  tbody.querySelectorAll("[data-tt-field]").forEach(function(el) {
+    el.addEventListener("change", async function() {
+      var i = Number(el.getAttribute("data-tt-idx"));
+      var field = el.getAttribute("data-tt-field");
+      var val = el.value;
+      if (field === "code") {
+        if (val === "__other__") {
+          var typed = prompt("Enter course code not yet in the catalogue:");
+          if (!typed) { el.value = ""; return; }
+          var res = await ensureCourseInCatalogue(typed.trim(), "");
+          if (!res.ok) { el.value = ""; return; }
+          val = res.course.code;
+          // refresh options so new course appears
+          await renderTimetableEditor();
+          return;
+        }
+        if (val) {
+          var chk = await ensureCourseInCatalogue(val, "");
+          if (!chk.ok) {
+            el.value = "";
+            return;
+          }
+        }
+      }
+      if (field === "weekday" || field === "hours") val = Number(val);
+      if (!TIMETABLES_CACHE[key].slots[i]) return;
+      TIMETABLES_CACHE[key].slots[i][field] = val;
+      // auto hours from start/end if both set
+      if (field === "start" || field === "end") {
+        var slot = TIMETABLES_CACHE[key].slots[i];
+        if (slot.start && slot.end) {
+          try {
+            var a = slot.start.split(":").map(Number);
+            var b = slot.end.split(":").map(Number);
+            var mins = (b[0] * 60 + b[1]) - (a[0] * 60 + a[1]);
+            if (mins > 0) {
+              slot.hours = Math.round((mins / 60) * 2) / 2;
+              var hoursInput = tbody.querySelector('[data-tt-field="hours"][data-tt-idx="' + i + '"]');
+              if (hoursInput) hoursInput.value = slot.hours;
+            }
+          } catch (_) {}
+        }
+      }
+      markDirty("timetable");
+    });
+  });
+  tbody.querySelectorAll("[data-tt-del]").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      if (!isQaOfficer()) return;
+      var i = Number(btn.getAttribute("data-tt-del"));
+      TIMETABLES_CACHE[key].slots.splice(i, 1);
+      markDirty("timetable");
+      renderTimetableEditor();
+    });
+  });
+}
+
+function addTimetableSlot() {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to edit timetables."); return; }
+  try {
+    if (typeof syncClassKeyFromPair === "function") syncClassKeyFromPair("ttEditProgramme", "ttEditLevel", "ttClassKey");
+  } catch (_) {}
+  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+  if (!TIMETABLES_CACHE) TIMETABLES_CACHE = {};
+  if (!TIMETABLES_CACHE[key]) TIMETABLES_CACHE[key] = { class_name: (typeof classLabelFromKey === "function" ? classLabelFromKey(key) : key), slots: [] };
+  if (!TIMETABLES_CACHE[key].slots) TIMETABLES_CACHE[key].slots = [];
+  TIMETABLES_CACHE[key].slots.push({ weekday: 0, code: "", start: "08:00", end: "10:00", hours: 2 });
+  markDirty("timetable");
+  renderTimetableEditor();
+}
+
+async function saveTimetableLocal() {
+  if (!isQaOfficer()) return;
+  try {
+    if (typeof syncClassKeyFromPair === "function") syncClassKeyFromPair("ttEditProgramme", "ttEditLevel", "ttClassKey");
+  } catch (_) {}
+  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+  var tt = TIMETABLES_CACHE && TIMETABLES_CACHE[key];
+  if (!tt || !tt.slots) { alert("No timetable data for this class."); return; }
+  // validate every code is in catalogue or offer to add
+  await loadCoursesCache();
+  for (var i = 0; i < tt.slots.length; i++) {
+    var code = String(tt.slots[i].code || "").trim();
+    if (!code) {
+      alert("Slot " + (i + 1) + " has no course selected. Choose a course or remove the slot.");
+      return;
+    }
+    var res = await ensureCourseInCatalogue(code, "");
+    if (!res.ok) return;
+  }
+  await writeAudit({ action: "update", entity: "timetables", entityId: key, reason: "Timetable saved for " + key });
+  markDirty("timetable");
+  alert("Timetable saved in this browser for " + key + ". Publish all data to write data/timetables.json.");
+}
+
+// Wire course modal once
+(function wireCourseUi() {
+  var addBtn = document.getElementById("btnAddCourse");
+  if (addBtn && !addBtn.__courseWired) {
+    addBtn.__courseWired = true;
+    addBtn.addEventListener("click", function() { openCourseForm(null); });
+  }
+  var form = document.getElementById("courseForm");
+  if (form && !form.__courseWired) {
+    form.__courseWired = true;
+    form.addEventListener("submit", saveCourseForm);
+  }
+  ["btnCloseCourseModal", "btnCancelCourse", "courseModalBackdrop"].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && !el.__courseWired) {
+      el.__courseWired = true;
+      el.addEventListener("click", closeCourseForm);
+    }
+  });
+})();
+
+window.renderCoursesTable = renderCoursesTable;
+window.openCourseForm = openCourseForm;
+window.saveCourseForm = saveCourseForm;
+window.deleteCourse = deleteCourse;
+window.addCoursePrompt = addCoursePrompt;
+window.ensureCourseInCatalogue = ensureCourseInCatalogue;
+window.renderTimetableEditor = renderTimetableEditor;
+window.addTimetableSlot = addTimetableSlot;
+window.saveTimetableLocal = saveTimetableLocal;
+window.loadCoursesCache = loadCoursesCache;
+
 })();

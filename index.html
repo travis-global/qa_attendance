@@ -813,12 +813,15 @@
             </div>
           </div>
           <div class="card" style="margin-top:16px">
-            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
-              <h3 style="margin:0">Courses</h3>
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+              <div>
+                <h3 style="margin:0">Courses catalogue</h3>
+                <p class="muted-note" style="margin:4px 0 0">Official codes &amp; titles. Timetable slots pick from this list. Unknown codes prompt you to add them.</p>
+              </div>
               <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnAddCourse">+ Add course</button>
             </div>
             <div class="card__body" style="overflow-x:auto">
-              <table class="data-table"><thead><tr><th>Code</th><th>Title</th><th class="qa-edit-only"></th></tr></thead>
+              <table class="data-table"><thead><tr><th>Code</th><th>Title</th><th>Linked classes</th><th class="qa-edit-only"></th></tr></thead>
               <tbody id="coursesTableBody"></tbody></table>
             </div>
           </div>
@@ -1122,8 +1125,33 @@
     </div>
   </div>
 
+  
+  <div class="modal" id="courseModal" hidden>
+    <div class="modal__backdrop" id="courseModalBackdrop"></div>
+    <div class="modal__dialog" style="max-width:520px">
+      <div class="modal__header"><h3 id="courseModalTitle">Course</h3><button type="button" class="icon-btn" id="btnCloseCourseModal">&times;</button></div>
+      <form id="courseForm" class="modal__body">
+        <input type="hidden" id="courseEditOriginalCode" value="" />
+        <div class="form-grid">
+          <label class="field"><span class="field__label">Course code <span class="req">*</span></span>
+            <input type="text" id="courseCode" required placeholder="e.g. NUS 114" /></label>
+          <label class="field field--full"><span class="field__label">Course title <span class="req">*</span></span>
+            <input type="text" id="courseName" required placeholder="Full official title" /></label>
+          <label class="field field--full"><span class="field__label">Typically taught for (optional tags)</span>
+            <input type="text" id="courseClassKeys" placeholder="e.g. 100_nursing, 200_nursing" />
+            <span class="muted-note">Comma-separated class keys. Helps filter checklist in timetable editor.</span>
+          </label>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" id="btnCancelCourse">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save course</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=46"></script>
+  <script src="app.js?v=47"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>
