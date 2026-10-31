@@ -8965,4 +8965,246 @@ window.addTimetableSlot = addTimetableSlot;
 window.saveTimetableLocal = saveTimetableLocal;
 window.loadCoursesCache = loadCoursesCache;
 
+
+// ===== Courses checklist for timetable + catalogue CRUD (final) =====
+async function loadCoursesCache() {
+  try {
+    COURSES_CACHE = await getAll("courses");
+  } catch (_) {
+    COURSES_CACHE = COURSES_CACHE || [];
+  }
+  COURSES_CACHE = (COURSES_CACHE || []).slice().sort(function(a, b) {
+    return String(a.code || "").localeCompare(String(b.code || ""));
+  });
+  return COURSES_CACHE;
+}
+
+function courseOptionsHtml(selectedCode, classKey) {
+  var list = COURSES_CACHE || [];
+  var preferred = list;
+  if (classKey) {
+    var tagged = list.filter(function(c) {
+      return Array.isArray(c.classKeys) && c.classKeys.indexOf(classKey) >= 0;
+    });
+    if (tagged.length) preferred = tagged.concat(list.filter(function(c) {
+      return !Array.isArray(c.classKeys) || c.classKeys.indexOf(classKey) < 0;
+    }));
+  }
+  var opts = '<option value="">— Select course —</option>';
+  preferred.forEach(function(c) {
+    var sel = String(c.code) === String(selectedCode) ? " selected" : "";
+    opts += '<option value="' + escapeHtml(c.code) + '"' + sel + ">" +
+      escapeHtml(c.code) + " — " + escapeHtml(c.name || "") + "</option>";
+  });
+  // keep unknown existing slot code visible
+  if (selectedCode && !list.some(function(c) { return String(c.code) === String(selectedCode); })) {
+    opts += '<option value="' + escapeHtml(selectedCode) + '" selected>' + escapeHtml(selectedCode) + " (not in catalogue)</option>";
+  }
+  opts += '<option value="__other__">+ Other / new course…</option>';
+  return opts;
+}
+
+async function ensureCourseInCatalogue(code, suggestedName) {
+  code = String(code || "").trim();
+  if (!code) return { ok: false, cancelled: true };
+  await loadCoursesCache();
+  var existing = COURSES_CACHE.find(function(c) { return String(c.code).toLowerCase() === code.toLowerCase(); });
+  if (existing) return { ok: true, course: existing, created: false };
+  if (!isQaOfficer()) {
+    alert('Course "' + code + '" is not in the catalogue. Sign in as QA Officer to add it, or pick an existing course.');
+    return { ok: false, cancelled: true };
+  }
+  var add = confirm(
+    'Course "' + code + '" is not in the official catalogue.\n\n' +
+    "OK = add this course to the catalogue now\n" +
+    "Cancel = stop and choose an existing course"
+  );
+  if (!add) return { ok: false, cancelled: true };
+  var title = prompt("Official title for " + code + ":", suggestedName || "");
+  if (title == null) return { ok: false, cancelled: true };
+  title = String(title).trim();
+  if (!title) {
+    alert("A course title is required.");
+    return { ok: false, cancelled: true };
+  }
+  var classKey = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "";
+  var rec = { code: code, name: title, classKeys: classKey ? [classKey] : [] };
+  await put("courses", rec);
+  await writeAudit({ action: "create", entity: "courses", entityId: code, reason: "Course added when used in timetable: " + code });
+  markDirty("courses");
+  await loadCoursesCache();
+  try { await renderCoursesTable(); } catch (_) {}
+  try { if (typeof seedQaDatalists === "function") seedQaDatalists(); } catch (_) {}
+  return { ok: true, course: rec, created: true };
+}
+
+async function renderCoursesTable() {
+  await loadCoursesCache();
+  var tbody = document.getElementById("coursesTableBody");
+  if (!tbody) return;
+  var sc = document.getElementById("statCourses");
+  if (sc) sc.textContent = String(COURSES_CACHE.length);
+  if (!COURSES_CACHE.length) {
+    tbody.innerHTML = '<tr><td colspan="4">No courses yet. Officers: use + Add course.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = COURSES_CACHE.map(function(c) {
+    var keys = Array.isArray(c.classKeys) ? c.classKeys.join(", ") : "";
+    var actions = isQaOfficer()
+      ? ('<button type="button" class="icon-btn-sm" data-edit-course="' + escapeHtml(c.code) + '">Edit</button> ' +
+         '<button type="button" class="icon-btn-sm" data-del-course="' + escapeHtml(c.code) + '">Del</button>')
+      : "";
+    return "<tr><td><strong>" + escapeHtml(c.code) + "</strong></td><td>" + escapeHtml(c.name || "—") +
+      '</td><td class="muted-note">' + escapeHtml(keys || "—") + '</td><td class="qa-edit-only">' + actions + "</td></tr>";
+  }).join("");
+  tbody.querySelectorAll("[data-edit-course]").forEach(function(btn) {
+    btn.addEventListener("click", function() { openCourseForm(btn.getAttribute("data-edit-course")); });
+  });
+  tbody.querySelectorAll("[data-del-course]").forEach(function(btn) {
+    btn.addEventListener("click", function() { deleteCourse(btn.getAttribute("data-del-course")); });
+  });
+}
+
+async function renderTimetableEditor() {
+  await ensureTimetables();
+  await loadCoursesCache();
+  try {
+    if (typeof syncClassKeyFromPair === "function") {
+      syncClassKeyFromPair("ttEditProgramme", "ttEditLevel", "ttClassKey");
+    }
+  } catch (_) {}
+  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+  var tt = TIMETABLES_CACHE[key] || { class_name: classLabelFromKey ? classLabelFromKey(key) : key, slots: [] };
+  if (!tt.slots) tt.slots = [];
+  TIMETABLES_CACHE[key] = tt;
+  var tbody = document.getElementById("timetableSlotsBody");
+  if (!tbody) return;
+  if (!tt.slots.length) {
+    tbody.innerHTML = '<tr><td colspan="6">No slots — add one. Course column is a checklist from the catalogue.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = tt.slots.map(function(s, idx) {
+    return "<tr>" +
+      '<td><input type="number" min="0" max="6" data-tt-field="weekday" data-tt-i="' + idx + '" value="' + (s.weekday != null ? s.weekday : 0) + '" style="width:56px" title="0=Mon … 4=Fri" /></td>' +
+      '<td><select data-tt-field="code" data-tt-i="' + idx + '" style="min-width:200px">' + courseOptionsHtml(s.code || "", key) + "</select></td>" +
+      '<td><input type="time" data-tt-field="start" data-tt-i="' + idx + '" value="' + escapeHtml(s.start || "08:00") + '" /></td>' +
+      '<td><input type="time" data-tt-field="end" data-tt-i="' + idx + '" value="' + escapeHtml(s.end || "10:00") + '" /></td>' +
+      '<td><input type="number" min="0" step="0.5" data-tt-field="hours" data-tt-i="' + idx + '" value="' + (s.hours != null ? s.hours : 2) + '" style="width:64px" /></td>' +
+      '<td class="qa-edit-only"><button type="button" class="icon-btn-sm" data-tt-del="' + idx + '">Del</button></td></tr>';
+  }).join("");
+
+  tbody.querySelectorAll("[data-tt-field]").forEach(function(inp) {
+    inp.addEventListener("change", async function() {
+      if (!isQaOfficer() && inp.tagName === "SELECT") return;
+      var i = Number(inp.getAttribute("data-tt-i"));
+      var f = inp.getAttribute("data-tt-field");
+      var key2 = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+      if (!TIMETABLES_CACHE[key2]) TIMETABLES_CACHE[key2] = { slots: [] };
+      var slot = TIMETABLES_CACHE[key2].slots[i];
+      if (!slot) return;
+      if (f === "code") {
+        var val = inp.value;
+        if (val === "__other__") {
+          var newCode = prompt("Enter new course code (e.g. NUS 118):", "");
+          if (!newCode || !String(newCode).trim()) {
+            inp.value = slot.code || "";
+            return;
+          }
+          newCode = String(newCode).trim();
+          var res = await ensureCourseInCatalogue(newCode, "");
+          if (!res.ok) {
+            inp.value = slot.code || "";
+            return;
+          }
+          slot.code = res.course.code;
+          markDirty("timetable");
+          renderTimetableEditor();
+          return;
+        }
+        if (val && !(COURSES_CACHE || []).some(function(c) { return c.code === val; })) {
+          var res2 = await ensureCourseInCatalogue(val, "");
+          if (!res2.ok) {
+            inp.value = slot.code || "";
+            return;
+          }
+        }
+        slot.code = val;
+      } else if (f === "weekday" || f === "hours") {
+        slot[f] = Number(inp.value);
+      } else {
+        slot[f] = String(inp.value || "").trim();
+      }
+      // auto hours from start/end if both time
+      if (f === "start" || f === "end") {
+        var st = slot.start || "", en = slot.end || "";
+        if (/^\d{1,2}:\d{2}$/.test(st) && /^\d{1,2}:\d{2}$/.test(en)) {
+          var a = st.split(":").map(Number), b = en.split(":").map(Number);
+          var mins = (b[0] * 60 + b[1]) - (a[0] * 60 + a[1]);
+          if (mins > 0) {
+            slot.hours = Math.round((mins / 60) * 2) / 2;
+            var hoursInp = tbody.querySelector('[data-tt-field="hours"][data-tt-i="' + i + '"]');
+            if (hoursInp) hoursInp.value = slot.hours;
+          }
+        }
+      }
+      markDirty("timetable");
+    });
+  });
+  tbody.querySelectorAll("[data-tt-del]").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      if (!isQaOfficer()) return;
+      var key2 = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+      var i = Number(btn.getAttribute("data-tt-del"));
+      if (!TIMETABLES_CACHE[key2] || !TIMETABLES_CACHE[key2].slots) return;
+      TIMETABLES_CACHE[key2].slots.splice(i, 1);
+      markDirty("timetable");
+      renderTimetableEditor();
+    });
+  });
+}
+
+function addTimetableSlot() {
+  if (!isQaOfficer()) return;
+  try {
+    if (typeof syncClassKeyFromPair === "function") syncClassKeyFromPair("ttEditProgramme", "ttEditLevel", "ttClassKey");
+  } catch (_) {}
+  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+  if (!TIMETABLES_CACHE) TIMETABLES_CACHE = {};
+  if (!TIMETABLES_CACHE[key]) TIMETABLES_CACHE[key] = { class_name: key, slots: [] };
+  if (!TIMETABLES_CACHE[key].slots) TIMETABLES_CACHE[key].slots = [];
+  TIMETABLES_CACHE[key].slots.push({ weekday: 0, code: "", start: "08:00", end: "10:00", hours: 2 });
+  markDirty("timetable");
+  renderTimetableEditor();
+}
+
+async function saveTimetableLocal() {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to save timetables."); return; }
+  try {
+    if (typeof syncClassKeyFromPair === "function") syncClassKeyFromPair("ttEditProgramme", "ttEditLevel", "ttClassKey");
+  } catch (_) {}
+  var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
+  var tt = TIMETABLES_CACHE && TIMETABLES_CACHE[key];
+  if (!tt || !tt.slots) { alert("No timetable data for this programme/level."); return; }
+  await loadCoursesCache();
+  for (var i = 0; i < tt.slots.length; i++) {
+    var code = String(tt.slots[i].code || "").trim();
+    if (!code) {
+      alert("Slot " + (i + 1) + " has no course selected. Choose from the list or remove the slot.");
+      return;
+    }
+    var res = await ensureCourseInCatalogue(code, "");
+    if (!res.ok) return;
+  }
+  await writeAudit({ action: "update", entity: "timetables", entityId: key, reason: "Timetable saved for " + key });
+  markDirty("timetable");
+  alert("Timetable saved for " + key + ".\nPublish all data so data/timetables.json is updated on the repository.");
+}
+
+window.loadCoursesCache = loadCoursesCache;
+window.ensureCourseInCatalogue = ensureCourseInCatalogue;
+window.renderCoursesTable = renderCoursesTable;
+window.renderTimetableEditor = renderTimetableEditor;
+window.addTimetableSlot = addTimetableSlot;
+window.saveTimetableLocal = saveTimetableLocal;
+
 })();
