@@ -11536,5 +11536,17 @@
     "user": "QA Officer",
     "source": "system",
     "id": 583
+  },
+  {
+    "ref": "REF/EOCNS/QA/1001",
+    "action": "create",
+    "entity": "courses",
+    "entityId": "NUS 114",
+    "reason": "Course added: NUS 114",
+    "details": {},
+    "timestamp": "2026-11-02T19:56:13.638Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 584
   }
 ]
