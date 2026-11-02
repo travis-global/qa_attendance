@@ -91,6 +91,13 @@
     ]
   },
   {
+    "code": "NUS 114",
+    "name": "Human Physiology",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
     "code": "NUS 121",
     "name": "Human Anatomy II",
     "classKeys": [
