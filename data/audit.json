@@ -12388,5 +12388,17 @@
     "user": "QA Officer",
     "source": "system",
     "id": 654
+  },
+  {
+    "ref": "REF/EOCNS/QA/1071",
+    "action": "delete",
+    "entity": "lecturers",
+    "entityId": "lec_mvrzl49lolixb",
+    "reason": "Lecturer removed",
+    "details": {},
+    "timestamp": "2026-11-03T14:05:51.770Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 655
   }
 ]
