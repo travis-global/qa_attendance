@@ -1,5 +1,180 @@
 [
   {
+    "code": "BIO 101",
+    "name": "Biology",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "GNS 102",
+    "name": "Communication in English I",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "GNS 111",
+    "name": "Citizenship Education",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "GNS 211",
+    "name": "Communication in English II",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "GNS 311",
+    "name": "Medical-Surgical Nursing IV",
+    "classKeys": [
+      "300_nursing"
+    ]
+  },
+  {
+    "code": "GNS 312",
+    "name": "Reproductive Health III",
+    "classKeys": [
+      "300_nursing"
+    ]
+  },
+  {
+    "code": "GNS 313",
+    "name": "Community Health Nursing II",
+    "classKeys": [
+      "300_nursing"
+    ]
+  },
+  {
+    "code": "GNS 314",
+    "name": "Mental Health - Psychiatric Nursing",
+    "classKeys": [
+      "300_nursing"
+    ]
+  },
+  {
+    "code": "GNS 315",
+    "name": "Emergency & Disaster Nursing",
+    "classKeys": [
+      "300_nursing"
+    ]
+  },
+  {
+    "code": "GNS 316",
+    "name": "Quality Improvement in Health Care and Patient Safety",
+    "classKeys": [
+      "300_nursing"
+    ]
+  },
+  {
+    "code": "MID 311",
+    "name": "Reproductive Health I",
+    "classKeys": [
+      "300_midwifery"
+    ]
+  },
+  {
+    "code": "MID 312",
+    "name": "Infant II",
+    "classKeys": [
+      "300_midwifery"
+    ]
+  },
+  {
+    "code": "MID 313",
+    "name": "Family Planning",
+    "classKeys": [
+      "300_midwifery"
+    ]
+  },
+  {
+    "code": "MID 314",
+    "name": "Complicated Midwifery II",
+    "classKeys": [
+      "300_midwifery"
+    ]
+  },
+  {
+    "code": "MID 315",
+    "name": "Research & Statistics",
+    "classKeys": [
+      "300_midwifery"
+    ]
+  },
+  {
+    "code": "MID 316",
+    "name": "Seminar in Midwifery",
+    "classKeys": [
+      "300_nursing"
+    ]
+  },
+  {
+    "code": "MID 317",
+    "name": "Practicum",
+    "classKeys": [
+      "300_midwifery"
+    ]
+  },
+  {
+    "code": "NUR 111",
+    "name": "Foundations of Nursing/Emergency Care",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUR 211",
+    "name": "Foundations of Nursing III",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "NUR 212",
+    "name": "Primary Health Care II",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "NUR 213",
+    "name": "Medical-Surgical Nursing",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "NUR 214",
+    "name": "Research Methodology I",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "NUS 111",
+    "name": "Applied Chemistry",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUS 112",
+    "name": "Applied Physics",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUS 113",
+    "name": "Human Anatomy",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
     "code": "NUS 114",
     "name": "Human Physiology",
     "classKeys": [
@@ -7,10 +182,80 @@
     ]
   },
   {
-    "code": "NUS 117",
-    "name": "Fundamentals of Nursing",
+    "code": "NUS 115",
+    "name": "Introduction to Sociology",
     "classKeys": [
       "100_nursing"
+    ]
+  },
+  {
+    "code": "NUS 116",
+    "name": "Use of Computer",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUS 117",
+    "name": "Medical Microbiology",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUS 211",
+    "name": "Human Anatomy III",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "NUS 212",
+    "name": "Human Physiology III",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "NUS 213",
+    "name": "Pharmacology II",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "NUS 214",
+    "name": "Dietetics",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "NUS 215",
+    "name": "Biostatistics",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "PRAC 101",
+    "name": "Practicum/Study Skills",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "PRAC 201",
+    "name": "Practicum",
+    "classKeys": [
+      "200_nursing"
+    ]
+  },
+  {
+    "code": "PRAC 301",
+    "name": "Practicum",
+    "classKeys": [
+      "300_nursing"
     ]
   }
 ]
