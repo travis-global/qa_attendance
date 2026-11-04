@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": "lec_mw27whgi5xg2",
+    "name": "Mr. Obasi Chukwu",
+    "staffId": "EOCNS/STF/2026/0001",
+    "phone": "08032642606",
+    "courses": [
+      "GNS 311"
+    ],
+    "assignments": [
+      {
+        "code": "GNS 311",
+        "programme": "Nursing",
+        "level": "300",
+        "hours": 45
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 45,
+    "status": "Active",
+    "updatedAt": "2026-11-04T14:34:10.144Z",
+    "createdAt": "2026-11-04T14:34:10.144Z"
+  }
+]
