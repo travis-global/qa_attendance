@@ -12045,5 +12045,330 @@
     "user": "QA Officer",
     "source": "system",
     "id": 598
+  },
+  {
+    "ref": "REF/EOCNS/QA/1594",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mw29ks5b37ai",
+    "reason": "Lecturer created",
+    "details": {
+      "name": "Mrs. Jennifer Amrasawore",
+      "contractHoursPerSemester": 165,
+      "courses": [
+        "MID 312",
+        "MID 317"
+      ],
+      "assignments": [
+        {
+          "code": "MID 312",
+          "programme": "Midwifery",
+          "level": "300",
+          "hours": 30
+        },
+        {
+          "code": "MID 317",
+          "programme": "Midwifery",
+          "level": "300",
+          "hours": 135
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-04T15:21:03.361Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 599
+  },
+  {
+    "ref": "REF/EOCNS/QA/1595",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mw29mptk01ys",
+    "reason": "Lecturer created",
+    "details": {
+      "name": "Mr. George Umeh",
+      "contractHoursPerSemester": 60,
+      "courses": [
+        "GNS 102",
+        "GNS 211"
+      ],
+      "assignments": [
+        {
+          "code": "GNS 102",
+          "programme": "Nursing",
+          "level": "100",
+          "hours": 30
+        },
+        {
+          "code": "GNS 211",
+          "programme": "Nursing",
+          "level": "200",
+          "hours": 30
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-04T15:22:33.658Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 600
+  },
+  {
+    "ref": "REF/EOCNS/QA/1596",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mw29p5fvxzze",
+    "reason": "Lecturer created",
+    "details": {
+      "name": "Mr. Simon Udu",
+      "contractHoursPerSemester": 120,
+      "courses": [
+        "NUS 113",
+        "NUR 213"
+      ],
+      "assignments": [
+        {
+          "code": "NUS 113",
+          "programme": "Nursing",
+          "level": "100",
+          "hours": 60
+        },
+        {
+          "code": "NUR 213",
+          "programme": "Nursing",
+          "level": "200",
+          "hours": 60
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-04T15:24:27.213Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 601
+  },
+  {
+    "ref": "REF/EOCNS/QA/1597",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mw29qfz0iog5",
+    "reason": "Lecturer created",
+    "details": {
+      "name": "Dr. Kennedy Ogunwa",
+      "contractHoursPerSemester": 30,
+      "courses": [
+        "NUS 111"
+      ],
+      "assignments": [
+        {
+          "code": "NUS 111",
+          "programme": "Nursing",
+          "level": "100",
+          "hours": 30
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-04T15:25:27.518Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 602
+  },
+  {
+    "ref": "REF/EOCNS/QA/1598",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mw29s0fzzzgj",
+    "reason": "Lecturer created",
+    "details": {
+      "name": "Dr. Jacinta Obimma",
+      "contractHoursPerSemester": 45,
+      "courses": [
+        "NUS 114",
+        "NUS 212"
+      ],
+      "assignments": [
+        {
+          "code": "NUS 114",
+          "programme": "Nursing",
+          "level": "100",
+          "hours": 30
+        },
+        {
+          "code": "NUS 212",
+          "programme": "Nursing",
+          "level": "200",
+          "hours": 15
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-04T15:26:40.705Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 603
+  },
+  {
+    "ref": "REF/EOCNS/QA/1599",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mw29t7hzx277",
+    "reason": "Lecturer created",
+    "details": {
+      "name": "Mr. Jude Nweze",
+      "contractHoursPerSemester": 30,
+      "courses": [
+        "NUS 112"
+      ],
+      "assignments": [
+        {
+          "code": "NUS 112",
+          "programme": "Nursing",
+          "level": "100",
+          "hours": 30
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-04T15:27:36.505Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 604
+  },
+  {
+    "ref": "REF/EOCNS/QA/1600",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mw29ukxek3hs",
+    "reason": "Lecturer created",
+    "details": {
+      "name": "Mr. Emmanuel Icheku",
+      "contractHoursPerSemester": 30,
+      "courses": [
+        "NUS 116"
+      ],
+      "assignments": [
+        {
+          "code": "NUS 116",
+          "programme": "Nursing",
+          "level": "100",
+          "hours": 30
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-04T15:28:40.564Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 605
+  },
+  {
+    "ref": "REF/EOCNS/QA/1601",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mw29voi7tkjq",
+    "reason": "Lecturer created",
+    "details": {
+      "name": "Mrs. Ngozi Nwaubani",
+      "contractHoursPerSemester": 30,
+      "courses": [
+        "GNS 111"
+      ],
+      "assignments": [
+        {
+          "code": "GNS 111",
+          "programme": "Nursing",
+          "level": "100",
+          "hours": 30
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-04T15:29:31.857Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 606
+  },
+  {
+    "ref": "REF/EOCNS/QA/1602",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mw29x0pb8ynj",
+    "reason": "Lecturer created",
+    "details": {
+      "name": "Mr. John Agbo",
+      "contractHoursPerSemester": 60,
+      "courses": [
+        "NUS 211"
+      ],
+      "assignments": [
+        {
+          "code": "NUS 211",
+          "programme": "Nursing",
+          "level": "200",
+          "hours": 60
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-04T15:30:34.321Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 607
+  },
+  {
+    "ref": "REF/EOCNS/QA/1603",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mw29ydlfz1dp",
+    "reason": "Lecturer created",
+    "details": {
+      "name": "Mr. Sabastine Ibomu",
+      "contractHoursPerSemester": 60,
+      "courses": [
+        "NUS 215",
+        "NUS 214"
+      ],
+      "assignments": [
+        {
+          "code": "NUS 215",
+          "programme": "Nursing",
+          "level": "200",
+          "hours": 30
+        },
+        {
+          "code": "NUS 214",
+          "programme": "Nursing",
+          "level": "200",
+          "hours": 29
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-04T15:31:37.685Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 608
   }
 ]
