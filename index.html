@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EOCNS Attendance System · Eastern Oak College of Nursing Sciences</title>
+  <link rel="icon" href="https://www.easternoak.org/images/Eastern-OAK-logo-201.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=35" />
+</head>
+<body class="role-viewer">
+  <div id="dirtyBanner" class="dirty-banner" hidden role="status"></div>
+  <div id="masterLoadBanner" class="master-load-banner" hidden role="status"></div>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__brand">
+        <img src="https://www.easternoak.org/images/Eastern-OAK-logo-201.png" alt="Eastern Oak crest" class="sidebar__logo" />
+        <div class="sidebar__brand-text">
+          <span class="sidebar__name">EOCNS</span>
+          <span class="sidebar__tag">Attendance System</span>
+        </div>
+      </div>
+      <nav class="sidebar__nav">
+        <div class="nav-section">
+          <p class="nav-section__label">Overview</p>
+          <a href="#" class="nav-item active" data-view="dashboard">Dashboard</a>
+        </div>
+        <div class="nav-section">
+          <p class="nav-section__label">Core Systems</p>
+          <a href="#" class="nav-item" data-view="students">Students</a>
+          <a href="#" class="nav-item" data-view="pending">Pending registrations</a>
+          <a href="#" class="nav-item" data-view="lecturers">Lecturers</a>
+          <a href="#" class="nav-item" data-view="hostel">Hostel</a>
+          <a href="#" class="nav-item" data-view="discipline">Discipline</a>
+          <a href="#" class="nav-item" data-view="attendance">Attendance sheets</a>
+          <a href="#" class="nav-item" data-view="sessions">Sessions</a>
+        </div>
+        <div class="nav-section">
+          <p class="nav-section__label">Quality Assurance</p>
+          <a href="#" class="nav-item" data-view="timetable-board">Timetable board</a>
+          <a href="#" class="nav-item" data-view="qa-daily">Daily QA</a>
+          <a href="#" class="nav-item" data-view="qa-weekly">Weekly QA</a>
+          <a href="#" class="nav-item" data-view="qa-monthly">Monthly QA</a>
+        </div>
+        <div class="nav-section">
+          <p class="nav-section__label">System</p>
+          <a href="#" class="nav-item" data-view="remedial">Remedial</a>
+          <a href="#" class="nav-item" data-view="reports">Reports & Export</a>
+          <a href="#" class="nav-item" data-view="lecturer-hours">Lecturer hours</a>
+          <a href="#" class="nav-item" data-view="audit">Audit Log</a>
+          <a href="#" class="nav-item" data-view="settings">Settings</a>
+        </div>
+      </nav>
+      <div class="sidebar__footer">
+        <div class="user-chip">
+          <div class="user-chip__avatar">QA</div>
+          <div class="user-chip__info">
+            <span class="user-chip__name">QA Officer</span>
+            <span class="user-chip__role">Full Access</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <div class="main-wrap">
+      <header class="topbar">
+        <button class="icon-btn sidebar-toggle" id="sidebarToggle">☰</button>
+        <div class="topbar__title">
+          <h1 id="pageTitle">Dashboard</h1>
+          <p id="pageSubtitle">Eastern Oak College of Nursing Sciences</p>
+        </div>
+        <div class="topbar__actions" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <label class="field" style="margin:0;min-width:180px">
+            <span class="field__label" style="font-size:0.7rem;margin:0">Active session</span>
+            <select id="globalSessionSelect" style="min-width:160px"></select>
+          </label>
+          <label class="field" style="margin:0;min-width:150px">
+            <span class="field__label" style="font-size:0.7rem;margin:0">Semester</span>
+            <select id="globalSemesterSelect" style="min-width:130px"></select>
+          </label>
+          <button class="icon-btn" id="themeToggle" title="Theme">🌓</button>
+        </div>
+      </header>
+      <main class="content" id="content">
+        <div id="viewerModeBanner" class="card viewer-mode-banner" style="margin-bottom:12px;padding:10px 14px;border-left:4px solid #b45309" hidden>
+          <strong>View only</strong>
+          <span class="muted-note" style="margin-left:8px">Contact QA to update records. Sign in under Settings if you are the QA officer.</span>
+        </div>
+        <div id="sessionContextBanner" class="card" style="margin-bottom:12px;padding:10px 14px;border-left:4px solid #0d9488" hidden>
+          <strong id="sessionContextTitle">No active session</strong>
+          <span class="muted-note" id="sessionContextDetail" style="margin-left:8px"></span>
+        </div>
+        <section class="view active" id="view-dashboard">
+          <div class="hero-card">
+            <div class="hero-card__content">
+              <p class="hero-card__eyebrow">Welcome back</p>
+              <h2 class="hero-card__title">EOCNS Attendance & QA System</h2>
+              <p class="hero-card__lead">One place for hostel, class attendance, lecturers and quality assurance.</p>
+            </div>
+            <div class="hero-card__crest">
+              <img src="https://www.easternoak.org/images/Eastern-OAK-logo-201.png" alt="Eastern Oak crest" />
+            </div>
+          </div>
+                    <div class="stats-grid">
+            <div class="stat-card"><div class="stat-card__icon teal">👥</div><div class="stat-card__body"><span class="stat-card__value" id="statStudents">0</span><span class="stat-card__label">Active students</span></div></div>
+            <div class="stat-card"><div class="stat-card__icon indigo">🎓</div><div class="stat-card__body"><span class="stat-card__value" id="statLecturers">0</span><span class="stat-card__label">Lecturers</span></div></div>
+            <div class="stat-card"><div class="stat-card__icon amber">📝</div><div class="stat-card__body"><span class="stat-card__value" id="statQaLogs">0</span><span class="stat-card__label">Lecture logs</span></div></div>
+            <div class="stat-card"><div class="stat-card__icon rose">📅</div><div class="stat-card__body"><span class="stat-card__value" id="statSessions">0</span><span class="stat-card__label">Active sessions</span></div></div>
+            <div class="stat-card"><div class="stat-card__icon teal">✅</div><div class="stat-card__body"><span class="stat-card__value" id="statAttendance">0</span><span class="stat-card__label">Attendance sheets</span></div></div>
+            <div class="stat-card"><div class="stat-card__icon indigo">📚</div><div class="stat-card__body"><span class="stat-card__value" id="statCourses">0</span><span class="stat-card__label">Courses</span></div></div>
+          </div>
+          <div class="grid-2">
+            <div class="card"><div class="card__header"><h3>Quick Actions</h3></div><div class="card__body quick-actions">
+              <button class="action-btn" data-goto="students"><span class="action-btn__icon">+</span><span>Add Student</span></button>
+              <button class="action-btn" data-goto="hostel"><span class="action-btn__icon">⌂</span><span>Hostel Report</span></button>
+              <button class="action-btn" data-goto="qa-daily"><span class="action-btn__icon">◎</span><span>Daily QA</span></button>
+              <button class="action-btn" data-goto="sessions"><span class="action-btn__icon">◫</span><span>New Session</span></button>
+            </div></div>
+            <div class="card"><div class="card__header"><h3>System Status</h3></div><div class="card__body">
+              <div class="status-list">
+                <div class="status-item"><span class="status-dot good"></span><span>Local database ready</span></div>
+                <div class="status-item"><span class="status-dot good"></span><span>All data stays on this device</span></div>
+                <div class="status-item"><span class="status-dot muted"></span><span>No active session selected</span></div>
+              </div>
+            </div></div>
+          </div>
+        </section>
+        
+        <section class="view" id="view-discipline">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <select id="discFilterSubject" class="select">
+                <option value="">All subjects</option>
+                <option value="student">Students</option>
+                <option value="staff">Staff</option>
+              </select>
+              <select id="discFilterStatus" class="select">
+                <option value="">All statuses</option>
+                <option value="Open">Open</option>
+                <option value="Under review">Under review</option>
+                <option value="Closed">Closed</option>
+              </select>
+              <input type="search" id="discSearch" placeholder="Search name, REF, case…" class="select" style="min-width:180px" />
+            </div>
+            <div class="page-toolbar__right">
+              <span class="count-pill" id="discCount">0 cases</span>
+              <button type="button" class="btn btn--ghost qa-edit-only" id="btnPrintDiscRegister">Print register</button>
+              <button type="button" class="btn btn--primary qa-edit-only" id="btnAddDiscipline">+ New case</button>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Date</th><th>Subject</th><th>Name</th><th>Type</th><th>Status</th><th>REF</th><th></th></tr></thead>
+                <tbody id="disciplineTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <p class="muted-note">Disciplinary records are officer-only to create or edit. Viewers see a restricted message. Always use official REF.</p>
+        </section>
+
+        
+        <section class="view" id="view-pending">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Students submit via <a href="register.html" target="_blank" rel="noopener">register.html</a>. Review photos carefully before approving.</p>
+            </div>
+            <div class="page-toolbar__right">
+              <span class="count-pill" id="pendingCount">0 pending</span>
+              <button type="button" class="btn btn--ghost qa-edit-only" id="btnRefreshPending">Refresh from repo</button>
+            </div>
+          </div>
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th>Photo</th><th>Name</th><th>Reg. No</th><th>Programme / Level</th><th>Email</th><th>Submitted</th><th class="qa-edit-only"></th></tr></thead>
+                <tbody id="pendingTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-students">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <div class="search-box"><input type="search" id="studentSearch" placeholder="Search name or reg. no…" /></div>
+              <select id="filterProgramme" class="select"><option value="">All Programmes</option><option value="Nursing">Nursing</option><option value="Midwifery">Midwifery</option></select>
+              <select id="filterLevel" class="select"><option value="">All Levels</option><option value="100">100 Level</option><option value="200">200 Level</option><option value="300">300 Level</option></select>
+            </div>
+            <div class="page-toolbar__right">
+              <span class="count-pill" id="studentsCount">0 students</span>
+              <button class="btn btn--ghost qa-edit-only" id="btnImportStudentsCsv">Import CSV</button>
+              <input type="file" id="studentsCsvInput" accept=".csv,text/csv" hidden />
+              <button class="btn btn--ghost" id="btnSeedStudents" class="btn btn--ghost qa-edit-only" title="Only needed if the repository list is empty">Reload master list</button>
+              <button class="btn btn--primary" id="btnAddStudent" class="btn btn--primary qa-edit-only">+ Add Student</button>
+            </div>
+          </div>
+          
+          <div class="card qa-edit-only" id="studentBulkBar" style="margin-bottom:12px">
+            <div class="card__body" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+              <label class="field" style="margin:0"><span class="field__label">Move selected to programme</span>
+                <select id="bulkProgramme"><option value="">— Programme —</option></select>
+              </label>
+              <label class="field" style="margin:0"><span class="field__label">Move selected to level</span>
+                <select id="bulkLevel"><option value="">— Level —</option></select>
+              </label>
+              <button type="button" class="btn btn--primary" id="btnBulkMove">Apply move / upgrade</button>
+              <button type="button" class="btn btn--ghost" id="btnBulkDeactivate">Remove from active group</button>
+              <button type="button" class="btn btn--ghost" id="btnBulkDeleteStudents" style="color:#b91c1c">Delete selected…</button>
+              <span class="muted-note" id="bulkSelectedCount">0 selected</span>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead><tr><th class="qa-edit-only"><input type="checkbox" id="selectAllStudents" title="Select all visible" /></th><th>Name</th><th>Reg. No</th><th>Programme</th><th>Level</th><th>Hostel</th><th>Status</th><th></th></tr></thead>
+                <tbody id="studentsTableBody"></tbody>
+              </table>
+            </div>
+            <div class="empty-state" id="studentsEmpty"><h3>No students yet</h3><p>Click Add Student. Leave Reg. No blank for TMP-EOCNS/YY/####/GNS (or MID).</p></div>
+          </div>
+        </section>
+        <section class="view" id="view-lecturers">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left"><div class="search-box"><input type="search" id="lecturerSearch" placeholder="Search lecturer or staff ID…" /></div></div>
+            <div class="page-toolbar__right">
+              <span class="count-pill" id="lecturersCount">0 lecturers</span>
+              <button class="btn btn--primary qa-edit-only" id="btnAddLecturer">+ Add Lecturer</button>
+            </div>
+          </div>
+          <div class="table-card">
+            <table class="data-table"><thead><tr><th>Name</th><th>Staff ID</th><th>Course assignments</th><th>Sessions</th><th>Contract hrs/sem</th><th>Phone</th><th>Status</th><th class="qa-edit-only"></th></tr></thead><tbody id="lecturersTableBody"></tbody></table>
+            <div class="empty-state" id="lecturersEmpty"><h3>No lecturers yet</h3><p>Click Add Lecturer to register staff and assign courses.</p></div>
+          </div>
+        </section>
+        <section class="view" id="view-hostel">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Upload the gate / biometric export (.xls / .xlsx) and generate the standard Hostel Absentees boarding-fee report.</p>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__header"><h3>1. Upload gate log</h3></div>
+            <div class="card__body">
+              <div id="hostelDropzone" class="dropzone" style="border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;cursor:pointer;background:var(--surface-2)">
+                <p style="margin:0 0 8px;font-weight:600">Drop the gate export here, or click to choose</p>
+                <p class="muted-note" style="margin:0">Required columns: Department, Name, No., Date/Time, Status, Location ID</p>
+                <input type="file" id="hostelFileInput" accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden />
+              </div>
+              <div id="hostelFileCheck" class="muted-note" style="margin-top:10px" hidden></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__header"><h3>Master hostel roster</h3></div>
+            <div class="card__body">
+              <p class="muted-note">Hostel assignment always comes from the <strong>student master list</strong>, not the biometric machine Location ID (machines often mix Hostel 1 / 2). Moving a student between hostels does not rewrite past published reports; new reports use the current master hostel.</p>
+              <div class="form-grid">
+                <label class="field"><span class="field__label">Filter by hostel</span>
+                  <select id="hostelRosterFilter">
+                    <option value="">All hostels</option>
+                    <option value="Hostel 1">Hostel 1</option>
+                    <option value="Hostel 2">Hostel 2</option>
+                    <option value="Off-campus">Off-campus</option>
+                    <option value="__unset">Not set</option>
+                  </select>
+                </label>
+                <label class="field"><span class="field__label">Programme</span><select id="hostelRosterProgramme"><option value="">All</option></select></label>
+                <label class="field"><span class="field__label">Level</span><select id="hostelRosterLevel"><option value="">All</option></select></label>
+                <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--ghost" id="btnRefreshHostelRoster">Refresh roster</button></label>
+              </div>
+              <div class="table-scroll" style="margin-top:12px;max-height:280px;overflow:auto">
+                <table class="data-table"><thead><tr><th>Name</th><th>Reg No</th><th>Programme</th><th>Level</th><th>Hostel</th></tr></thead>
+                <tbody id="hostelRosterBody"></tbody></table>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__header"><h3>2. Report settings</h3></div>
+            <div class="card__body">
+              <div class="form-grid">
+                <label class="field"><span class="field__label">Start date</span><input type="date" id="hostelStartDate" /></label>
+                <label class="field"><span class="field__label">End date</span><input type="date" id="hostelEndDate" /></label>
+                <label class="field"><span class="field__label">Rate per absent day (₦)</span><input type="number" id="hostelRate" value="15000" min="0" step="500" /></label>
+                <label class="field"><span class="field__label">Hostel 1 name (Location ID = 1)</span><input type="text" id="hostel1Name" value="Hostel 1" /></label>
+                <label class="field"><span class="field__label">Hostel 2 name (Location ID = 2)</span><input type="text" id="hostel2Name" value="Hostel 2" /></label>
+              </div>
+              <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+                <button type="button" class="btn btn--primary" id="btnGenerateHostel">Generate &amp; download report</button>
+                <button type="button" class="btn btn--ghost" id="btnClearHostel">Clear</button>
+              </div>
+              <div id="hostelStatus" class="muted-note" style="margin-top:12px"></div>
+            </div>
+          </div>
+
+          <div class="card" id="hostelResults" hidden>
+            <div class="card__header"><h3>Preview — Absentees only</h3></div>
+            <div class="card__body" style="overflow-x:auto">
+              <div id="hostelSummary" class="muted-note" style="margin-bottom:10px"></div>
+              <table class="data-table" id="hostelPreviewTable"><thead></thead><tbody></tbody></table>
+            </div>
+          </div>
+        </section>
+        <section class="view" id="view-sessions">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Create and manage academic sessions.</p></div>
+            <div class="page-toolbar__right">
+              <span class="count-pill" id="sessionsCount">0 sessions</span>
+              <button class="btn btn--primary" id="btnAddSession" class="btn btn--primary qa-edit-only" class="btn btn--primary qa-edit-only">+ New Session</button>
+            </div>
+          </div>
+          <div id="sessionsList"></div>
+          <div class="empty-state" id="sessionsEmpty"><h3>No sessions yet</h3><p>Create the first academic session.</p></div>
+        </section>
+                        <section class="view" id="view-timetable-board">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Weekly grid from saved timetables. Officers can open a slot to log a lecture.</p></div>
+            <div class="page-toolbar__right">
+              <select id="ttBoardProgramme" title="Programme"><option value="">Programme</option></select>
+              <select id="ttBoardLevel" title="Level"><option value="">Level</option></select>
+              <input type="hidden" id="ttBoardClass" value="100_nursing" />
+              <button type="button" class="btn btn--primary" id="btnRenderTtBoard">Show week board</button>
+            </div>
+          </div>
+          <div id="timetableBoard" class="card"><div class="card__body muted-note">Choose a class and click Show week board.</div></div>
+        </section>
+        <section class="view" id="view-qa-daily">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Timetable slots for the day — mark each as delivered or missed (same workflow as the college QA analyser).</p>
+            </div>
+            <div class="page-toolbar__right" style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="btn btn--primary" id="btnPrintDailyReport">Print today's lecture report</button>
+              <button class="btn btn--ghost qa-edit-only" id="btnAddQaEntry">+ Extra lecture</button>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__body">
+              <div class="form-grid">
+                <label class="field"><span class="field__label">Date</span><input type="date" id="qaDailyDate" /></label>
+                <label class="field"><span class="field__label">Programme</span>
+                  <select id="qaDailyProgramme"><option value="">Programme</option></select>
+                </label>
+                <label class="field"><span class="field__label">Level</span>
+                  <select id="qaDailyLevel"><option value="">Level</option></select>
+                </label>
+                <input type="hidden" id="qaDailyClass" value="100_nursing" />
+                <label class="field"><span class="field__label">&nbsp;</span>
+                  <button type="button" class="btn btn--primary" id="btnFilterQaDaily">Load day board</button>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div id="qaDailyStats" class="stats-grid" style="margin-bottom:16px" hidden></div>
+          
+          
+<div class="card">
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+              <h3 style="margin:0">Scheduled vs logged</h3>
+              <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadDailyQa" title="Download day report" hidden>⬇ Download</button>
+            </div>
+            <div class="card__body" style="overflow-x:auto">
+              <table class="data-table">
+                <thead><tr><th>Time</th><th>Course</th><th>Hrs</th><th>Status</th><th>Lecturer</th><th>Actual mins</th><th class="qa-edit-only">Actions</th></tr></thead>
+                <tbody id="qaDailyTableBody"></tbody>
+              </table>
+              <div class="empty-state" id="qaDailyEmpty"><h3>Pick a date and class</h3><p>Then click Load day board to see timetable slots.</p></div>
+            </div>
+          </div>
+        </section>
+                        <section class="view" id="view-qa-weekly">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Weekly teaching compliance — scheduled vs delivered vs missed (Mon–Fri), matching the QA weekly analyser.</p>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__body">
+              <div class="form-grid">
+                <label class="field"><span class="field__label">Start date</span><input type="date" id="qaWeekStart" /></label>
+                <label class="field"><span class="field__label">End date</span><input type="date" id="qaWeekEnd" /></label>
+                <label class="field"><span class="field__label">Class</span>
+                  <select id="qaWeekClass"></select>
+                </label>
+                <label class="field field--full"><span class="field__label">Exclude dates (holidays, comma YYYY-MM-DD)</span>
+                  <input type="text" id="qaWeekExclude" placeholder="e.g. 2026-06-12, 2026-06-13" />
+                </label>
+                <label class="field"><span class="field__label">&nbsp;</span>
+                  <button type="button" class="btn btn--primary" id="btnBuildWeeklyQa">Build weekly report</button>
+                  <button type="button" class="btn btn--ghost" id="btnPrintWeeklyQa">Print weekly pack</button>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div id="qaWeeklySummary" class="stats-grid" style="margin-bottom:16px" hidden></div>
+          <div class="card" id="qaWeeklyCard" hidden style="margin-bottom:16px">
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+              <h3 style="margin:0">Course compliance (scheduled vs delivered)</h3>
+              <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadWeeklyQa" title="Download weekly report">⬇ Download</button>
+            </div>
+            <div class="card__body" style="overflow-x:auto">
+              <table class="data-table">
+                <thead><tr><th>Course</th><th>Scheduled</th><th>Delivered</th><th>Missed</th><th>Status</th><th>Rate</th></tr></thead>
+                <tbody id="qaWeeklyCourseBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card" id="qaWeeklyDayCard" hidden>
+            <div class="card__header"><h3>Day-by-day breakdown</h3></div>
+            <div class="card__body" style="overflow-x:auto">
+              <table class="data-table">
+                <thead><tr><th>Date</th><th>Day</th><th>Course</th><th>Scheduled hrs</th><th>Logged status</th><th>Lecturer</th></tr></thead>
+                <tbody id="qaWeeklyTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+                        <section class="view" id="view-qa-monthly">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Full monthly QA — compliance by course and lecturer against the timetable.</p>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__body">
+              <div class="form-grid">
+                <label class="field"><span class="field__label">Month</span><input type="month" id="qaMonthInput" /></label>
+                <label class="field"><span class="field__label">Class</span>
+                  <select id="qaMonthClass"></select>
+                </label>
+                <label class="field field--full"><span class="field__label">Exclude dates (comma YYYY-MM-DD)</span>
+                  <input type="text" id="qaMonthExclude" placeholder="holidays / mid-term breaks" />
+                </label>
+                <label class="field"><span class="field__label">&nbsp;</span>
+                  <button type="button" class="btn btn--primary" id="btnBuildMonthlyQa">Build monthly report</button>
+                  <button type="button" class="btn btn--ghost" id="btnPrintMonthlyQa">Print monthly pack</button>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div id="qaMonthlySummary" class="stats-grid" style="margin-bottom:16px" hidden></div>
+          <div class="grid-2" id="qaMonthlyDetail" hidden>
+            <div class="card">
+              <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0">By course</h3>
+                <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadMonthlyQa">⬇ Download</button>
+              </div>
+              <div class="card__body" style="overflow-x:auto">
+                <table class="data-table"><thead><tr><th>Course</th><th>Scheduled</th><th>Delivered</th><th>Missed</th><th>Rate</th></tr></thead>
+                <tbody id="qaMonthCourseBody"></tbody></table>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card__header"><h3>By lecturer</h3></div>
+              <div class="card__body" style="overflow-x:auto">
+                <table class="data-table"><thead><tr><th>Lecturer</th><th>Held</th><th>Missed</th><th>Rate</th></tr></thead>
+                <tbody id="qaMonthLecBody"></tbody></table>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <section class="view" id="view-attendance">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Printable class attendance sheets from the student master (programme + level).</p>
+            </div>
+            <div class="page-toolbar__right" style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="btn btn--primary" id="btnDownloadAttendanceDocx">Download Word (.doc)</button>
+              <button type="button" class="btn btn--ghost" id="btnPrintAttendance">Print</button>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__body">
+              <div class="form-grid">
+                <label class="field"><span class="field__label">Programme <span class="req">*</span></span><select id="attProgramme"><option value="">— Select —</option></select></label>
+                <label class="field"><span class="field__label">Level <span class="req">*</span></span><select id="attLevel"><option value="">— Select —</option></select></label>
+                <label class="field"><span class="field__label">Session label</span><input type="text" id="attSessionLabel" placeholder="e.g. 2026/2027 SESSION" /></label>
+                <label class="field"><span class="field__label">Course code columns</span><input type="number" id="attCourseCols" min="1" max="12" value="4" /></label>
+                <label class="field"><span class="field__label">&nbsp;</span>
+                  <button type="button" class="btn btn--primary" id="btnBuildAttendance">Build sheet</button>
+                </label>
+              </div>
+              <p class="muted-note" style="margin:12px 0 0">Matches the college paper format: S/N, student names, then blank <strong>COURSE CODE</strong> columns for marking, plus lecturer signature lines at the bottom.</p>
+            </div>
+          </div>
+          <div class="card" id="attendanceSheetCard">
+            <div class="card__header"><h3 id="attendanceSheetTitle">Attendance sheet</h3></div>
+            <div class="card__body" style="overflow-x:auto" id="attendanceSheetBody">
+              <div class="empty-state"><h3>Choose filters</h3><p>Select programme / level and build a printable sheet.</p></div>
+            </div>
+          </div>
+        </section>
+
+        
+        
+        <section class="view" id="view-remedial">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Standalone Remedial Class System — enrolment by failed courses, timetable, logging, weekly &amp; summary QA packs. Officer sign-in required to edit.</p>
+            </div>
+          </div>
+          <div class="rem-tabs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+            <button type="button" class="btn btn--ghost rem-tab active" data-rem-tab="setup">Setup</button>
+            <button type="button" class="btn btn--ghost rem-tab" data-rem-tab="enrolment">Enrolment list</button>
+            <button type="button" class="btn btn--ghost rem-tab" data-rem-tab="timetable">Timetable &amp; lecturers</button>
+            <button type="button" class="btn btn--ghost rem-tab" data-rem-tab="logging">Lecture log</button>
+            <button type="button" class="btn btn--ghost rem-tab" data-rem-tab="weekly">Weekly QA</button>
+            <button type="button" class="btn btn--ghost rem-tab" data-rem-tab="summary">Summary report</button>
+          </div>
+
+          <div class="rem-panel" id="remPanel-setup">
+            <div class="grid-2">
+              <div class="card">
+                <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
+                  <h3 style="margin:0">Remedial programmes</h3>
+                  <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnRemAddProgramme">+ Add</button>
+                </div>
+                <div class="card__body"><ul id="remProgrammesList" class="muted-note" style="margin:0;padding-left:18px"></ul></div>
+              </div>
+              <div class="card">
+                <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
+                  <h3 style="margin:0">Remedial levels</h3>
+                  <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnRemAddLevel">+ Add</button>
+                </div>
+                <div class="card__body"><ul id="remLevelsList" class="muted-note" style="margin:0;padding-left:18px"></ul></div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:12px">
+              <div class="card__body">
+                <label class="field"><span class="field__label">Active remedial session (from Sessions master)</span>
+                  <select id="remActiveSession"><option value="">— Select session —</option></select>
+                </label>
+                <p class="muted-note">Session list comes from Academic Sessions already created in the main system.</p>
+                <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnRemSaveSession">Save session link</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="rem-panel" id="remPanel-enrolment" hidden>
+            <div class="page-toolbar">
+              <div class="page-toolbar__left" style="display:flex;gap:8px;flex-wrap:wrap">
+                <select id="remEnrFilterProg"><option value="">All programmes</option></select>
+                <select id="remEnrFilterLevel"><option value="">All levels</option></select>
+              </div>
+              <div class="page-toolbar__right qa-edit-only">
+                <button type="button" class="btn btn--primary" id="btnRemAddEnrolment">+ Enrol student</button>
+              </div>
+            </div>
+            <div class="table-card">
+              <table class="data-table">
+                <thead><tr><th>Name</th><th>Matric</th><th>Programme</th><th>Level</th><th>Enrolled courses</th><th class="qa-edit-only"></th></tr></thead>
+                <tbody id="remEnrolmentBody"></tbody>
+              </table>
+              <div class="empty-state" id="remEnrolmentEmpty"><h3>No enrolment yet</h3><p>Add only students who failed specific courses.</p></div>
+            </div>
+          </div>
+
+          <div class="rem-panel" id="remPanel-timetable" hidden>
+            <div class="card">
+              <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+                <h3 style="margin:0">Course → lecturer assignments</h3>
+                <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnRemAddAssignment">+ Assignment</button>
+              </div>
+              <div class="card__body table-scroll">
+                <table class="data-table"><thead><tr><th>Course code</th><th>Course title</th><th>Lecturer</th><th>Hours / slot</th><th class="qa-edit-only"></th></tr></thead>
+                <tbody id="remAssignBody"></tbody></table>
+              </div>
+            </div>
+            <div class="card" style="margin-top:12px">
+              <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+                <h3 style="margin:0">Weekly timetable slots</h3>
+                <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnRemAddSlot">+ Slot</button>
+              </div>
+              <div class="card__body table-scroll">
+                <table class="data-table"><thead><tr><th>Weekday</th><th>Course</th><th>Start</th><th>End</th><th>Hours</th><th class="qa-edit-only"></th></tr></thead>
+                <tbody id="remTtBody"></tbody></table>
+                <p class="muted-note">Weekday: 0=Mon … 4=Fri. Save is automatic into local master; Publish to repository when ready.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="rem-panel" id="remPanel-logging" hidden>
+            <div class="card" style="margin-bottom:12px">
+              <div class="card__body form-grid">
+                <label class="field"><span class="field__label">Date</span><input type="date" id="remLogDate" /></label>
+                <label class="field"><span class="field__label">Course</span><select id="remLogCourse"><option value="">— Select —</option></select></label>
+                <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--primary" id="btnRemLoadLogSheet">Load enrolled sheet</button></label>
+              </div>
+            </div>
+            <div id="remLogSheet" class="card"><div class="card__body muted-note">Pick date and course to mark present/absent for enrolled students only.</div></div>
+            <div class="page-toolbar" style="margin-top:12px">
+              <div class="page-toolbar__right qa-edit-only">
+                <button type="button" class="btn btn--primary" id="btnRemSaveLog">Save lecture log (REF required)</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="rem-panel" id="remPanel-weekly" hidden>
+            <div class="card">
+              <div class="card__body form-grid">
+                <label class="field"><span class="field__label">Week start</span><input type="date" id="remWeekStart" /></label>
+                <label class="field"><span class="field__label">Week end</span><input type="date" id="remWeekEnd" /></label>
+                <label class="field field--full"><span class="field__label">Excluded dates</span><input type="text" id="remWeekExclude" placeholder="e.g. 2026-10-13" /></label>
+                <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--primary" id="btnRemBuildWeekly">Build weekly analysis</button></label>
+                <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--ghost" id="btnRemPrintWeekly">Print weekly pack</button></label>
+              </div>
+            </div>
+            <div id="remWeeklyResult" style="margin-top:12px"></div>
+          </div>
+
+          <div class="rem-panel" id="remPanel-summary" hidden>
+            <div class="card">
+              <div class="card__body form-grid">
+                <label class="field"><span class="field__label">Period start</span><input type="date" id="remSumStart" /></label>
+                <label class="field"><span class="field__label">Period end</span><input type="date" id="remSumEnd" /></label>
+                <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--primary" id="btnRemBuildSummary">Build summary</button></label>
+                <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--ghost" id="btnRemPrintSummary">Print summary pack</button></label>
+              </div>
+              <p class="muted-note">Aggregates all remedial weeks in the range (course-specific rates + lecturer hours).</p>
+            </div>
+            <div id="remSummaryResult" style="margin-top:12px"></div>
+          </div>
+        </section>
+
+        <section class="view" id="view-lecturer-hours">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Contract hours are set <strong>per semester</strong>. Pick a semester for the whole-semester position, or also pick a month to see that month's share (worked out from each lecturer's timetable slots and the weeks that fall in the semester). Regular lecture logs only (not remedial).</p>
+            </div>
+            <div class="page-toolbar__right" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <select id="lecturerHoursSemester" title="Semester"></select>
+              <input type="month" id="lecturerHoursMonth" title="Month (optional — leave empty for the whole semester)" />
+              <button type="button" class="btn btn--primary" id="btnBuildLecturerHours">Build report</button>
+              <button type="button" class="btn btn--ghost" id="btnPrintLecturerHours">Print pack</button>
+            </div>
+          </div>
+          <div id="lecturerHoursResult" class="card"><div class="card__body muted-note">Choose a semester (and optionally a month) and build the report.</div></div>
+        </section>
+
+<section class="view" id="view-reports">
+          <div class="page-toolbar">
+            <div class="page-toolbar__left">
+              <p class="muted-note" style="margin:0">Professional QA and compliance packs: executive summary, charts, tables and narrative.</p>
+            </div>
+            <div class="page-toolbar__right" style="display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="btn btn--primary" id="btnPrintFullQaPack">Print full QA pack</button>
+              <button type="button" class="btn btn--ghost qa-edit-only" id="btnExportLectureLogs">Export JSON</button>
+              <button type="button" class="btn btn--ghost qa-edit-only" id="btnExportSnapshot">Export full snapshot</button>
+              <button type="button" class="btn btn--ghost qa-edit-only" id="btnImportSnapshot">Import snapshot</button>
+              <input type="file" id="snapshotFileInput" accept="application/json,.json" hidden />
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__body">
+              <div class="form-grid">
+                <label class="field"><span class="field__label">From</span><input type="date" id="reportFrom" /></label>
+                <label class="field"><span class="field__label">To</span><input type="date" id="reportTo" /></label>
+                <label class="field"><span class="field__label">Class</span>
+                  <select id="reportClass"><option value="">All classes</option></select>
+                </label>
+                <label class="field"><span class="field__label">&nbsp;</span>
+                  <button type="button" class="btn btn--primary" id="btnFilterReports">Show logs</button>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
+              <h3 style="margin:0">Lecture log master</h3>
+              <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadFilteredReports">⬇ JSON</button>
+              <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnPrintLectureReport">Print / PDF</button>
+            </div>
+            <div class="card__body" style="overflow-x:auto">
+              <table class="data-table">
+                <thead><tr><th>Date</th><th>Class</th><th>Course</th><th>Lecturer</th><th>Time</th><th>Status</th><th>Topic</th><th>Absent</th></tr></thead>
+                <tbody id="reportsTableBody"></tbody>
+              </table>
+              <div class="empty-state" id="reportsEmpty"><h3>No logs in range</h3><p>Log lectures under Daily QA. Data is stored in the master QA entries sheet.</p></div>
+            </div>
+          </div>
+        </section>
+        <section class="view" id="view-audit">
+          <div class="card" id="auditDeniedCard">
+            <div class="card__body" style="text-align:center;padding:40px 20px">
+              <h3 style="margin:0 0 8px">Access not granted</h3>
+              <p class="muted-note" style="margin:0">The audit trail is restricted to authenticated QA officers. Sign in under Settings to view access logs.</p>
+            </div>
+          </div>
+          <div class="card" id="auditOfficerCard" hidden>
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+              <h3 style="margin:0">Audit Trail</h3>
+              <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadAudit">⬇ Download</button>
+            </div>
+            <div class="card__body" id="auditList"><p>No audit entries yet.</p></div>
+          </div>
+        </section>
+                <section class="view" id="view-settings">
+          
+          <div class="card" style="margin-top:16px" id="changePinCard">
+            <div class="card__header"><h3>Change QA officer PIN</h3></div>
+            <div class="card__body">
+              <p class="muted-note">Use this if the PIN may have leaked. You must know the <strong>current</strong> PIN. The new PIN is written to <code>data/config.json</code> in the repository through the publish worker (GitHub token stays on the worker).</p>
+              <div class="form-grid">
+                <label class="field field--full"><span class="field__label">Current PIN</span>
+                  <input type="password" id="changePinCurrent" autocomplete="current-password" />
+                </label>
+                <label class="field"><span class="field__label">New PIN</span>
+                  <input type="password" id="changePinNew" autocomplete="new-password" />
+                </label>
+                <label class="field"><span class="field__label">Confirm new PIN</span>
+                  <input type="password" id="changePinConfirm" autocomplete="new-password" />
+                </label>
+              </div>
+              <p class="muted-note" id="changePinStatus" style="margin-top:10px" hidden></p>
+              <button type="button" class="btn btn--primary" id="btnChangeQaPin" style="margin-top:12px">Update PIN in repository</button>
+            </div>
+          </div>
+<div class="card" style="margin-bottom:16px">
+            <div class="card__header"><h3>QA Officer access</h3></div>
+            <div class="card__body">
+              <p class="muted-note" style="margin-top:0">Everyone can view. Editing, creating records, and downloads require QA Officer sign-in. PIN is stored in <code>data/config.json</code> in the repository. Use <strong>Change officer PIN</strong> below after a leak or rotation — it verifies the current PIN, then updates the repository via the publish worker.</p>
+              <div id="qaAuthLoggedOut">
+                <div class="form-grid" style="max-width:360px">
+                  <label class="field field--full"><span class="field__label">Officer PIN</span><input type="password" id="qaPinInput" placeholder="Enter QA PIN" autocomplete="off" /></label>
+                </div>
+                <button type="button" class="btn btn--primary" id="btnQaLogin" style="margin-top:12px">Sign in as QA Officer</button>
+                <p id="qaAuthError" class="muted-note" style="color:#b91c1c;margin-top:8px" hidden></p>
+              </div>
+              <div id="qaAuthLoggedIn" hidden>
+                <p style="margin:0 0 12px"><span class="badge badge--green">Signed in</span> Edit and download roles active.</p>
+                <div style="display:flex;flex-wrap:wrap;gap:10px">
+                  <button type="button" class="btn btn--primary" id="btnExportStudents">Export snapshot (JSON)</button>
+                  <button type="button" class="btn btn--primary" id="btnPublishAll">Publish all data to repository</button>
+                  <button type="button" class="btn btn--ghost" id="btnQaLogout">Sign out</button>
+                </div>
+                <div id="qaPublishStatus" class="muted-note" style="margin-top:12px"></div>
+                <div id="qaTokenPanel" style="margin-top:16px" hidden>
+                  <p class="muted-note">Confirm with your officer PIN. The page sends data to the publish worker (GitHub token stays on the worker). If publish fails, the status line explains the likely cause (PIN, worker URL, PUBLISH_KEY mismatch, GitHub token, or network).</p>
+                  <label class="field field--full"><span class="field__label">Confirm officer PIN</span>
+                    <input type="password" id="qaPublishPin" placeholder="Officer PIN" autocomplete="off" />
+                  </label>
+                  <button type="button" class="btn btn--primary" id="btnConfirmPublish" style="margin-top:8px">Confirm publish all</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__header"><h3>Full backup &amp; restore</h3></div>
+            <div class="card__body">
+              <p class="muted-note">Download <strong>all</strong> operational data including students <em>with passport photos</em>, discipline cases, lecturers, sessions, QA logs, audit, remedial, timetables, attendance, hostel, programmes, levels, courses, and config. Restore uploads the same file and rebuilds local stores so the system matches this backup version — then <strong>Publish</strong> so the repository matches.</p>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+                <button type="button" class="btn btn--primary qa-edit-only" id="btnFullBackupDownload">Download full backup</button>
+                <button type="button" class="btn btn--ghost qa-edit-only" id="btnFullBackupRestore">Restore from backup file</button>
+                <input type="file" id="fullBackupFileInput" accept="application/json,.json" hidden />
+              </div>
+              <p class="muted-note" id="fullBackupStatus" style="margin-top:8px" hidden></p>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__header"><h3>Documentation &amp; handover</h3></div>
+            <div class="card__body">
+              <p class="muted-note">Official package for the College (PDFs). Open online or download the zip.</p>
+              <ul class="muted-note" style="padding-left:18px">
+                <li><a href="docs/01_System_Handover_Document.pdf" target="_blank" rel="noopener">System Handover Document</a></li>
+                <li><a href="docs/02_Technical_Documentation.pdf" target="_blank" rel="noopener">Technical Documentation</a></li>
+                <li><a href="docs/03_User_Manual.pdf" target="_blank" rel="noopener">User Manual</a></li>
+                <li><a href="docs/04_Maintenance_Backup_Recovery_Guide.pdf" target="_blank" rel="noopener">Maintenance, Backup &amp; Recovery</a></li>
+                <li><a href="docs/05_Developer_Contribution_Acknowledgment_Letter.pdf" target="_blank" rel="noopener">Developer Acknowledgment Letter (template)</a></li>
+                <li><a href="docs/06_Professional_Portfolio_Case_Study.pdf" target="_blank" rel="noopener">Portfolio Case Study</a></li>
+              </ul>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+                <a class="btn btn--primary" href="docs/EOCNS_System_Documentation_Package.zip">Download full documentation zip</a>
+                <button type="button" class="btn btn--ghost" id="btnPrintHandoverPack">Print quick officer handover sheet</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__header"><h3>Data source</h3></div>
+            <div class="card__body">
+              <p class="muted-note" style="margin:0">Students, lecturers, sessions, programmes, levels, courses, timetables, QA logs and audit all live under <code>data/</code> in the repository.</p>
+              <button type="button" class="btn btn--ghost" id="btnReloadFromRepo" style="margin-top:12px">Reload all data from repository</button>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0">Programmes</h3>
+                <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnAddProgramme">+ Add</button>
+              </div>
+              <div class="card__body"><ul id="programmesList" class="muted-note" style="margin:0;padding-left:18px"></ul></div>
+            </div>
+            <div class="card">
+              <div class="card__header" style="display:flex;justify-content:space-between;align-items:center">
+                <h3 style="margin:0">Levels</h3>
+                <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnAddLevel">+ Add</button>
+              </div>
+              <div class="card__body"><ul id="levelsList" class="muted-note" style="margin:0;padding-left:18px"></ul></div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px">
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+              <div>
+                <h3 style="margin:0">Courses catalogue</h3>
+                <p class="muted-note" style="margin:4px 0 0;font-size:0.85rem">Official codes &amp; titles. Timetable slots pick from this list. Missing codes prompt the officer to add them.</p>
+                <p class="muted-note" style="margin:4px 0 0">Official codes &amp; titles. Timetable slots pick from this list. Unknown codes prompt you to add them.</p>
+              </div>
+              <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnAddCourse">+ Add course</button>
+            </div>
+            <div class="card__body" style="overflow-x:auto">
+              <table class="data-table"><thead><tr><th>Code</th><th>Title</th><th>Linked classes</th><th class="qa-edit-only"></th></tr></thead>
+              <tbody id="coursesTableBody"></tbody></table>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px" id="timetableEditor">
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+              <h3 style="margin:0">Timetable editor</h3>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <select id="ttEditProgramme" class="qa-edit-only"><option value="">Programme</option></select>
+                <select id="ttEditLevel" class="qa-edit-only"><option value="">Level</option></select>
+                <input type="hidden" id="ttClassKey" value="100_nursing" />
+                <button type="button" class="btn btn--primary btn--sm qa-edit-only" id="btnAddTimetableSlot">+ Slot</button>
+                <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnSaveTimetable">Save timetable</button>
+              </div>
+            </div>
+            <div class="card__body" style="overflow-x:auto">
+              <table class="data-table">
+                <thead><tr><th>Weekday</th><th>Code</th><th>Start</th><th>End</th><th>Hours</th><th class="qa-edit-only"></th></tr></thead>
+                <tbody id="timetableSlotsBody"></tbody>
+              </table>
+              <p class="muted-note">Weekday: 0=Mon … 4=Fri. Save stores in memory then Publish to write <code>data/timetables.json</code>.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal" id="studentModal" hidden>
+    <div class="modal__backdrop" id="studentModalBackdrop"></div>
+    <div class="modal__dialog">
+      <div class="modal__header"><h3 id="studentModalTitle">Add Student</h3><button class="icon-btn" id="btnCancelStudent" type="button">×</button></div>
+      <form id="studentForm" class="modal__body">
+        <input type="hidden" id="studentId" />
+        <div class="form-grid">
+          <label class="field field--full"><span class="field__label">Full Name <span class="req">*</span></span><input type="text" id="studentName" required /></label>
+          <label class="field"><span class="field__label">Registration Number</span><input type="text" id="studentRegNo" placeholder="Leave blank for TMP-EOCNS/YY/####/CODE" /></label>
+          <label class="field"><span class="field__label">Programme</span><select id="studentProgramme"><option value="">— Select —</option></select></label>
+          <label class="field"><span class="field__label">Level</span><select id="studentLevel"><option value="">— Select —</option></select></label>
+          <label class="field"><span class="field__label">Gender</span><select id="studentGender"><option value="">—</option><option value="Female">Female</option><option value="Male">Male</option></select></label>
+          <label class="field"><span class="field__label">Hostel (master)</span>
+            <select id="studentHostel">
+              <option value="">— Not set —</option>
+              <option value="Hostel 1">Hostel 1</option>
+              <option value="Hostel 2">Hostel 2</option>
+              <option value="Off-campus">Off-campus</option>
+            </select>
+          </label>
+          <label class="field"><span class="field__label">Status</span><select id="studentStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></label>
+          <label class="field"><span class="field__label">Phone</span><input type="tel" id="studentPhone" /></label>
+          <div class="field field--full" id="studentPhotoField">
+            <span class="field__label">Passport photograph</span>
+            <p class="muted-note" style="margin:4px 0 8px">Optional. Image is auto-compressed before save (same as profile upload).</p>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+              <div class="passport-frame" id="studentPhotoPreview" style="width:96px;height:120px">—</div>
+              <div>
+                <input type="file" id="studentPhotoInput" accept="image/*" />
+                <button type="button" class="btn btn--ghost btn--sm" id="btnClearStudentPhoto" style="margin-top:8px">Clear photo</button>
+              </div>
+            </div>
+            <input type="hidden" id="studentPhotoDataUrl" value="" />
+          </div>
+          <label class="field field--full" id="auditReasonGroup" hidden><span class="field__label">Reason for change <span class="req">*</span></span><textarea id="auditReason" rows="2"></textarea></label>
+          <label class="field field--full" id="auditRefGroup" hidden><span class="field__label">Official Reference Number <span class="req">*</span></span><input type="text" id="auditRef" placeholder="REF/EOCNS/QA/0042" /></label>
+        </div>
+        <div class="modal__footer"><button type="button" class="btn btn--ghost" id="btnCancelStudent2">Cancel</button><button type="submit" class="btn btn--primary">Save Student</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="lecturerModal" hidden>
+    <div class="modal__backdrop" id="lecturerModalBackdrop"></div>
+    <div class="modal__dialog">
+      <div class="modal__header"><h3 id="lecturerModalTitle">Add Lecturer</h3><button class="icon-btn" type="button" onclick="document.getElementById('lecturerModal').hidden=true">×</button></div>
+      <form id="lecturerForm" class="modal__body">
+        <input type="hidden" id="lecturerId" />
+        <div class="form-grid">
+          <label class="field field--full"><span class="field__label">Full Name <span class="req">*</span></span><input type="text" id="lecturerName" required /></label>
+          <label class="field"><span class="field__label">Staff ID <span class="cell-sub">(auto)</span></span><input type="text" id="lecturerStaffId" readonly placeholder="EOCNS/STF/YYYY/####" /></label>
+          <label class="field"><span class="field__label">Phone</span><input type="tel" id="lecturerPhone" /></label>
+          <div class="field field--full">
+            <span class="field__label">Course assignments (programme × level)</span>
+            <p class="muted-note" style="margin:4px 0 8px">A lecturer can teach multiple courses across different programmes and levels in the same session. Add one row per assignment.</p>
+            <div id="lecturerAssignRows"></div>
+            <button type="button" class="btn btn--ghost btn--sm" id="btnAddLecturerAssign" style="margin-top:8px">+ Add course assignment</button>
+            <input type="hidden" id="lecturerCourses" />
+          </div>
+          <div class="field field--full"><span class="field__label">Sessions</span>
+            <p class="muted-note" style="margin:4px 0 8px">Academic session(s) this lecturer teaches in.</p>
+            <div id="lecturerSessionsBox" class="chip-box"></div>
+          </div>
+          <label class="field"><span class="field__label">Contract hours / semester</span>
+            <input type="number" id="lecturerContractHours" min="0" step="0.5" placeholder="e.g. 40" />
+          </label>
+          <label class="field"><span class="field__label">Status</span><select id="lecturerStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></label>
+        </div>
+        <div class="modal__footer"><button type="button" class="btn btn--ghost" onclick="document.getElementById('lecturerModal').hidden=true">Cancel</button><button type="submit" class="btn btn--primary">Save Lecturer</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="sessionModal" hidden>
+    <div class="modal__backdrop" id="sessionModalBackdrop"></div>
+    <div class="modal__dialog">
+      <div class="modal__header"><h3 id="sessionModalTitle">New Academic Session</h3><button class="icon-btn" type="button" onclick="document.getElementById('sessionModal').hidden=true">×</button></div>
+      <form id="sessionForm" class="modal__body">
+        <input type="hidden" id="sessionId" />
+        <div class="form-grid">
+          <label class="field field--full"><span class="field__label">Session Name <span class="req">*</span></span><input type="text" id="sessionName" required placeholder="e.g. 2025/2026 Academic Session" /></label>
+          <label class="field"><span class="field__label">Start Date</span><input type="date" id="sessionStart" /></label>
+          <label class="field"><span class="field__label">Status</span><select id="sessionStatus"><option value="Active">Active</option><option value="Planned">Planned</option><option value="Completed">Completed</option></select></label>
+          <div class="field field--full"><span class="field__label">Semesters</span>
+            <p class="muted-note" style="margin:4px 0 8px">Usually 1st and 2nd, but add or remove as needed. Start/end dates drive the monthly lecturer-hours breakdown.</p>
+            <div id="sessionSemestersBox"></div>
+            <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnSessionAddSemester" style="margin-top:6px">+ Add semester</button>
+          </div>
+          <label class="field field--full"><span class="field__label">Programmes</span>
+            <div id="sessionProgrammesBox" class="chip-box"></div>
+            <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnSessionAddProgramme" style="margin-top:8px">+ New programme</button>
+          </label>
+          <label class="field field--full"><span class="field__label">Levels</span>
+            <div id="sessionLevelsBox" class="chip-box"></div>
+            <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnSessionAddLevel" style="margin-top:8px">+ New level</button>
+          </label>
+        </div>
+        <div class="modal__footer"><button type="button" class="btn btn--ghost" onclick="document.getElementById('sessionModal').hidden=true">Cancel</button><button type="submit" class="btn btn--primary">Save Session</button></div>
+      </form>
+    </div>
+  </div>
+
+  
+  <div class="modal" id="qaEntryModal" hidden>
+    <div class="modal__backdrop" id="qaEntryModalBackdrop"></div>
+    <div class="modal__dialog">
+      <div class="modal__header"><h3 id="qaEntryModalTitle">Log lecture</h3><button class="icon-btn" type="button" id="btnCancelQaEntry">×</button></div>
+      <form id="qaEntryForm" class="modal__body">
+        <input type="hidden" id="qaEntryId" />
+        <div class="form-grid">
+          <label class="field"><span class="field__label">Date <span class="req">*</span></span><input type="date" id="qaEntryDate" required /></label>
+          <label class="field"><span class="field__label">Class <span class="req">*</span></span>
+            <select id="qaEntryClass" required></select>
+          </label>
+          <label class="field field--full"><span class="field__label">Course <span class="req">*</span></span>
+            <select id="qaEntryCourse" required>
+              <option value="">— Select course —</option>
+            </select>
+          </label>
+          <label class="field field--full"><span class="field__label">Lecturer <span class="req">*</span></span>
+            <select id="qaEntryLecturer" required>
+              <option value="">— Select lecturer —</option>
+            </select>
+          </label>
+          <label class="field"><span class="field__label">Start time <span class="req">*</span></span><input type="time" id="qaEntryStart" required /></label>
+          <label class="field"><span class="field__label">End time <span class="req">*</span></span><input type="time" id="qaEntryEnd" required /></label>
+          <label class="field"><span class="field__label">Status <span class="req">*</span></span>
+            <select id="qaEntryStatus" required>
+              <option value="Held">Held</option>
+              <option value="Missed">Missed</option>
+              <option value="Partial">Partial</option>
+              <option value="Rescheduled">Rescheduled</option>
+            </select>
+          </label>
+          <label class="field"><span class="field__label">Duration (minutes)</span>
+            <input type="number" id="qaEntryDuration" readonly tabindex="-1" placeholder="Auto from start–end" title="Calculated from start and end time" />
+          </label>
+          <label class="field field--full"><span class="field__label">Topic</span><input type="text" id="qaEntryTopic" placeholder="Lecture topic" /></label>
+          <label class="field field--full"><span class="field__label">Learning objectives</span><textarea id="qaEntryObjectives" rows="2" placeholder="Separate with period or semicolon"></textarea></label>
+          <label class="field field--full"><span class="field__label">Lecture summary</span><textarea id="qaEntrySummary" rows="3" placeholder="What was covered…"></textarea></label>
+          <label class="field"><span class="field__label">Assignment</span><textarea id="qaEntryAssignment" rows="2" placeholder="e.g. No assignment was given."></textarea></label>
+          <label class="field"><span class="field__label">Remarks</span><textarea id="qaEntryRemark" rows="2" placeholder="Class participation, notes…"></textarea></label>
+          <div class="field field--full" id="qaAbsentPickerWrap">
+            <span class="field__label">Absent students</span>
+            <p class="muted-note" style="margin:4px 0 8px">Pick from the master list for this programme &amp; level (same for timetable and extra lectures). First-time log does not need REF — only edits do.</p>
+            <input type="search" id="qaAbsentSearch" class="absent-search" placeholder="Search by name or reg. no…" autocomplete="off" />
+            <div class="student-list" id="qaAbsentStudentList" style="max-height:200px;overflow:auto;border:1px solid var(--border,#e2e8f0);border-radius:0 0 8px 8px;margin-top:-1px"></div>
+            <div class="absent-tags" id="qaAbsentTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:28px"></div>
+            <input type="hidden" id="qaEntryAbsent" value="" />
+          </div>
+        </div>
+          <div id="qaEntryAmendBlock" class="form-grid" hidden style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border, #e2e8f0)">
+            <p class="muted-note field--full" style="margin:0">Editing a saved lecture requires an official REF and a reason. The change is written to the master QA sheet and noted on reports.</p>
+            <label class="field field--full"><span class="field__label">Official REF <span class="req">*</span></span>
+              <input type="text" id="qaEntryEditRef" placeholder="REF/EOCNS/QA/####" autocomplete="off" />
+            </label>
+            <label class="field field--full"><span class="field__label">Reason for change <span class="req">*</span></span>
+              <textarea id="qaEntryEditReason" rows="2" placeholder="e.g. Corrected lecturer name / status was logged in error"></textarea>
+            </label>
+          </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" id="btnCancelQaEntry2">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="qaEntrySaveBtn">Save entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+    <div class="modal" id="studentProfileDrawer" hidden>
+    <div class="modal__backdrop" id="studentProfileBackdrop"></div>
+    <div class="modal__dialog" style="max-width:720px">
+      <div class="modal__header"><h3 id="studentProfileTitle">Student profile</h3><button type="button" class="icon-btn" id="btnCloseStudentProfile" aria-label="Close">&times;</button></div>
+      <div class="modal__body" id="studentProfileBody"></div>
+      <div class="modal__footer" style="flex-wrap:wrap;gap:8px">
+        <button type="button" class="btn btn--ghost" id="btnProfileFullRecord">Full record</button>
+        <button type="button" class="btn btn--ghost qa-edit-only" id="btnProfilePhoto">Passport photo</button>
+        <button type="button" class="btn btn--ghost qa-edit-only" id="btnProfileEdit">Edit</button>
+        <button type="button" class="btn btn--ghost qa-edit-only" id="btnProfileDelete" style="color:#b91c1c">Delete…</button>
+        <button type="button" class="btn btn--primary" id="btnCloseStudentProfile2">Close</button>
+        <input type="file" id="profilePhotoInput" accept="image/*" hidden />
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="modal" id="disciplineModal" hidden>
+    <div class="modal__backdrop" id="disciplineModalBackdrop"></div>
+    <div class="modal__dialog" style="max-width:640px">
+      <div class="modal__header"><h3 id="disciplineModalTitle">Disciplinary case</h3><button type="button" class="icon-btn" id="btnCloseDiscipline">&times;</button></div>
+      <form id="disciplineForm" class="modal__body">
+        <input type="hidden" id="discId" />
+        <div class="form-grid">
+          <label class="field"><span class="field__label">Subject type <span class="req">*</span></span>
+            <select id="discSubjectType" required><option value="student">Student</option><option value="staff">Staff</option></select>
+          </label>
+          <label class="field"><span class="field__label">Date <span class="req">*</span></span><input type="date" id="discDate" required /></label>
+          <label class="field field--full"><span class="field__label">Full name <span class="req">*</span></span><input type="text" id="discName" required list="discNameList" /></label>
+          <datalist id="discNameList"></datalist>
+          <label class="field"><span class="field__label">Reg. no / Staff ID</span><input type="text" id="discSubjectRef" /></label>
+          <label class="field"><span class="field__label">Linked record id</span><input type="text" id="discSubjectId" placeholder="Optional student/lecturer id" /></label>
+          <label class="field"><span class="field__label">Case type <span class="req">*</span></span>
+            <select id="discType" required>
+              <option>Verbal warning</option>
+              <option>Written warning</option>
+              <option>Query</option>
+              <option>Suspension</option>
+              <option>Referral</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label class="field"><span class="field__label">Status <span class="req">*</span></span>
+            <select id="discStatus" required>
+              <option>Open</option>
+              <option>Under review</option>
+              <option>Closed</option>
+            </select>
+          </label>
+          <label class="field field--full"><span class="field__label">Summary of allegation / incident <span class="req">*</span></span>
+            <textarea id="discSummary" rows="3" required></textarea>
+          </label>
+          <label class="field field--full"><span class="field__label">Action taken / outcome</span>
+            <textarea id="discOutcome" rows="2"></textarea>
+          </label>
+          <label class="field field--full"><span class="field__label">Official REF <span class="req">*</span></span>
+            <input type="text" id="discRef" required placeholder="REF/EOCNS/DSA/####" />
+          </label>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" id="btnCancelDiscipline">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save case</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  
+  <div class="modal" id="studentFullRecordModal" hidden>
+    <div class="modal__backdrop" id="studentFullRecordBackdrop"></div>
+    <div class="modal__dialog" style="max-width:860px">
+      <div class="modal__header"><h3 id="studentFullRecordTitle">Student full record</h3><button type="button" class="icon-btn" id="btnCloseFullRecord">&times;</button></div>
+      <div class="modal__body" id="studentFullRecordBody" style="max-height:70vh;overflow:auto"></div>
+      <div class="modal__footer">
+        <button type="button" class="btn btn--ghost" id="btnPrintStudentSummary">Print summary</button>
+        <button type="button" class="btn btn--primary" id="btnCloseFullRecord2">Close</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="modal" id="pendingReviewModal" hidden>
+    <div class="modal__backdrop" id="pendingReviewBackdrop"></div>
+    <div class="modal__dialog" style="max-width:640px">
+      <div class="modal__header"><h3>Review registration</h3><button type="button" class="icon-btn" id="btnClosePendingReview">&times;</button></div>
+      <div class="modal__body" id="pendingReviewBody"></div>
+      <div class="modal__footer qa-edit-only">
+        <button type="button" class="btn btn--ghost" id="btnPendingReject">Reject…</button>
+        <button type="button" class="btn btn--primary" id="btnPendingApprove">Approve to master list</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="modal" id="pendingRejectModal" hidden>
+    <div class="modal__backdrop" id="pendingRejectBackdrop"></div>
+    <div class="modal__dialog" style="max-width:480px">
+      <div class="modal__header"><h3>Reject registration</h3><button type="button" class="icon-btn" id="btnClosePendingRejectModal">&times;</button></div>
+      <div class="modal__body">
+        <p class="muted-note" id="pendingRejectSummary">—</p>
+        <label class="field field--full"><span class="field__label">Reason (audit log) <span class="req">*</span></span>
+          <textarea id="pendingRejectReason" rows="3" placeholder="Why this submission is rejected…"></textarea>
+        </label>
+        <label class="field field--full"><span class="field__label">Officer PIN <span class="req">*</span></span>
+          <input type="password" id="pendingRejectPin" autocomplete="current-password" placeholder="QA officer PIN" />
+        </label>
+      </div>
+      <div class="modal__footer">
+        <button type="button" class="btn btn--ghost" id="btnCancelPendingReject">Cancel</button>
+        <button type="button" class="btn btn--primary" id="btnConfirmPendingReject" style="background:#b91c1c;border-color:#b91c1c">Confirm reject &amp; remove</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="modal" id="courseModal" hidden>
+    <div class="modal__backdrop" id="courseModalBackdrop"></div>
+    <div class="modal__dialog" style="max-width:520px">
+      <div class="modal__header"><h3 id="courseModalTitle">Course</h3><button type="button" class="icon-btn" id="btnCloseCourseModal">&times;</button></div>
+      <form id="courseForm" class="modal__body">
+        <input type="hidden" id="courseEditOriginalCode" value="" />
+        <div class="form-grid">
+          <label class="field"><span class="field__label">Course code <span class="req">*</span></span>
+            <input type="text" id="courseCode" required placeholder="e.g. NUS 114" /></label>
+          <label class="field field--full"><span class="field__label">Course title <span class="req">*</span></span>
+            <input type="text" id="courseName" required placeholder="Full official title" /></label>
+          <label class="field field--full"><span class="field__label">Typically taught for (optional tags)</span>
+            <input type="text" id="courseClassKeys" placeholder="e.g. 100_nursing, 200_nursing" />
+            <span class="muted-note">Comma-separated class keys. Helps filter checklist in timetable editor.</span>
+          </label>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" id="btnCancelCourse">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save course</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="app.js?v=48"></script>
+
+  <div class="modal" id="remedialModal" hidden>
+    <div class="modal__backdrop" id="remedialModalBackdrop"></div>
+    <div class="modal__dialog">
+      <div class="modal__header"><h3 id="remedialModalTitle">Log remedial session</h3><button type="button" class="icon-btn" id="btnCloseRemedial">&times;</button></div>
+      <form id="remedialForm" class="modal__body">
+        <input type="hidden" id="remedialId" />
+        <div class="form-grid">
+          <label class="field"><span class="field__label">Date <span class="req">*</span></span><input type="date" id="remedialDate" required /></label>
+          <label class="field"><span class="field__label">Hours <span class="req">*</span></span><input type="number" id="remedialHours" min="0.5" step="0.5" required value="2" /></label>
+          <label class="field field--full"><span class="field__label">Course <span class="req">*</span></span><select id="remedialCourse" required><option value="">— Select —</option></select></label>
+          <label class="field field--full"><span class="field__label">Lecturer <span class="req">*</span></span><select id="remedialLecturer" required><option value="">— Select —</option></select></label>
+          <label class="field"><span class="field__label">Class</span>
+            <select id="remedialClass"></select>
+          </label>
+          <label class="field field--full"><span class="field__label">Reason / focus</span><textarea id="remedialReason" rows="2" placeholder="Missed lecture make-up, weak topic revision…"></textarea></label>
+          <label class="field field--full"><span class="field__label">Official REF <span class="req">*</span></span>
+            <input type="text" id="remedialRef" required placeholder="REF/EOCNS/QA/####" />
+          </label>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" id="btnCancelRemedial">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save remedial</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <div class="modal" id="remEnrolModal" hidden>
+    <div class="modal__backdrop" id="remEnrolModalBackdrop"></div>
+    <div class="modal__dialog">
+      <div class="modal__header"><h3>Enrol remedial student</h3><button type="button" class="icon-btn" id="btnCloseRemEnrol">&times;</button></div>
+      <form id="remEnrolForm" class="modal__body">
+        <input type="hidden" id="remEnrolId" />
+        <div class="form-grid">
+          <label class="field field--full"><span class="field__label">Full name <span class="req">*</span></span><input type="text" id="remEnrolName" required /></label>
+          <label class="field"><span class="field__label">Matric / Reg No <span class="req">*</span></span><input type="text" id="remEnrolMatric" required /></label>
+          <label class="field"><span class="field__label">Programme</span><select id="remEnrolProg"></select></label>
+          <label class="field"><span class="field__label">Level</span><select id="remEnrolLevel"></select></label>
+          <label class="field field--full"><span class="field__label">Enrolled courses (comma-separated codes)</span>
+            <input type="text" id="remEnrolCourses" required placeholder="e.g. GNS 211, GNS 213, MID 214" />
+          </label>
+          <label class="field field--full"><span class="field__label">Official REF <span class="req">*</span></span><input type="text" id="remEnrolRef" required placeholder="REF/EOCNS/QA/####" /></label>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" id="btnCancelRemEnrol">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save enrolment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
