@@ -370,5 +370,280 @@
     "status": "Active",
     "updatedAt": "2026-11-04T15:04:39.632Z",
     "createdAt": "2026-11-04T15:04:39.632Z"
+  },
+  {
+    "id": "lec_mw29ks5b37ai",
+    "name": "Mrs. Jennifer Amrasawore",
+    "staffId": "EOCNS/STF/2026/0013",
+    "phone": "08077420019",
+    "courses": [
+      "MID 312",
+      "MID 317"
+    ],
+    "assignments": [
+      {
+        "code": "MID 312",
+        "programme": "Midwifery",
+        "level": "300",
+        "hours": 30
+      },
+      {
+        "code": "MID 317",
+        "programme": "Midwifery",
+        "level": "300",
+        "hours": 135
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 165,
+    "status": "Active",
+    "updatedAt": "2026-11-04T15:21:03.358Z",
+    "createdAt": "2026-11-04T15:21:03.358Z"
+  },
+  {
+    "id": "lec_mw29mptk01ys",
+    "name": "Mr. George Umeh",
+    "staffId": "EOCNS/STF/2026/0014",
+    "phone": "08068073321",
+    "courses": [
+      "GNS 102",
+      "GNS 211"
+    ],
+    "assignments": [
+      {
+        "code": "GNS 102",
+        "programme": "Nursing",
+        "level": "100",
+        "hours": 30
+      },
+      {
+        "code": "GNS 211",
+        "programme": "Nursing",
+        "level": "200",
+        "hours": 30
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 60,
+    "status": "Active",
+    "updatedAt": "2026-11-04T15:22:33.655Z",
+    "createdAt": "2026-11-04T15:22:33.655Z"
+  },
+  {
+    "id": "lec_mw29p5fvxzze",
+    "name": "Mr. Simon Udu",
+    "staffId": "EOCNS/STF/2026/0015",
+    "phone": "08063980539",
+    "courses": [
+      "NUS 113",
+      "NUR 213"
+    ],
+    "assignments": [
+      {
+        "code": "NUS 113",
+        "programme": "Nursing",
+        "level": "100",
+        "hours": 60
+      },
+      {
+        "code": "NUR 213",
+        "programme": "Nursing",
+        "level": "200",
+        "hours": 60
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 120,
+    "status": "Active",
+    "updatedAt": "2026-11-04T15:24:27.210Z",
+    "createdAt": "2026-11-04T15:24:27.210Z"
+  },
+  {
+    "id": "lec_mw29qfz0iog5",
+    "name": "Dr. Kennedy Ogunwa",
+    "staffId": "EOCNS/STF/2026/0016",
+    "phone": "08035406442",
+    "courses": [
+      "NUS 111"
+    ],
+    "assignments": [
+      {
+        "code": "NUS 111",
+        "programme": "Nursing",
+        "level": "100",
+        "hours": 30
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 30,
+    "status": "Active",
+    "updatedAt": "2026-11-04T15:25:27.515Z",
+    "createdAt": "2026-11-04T15:25:27.515Z"
+  },
+  {
+    "id": "lec_mw29s0fzzzgj",
+    "name": "Dr. Jacinta Obimma",
+    "staffId": "EOCNS/STF/2026/0017",
+    "phone": "08035229201",
+    "courses": [
+      "NUS 114",
+      "NUS 212"
+    ],
+    "assignments": [
+      {
+        "code": "NUS 114",
+        "programme": "Nursing",
+        "level": "100",
+        "hours": 30
+      },
+      {
+        "code": "NUS 212",
+        "programme": "Nursing",
+        "level": "200",
+        "hours": 15
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 45,
+    "status": "Active",
+    "updatedAt": "2026-11-04T15:26:40.702Z",
+    "createdAt": "2026-11-04T15:26:40.702Z"
+  },
+  {
+    "id": "lec_mw29t7hzx277",
+    "name": "Mr. Jude Nweze",
+    "staffId": "EOCNS/STF/2026/0018",
+    "phone": "08036871198",
+    "courses": [
+      "NUS 112"
+    ],
+    "assignments": [
+      {
+        "code": "NUS 112",
+        "programme": "Nursing",
+        "level": "100",
+        "hours": 30
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 30,
+    "status": "Active",
+    "updatedAt": "2026-11-04T15:27:36.502Z",
+    "createdAt": "2026-11-04T15:27:36.502Z"
+  },
+  {
+    "id": "lec_mw29ukxek3hs",
+    "name": "Mr. Emmanuel Icheku",
+    "staffId": "EOCNS/STF/2026/0019",
+    "phone": "08039375369",
+    "courses": [
+      "NUS 116"
+    ],
+    "assignments": [
+      {
+        "code": "NUS 116",
+        "programme": "Nursing",
+        "level": "100",
+        "hours": 30
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 30,
+    "status": "Active",
+    "updatedAt": "2026-11-04T15:28:40.561Z",
+    "createdAt": "2026-11-04T15:28:40.561Z"
+  },
+  {
+    "id": "lec_mw29voi7tkjq",
+    "name": "Mrs. Ngozi Nwaubani",
+    "staffId": "EOCNS/STF/2026/0020",
+    "phone": "08033830330",
+    "courses": [
+      "GNS 111"
+    ],
+    "assignments": [
+      {
+        "code": "GNS 111",
+        "programme": "Nursing",
+        "level": "100",
+        "hours": 30
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 30,
+    "status": "Active",
+    "updatedAt": "2026-11-04T15:29:31.854Z",
+    "createdAt": "2026-11-04T15:29:31.854Z"
+  },
+  {
+    "id": "lec_mw29x0pb8ynj",
+    "name": "Mr. John Agbo",
+    "staffId": "EOCNS/STF/2026/0021",
+    "phone": "08037718461",
+    "courses": [
+      "NUS 211"
+    ],
+    "assignments": [
+      {
+        "code": "NUS 211",
+        "programme": "Nursing",
+        "level": "200",
+        "hours": 60
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 60,
+    "status": "Active",
+    "updatedAt": "2026-11-04T15:30:34.318Z",
+    "createdAt": "2026-11-04T15:30:34.318Z"
+  },
+  {
+    "id": "lec_mw29ydlfz1dp",
+    "name": "Mr. Sabastine Ibomu",
+    "staffId": "EOCNS/STF/2026/0022",
+    "phone": "08137143436",
+    "courses": [
+      "NUS 215",
+      "NUS 214"
+    ],
+    "assignments": [
+      {
+        "code": "NUS 215",
+        "programme": "Nursing",
+        "level": "200",
+        "hours": 30
+      },
+      {
+        "code": "NUS 214",
+        "programme": "Nursing",
+        "level": "200",
+        "hours": 29
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 60,
+    "status": "Active",
+    "updatedAt": "2026-11-04T15:31:37.682Z",
+    "createdAt": "2026-11-04T15:31:37.682Z"
   }
 ]
