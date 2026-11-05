@@ -12370,5 +12370,23 @@
     "user": "QA Officer",
     "source": "system",
     "id": 608
+  },
+  {
+    "ref": "REF/EOCNS/QA/1001",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mw3qqu5harxl",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-10-26",
+      "course": "NUS 114",
+      "status": "Held",
+      "classKey": "100_nursing",
+      "amended": false
+    },
+    "timestamp": "2026-11-05T16:09:25.668Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 656
   }
 ]
