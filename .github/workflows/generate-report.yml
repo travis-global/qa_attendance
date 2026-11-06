@@ -1,0 +1,62 @@
+name: Generate EOCNS Report
+
+on:
+  workflow_dispatch:
+    inputs:
+      report_type:
+        description: "daily_qa | weekly_qa | monthly_qa | lecturer_hours | student_register | hostel"
+        required: true
+        default: daily_qa
+      payload_json:
+        description: "Full JSON payload as a string"
+        required: true
+      officer_name:
+        description: "QA officer releasing the report"
+        required: true
+        default: "QA Officer"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: pip install reportlab
+
+      - name: Write payload
+        env:
+          PAYLOAD: ${{ inputs.payload_json }}
+          OFFICER: ${{ inputs.officer_name }}
+          RTYPE: ${{ inputs.report_type }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          raw = os.environ.get("PAYLOAD") or "{}"
+          try:
+              data = json.loads(raw)
+          except Exception:
+              data = {}
+          data["officer_name"] = os.environ.get("OFFICER") or data.get("officer_name") or "QA Officer"
+          data["report_type"] = os.environ.get("RTYPE") or data.get("report_type") or "daily_qa"
+          Path("payload.json").write_text(json.dumps(data), encoding="utf-8")
+          print("payload keys:", list(data.keys()))
+          PY
+
+      - name: Generate PDF
+        run: |
+          mkdir -p out
+          python3 reports/generate.py --type "${{ inputs.report_type }}" --payload payload.json -o "out/EOCNS_Report.pdf"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: eocns-report
+          path: out/EOCNS_Report.pdf
+          retention-days: 7

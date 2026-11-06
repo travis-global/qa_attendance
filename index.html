@@ -334,7 +334,7 @@
               <p class="muted-note" style="margin:0">Timetable slots for the day — mark each as delivered or missed (same workflow as the college QA analyser).</p>
             </div>
             <div class="page-toolbar__right" style="display:flex;gap:8px;flex-wrap:wrap">
-              <button type="button" class="btn btn--primary" id="btnPrintDailyReport">Print today's lecture report</button>
+              <button type="button" class="btn btn--primary" id="btnPrintDailyReport">Generate daily report</button>
               <button class="btn btn--ghost qa-edit-only" id="btnAddQaEntry">+ Extra lecture</button>
             </div>
           </div>
@@ -390,7 +390,7 @@
                   <input type="text" id="qaWeekExclude" placeholder="e.g. 2026-06-12, 2026-06-13" />
                 </label>
                 <label class="field"><span class="field__label">&nbsp;</span>
-                  <button type="button" class="btn btn--primary" id="btnBuildWeeklyQa">Build weekly report</button>
+                  <button type="button" class="btn btn--primary" id="btnBuildWeeklyQa">Generate weekly report</button>
                   <button type="button" class="btn btn--ghost" id="btnPrintWeeklyQa">Print weekly pack</button>
                 </label>
               </div>
@@ -1150,7 +1150,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=50"></script>
+  <script src="app.js?v=51"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

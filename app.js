@@ -1964,30 +1964,154 @@ async function importFullSnapshot(file) {
 
 
 
-function eocnsReportStyles() { /* amend-footer supported via amendmentFooterHtml() */
-  return "body{font-family:'Segoe UI',system-ui,Georgia,serif;color:#1a1a2e;padding:28px;max-width:960px;margin:0 auto;line-height:1.45}" +
-    "h1{color:#1B3A6B;text-align:center;margin:0 0 4px;font-size:1.45rem;letter-spacing:0.02em}" +
-    "h1 .gold{color:#c9a227;display:block;font-size:0.95rem;font-weight:600;margin-top:4px}" +
-    ".sub{text-align:center;color:#555;margin:0 0 8px;font-size:12px}" +
-    ".rule{height:3px;background:linear-gradient(90deg,#1B3A6B,#c9a227,#1B3A6B);border:0;margin:12px 0 20px}" +
-    "h2{color:#1B3A6B;font-size:0.95rem;margin:28px 0 10px;padding:8px 12px;background:#e8eef7;border-left:4px solid #1B3A6B}" +
-    "table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}" +
-    "th{background:#1B3A6B;color:#fff;padding:8px;text-align:left;font-weight:600}" +
-    "td{border:1px solid #c5cdd8;padding:7px 8px;vertical-align:top}" +
-    "tr:nth-child(even) td{background:#f7f9fc}" +
-    ".kpi{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 8px}" +
-    ".kpi>div{flex:1;min-width:110px;text-align:center;border:1px solid #c5cdd8;border-radius:8px;padding:12px 8px;background:#fff}" +
-    ".kpi strong{display:block;font-size:1.45rem;line-height:1.2}" +
-    ".kpi span{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:#555}" +
-    ".k-sched strong{color:#1B3A6B}.k-del strong{color:#0f766e}.k-miss strong{color:#b91c1c}.k-rate strong{color:#0f766e}" +
-    ".meta-grid{display:grid;grid-template-columns:140px 1fr;gap:4px 12px;font-size:13px;margin:8px 0 12px}" +
-    ".meta-grid b{color:#334}" +
-    ".absent-head th{background:#b91c1c}" +
-    ".note{background:#fff8e6;border-left:4px solid #c9a227;padding:8px 12px;font-size:12px;margin:8px 0}" +
-    ".charts{display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin:12px 0}" +
-    ".footer{margin-top:36px;font-size:12px;color:#555;text-align:center}" +
-    "@media print{body{padding:12px} .kpi>div{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
+
+/* ═══ EOCNS professional report design system ═══ */
+var EOCNS_REPORT_LOGO = "assets/eocns-logo.png";
+var EOCNS_SCHOOL = {
+  name: "Eastern Oak College of Nursing Sciences",
+  address: "12 Udensi Ugorji Street, Aguogboriga, Abakaliki, Ebonyi State, Nigeria",
+  phones: "0810 082 8004 · 0903 082 9076",
+  email: "info@easternoak.org",
+  motto: "Knowledge, Integrity & Compassion",
+  dept: "QUALITY ASSURANCE DEPARTMENT"
+};
+
+function eocnsReportStyles() {
+  return [
+    "@page{size:A4;margin:14mm 14mm 16mm 14mm}",
+    "body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#0f172a;margin:0;padding:0;line-height:1.45;font-size:12.5px}",
+    ".sheet{max-width:190mm;margin:0 auto;padding:8px 4px 24px}",
+    ".lh{display:flex;align-items:center;gap:14px;margin-bottom:6px}",
+    ".lh img{width:64px;height:64px;object-fit:contain}",
+    ".lh-text{flex:1;text-align:center}",
+    ".lh-text .school{font-size:15px;font-weight:700;color:#1B3A6B;letter-spacing:0.02em;margin:0}",
+    ".lh-text .addr{font-size:10px;color:#64748b;margin:2px 0 0}",
+    ".lh-text .motto{font-size:10px;color:#B8860B;font-style:italic;margin:2px 0 0}",
+    ".dept-line{text-align:center;font-weight:700;font-size:11px;color:#B8860B;letter-spacing:0.06em;margin:6px 0 4px}",
+    ".rule-navy{height:3px;background:#1B3A6B;border:0;margin:4px 0}",
+    ".rule-gold{height:1.5px;background:#B8860B;border:0;margin:4px 0 12px}",
+    "h1.rtitle{color:#1B3A6B;text-align:center;margin:6px 0 2px;font-size:20px;letter-spacing:0.03em}",
+    ".rsub{text-align:center;color:#B8860B;font-weight:600;font-size:12px;margin:0}",
+    ".rperiod{text-align:center;color:#64748b;font-size:11px;margin:4px 0 0}",
+    "h2.sec{color:#1B3A6B;font-size:11px;margin:18px 0 8px;padding:8px 12px;background:#D6E4F0;border-left:4px solid #1B3A6B;letter-spacing:0.04em}",
+    "table.data{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:6px}",
+    "table.data th{background:#1B3A6B;color:#fff;padding:7px 8px;text-align:left;font-weight:600}",
+    "table.data td{border:1px solid #cbd5e1;padding:6px 8px;vertical-align:top}",
+    "table.data tr:nth-child(even) td{background:#F0F4FA}",
+    "table.absent th{background:#B91C1C}",
+    "table.absent td:first-child{color:#B91C1C;font-weight:700;text-align:center;width:48px}",
+    "table.absent tr:nth-child(even) td{background:#FEF2F2}",
+    ".kpi{display:flex;gap:0;margin:10px 0;border:1px solid #1B3A6B}",
+    ".kpi>div{flex:1;text-align:center;padding:12px 8px;border-right:1px solid #cbd5e1}",
+    ".kpi>div:last-child{border-right:0}",
+    ".kpi .lab{font-size:10px;font-weight:700;color:#1B3A6B;text-transform:uppercase;letter-spacing:0.04em}",
+    ".kpi .val{font-size:22px;font-weight:700;line-height:1.2;margin-top:4px}",
+    ".kpi .present{background:#D1FAE5}.kpi .present .val{color:#1B7A3D}",
+    ".kpi .absent{background:#FEE2E2}.kpi .absent .val{color:#B91C1C}",
+    ".meta{margin:8px 0 12px}",
+    ".meta-row{display:grid;grid-template-columns:130px 1fr;gap:4px 10px;font-size:12px;margin:3px 0}",
+    ".meta-row b{color:#1B3A6B}",
+    ".muted{color:#64748b;font-style:italic}",
+    ".sig{display:flex;justify-content:space-between;gap:24px;margin-top:36px;page-break-inside:avoid}",
+    ".sig .col{flex:1}",
+    ".sig .lab{font-size:10px;color:#64748b;font-weight:700;margin-bottom:28px}",
+    ".sig .line{border-top:1px solid #0f172a;padding-top:6px;margin-top:4px}",
+    ".sig .name{font-weight:700;color:#1B3A6B;font-size:12px}",
+    ".sig .role{font-size:10px;color:#64748b}",
+    ".page-foot{margin-top:28px;padding-top:8px;border-top:1px solid #B8860B;font-size:9px;color:#64748b;display:flex;justify-content:space-between}",
+    "@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact} .no-print{display:none!important}}"
+  ].join("");
 }
+
+function reportLetterheadHtml(title, subtitle, periodLine) {
+  var S = EOCNS_SCHOOL;
+  return (
+    '<div class="lh">' +
+      '<img src="' + EOCNS_REPORT_LOGO + '" alt="EOCNS logo" onerror="this.style.display=\'none\'"/>' +
+      '<div class="lh-text">' +
+        '<p class="school">' + escapeHtml(S.name.toUpperCase()) + '</p>' +
+        '<p class="addr">' + escapeHtml(S.address) + '</p>' +
+        '<p class="addr">' + escapeHtml(S.phones) + ' · ' + escapeHtml(S.email) + '</p>' +
+        '<p class="motto">' + escapeHtml(S.motto) + '</p>' +
+      '</div>' +
+    '</div>' +
+    '<hr class="rule-navy"/>' +
+    '<div class="dept-line">' + escapeHtml(S.dept) + '</div>' +
+    '<h1 class="rtitle">' + escapeHtml(title) + '</h1>' +
+    (subtitle ? '<p class="rsub">' + escapeHtml(subtitle) + '</p>' : '') +
+    (periodLine ? '<p class="rperiod">' + escapeHtml(periodLine) + '</p>' : '') +
+    '<hr class="rule-gold"/>'
+  );
+}
+
+function reportSignatureHtml(officerName) {
+  var gen = new Date().toLocaleString();
+  var name = (officerName || "").trim() || "QA Officer";
+  return (
+    '<div class="sig">' +
+      '<div class="col"><div class="lab">Prepared &amp; Released by</div>' +
+        '<div class="line"><div class="name">' + escapeHtml(name) + '</div>' +
+        '<div class="role">Quality Assurance Officer</div>' +
+        '<div class="role">Generated: ' + escapeHtml(gen) + '</div></div></div>' +
+      '<div class="col"><div class="lab">For official use</div>' +
+        '<div class="line"><div class="name">Head, Quality Assurance</div>' +
+        '<div class="role">Date / Stamp</div></div></div>' +
+    '</div>' +
+    '<div class="page-foot"><span>EOCNS · QUALITY ASSURANCE DEPARTMENT · Confidential</span>' +
+    '<span>Released by: ' + escapeHtml(name) + '</span></div>'
+  );
+}
+
+function promptOfficerAndFormat(defaultTitle) {
+  return new Promise(function(resolve) {
+    var officer = prompt("Officer name to appear on this report (required for audit):", localStorage.getItem("eocns_officer_name") || "");
+    if (officer == null) { resolve(null); return; }
+    officer = String(officer).trim();
+    if (!officer) { alert("Officer name is required."); resolve(null); return; }
+    localStorage.setItem("eocns_officer_name", officer);
+    var fmt = prompt("Format: type PDF or WORD (default PDF):", "PDF");
+    if (fmt == null) { resolve(null); return; }
+    fmt = String(fmt).trim().toLowerCase();
+    if (fmt.indexOf("w") === 0) fmt = "word";
+    else fmt = "pdf";
+    resolve({ officer: officer, format: fmt, title: defaultTitle || "Report" });
+  });
+}
+
+function openReportWindow(title, bodyHtml, officer, format) {
+  var w = window.open("", "_blank");
+  if (!w) { alert("Pop-up blocked. Allow pop-ups for this site to view reports."); return; }
+  var html = "<!DOCTYPE html><html><head><meta charset='utf-8'/><title>" + escapeHtml(title) + "</title><style>" +
+    eocnsReportStyles() + "</style></head><body><div class='sheet'>" + bodyHtml + reportSignatureHtml(officer) +
+    "</div>" +
+    "<div class='no-print' style='text-align:center;margin:16px'><button onclick='window.print()' style='padding:10px 18px;font-size:14px;cursor:pointer'>Print / Save as PDF</button></div>" +
+    "</body></html>";
+  w.document.write(html);
+  w.document.close();
+  if (format === "pdf") {
+    setTimeout(function() { try { w.print(); } catch (_) {} }, 500);
+  }
+  // Word: user can open HTML in Word, or we download .doc
+  if (format === "word") {
+    try {
+      var blob = new Blob(["\ufeff", html], { type: "application/msword" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = (title || "EOCNS_Report").replace(/[^\w\-]+/g, "_") + ".doc";
+      a.click();
+      setTimeout(function() { URL.revokeObjectURL(a.href); }, 2000);
+    } catch (e) { console.warn(e); }
+  }
+  try {
+    writeAudit({
+      action: "create", entity: "report", entityId: "report_" + Date.now().toString(36),
+      reason: "Generated report: " + title,
+      details: { officer: officer, format: format || "pdf" }
+    });
+  } catch (_) {}
+}
+
+
 
 function classLabelFromKey(key) {
   var m = String(key || "").match(/^(\d+)_(.+)$/);
@@ -2014,99 +2138,160 @@ function formatDateLong(iso) {
 }
 
 async function printDailyLectureReport() {
+  var meta = await promptOfficerAndFormat("Today's Lecture(s) Report");
+  if (!meta) return;
   var date = (document.getElementById("qaDailyDate") && document.getElementById("qaDailyDate").value) || "";
-  var classKey = (document.getElementById("qaDailyClass") && document.getElementById("qaDailyClass").value) || "100_nursing";
+  var classKey = (document.getElementById("qaDailyClass") && document.getElementById("qaDailyClass").value) || "";
+  if (!classKey) {
+    var prog = (document.getElementById("qaDailyProgramme") && document.getElementById("qaDailyProgramme").value) || "";
+    var level = (document.getElementById("qaDailyLevel") && document.getElementById("qaDailyLevel").value) || "";
+    if (prog && level && typeof makeClassKey === "function") classKey = makeClassKey(prog, level);
+  }
+  if (!classKey) classKey = "100_nursing";
   if (!date) { alert("Choose a date on Daily QA first."); return; }
   await ensureTimetables();
   var tt = TIMETABLES_CACHE[classKey] || { slots: [] };
-  var weekday = (new Date(date + "T12:00:00").getDay() + 6) % 7; // Mon=0
+  var weekday = (new Date(date + "T12:00:00").getDay() + 6) % 7;
   var slots = (tt.slots || []).filter(function(s) { return Number(s.weekday) === weekday; });
-  var entries = (await getQaEntries()).filter(function(e) { return e.date === date && e.classKey === classKey; });
+  var entries = (await getQaEntries()).filter(function(e) { return e.date === date && (e.classKey === classKey || !e.classKey); });
   var sessionName = "Academic Session";
   try {
     var sessions = await getAll("sessions");
-    var active = sessions.find(function(s) { return s.status === "Active"; });
-    if (active) sessionName = active.name;
+    var active = sessions.find(function(s) { return s.status === "Active"; }) || sessions[0];
+    if (active) sessionName = active.name || sessionName;
   } catch (_) {}
   var students = await getAll("students");
   function resolveAbsent(list) {
     if (!list || !list.length) return [];
     return list.map(function(a) {
+      if (a && typeof a === "object") {
+        return { sn: a.serial || a.sn || "", name: a.name || "" };
+      }
       var sn = String(a).trim();
-      var found = students.find(function(s) { return String(s.serial) === sn || String(s.regNo) === sn || (s.name && s.name.toLowerCase() === sn.toLowerCase()); });
+      var found = students.find(function(s) {
+        return String(s.serial) === sn || String(s.regNo) === sn || (s.name && s.name.toLowerCase() === sn.toLowerCase());
+      });
       return { sn: found ? (found.serial || sn) : sn, name: found ? found.name : sn };
     });
   }
-  var scheduleRows = "";
+  var classLabel = (typeof classLabelFromKey === "function" ? classLabelFromKey(classKey) : classKey);
+  var dept = classLabel;
+  var period = classLabel + " · " + sessionName + " · " + formatDateLong(date);
+
+  var scheduleRows = slots.map(function(s, i) {
+    return "<tr><td style='text-align:center'>" + (i + 1) + "</td><td>" + escapeHtml(s.title || s.course || "") +
+      "</td><td>" + escapeHtml(s.code || s.courseCode || "") + "</td><td>" + escapeHtml(formatTimeNice(s.start)) +
+      "</td><td>" + escapeHtml(formatTimeNice(s.end)) + "</td><td>" + escapeHtml(s.remark || "") + "</td></tr>";
+  }).join("");
+  if (!scheduleRows && entries.length) {
+    scheduleRows = entries.map(function(e, i) {
+      return "<tr><td style='text-align:center'>" + (i + 1) + "</td><td>" + escapeHtml(e.course || "") +
+        "</td><td></td><td>" + escapeHtml(formatTimeNice(e.start)) + "</td><td>" + escapeHtml(formatTimeNice(e.end)) +
+        "</td><td>" + escapeHtml(e.status || "") + "</td></tr>";
+    }).join("");
+  }
+
+  var body = reportLetterheadHtml("Today's Lecture(s) Report", dept, period);
+  body += "<h2 class='sec'>Course Schedule / Timetable</h2>";
+  body += "<table class='data'><thead><tr><th>S/N</th><th>Course Title</th><th>Code</th><th>Start</th><th>End</th><th>Remark</th></tr></thead><tbody>" +
+    (scheduleRows || "<tr><td colspan='6' class='muted'>No timetable slots for this weekday.</td></tr>") + "</tbody></table>";
+
+  var allAbsentMap = {};
   var courseBlocks = "";
-  var allAbsent = {};
-  var used = slots.length ? slots : entries.map(function(e) {
-    return { code: (e.course || "").split("—")[0].trim(), start: e.start, end: e.end, hours: e.duration ? e.duration / 60 : 2 };
+  var heldEntries = entries.filter(function(e) {
+    var st = String(e.status || "").toLowerCase();
+    return st === "held" || st === "partial" || st === "delivered" || !st;
   });
-  used.forEach(function(slot, i) {
-    var code = slot.code || "";
-    var ent = entries.find(function(e) {
-      return (e.course || "").indexOf(code) >= 0 || (e.start && slot.start && e.start === slot.start);
-    }) || entries[i];
-    var remark = ent ? (ent.status === "Held" ? "Lecture held" : ent.status === "Missed" ? "Lecture missed" : (ent.status || "Logged")) : "Not logged";
-    var title = ent ? (ent.course || code) : courseName(code);
-    scheduleRows += "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(String(title).replace(/^[^—]+—\s*/, "") || title) +
-      "</td><td>" + escapeHtml(code) + "</td><td>" + formatTimeNice(slot.start || (ent && ent.start)) +
-      "</td><td>" + formatTimeNice(slot.end || (ent && ent.end)) + "</td><td>" + escapeHtml(remark) + "</td></tr>";
-    if (ent) {
-      var abs = resolveAbsent(ent.absent);
-      abs.forEach(function(a) { allAbsent[a.sn + "|" + a.name] = a; });
-      var obj = (ent.objectives || "").split(/[.;\n]+/).map(function(x) { return x.trim(); }).filter(Boolean);
-      courseBlocks += "<h2>COURSE " + (i + 1) + " INFORMATION</h2>" +
-        "<div class=\"meta-grid\">" +
-        "<b>Course Code:</b><span>" + escapeHtml(code || (ent.course || "")) + "</span>" +
-        "<b>Course Title:</b><span>" + escapeHtml(ent.course || title) + "</span>" +
-        "<b>Lecturer:</b><span>" + escapeHtml(ent.lecturer || "—") + "</span>" +
-        "<b>Topic:</b><span>" + escapeHtml(ent.topic || "—") + "</span>" +
-        "<b>Date:</b><span>" + formatDateLong(ent.date) + "</span>" +
-        "<b>Time:</b><span>" + formatTimeNice(ent.start) + " – " + formatTimeNice(ent.end) + "</span></div>" +
-        "<h2>LEARNING OBJECTIVES</h2><ul>" + (obj.length ? obj.map(function(o) { return "<li>" + escapeHtml(o) + "</li>"; }).join("") : "<li>—</li>") + "</ul>" +
-        "<h2>LECTURE SUMMARY</h2><p>" + escapeHtml(ent.lectureSummary || "—") + "</p>" +
-        "<h2>ASSIGNMENT</h2><div class=\"note\">" + escapeHtml(ent.assignment || "None was given") + "</div>" +
-        "<h2>REMARKS</h2><p>" + escapeHtml(ent.remark || "—") + "</p>" +
-        "<h2>ABSENT STUDENTS</h2>" +
-        (abs.length ? ("<table><thead class=\"absent-head\"><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
-          abs.map(function(a) { return "<tr><td>" + escapeHtml(String(a.sn)) + "</td><td>" + escapeHtml(a.name) + "</td></tr>"; }).join("") +
-          "</tbody></table>") : "<p>None recorded.</p>");
+  if (!heldEntries.length) heldEntries = entries.slice();
+
+  heldEntries.forEach(function(e, idx) {
+    var absentList = resolveAbsent(e.absentDetails && e.absentDetails.length ? e.absentDetails : e.absent);
+    absentList.forEach(function(a) {
+      var k = String(a.sn) + "|" + String(a.name);
+      allAbsentMap[k] = a;
+    });
+    var timeStr = (formatTimeNice(e.start) || "") + (e.end ? " – " + formatTimeNice(e.end) : "");
+    courseBlocks += reportLetterheadHtml("Today's Lecture(s) Report", "Course " + (idx + 1) + " of " + heldEntries.length, period);
+    courseBlocks += "<h2 class='sec'>Course " + (idx + 1) + " Information</h2>";
+    courseBlocks += "<div class='meta'>" +
+      "<div class='meta-row'><b>Course</b><span>" + escapeHtml(e.course || "—") + "</span></div>" +
+      "<div class='meta-row'><b>Lecturer</b><span>" + escapeHtml(e.lecturer || "—") + "</span></div>" +
+      "<div class='meta-row'><b>Topic</b><span>" + escapeHtml(e.topic || "—") + "</span></div>" +
+      "<div class='meta-row'><b>Date</b><span>" + escapeHtml(formatDateLong(e.date || date)) + "</span></div>" +
+      "<div class='meta-row'><b>Time</b><span>" + escapeHtml(timeStr || "—") + "</span></div>" +
+      "<div class='meta-row'><b>Status</b><span>" + escapeHtml(e.status || "—") + "</span></div>" +
+      "</div>";
+    courseBlocks += "<h2 class='sec'>Learning Objectives</h2><p class='" + (e.objectives ? "" : "muted") + "'>" +
+      (e.objectives ? escapeHtml(e.objectives).replace(/\n/g, "<br/>") : "Not recorded for this lecture.") + "</p>";
+    courseBlocks += "<h2 class='sec'>Lecture Summary</h2><p class='" + ((e.lectureSummary || e.summary) ? "" : "muted") + "'>" +
+      (e.lectureSummary || e.summary ? escapeHtml(e.lectureSummary || e.summary).replace(/\n/g, "<br/>") : "Not recorded for this lecture.") + "</p>";
+    if (e.remark) courseBlocks += "<p><b>Remarks:</b> " + escapeHtml(e.remark) + "</p>";
+    courseBlocks += "<h2 class='sec'>Absent Students (" + absentList.length + ")</h2>";
+    if (absentList.length) {
+      courseBlocks += "<table class='data absent'><thead><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
+        absentList.map(function(a) {
+          return "<tr><td>" + escapeHtml(a.sn) + "</td><td>" + escapeHtml(a.name) + "</td></tr>";
+        }).join("") + "</tbody></table>";
+    } else {
+      courseBlocks += "<p style='color:#1B7A3D;font-weight:600'>Full attendance — no absentees recorded.</p>";
     }
+    if (idx < heldEntries.length - 1) courseBlocks += "<div style='page-break-after:always'></div>";
   });
-  var absentList = Object.keys(allAbsent).map(function(k) { return allAbsent[k]; });
+
+  if (courseBlocks) {
+    body += "<div style='page-break-after:always'></div>" + courseBlocks;
+  }
+
+  // Consolidated
+  var consol = Object.keys(allAbsentMap).map(function(k) { return allAbsentMap[k]; });
+  consol.sort(function(a, b) {
+    var na = parseInt(a.sn, 10), nb = parseInt(b.sn, 10);
+    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+    return String(a.name).localeCompare(String(b.name));
+  });
   var registered = students.filter(function(s) {
-    if (s.status && s.status !== "Active") return false;
-    // best-effort class filter by level in classKey
-    if (classKey.indexOf("100") === 0) return String(s.level) === "100";
-    if (classKey.indexOf("200") === 0) return String(s.level) === "200";
+    if (s.status && String(s.status).toLowerCase() === "inactive") return false;
+    // best-effort class filter
     return true;
   }).length;
-  var present = Math.max(0, registered - absentList.length);
-  var w = window.open("", "_blank");
-  if (!w) return;
-  w.document.write("<!DOCTYPE html><html><head><title>Today's Lecture Report</title><style>" + eocnsReportStyles() + "</style></head><body>" +
-    "<h1>TODAY'S LECTURE(S) REPORT<span class=\"gold\">" + escapeHtml(classLabelFromKey(classKey)) + "</span></h1>" +
-    "<div class=\"sub\">" + escapeHtml(classKey.replace(/_.*/, "").toUpperCase() + " Level") + " · " + escapeHtml(sessionName) + " · " + formatDateLong(date) + "</div>" +
-    "<hr class=\"rule\"/>" +
-    "<h2>COURSE SCHEDULE / TIMETABLE</h2>" +
-    "<table><thead><tr><th>S/N</th><th>Course Title</th><th>Course Code</th><th>Start Time</th><th>End Time</th><th>Remark</th></tr></thead><tbody>" +
-    (scheduleRows || "<tr><td colspan=\"6\">No timetable slots or logs for this day.</td></tr>") + "</tbody></table>" +
-    courseBlocks +
-    "<h2>CONSOLIDATED ATTENDANCE REPORT</h2>" +
-    "<div class=\"kpi\"><div class=\"k-sched\"><strong>" + registered + "</strong><span>Total registered</span></div>" +
-    "<div class=\"k-del\"><strong>" + present + "</strong><span>Present (est.)</span></div>" +
-    "<div class=\"k-miss\"><strong>" + absentList.length + "</strong><span>Absent (unique)</span></div></div>" +
-    "<h2>CONSOLIDATED ABSENT STUDENTS LIST</h2>" +
-    (absentList.length ? ("<table><thead class=\"absent-head\"><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
-      absentList.map(function(a) { return "<tr><td>" + escapeHtml(String(a.sn)) + "</td><td>" + escapeHtml(a.name) + "</td></tr>"; }).join("") +
-      "</tbody></table>") : "<p>No absentees recorded in lecture logs for this day.</p>") +
-    amendmentFooterHtml(typeof entries !== "undefined" ? entries : (window.__lastQaReportEntries || [])) + "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + " · EOCNS QA System</div>" +
-    "</body></html>");
-  w.document.close();
-  setTimeout(function() { w.print(); }, 400);
+  // Prefer class-scoped student count if possible
+  try {
+    var scoped = students.filter(function(s) {
+      if (s.status && String(s.status).toLowerCase() === "inactive") return false;
+      var prog = (document.getElementById("qaDailyProgramme") && document.getElementById("qaDailyProgramme").value) || "";
+      var level = (document.getElementById("qaDailyLevel") && document.getElementById("qaDailyLevel").value) || "";
+      if (prog && s.programme && String(s.programme).toLowerCase().indexOf(String(prog).toLowerCase().slice(0, 4)) < 0) return false;
+      if (level && String(s.level) !== String(level) && String(s.level) !== String(level).replace(/\D/g, "")) return false;
+      return true;
+    });
+    if (scoped.length) registered = scoped.length;
+  } catch (_) {}
+  var absentN = consol.length;
+  var presentN = Math.max(0, registered - absentN);
+
+  body += "<div style='page-break-before:always'></div>";
+  body += reportLetterheadHtml("Consolidated Attendance Report", dept, period);
+  body += "<h2 class='sec'>Attendance Summary</h2>";
+  body += "<div class='kpi'><div><div class='lab'>Total Registered</div><div class='val' style='color:#1B3A6B'>" + registered +
+    "</div></div><div class='present'><div class='lab'>Present</div><div class='val'>" + presentN +
+    "</div></div><div class='absent'><div class='lab'>Absent</div><div class='val'>" + absentN + "</div></div></div>";
+  if (registered) {
+    var rate = Math.round((presentN / registered) * 1000) / 10;
+    body += "<p class='rperiod'>Class attendance rate: <b>" + rate + "%</b> · " + heldEntries.length + " lecture session(s) on record.</p>";
+  }
+  body += "<h2 class='sec'>Consolidated Absent Students List (" + consol.length + ")</h2>";
+  if (consol.length) {
+    body += "<table class='data absent'><thead><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
+      consol.map(function(a) {
+        return "<tr><td>" + escapeHtml(a.sn) + "</td><td>" + escapeHtml(a.name) + "</td></tr>";
+      }).join("") + "</tbody></table>";
+  } else {
+    body += "<p style='color:#1B7A3D;font-weight:600'>No absentees across recorded lectures.</p>";
+  }
+
+  openReportWindow("EOCNS Daily Lecture Report — " + date, body, meta.officer, meta.format);
 }
+
 
 function printWeeklyProfessionalPack(payload) {
   var p = payload || window.__weeklyQaPayload;
@@ -6544,30 +6729,9 @@ async function importFullSnapshot(file) {
 
 
 
-function eocnsReportStyles() {
-  return "body{font-family:'Segoe UI',system-ui,Georgia,serif;color:#1a1a2e;padding:28px;max-width:960px;margin:0 auto;line-height:1.45}" +
-    "h1{color:#1B3A6B;text-align:center;margin:0 0 4px;font-size:1.45rem;letter-spacing:0.02em}" +
-    "h1 .gold{color:#c9a227;display:block;font-size:0.95rem;font-weight:600;margin-top:4px}" +
-    ".sub{text-align:center;color:#555;margin:0 0 8px;font-size:12px}" +
-    ".rule{height:3px;background:linear-gradient(90deg,#1B3A6B,#c9a227,#1B3A6B);border:0;margin:12px 0 20px}" +
-    "h2{color:#1B3A6B;font-size:0.95rem;margin:28px 0 10px;padding:8px 12px;background:#e8eef7;border-left:4px solid #1B3A6B}" +
-    "table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}" +
-    "th{background:#1B3A6B;color:#fff;padding:8px;text-align:left;font-weight:600}" +
-    "td{border:1px solid #c5cdd8;padding:7px 8px;vertical-align:top}" +
-    "tr:nth-child(even) td{background:#f7f9fc}" +
-    ".kpi{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 8px}" +
-    ".kpi>div{flex:1;min-width:110px;text-align:center;border:1px solid #c5cdd8;border-radius:8px;padding:12px 8px;background:#fff}" +
-    ".kpi strong{display:block;font-size:1.45rem;line-height:1.2}" +
-    ".kpi span{font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:#555}" +
-    ".k-sched strong{color:#1B3A6B}.k-del strong{color:#0f766e}.k-miss strong{color:#b91c1c}.k-rate strong{color:#0f766e}" +
-    ".meta-grid{display:grid;grid-template-columns:140px 1fr;gap:4px 12px;font-size:13px;margin:8px 0 12px}" +
-    ".meta-grid b{color:#334}" +
-    ".absent-head th{background:#b91c1c}" +
-    ".note{background:#fff8e6;border-left:4px solid #c9a227;padding:8px 12px;font-size:12px;margin:8px 0}" +
-    ".charts{display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin:12px 0}" +
-    ".footer{margin-top:36px;font-size:12px;color:#555;text-align:center}" +
-    "@media print{body{padding:12px} .kpi>div{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
-}
+
+/* eocnsReportStyles defined once above */
+
 
 function formatTimeNice(t) {
   if (!t) return "";
@@ -6587,100 +6751,9 @@ function formatDateLong(iso) {
   return d.getDate() + (d.getDate()===1||d.getDate()===21||d.getDate()===31?"st":d.getDate()===2||d.getDate()===22?"nd":d.getDate()===3||d.getDate()===23?"rd":"th") + " " + months[d.getMonth()] + ", " + d.getFullYear();
 }
 
-async function printDailyLectureReport() {
-  var date = (document.getElementById("qaDailyDate") && document.getElementById("qaDailyDate").value) || "";
-  var classKey = (document.getElementById("qaDailyClass") && document.getElementById("qaDailyClass").value) || "100_nursing";
-  if (!date) { alert("Choose a date on Daily QA first."); return; }
-  await ensureTimetables();
-  var tt = TIMETABLES_CACHE[classKey] || { slots: [] };
-  var weekday = (new Date(date + "T12:00:00").getDay() + 6) % 7; // Mon=0
-  var slots = (tt.slots || []).filter(function(s) { return Number(s.weekday) === weekday; });
-  var entries = (await getQaEntries()).filter(function(e) { return e.date === date && e.classKey === classKey; });
-  var sessionName = "Academic Session";
-  try {
-    var sessions = await getAll("sessions");
-    var active = sessions.find(function(s) { return s.status === "Active"; });
-    if (active) sessionName = active.name;
-  } catch (_) {}
-  var students = await getAll("students");
-  function resolveAbsent(list) {
-    if (!list || !list.length) return [];
-    return list.map(function(a) {
-      var sn = String(a).trim();
-      var found = students.find(function(s) { return String(s.serial) === sn || String(s.regNo) === sn || (s.name && s.name.toLowerCase() === sn.toLowerCase()); });
-      return { sn: found ? (found.serial || sn) : sn, name: found ? found.name : sn };
-    });
-  }
-  var scheduleRows = "";
-  var courseBlocks = "";
-  var allAbsent = {};
-  var used = slots.length ? slots : entries.map(function(e) {
-    return { code: (e.course || "").split("—")[0].trim(), start: e.start, end: e.end, hours: e.duration ? e.duration / 60 : 2 };
-  });
-  used.forEach(function(slot, i) {
-    var code = slot.code || "";
-    var ent = entries.find(function(e) {
-      return (e.course || "").indexOf(code) >= 0 || (e.start && slot.start && e.start === slot.start);
-    }) || entries[i];
-    var remark = ent ? (ent.status === "Held" ? "Lecture held" : ent.status === "Missed" ? "Lecture missed" : (ent.status || "Logged")) : "Not logged";
-    var title = ent ? (ent.course || code) : courseName(code);
-    scheduleRows += "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(String(title).replace(/^[^—]+—\s*/, "") || title) +
-      "</td><td>" + escapeHtml(code) + "</td><td>" + formatTimeNice(slot.start || (ent && ent.start)) +
-      "</td><td>" + formatTimeNice(slot.end || (ent && ent.end)) + "</td><td>" + escapeHtml(remark) + "</td></tr>";
-    if (ent) {
-      var abs = resolveAbsent(ent.absent);
-      abs.forEach(function(a) { allAbsent[a.sn + "|" + a.name] = a; });
-      var obj = (ent.objectives || "").split(/[.;\n]+/).map(function(x) { return x.trim(); }).filter(Boolean);
-      courseBlocks += "<h2>COURSE " + (i + 1) + " INFORMATION</h2>" +
-        "<div class=\"meta-grid\">" +
-        "<b>Course Code:</b><span>" + escapeHtml(code || (ent.course || "")) + "</span>" +
-        "<b>Course Title:</b><span>" + escapeHtml(ent.course || title) + "</span>" +
-        "<b>Lecturer:</b><span>" + escapeHtml(ent.lecturer || "—") + "</span>" +
-        "<b>Topic:</b><span>" + escapeHtml(ent.topic || "—") + "</span>" +
-        "<b>Date:</b><span>" + formatDateLong(ent.date) + "</span>" +
-        "<b>Time:</b><span>" + formatTimeNice(ent.start) + " – " + formatTimeNice(ent.end) + "</span></div>" +
-        "<h2>LEARNING OBJECTIVES</h2><ul>" + (obj.length ? obj.map(function(o) { return "<li>" + escapeHtml(o) + "</li>"; }).join("") : "<li>—</li>") + "</ul>" +
-        "<h2>LECTURE SUMMARY</h2><p>" + escapeHtml(ent.lectureSummary || "—") + "</p>" +
-        "<h2>ASSIGNMENT</h2><div class=\"note\">" + escapeHtml(ent.assignment || "None was given") + "</div>" +
-        "<h2>REMARKS</h2><p>" + escapeHtml(ent.remark || "—") + "</p>" +
-        "<h2>ABSENT STUDENTS</h2>" +
-        (abs.length ? ("<table><thead class=\"absent-head\"><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
-          abs.map(function(a) { return "<tr><td>" + escapeHtml(String(a.sn)) + "</td><td>" + escapeHtml(a.name) + "</td></tr>"; }).join("") +
-          "</tbody></table>") : "<p>None recorded.</p>");
-    }
-  });
-  var absentList = Object.keys(allAbsent).map(function(k) { return allAbsent[k]; });
-  var registered = students.filter(function(s) {
-    if (s.status && s.status !== "Active") return false;
-    // best-effort class filter by level in classKey
-    if (classKey.indexOf("100") === 0) return String(s.level) === "100";
-    if (classKey.indexOf("200") === 0) return String(s.level) === "200";
-    return true;
-  }).length;
-  var present = Math.max(0, registered - absentList.length);
-  var w = window.open("", "_blank");
-  if (!w) return;
-  w.document.write("<!DOCTYPE html><html><head><title>Today's Lecture Report</title><style>" + eocnsReportStyles() + "</style></head><body>" +
-    "<h1>TODAY'S LECTURE(S) REPORT<span class=\"gold\">" + escapeHtml(classLabelFromKey(classKey)) + "</span></h1>" +
-    "<div class=\"sub\">" + escapeHtml(classKey.replace(/_.*/, "").toUpperCase() + " Level") + " · " + escapeHtml(sessionName) + " · " + formatDateLong(date) + "</div>" +
-    "<hr class=\"rule\"/>" +
-    "<h2>COURSE SCHEDULE / TIMETABLE</h2>" +
-    "<table><thead><tr><th>S/N</th><th>Course Title</th><th>Course Code</th><th>Start Time</th><th>End Time</th><th>Remark</th></tr></thead><tbody>" +
-    (scheduleRows || "<tr><td colspan=\"6\">No timetable slots or logs for this day.</td></tr>") + "</tbody></table>" +
-    courseBlocks +
-    "<h2>CONSOLIDATED ATTENDANCE REPORT</h2>" +
-    "<div class=\"kpi\"><div class=\"k-sched\"><strong>" + registered + "</strong><span>Total registered</span></div>" +
-    "<div class=\"k-del\"><strong>" + present + "</strong><span>Present (est.)</span></div>" +
-    "<div class=\"k-miss\"><strong>" + absentList.length + "</strong><span>Absent (unique)</span></div></div>" +
-    "<h2>CONSOLIDATED ABSENT STUDENTS LIST</h2>" +
-    (absentList.length ? ("<table><thead class=\"absent-head\"><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
-      absentList.map(function(a) { return "<tr><td>" + escapeHtml(String(a.sn)) + "</td><td>" + escapeHtml(a.name) + "</td></tr>"; }).join("") +
-      "</tbody></table>") : "<p>No absentees recorded in lecture logs for this day.</p>") +
-    amendmentFooterHtml(typeof entries !== "undefined" ? entries : (window.__lastQaReportEntries || [])) + "<div class=\"footer\">Eastern Oak College of Nursing Sciences · Generated " + new Date().toLocaleString() + " · EOCNS QA System</div>" +
-    "</body></html>");
-  w.document.close();
-  setTimeout(function() { w.print(); }, 400);
-}
+
+/* printDailyLectureReport defined once */
+
 
 function printWeeklyProfessionalPack(payload) {
   var p = payload || window.__weeklyQaPayload;
