@@ -4,14 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       report_type:
-        description: "daily_qa | weekly_qa | monthly_qa | lecturer_hours | student_register | hostel"
+        description: "daily_qa | weekly_qa | monthly_qa | lecturer_hours | student_register | hostel | remedial_weekly | remedial_summary"
         required: true
         default: daily_qa
       payload_json:
         description: "Full JSON payload as a string"
         required: true
       officer_name:
-        description: "QA officer releasing the report"
+        description: "QA officer releasing the report (not stored)"
         required: true
         default: "QA Officer"
 
