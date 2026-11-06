@@ -4750,24 +4750,30 @@ async function putMany(storeName, rows) {
 }
 
 function shapeStudentsForRepo(students) {
-  return students.slice().sort((a, b) => String(a.name).localeCompare(String(b.name))).map(s => ({
-    serial: s.serial || "",
-    name: s.name,
-    programme: normalizeProgramme(s.programme) === "Nursing" ? "General Nursing" : normalizeProgramme(s.programme),
-    level: Number(s.level) || (s.programme === "Midwifery" ? 200 : 100),
-    code: getProgrammeCode(normalizeProgramme(s.programme)),
-    regNo: s.regNo || "",
-    hostel: s.hostel || "",
-    status: s.status || "Active",
-    gender: s.gender || "",
-    phone: s.phone || "",
-    id: s.id || "",
-  }));
+  return students.slice().sort((a, b) => String(a.name).localeCompare(String(b.name))).map(s => {
+    var row = {
+      serial: s.serial || "",
+      name: s.name,
+      programme: normalizeProgramme(s.programme) === "Nursing" ? "General Nursing" : normalizeProgramme(s.programme),
+      level: Number(s.level) || (s.programme === "Midwifery" ? 200 : 100),
+      code: getProgrammeCode(normalizeProgramme(s.programme)),
+      regNo: s.regNo || "",
+      hostel: s.hostel || "",
+      status: s.status || "Active",
+      gender: s.gender || "",
+      phone: s.phone || "",
+      email: s.email || "",
+      id: s.id || ""
+    };
+    if (s.photoDataUrl) row.photoDataUrl = s.photoDataUrl;
+    if (s.photoUpdatedAt) row.photoUpdatedAt = s.photoUpdatedAt;
+    return row;
+  });
 }
 
 function studentFromRepo(s) {
   const now = new Date().toISOString();
-  return {
+  var row = {
     id: s.id || ("stu_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7)),
     name: s.name,
     regNo: s.regNo || "",
@@ -4777,10 +4783,16 @@ function studentFromRepo(s) {
     hostel: s.hostel || "",
     status: s.status || "Active",
     phone: s.phone || "",
+    email: s.email || "",
     serial: s.serial || "",
     createdAt: s.createdAt || now,
-    updatedAt: s.updatedAt || now,
+    updatedAt: s.updatedAt || now
   };
+  if (s.photoDataUrl) {
+    row.photoDataUrl = s.photoDataUrl;
+    row.photoUpdatedAt = s.photoUpdatedAt || now;
+  }
+  return row;
 }
 
 async function hydrateAllFromRepoIfEmpty() {
@@ -4887,40 +4899,61 @@ async function refreshCachesAfterSync() {
   try { refreshDashboardStats(); } catch (_) {}
 }
 async function syncFromRepoIfClean() {
+  // Repo is the source of truth on every clean load (all devices stay consistent).
   var metaRows = await getAll("meta"), m = {};
   metaRows.forEach(function(r) { m[r.key] = r.value; });
   if (m.dirty === true || EOCNS_DIRTY) {
     EOCNS_DIRTY = true;
     var b = document.getElementById("dirtyBanner");
-    if (b) { b.hidden = false; b.textContent = "This browser has unpublished changes, so newer repository data was NOT loaded over them. Publish them (Settings), or use “Reload all data from repository” to discard them."; }
+    if (b) {
+      b.hidden = false;
+      b.textContent = "This browser has unpublished changes — repository data was NOT loaded over them. Publish (Settings) or use Reload all data from repository to discard.";
+    }
     return { skipped: "unpublished changes" };
   }
-  var lastPub = m.lastPublishAt ? Date.parse(m.lastPublishAt) : 0;
-  // GitHub Pages can take a few minutes to show a fresh publish; don't overwrite fresh local data with the old copy.
-  if (lastPub && Date.now() - lastPub < 10 * 60 * 1000) return { skipped: "just published" };
-  var firstRun = !Object.keys(m).some(function(k) { return k.indexOf("repoFp:") === 0; });
+  // Always pull every store from the repository so Device B sees Device A publishes.
   var changed = [];
+  var failed = [];
   for (var i = 0; i < SYNC_STORES.length; i++) {
     var store = SYNC_STORES[i][0], path = DATA_FILES[SYNC_STORES[i][1]];
     if (!path) continue;
     try {
       var text = await fetchRepoText(path);
-      var fp = textFingerprint(text);
-      if (m["repoFp:" + store] === fp) continue;
-      if (!firstRun) {
-        var rows = JSON.parse(text);
-        if (!Array.isArray(rows)) continue;
-        await replaceStoreFromRepoRows(store, rows);
-        changed.push(store);
-      }
-      await put("meta", { key: "repoFp:" + store, value: fp });
-    } catch (e) { console.warn("repo sync", store, e); }
+      var rows = JSON.parse(text);
+      if (!Array.isArray(rows)) throw new Error("not a list");
+      await replaceStoreFromRepoRows(store, rows);
+      await put("meta", { key: "repoFp:" + store, value: textFingerprint(text) });
+      changed.push(store);
+    } catch (e) {
+      console.warn("repo sync", store, e);
+      failed.push(store);
+    }
   }
-  if (changed.length) {
-    await refreshCachesAfterSync();
-    showToast("Updated from the repository: " + changed.join(", "), 5000);
+  try {
+    var meta = await fetchRepoJson(DATA_FILES.remedial_meta);
+    if (meta) await put("remedial_meta", { key: "main", value: meta });
+  } catch (_) {}
+  try {
+    var rtt = await fetchRepoJson(DATA_FILES.remedial_timetable);
+    if (rtt) await put("remedial_timetable", { key: "main", value: rtt });
+  } catch (_) {}
+  try {
+    TIMETABLES_CACHE = await fetchRepoJson(DATA_FILES.timetables);
+  } catch (_) {}
+  try {
+    APP_CONFIG = await fetchRepoJson(DATA_FILES.config);
+  } catch (_) {}
+  clearDirty();
+  await refreshCachesAfterSync();
+  var banner = document.getElementById("masterLoadBanner");
+  if (banner) {
+    banner.hidden = false;
+    banner.textContent = "Loaded from repository (" + changed.length + " data sets)" +
+      (failed.length ? ". Could not load: " + failed.join(", ") : ".") +
+      " Data is consistent with the published master.";
+    setTimeout(function() { banner.hidden = true; }, 10000);
   }
-  return { changed: changed, firstRun: firstRun };
+  return { changed: changed, failed: failed };
 }
 
 async function reloadAllFromRepo(force) {
@@ -5062,8 +5095,53 @@ async function publishAllToRepo() {
       }
       throw new Error(msg);
     }
+    EOCNS_DIRTY = false;
     clearDirty();
-    if (status) status.textContent = "Published via worker: " + ((body.updated && body.updated.join(", ")) || "ok");
+    try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
+    try { await put("meta", { key: "lastPublishAt", value: new Date().toISOString() }); } catch (_) {}
+    if (status) status.textContent = "Published via worker: " + ((body.updated && body.updated.join(", ")) || "ok") + ". Clearing local cache and reloading from repository…";
+    // After successful publish: wipe local operational stores and re-read from repo
+    // so this browser matches GitHub Pages (Device B sees the same after load/refresh).
+    try {
+      for (var si = 0; si < SYNC_STORES.length; si++) {
+        try { await clearStore(SYNC_STORES[si][0]); } catch (_) {}
+      }
+      try {
+        var metaAll = await getAll("meta");
+        for (var mi = 0; mi < metaAll.length; mi++) {
+          var mk = metaAll[mi] && metaAll[mi].key;
+          if (mk && (String(mk).indexOf("repoFp:") === 0 || mk === "dirty")) {
+            try { await del("meta", mk); } catch (_) {}
+          }
+        }
+        await put("meta", { key: "dirty", value: false });
+      } catch (_) {}
+      TIMETABLES_CACHE = null;
+      try { PROGRAMMES_CACHE = null; LEVELS_CACHE = null; } catch (_) {}
+      await new Promise(function(r) { setTimeout(r, 3000); });
+      var syncOk = false;
+      try {
+        await syncFromRepoIfClean();
+        syncOk = true;
+      } catch (e1) {
+        console.warn("post-publish sync attempt 1", e1);
+        await new Promise(function(r) { setTimeout(r, 2000); });
+        try {
+          await syncFromRepoIfClean();
+          syncOk = true;
+        } catch (e2) {
+          console.warn("post-publish sync attempt 2", e2);
+        }
+      }
+      if (status) {
+        status.textContent = syncOk
+          ? "Published and local cache refreshed from repository. Other devices will see this after they load/refresh the site."
+          : "Published OK. If lists look empty, hard-refresh this page (GitHub Pages may still be updating).";
+      }
+    } catch (postErr) {
+      console.warn("post-publish reload", postErr);
+      if (status) status.textContent = "Published OK, but local reload had an issue: " + (postErr.message || postErr) + ". Hard-refresh this page.";
+    }
     var panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = true;
     if (document.getElementById("qaPublishPin")) document.getElementById("qaPublishPin").value = "";
