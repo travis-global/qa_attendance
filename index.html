@@ -114,6 +114,7 @@
             <div class="card"><div class="card__header"><h3>Quick Actions</h3></div><div class="card__body quick-actions">
               <button class="action-btn" data-goto="students"><span class="action-btn__icon">+</span><span>Add Student</span></button>
               <button class="action-btn" data-goto="hostel"><span class="action-btn__icon">⌂</span><span>Hostel Report</span></button>
+              <button class="action-btn" id="btnGenerateHostelReportDash"><span class="action-btn__icon">⌂</span><span>Generate Hostel PDF</span></button>
               <button class="action-btn" data-goto="qa-daily"><span class="action-btn__icon">◎</span><span>Daily QA</span></button>
               <button class="action-btn" data-goto="sessions"><span class="action-btn__icon">◫</span><span>New Session</span></button>
             </div></div>
@@ -192,8 +193,9 @@
               <span class="count-pill" id="studentsCount">0 students</span>
               <button class="btn btn--ghost qa-edit-only" id="btnImportStudentsCsv">Import CSV</button>
               <input type="file" id="studentsCsvInput" accept=".csv,text/csv" hidden />
-              <button class="btn btn--ghost" id="btnSeedStudents" class="btn btn--ghost qa-edit-only" title="Only needed if the repository list is empty">Reload master list</button>
-              <button class="btn btn--primary" id="btnAddStudent" class="btn btn--primary qa-edit-only">+ Add Student</button>
+              <button class="btn btn--ghost btn btn--ghost qa-edit-only" id="btnSeedStudents"  title="Only needed if the repository list is empty">Reload master list</button>
+              <button type="button" class="btn btn--ghost" id="btnGenerateStudentRegister">Generate register report</button>
+              <button type="button" class="btn btn--primary qa-edit-only btn btn--primary qa-edit-only" id="btnAddStudent" >+ Add Student</button>
             </div>
           </div>
           
@@ -236,6 +238,11 @@
           </div>
         </section>
         <section class="view" id="view-hostel">
+          <div class="page-toolbar" style="margin-bottom:12px">
+            <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Hostel assignments come from the student master list.</p></div>
+            <div class="page-toolbar__right"><button type="button" class="btn btn--primary" id="btnGenerateHostelReport">Generate hostel report</button></div>
+          </div>
+
           <div class="page-toolbar">
             <div class="page-toolbar__left">
               <p class="muted-note" style="margin:0">Upload the gate / biometric export (.xls / .xlsx) and generate the standard Hostel Absentees boarding-fee report.</p>
@@ -310,7 +317,7 @@
             <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Create and manage academic sessions.</p></div>
             <div class="page-toolbar__right">
               <span class="count-pill" id="sessionsCount">0 sessions</span>
-              <button class="btn btn--primary" id="btnAddSession" class="btn btn--primary qa-edit-only" class="btn btn--primary qa-edit-only">+ New Session</button>
+              <button class="btn btn--primary btn btn--primary qa-edit-only" id="btnAddSession"  class="btn btn--primary qa-edit-only">+ New Session</button>
             </div>
           </div>
           <div id="sessionsList"></div>
@@ -1150,7 +1157,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=51"></script>
+  <script src="app.js?v=52"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

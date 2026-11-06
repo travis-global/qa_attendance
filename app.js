@@ -2064,12 +2064,12 @@ function reportSignatureHtml(officerName) {
 
 function promptOfficerAndFormat(defaultTitle) {
   return new Promise(function(resolve) {
-    var officer = prompt("Officer name to appear on this report (required for audit):", localStorage.getItem("eocns_officer_name") || "");
+    // Officer name is requested every time — never stored for reuse (audit integrity).
+    var officer = prompt("Enter the full name of the officer generating/releasing this report:\n(Required — will appear on the report and in the audit trail)", "");
     if (officer == null) { resolve(null); return; }
     officer = String(officer).trim();
-    if (!officer) { alert("Officer name is required."); resolve(null); return; }
-    localStorage.setItem("eocns_officer_name", officer);
-    var fmt = prompt("Format: type PDF or WORD (default PDF):", "PDF");
+    if (!officer) { alert("Officer name is required for every report."); resolve(null); return; }
+    var fmt = prompt("Output format — type PDF or WORD (default PDF):", "PDF");
     if (fmt == null) { resolve(null); return; }
     fmt = String(fmt).trim().toLowerCase();
     if (fmt.indexOf("w") === 0) fmt = "word";
@@ -2077,6 +2077,104 @@ function promptOfficerAndFormat(defaultTitle) {
     resolve({ officer: officer, format: fmt, title: defaultTitle || "Report" });
   });
 }
+
+/** Pull audit rows that touch entities in a date window (for amendment footnotes). */
+async function collectReportAmendments(opts) {
+  opts = opts || {};
+  var from = opts.from || "";
+  var to = opts.to || "";
+  var entities = opts.entities || ["qa_entries", "students", "lecturers", "timetables", "remedial", "remedial_enrolment", "remedial_logs", "attendance"];
+  var rows = [];
+  try {
+    var audit = await getAll("audit");
+    audit.forEach(function(a) {
+      if (!a) return;
+      var ent = String(a.entity || "");
+      if (entities.length && entities.indexOf(ent) < 0) return;
+      var at = String(a.at || a.createdAt || a.date || "");
+      var day = at.slice(0, 10);
+      if (from && day && day < from) return;
+      if (to && day && day > to) return;
+      if (String(a.action || "") === "create" && !a.externalRef && !a.reason) return;
+      rows.push(a);
+    });
+  } catch (_) {}
+  rows.sort(function(a, b) {
+    return String(b.at || b.createdAt || "").localeCompare(String(a.at || a.createdAt || ""));
+  });
+  return rows.slice(0, 40);
+}
+
+function reportAmendmentsHtml(rows) {
+  if (!rows || !rows.length) {
+    return "<h2 class='sec'>Master-list &amp; log amendments in this window</h2>" +
+      "<p class='muted'>No audited edits to master data or lecture logs were recorded for this reporting window.</p>";
+  }
+  var body = rows.map(function(a, i) {
+    var when = a.at || a.createdAt || a.date || "—";
+    var ref = a.externalRef || a.ref || "—";
+    var who = a.officer || a.by || "—";
+    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(String(when).slice(0, 19).replace("T", " ")) +
+      "</td><td>" + escapeHtml(String(a.action || "")) + "</td><td>" + escapeHtml(String(a.entity || "")) +
+      "</td><td>" + escapeHtml(String(ref)) + "</td><td>" + escapeHtml(String(a.reason || a.details && a.details.reason || "—")) +
+      "</td><td>" + escapeHtml(String(who)) + "</td></tr>";
+  }).join("");
+  return "<h2 class='sec'>Master-list &amp; log amendments in this window</h2>" +
+    "<p style='font-size:11px;color:#64748b'>Any create / update / delete on master lists or lecture logs that falls inside the report period is listed automatically from the audit trail. Official REF numbers appear when officers supplied them.</p>" +
+    "<table class='data'><thead><tr><th>#</th><th>When</th><th>Action</th><th>Entity</th><th>REF</th><th>Reason</th><th>Officer</th></tr></thead><tbody>" +
+    body + "</tbody></table>";
+}
+
+function reportGlossaryHtml(extraItems) {
+  var items = [
+    ["Scheduled", "Contact sessions expected from the official timetable for the selected class and dates (weekends/excluded days omitted)."],
+    ["Delivered / Held", "Sessions logged by QA as held or partially held."],
+    ["Missed", "Timetable slots with no matching held log in the period."],
+    ["Compliance %", "Delivered ÷ Scheduled × 100. Values above 100% mean extra sessions beyond the timetable (over-delivery)."],
+    ["At risk (<75%)", "Students whose attendance rate for the period is below 75%."],
+    ["Critical (<50%)", "Students below 50% attendance — priority follow-up."],
+    ["Perfect (100%)", "Present for every countable session in the window."],
+    ["Tentative / UNDEFINED", "Appeared on attendance material but not on the official enrolment list — pending verification."]
+  ].concat(extraItems || []);
+  var lis = items.map(function(pair) {
+    return "<li><b>" + escapeHtml(pair[0]) + ":</b> " + escapeHtml(pair[1]) + "</li>";
+  }).join("");
+  return "<h2 class='sec'>How to read this report</h2><ul style='font-size:11.5px;line-height:1.55;margin:6px 0 12px 18px'>" + lis + "</ul>";
+}
+
+function svgDonut(pct, size, label) {
+  size = size || 140;
+  pct = Math.max(0, Math.min(100, Number(pct) || 0));
+  var r = size / 2 - 12;
+  var c = 2 * Math.PI * r;
+  var dash = (pct / 100) * c;
+  var col = pct >= 80 ? "#1B7A3D" : pct >= 60 ? "#B8860B" : "#B91C1C";
+  return "<svg width='" + size + "' height='" + size + "' viewBox='0 0 " + size + " " + size + "' role='img'>" +
+    "<circle cx='" + (size/2) + "' cy='" + (size/2) + "' r='" + r + "' fill='none' stroke='#E2E8F0' stroke-width='14'/>" +
+    "<circle cx='" + (size/2) + "' cy='" + (size/2) + "' r='" + r + "' fill='none' stroke='" + col + "' stroke-width='14' " +
+    "stroke-dasharray='" + dash + " " + (c - dash) + "' stroke-linecap='round' transform='rotate(-90 " + (size/2) + " " + (size/2) + ")'/>" +
+    "<text x='50%' y='48%' text-anchor='middle' font-size='22' font-weight='700' fill='#1B3A6B'>" + pct.toFixed(1) + "%</text>" +
+    "<text x='50%' y='62%' text-anchor='middle' font-size='10' fill='#64748b'>" + escapeHtml(label || "Compliance") + "</text></svg>";
+}
+
+function svgHBarRows(rows, maxW) {
+  // rows: [{label, value, max}] value is percent 0-100+
+  maxW = maxW || 320;
+  if (!rows || !rows.length) return "";
+  var h = rows.length * 28 + 10;
+  var bars = rows.map(function(r, i) {
+    var pct = Number(r.value) || 0;
+    var w = Math.min(maxW - 120, Math.max(2, (Math.min(pct, 150) / 150) * (maxW - 120)));
+    var col = pct >= 100 ? "#1d4ed8" : pct >= 80 ? "#1B7A3D" : pct >= 50 ? "#B8860B" : "#B91C1C";
+    var y = 8 + i * 28;
+    return "<text x='0' y='" + (y + 12) + "' font-size='10' fill='#334155'>" + escapeHtml(String(r.label).slice(0, 28)) + "</text>" +
+      "<rect x='120' y='" + y + "' width='" + (maxW - 120) + "' height='14' fill='#F1F5F9' rx='3'/>" +
+      "<rect x='120' y='" + y + "' width='" + w + "' height='14' fill='" + col + "' rx='3'/>" +
+      "<text x='" + (maxW + 6) + "' y='" + (y + 12) + "' font-size='10' font-weight='600' fill='#1B3A6B'>" + pct.toFixed(0) + "%</text>";
+  }).join("");
+  return "<svg width='" + (maxW + 50) + "' height='" + h + "' xmlns='http://www.w3.org/2000/svg'>" + bars + "</svg>";
+}
+
 
 function openReportWindow(title, bodyHtml, officer, format) {
   var w = window.open("", "_blank");
@@ -2293,90 +2391,109 @@ async function printDailyLectureReport() {
 }
 
 
-function printWeeklyProfessionalPack(payload) {
+async function printWeeklyProfessionalPack(payload) {
+  var meta = await promptOfficerAndFormat("Weekly QA Report");
+  if (!meta) return;
   var p = payload || window.__weeklyQaPayload;
-  if (!p) { alert("Build the weekly report first."); return; }
+  if (!p) { alert("Build the weekly report first (Generate weekly report)."); return; }
   var compliance = p.scheduled ? Math.round((p.delivered / p.scheduled) * 1000) / 10 : 0;
   var courseRows = (p.courseRows || []).map(function(r) {
-    return "<tr><td>" + escapeHtml(r.course) + "</td><td>" + escapeHtml(r.lecturer) + "</td><td>" + r.sched +
-      "</td><td>" + r.deliv + "</td><td>" + r.missed + "</td><td>" + r.hrs + "</td><td>" + escapeHtml(r.status) +
-      "</td><td>" + r.pct + "</td></tr>";
+    var st = String(r.status || "");
+    var stColor = st.indexOf("Fully Delivered") >= 0 ? "#1B7A3D" : st.indexOf("Missed") >= 0 ? "#B91C1C" : st.indexOf("Partial") >= 0 ? "#B8860B" : st.indexOf("Over") >= 0 ? "#1d4ed8" : "#64748b";
+    return "<tr><td><b>" + escapeHtml(r.course) + "</b></td><td>" + escapeHtml(r.lecturers || r.lecturer || "—") +
+      "</td><td style='text-align:center'>" + r.scheduled + "</td><td style='text-align:center;color:#1B7A3D;font-weight:600'>" + r.delivered +
+      "</td><td style='text-align:center;color:#B91C1C;font-weight:600'>" + (r.missed || "—") +
+      "</td><td style='text-align:center'>" + escapeHtml(String(r.hrs || r.hrsDel || "—")) +
+      "</td><td style='color:" + stColor + ";font-weight:600'>" + escapeHtml(st) +
+      "</td><td style='text-align:center;font-weight:700'>" + (r.pct != null ? r.pct + "%" : "—") + "</td></tr>";
   }).join("");
   var dayRows = (p.dayRows || []).map(function(r) {
-    return "<tr><td>" + escapeHtml(r.date) + "</td><td>" + escapeHtml(r.day) + "</td><td>" + escapeHtml(r.course) +
-      "</td><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml(r.topic) + "</td><td>" + escapeHtml(r.time) +
-      "</td><td>" + escapeHtml(r.hrs) + "</td></tr>";
+    return "<tr><td>" + escapeHtml(r.date) + "</td><td>" + escapeHtml(r.day || "") + "</td><td><b>" + escapeHtml(r.course) +
+      "</b></td><td>" + escapeHtml(r.lecturer || "") + "</td><td>" + escapeHtml(r.topic || "") +
+      "</td><td>" + escapeHtml(r.time || "") + "</td><td>" + escapeHtml(String(r.hrs || "")) + "</td></tr>";
   }).join("");
-  var pie = [
-    { label: "Delivered", value: p.delivered, color: "#0f766e" },
-    { label: "Missed", value: p.missed, color: "#b91c1c" }
-  ].filter(function(x) { return x.value > 0; });
-  var bars = (p.courseRows || []).slice(0, 10).map(function(r) {
-    return { label: String(r.course).slice(0, 8), value: r.deliv, color: "#1d4ed8" };
+  var barRows = (p.courseRows || []).filter(function(r) { return r.pct != null && r.scheduled > 0; }).map(function(r) {
+    return { label: String(r.course).slice(0, 24), value: Number(r.pct) || 0 };
   });
-  var w = window.open("", "_blank");
-  if (!w) return;
-  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Weekly QA Report</title><style>" + eocnsReportStyles() + "</style></head><body>" +
-    "<h1>EOCNS QA REPORT — WEEKLY<span class=\"gold\">Staff Teaching Commitment &amp; Lecture Attendance</span></h1>" +
-    "<div class=\"sub\"><strong>" + escapeHtml(classLabelFromKey(p.classKey)) + "</strong><br/>" +
-    escapeHtml(p.periodLabel) + "<br/>Generated: " + new Date().toLocaleString() + " · Excluded: " + escapeHtml(p.excluded || "None") + "</div>" +
-    "<hr class=\"rule\"/>" +
-    "<h2>WEEKLY SUMMARY</h2>" +
-    "<div class=\"kpi\">" +
-    "<div class=\"k-sched\"><strong>" + p.scheduled + "</strong><span>Scheduled</span></div>" +
-    "<div class=\"k-del\"><strong>" + p.delivered + "</strong><span>Delivered</span></div>" +
-    "<div class=\"k-miss\"><strong>" + p.missed + "</strong><span>Missed</span></div>" +
-    "<div class=\"k-rate\"><strong>" + compliance + "%</strong><span>Compliance</span></div></div>" +
-    "<p>Teaching delivery for this window stands at <strong>" + compliance + "%</strong> " +
-    "(" + p.delivered + " of " + p.scheduled + " scheduled contact sessions logged as held). " +
-    (p.missed ? (p.missed + " session(s) were missed and should be rescheduled or explained in audit.") : "No missed sessions were recorded.") + "</p>" +
-    "<h2>COURSE COMPLIANCE</h2>" +
-    "<table><thead><tr><th>Course</th><th>Lecturer(s)</th><th>Sched</th><th>Deliv</th><th>Missed</th><th>Hrs Del</th><th>Status</th><th>%</th></tr></thead><tbody>" +
-    (courseRows || "<tr><td colspan=\"8\">No course data.</td></tr>") + "</tbody></table>" +
-    "<h2>VISUAL ANALYSIS</h2><div class=\"charts\">" +
-    (typeof svgPie === "function" ? svgPie(pie, 160) : "") +
-    (typeof svgBars === "function" ? svgBars(bars, 340, 150) : "") + "</div>" +
-    "<h2>DAY-BY-DAY BREAKDOWN</h2>" +
-    "<table><thead><tr><th>Date</th><th>Day</th><th>Course</th><th>Lecturer</th><th>Topic</th><th>Time</th><th>Hrs</th></tr></thead><tbody>" +
-    (dayRows || "<tr><td colspan=\"7\">No lectures logged in range.</td></tr>") + "</tbody></table>" +
-    "<div class=\"footer\">— End of Weekly QA Report — · EOCNS QA Attendance System</div></body></html>");
-  w.document.close();
-  setTimeout(function() { w.print(); }, 400);
+  var amendments = await collectReportAmendments({ from: p.start, to: p.end, entities: ["qa_entries", "timetables", "lecturers", "students"] });
+  var period = (p.periodLabel || ((p.start || "") + " – " + (p.end || "")));
+  var body = reportLetterheadHtml(
+    "EOCNS QA Report — Weekly",
+    "Staff Teaching Commitment & Lecture Attendance",
+    (typeof classLabelFromKey === "function" ? classLabelFromKey(p.classKey) : p.classKey) + " · " + period
+  );
+  body += "<h2 class='sec'>Weekly Summary</h2>";
+  body += "<div class='kpi'>" +
+    "<div><div class='lab'>Scheduled</div><div class='val' style='color:#1B3A6B'>" + p.scheduled + "</div></div>" +
+    "<div class='present'><div class='lab'>Delivered</div><div class='val'>" + p.delivered + "</div></div>" +
+    "<div class='absent'><div class='lab'>Missed</div><div class='val'>" + p.missed + "</div></div>" +
+    "<div><div class='lab'>Compliance</div><div class='val' style='color:" + (compliance >= 80 ? "#1B7A3D" : compliance >= 60 ? "#B8860B" : "#B91C1C") + "'>" + compliance + "%</div></div>" +
+    "</div>";
+  body += "<p style='font-size:12px;margin:10px 0'>Teaching delivery for this window stands at <b>" + compliance + "%</b> (" +
+    p.delivered + " of " + p.scheduled + " scheduled contact sessions logged as held). " +
+    (p.missed ? (p.missed + " session(s) were missed and should be rescheduled or explained in audit.") : "No missed sessions were recorded.") + "</p>";
+  body += "<div style='display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin:12px 0 8px'>" +
+    svgDonut(compliance, 150, "Week rate") +
+    "<div style='flex:1;min-width:240px'>" + svgHBarRows(barRows.slice(0, 10), 340) + "</div></div>";
+  body += "<h2 class='sec'>Course Compliance</h2>";
+  body += "<table class='data'><thead><tr><th>Course</th><th>Lecturer(s)</th><th>Sched</th><th>Deliv</th><th>Missed</th><th>Hrs</th><th>Status</th><th>%</th></tr></thead><tbody>" +
+    (courseRows || "<tr><td colspan='8'>No course data.</td></tr>") + "</tbody></table>";
+  if (dayRows) {
+    body += "<h2 class='sec'>Day-by-day breakdown</h2>";
+    body += "<table class='data'><thead><tr><th>Date</th><th>Day</th><th>Course</th><th>Lecturer</th><th>Topic</th><th>Time</th><th>Hrs</th></tr></thead><tbody>" +
+      dayRows + "</tbody></table>";
+  }
+  body += reportGlossaryHtml([
+    ["Status: Fully Delivered", "All scheduled slots for that course were logged as held."],
+    ["Status: Over-Delivered", "More held sessions than the timetable scheduled for the window."],
+    ["Status: Not in Timetable", "A held log exists for a course/slot not on the official timetable."]
+  ]);
+  body += reportAmendmentsHtml(amendments);
+  openReportWindow("EOCNS Weekly QA — " + period, body, meta.officer, meta.format);
 }
 
-function printMonthlyProfessionalPack(payload) {
+
+
+async function printMonthlyProfessionalPack(payload) {
+  var meta = await promptOfficerAndFormat("Monthly QA / Attendance Report");
+  if (!meta) return;
   var p = payload || window.__monthlyQaPayload;
   if (!p) { alert("Build the monthly report first."); return; }
-  var w = window.open("", "_blank");
-  if (!w) return;
   var courseRows = (p.courseRows || []).map(function(r) {
-    return "<tr><td>" + escapeHtml(r.course) + "</td><td>" + r.scheduled + "</td><td>" + r.held + "</td><td>" + r.missed + "</td><td>" + r.rate + "%</td></tr>";
+    return "<tr><td>" + escapeHtml(r.course) + "</td><td style='text-align:center'>" + r.scheduled +
+      "</td><td style='text-align:center'>" + r.held + "</td><td style='text-align:center'>" + r.missed +
+      "</td><td style='text-align:center;font-weight:700'>" + r.rate + "%</td></tr>";
   }).join("");
-  var pie = [
-    { label: "Held", value: p.delivered, color: "#0f766e" },
-    { label: "Missed", value: p.missed, color: "#b91c1c" }
-  ].filter(function(x) { return x.value > 0; });
-  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Monthly QA Report</title><style>" + eocnsReportStyles() + "</style></head><body>" +
-    "<h1>EOCNS — MONTHLY QA REPORT<span class=\"gold\">Lecture Delivery &amp; Compliance Analysis</span></h1>" +
-    "<div class=\"sub\"><strong>" + escapeHtml(classLabelFromKey(p.classKey)) + "</strong><br/>Reporting period: " + escapeHtml(p.monthLabel) +
-    " · Generated " + new Date().toLocaleString() + "</div><hr class=\"rule\"/>" +
-    "<h2>EXECUTIVE SUMMARY</h2>" +
-    "<div class=\"kpi\">" +
-    "<div class=\"k-sched\"><strong>" + p.scheduled + "</strong><span>Scheduled</span></div>" +
-    "<div class=\"k-del\"><strong>" + p.delivered + "</strong><span>Delivered</span></div>" +
-    "<div class=\"k-miss\"><strong>" + p.missed + "</strong><span>Missed</span></div>" +
-    "<div class=\"k-rate\"><strong>" + p.rate + "%</strong><span>Compliance</span></div></div>" +
-    "<p>Over <strong>" + escapeHtml(p.monthLabel) + "</strong>, the class recorded <strong>" + p.rate + "%</strong> delivery compliance. " +
-    "This pack is intended for academic board review and continuous quality improvement.</p>" +
-    "<h2>COURSE PERFORMANCE</h2>" +
-    "<table><thead><tr><th>Course</th><th>Scheduled</th><th>Held</th><th>Missed</th><th>Rate</th></tr></thead><tbody>" +
-    (courseRows || "<tr><td colspan=\"5\">No data</td></tr>") + "</tbody></table>" +
-    "<h2>VISUAL ANALYSIS</h2><div class=\"charts\">" +
-    (typeof svgPie === "function" ? svgPie(pie, 160) : "") + "</div>" +
-    "<div class=\"footer\">— End of Monthly QA Report — · Eastern Oak College of Nursing Sciences</div></body></html>");
-  w.document.close();
-  setTimeout(function() { w.print(); }, 400);
+  var amendments = await collectReportAmendments({ from: p.start, to: p.end, entities: ["qa_entries", "students", "timetables", "lecturers"] });
+  var period = p.monthLabel || ((p.start || "") + " – " + (p.end || ""));
+  var body = reportLetterheadHtml(
+    "EOCNS — Student Attendance & Monthly QA Report",
+    "Monthly Lecture Attendance Analysis & Compliance Report",
+    (typeof classLabelFromKey === "function" ? classLabelFromKey(p.classKey) : p.classKey) + " · " + period
+  );
+  body += "<h2 class='sec'>Executive Summary</h2>";
+  body += "<div class='kpi'>" +
+    "<div><div class='lab'>Registered</div><div class='val' style='color:#1B3A6B'>" + (p.registered != null ? p.registered : "—") + "</div></div>" +
+    "<div><div class='lab'>Lecture days</div><div class='val' style='color:#1B3A6B'>" + (p.lectureDays != null ? p.lectureDays : p.scheduled || "—") + "</div></div>" +
+    "<div><div class='lab'>Avg attendance</div><div class='val' style='color:#B8860B'>" + (p.avgAtt != null ? p.avgAtt : p.rate) + "%</div></div>" +
+    "<div class='absent'><div class='lab'>At risk (&lt;75%)</div><div class='val'>" + (p.atRisk != null ? p.atRisk : "—") + "</div></div>" +
+    "<div class='absent'><div class='lab'>Critical (&lt;50%)</div><div class='val'>" + (p.critical != null ? p.critical : "—") + "</div></div>" +
+    "</div>";
+  body += "<div style='display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:12px 0'>" +
+    svgDonut(Number(p.rate || p.avgAtt || 0), 150, "Period rate") +
+    "<div style='flex:1;min-width:220px;font-size:12px'>" +
+    (p.perfectNote ? ("<p><b>Perfect attendance:</b> " + escapeHtml(p.perfectNote) + "</p>") : "") +
+    "<p>Delivery compliance (lectures held vs scheduled): <b>" + (p.rate != null ? p.rate : "—") + "%</b>. " +
+    "Scheduled " + (p.scheduled || "—") + " · Delivered " + (p.delivered || "—") + " · Missed " + (p.missed || "—") + ".</p></div></div>";
+  body += "<h2 class='sec'>Course performance</h2>";
+  body += "<table class='data'><thead><tr><th>Course</th><th>Scheduled</th><th>Held</th><th>Missed</th><th>Rate</th></tr></thead><tbody>" +
+    (courseRows || "<tr><td colspan='5'>No data</td></tr>") + "</tbody></table>";
+  body += reportGlossaryHtml();
+  body += reportAmendmentsHtml(amendments);
+  openReportWindow("EOCNS Monthly QA — " + period, body, meta.officer, meta.format);
 }
+
+
 
 
 function downloadAttendanceAsWord() {
@@ -2799,54 +2916,82 @@ async function buildRemWeekly() {
     '</div><p class="muted-note">Course-specific rates use the official enrolment list. Print for the full professional pack.</p></div>';
 }
 
-function printRemWeeklyPack() {
+async function printRemWeeklyPack() {
+  var meta = await promptOfficerAndFormat("Remedial Weekly Report");
+  if (!meta) return;
   var d = window.__remWeekly;
-  if (!d) { alert("Build weekly analysis first"); return; }
-  var byProg = {};
-  d.studentRows.forEach(function(s) {
-    var p = s.programme || "Other";
-    byProg[p] = byProg[p] || [];
-    byProg[p].push(s);
-  });
-  var progTables = Object.keys(byProg).map(function(p) {
-    var rows = byProg[p].map(function(s, i) {
-      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.matric) +
-        "</td><td>" + escapeHtml((s.courses || []).join(", ")) + "</td><td>" + s.present + "/" + s.possible +
-        "</td><td>" + (s.pct != null ? s.pct + "%" : "—") + "</td></tr>";
-    }).join("");
-    return "<h2>STUDENT ATTENDANCE — " + escapeHtml(p.toUpperCase()) + " (Course-Specific)</h2>" +
-      "<table><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>Enrolled Courses</th><th>Sess. P/Poss</th><th>%</th></tr></thead><tbody>" +
-      rows + "</tbody></table>";
-  }).join("");
-  var lecRows = d.lecturerRows.map(function(r) {
+  if (!d) { alert("Build the remedial weekly analysis first."); return; }
+  var lecRows = (d.lecturerRows || []).map(function(r) {
     return "<tr><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
-      "</td><td>" + r.taught + "h</td><td>" + r.missed + "h</td></tr>";
+      "</td><td>" + escapeHtml(String(r.presentDays || r.present || "—")) +
+      "</td><td style='color:#B91C1C'>" + escapeHtml(String(r.absentDays || r.absent || "—")) +
+      "</td><td>" + escapeHtml(String(r.taught != null ? r.taught + "h" : r.hrsTaught || "—")) +
+      "</td><td style='color:#B91C1C'>" + escapeHtml(String(r.missed != null ? r.missed + "h" : r.hrsMissed || "—")) + "</td></tr>";
   }).join("");
-  var perfectNames = d.perfect.slice(0, 8).map(function(s) { return s.name; }).join(", ");
-  var w = window.open("", "_blank");
-  if (!w) return;
-  w.document.write("<!DOCTYPE html><html><head><title>Remedial Weekly QA</title><style>" + eocnsReportStyles() +
-    ".pill{display:inline-block;padding:10px 14px;margin:4px;border-radius:8px;border:1px solid #c5cdd8;text-align:center;min-width:90px}" +
-    ".pill strong{display:block;font-size:1.3rem}</style></head><body>" +
-    "<div class=\"sub\">EOCNS Quality Assurance Department · Remedial Classes Report · Confidential</div>" +
-    "<h1>EOCNS QUALITY ASSURANCE REPORT<span class=\"gold\">FOR THE REMEDIAL CLASSES</span></h1>" + sessionCoverHtml() +
-    "<div class=\"sub\">" + escapeHtml(d.start) + " – " + escapeHtml(d.end) + "<br/>Course-Specific Student &amp; Lecturer Attendance Analysis</div><hr class=\"rule\"/>" +
-    "<h2>EXECUTIVE SUMMARY</h2>" +
-    "<div class=\"kpi\">" +
-    "<div class=\"k-sched\"><strong>" + d.registered + "</strong><span>Registered</span></div>" +
-    "<div class=\"k-del\"><strong>" + d.lectureDays + "</strong><span>Lecture days</span></div>" +
-    "<div class=\"k-rate\"><strong>" + d.avg + "%</strong><span>Avg attendance</span></div>" +
-    "<div class=\"k-miss\"><strong>" + d.zero + "</strong><span>Zero att.</span></div></div>" +
-    "<p>Method: Attendance % is calculated only against the specific courses each student is enrolled in (official Remedial Enrolment List). Presence is counted only on days when those enrolled courses were taught.</p>" +
-    (perfectNames ? ("<p><strong>" + d.perfect.length + " perfect (100%):</strong> " + escapeHtml(perfectNames) + (d.perfect.length > 8 ? " …" : "") + "</p>") : "") +
-    "<h2>LECTURER ATTENDANCE &amp; HOURS</h2>" +
-    "<table><thead><tr><th>Lecturer</th><th>Courses</th><th>Hrs Taught</th><th>Hrs Missed</th></tr></thead><tbody>" +
-    (lecRows || "<tr><td colspan=\"4\">No logs</td></tr>") + "</tbody></table>" +
-    progTables +
-    amendmentFooterHtml(d.logsIn || []) + "<div class=\"footer\">Report prepared by Quality Assurance Department · Generated " + new Date().toLocaleString() + "<br/>— End of Report —</div></body></html>");
-  w.document.close();
-  setTimeout(function() { w.print(); }, 400);
+  var stuBlocks = "";
+  (d.byProgramme || []).forEach(function(pg) {
+    var rows = (pg.students || []).map(function(s, i) {
+      var pct = s.pct != null ? s.pct : s.rate;
+      var col = pct >= 80 ? "#1B7A3D" : pct >= 50 ? "#B8860B" : "#B91C1C";
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || s.matric || "") +
+        "</td><td>" + escapeHtml((s.courses || s.enrolled || []).join ? (s.courses || s.enrolled).join(", ") : (s.courses || "")) +
+        "</td><td style='text-align:center'>" + escapeHtml(String(s.sess || s.sessions || "")) +
+        "</td><td style='text-align:center;font-weight:700;color:" + col + "'>" + (pct != null ? pct + "%" : "—") + "</td></tr>";
+    }).join("");
+    stuBlocks += "<h2 class='sec'>Student attendance — " + escapeHtml(pg.name || pg.programme || "Programme") + " (course-specific)</h2>";
+    stuBlocks += "<p style='font-size:11px;color:#64748b'>Sessions = present course-days ÷ course-days scheduled for that student's enrolled remedial courses only.</p>";
+    stuBlocks += "<table class='data'><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>Enrolled courses</th><th>Sess. P/Poss</th><th>%</th></tr></thead><tbody>" +
+      (rows || "<tr><td colspan='6'>No students</td></tr>") + "</tbody></table>";
+    if (pg.footer) stuBlocks += "<p style='font-size:11px'>" + escapeHtml(pg.footer) + "</p>";
+  });
+  if (!stuBlocks && d.studentRows) {
+    var rows = d.studentRows.map(function(s, i) {
+      var pct = s.pct != null ? s.pct : 0;
+      var col = pct >= 80 ? "#1B7A3D" : pct >= 50 ? "#B8860B" : "#B91C1C";
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
+        "</td><td style='text-align:center;color:" + col + ";font-weight:700'>" + pct + "%</td></tr>";
+    }).join("");
+    stuBlocks = "<h2 class='sec'>Student attendance (course-specific)</h2><table class='data'><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>%</th></tr></thead><tbody>" + rows + "</tbody></table>";
+  }
+  var tentRows = (d.tentative || []).map(function(t, i) {
+    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(t.name) + "</td><td>" + escapeHtml(t.regNo || "") +
+      "</td><td>" + escapeHtml(String(t.days || "")) + "</td><td style='color:#7c3aed;font-weight:600'>TENTATIVE – UNDEFINED</td></tr>";
+  }).join("");
+  var amendments = await collectReportAmendments({ from: d.start, to: d.end, entities: ["remedial", "remedial_enrolment", "remedial_logs", "remedial_assignments", "students"] });
+  var period = (d.start || "") + " – " + (d.end || "");
+  var body = reportLetterheadHtml(
+    "EOCNS Quality Assurance Report — Remedial Classes",
+    "Course-Specific Student & Lecturer Attendance Analysis",
+    period + (d.weekLabel ? " · " + d.weekLabel : "")
+  );
+  body += "<h2 class='sec'>Executive Summary</h2>";
+  body += "<div class='kpi'>" +
+    "<div><div class='lab'>Registered</div><div class='val' style='color:#1B3A6B'>" + (d.registered || 0) + "</div></div>" +
+    "<div><div class='lab'>Lecture days</div><div class='val' style='color:#1B3A6B'>" + (d.lectureDays || 0) + "</div></div>" +
+    "<div><div class='lab'>Avg attendance</div><div class='val' style='color:#B8860B'>" + (d.avg != null ? d.avg : "—") + "%</div></div>" +
+    "<div class='absent'><div class='lab'>Zero att. (0%)</div><div class='val'>" + (d.zero || 0) + "</div></div>" +
+    "<div><div class='lab'>Tentative</div><div class='val' style='color:#7c3aed'>" + (d.tentativeCount != null ? d.tentativeCount : (d.tentative || []).length) + "</div></div>" +
+    "</div>";
+  if (d.perfectNames) body += "<p style='font-size:12px'><b>Perfect (100%):</b> " + escapeHtml(d.perfectNames) + "</p>";
+  body += "<p style='font-size:11px;color:#64748b'><b>Method:</b> Attendance % is calculated only against the specific courses each student is enrolled in (official Remedial Enrolment List). Presence is counted only on days when those enrolled courses were taught.</p>";
+  body += "<div style='margin:10px 0'>" + svgDonut(Number(d.avg || 0), 140, "Avg att.") + "</div>";
+  body += "<h2 class='sec'>Lecturer attendance &amp; hours</h2>";
+  body += "<table class='data'><thead><tr><th>Lecturer</th><th>Courses</th><th>Present days</th><th>Absent</th><th>Hrs taught</th><th>Hrs missed</th></tr></thead><tbody>" +
+    (lecRows || "<tr><td colspan='6'>No lecturer logs</td></tr>") + "</tbody></table>";
+  body += stuBlocks;
+  if (tentRows) {
+    body += "<h2 class='sec'>Tentative records (not on official enrolment list)</h2>";
+    body += "<p style='font-size:11px;color:#64748b'>Appeared on attendance sheets but not on Enrolment List — courses marked UNDEFINED. Pending QA verification.</p>";
+    body += "<table class='data'><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>Days present</th><th>Status</th></tr></thead><tbody>" + tentRows + "</tbody></table>";
+  }
+  body += reportGlossaryHtml([
+    ["Course-specific %", "Only remedial courses on the student's enrolment list count toward possible sessions."],
+    ["Hrs missed", "Contracted or timetable hours not covered by a remedial lecture log."]
+  ]);
+  body += reportAmendmentsHtml(amendments);
+  openReportWindow("EOCNS Remedial Weekly — " + period, body, meta.officer, meta.format);
 }
+
 
 async function buildRemSummary() {
   var start = document.getElementById("remSumStart").value;
@@ -2864,46 +3009,58 @@ async function buildRemSummary() {
   if (el) el.innerHTML = '<div class="pro-report"><h3>Summary ready</h3><p class="muted-note">' + data.registered + ' enrolled · avg ' + data.avg + '% · Print summary pack for full tables.</p></div>';
 }
 
-function printRemSummaryPack() {
+async function printRemSummaryPack() {
+  var meta = await promptOfficerAndFormat("Remedial Summary Report");
+  if (!meta) return;
   var d = window.__remSummary;
-  if (!d) { alert("Build summary first"); return; }
+  if (!d) { alert("Build remedial summary first."); return; }
+  var lecRows = (d.lecturerRows || []).map(function(r) {
+    return "<tr><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
+      "</td><td>" + (r.taught != null ? r.taught + "h" : "—") + "</td><td>" + (r.missed != null ? r.missed + "h" : "—") + "</td></tr>";
+  }).join("");
+  var tables = "";
   var byProg = {};
-  d.studentRows.forEach(function(s) {
+  (d.studentRows || []).forEach(function(s) {
     var p = s.programme || "Other";
     byProg[p] = byProg[p] || [];
     byProg[p].push(s);
   });
   Object.keys(byProg).forEach(function(p) {
     byProg[p].sort(function(a, b) { return (b.pct || 0) - (a.pct || 0); });
-  });
-  var tables = Object.keys(byProg).map(function(p) {
     var rows = byProg[p].map(function(s, i) {
-      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.matric) +
-        "</td><td>" + (s.pct != null ? s.pct + "%" : "—") + "</td><td>" + escapeHtml(s.status) + "</td></tr>";
+      var pct = s.pct != null ? s.pct : 0;
+      var col = pct >= 80 ? "#1B7A3D" : pct >= 50 ? "#B8860B" : "#B91C1C";
+      var status = pct >= 80 ? "Excellent" : pct >= 65 ? "Good" : pct >= 40 ? "At risk" : "Critical";
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
+        "</td><td style='text-align:center;color:" + col + ";font-weight:700'>" + pct + "%</td><td>" + status + "</td></tr>";
     }).join("");
-    return "<h2>" + escapeHtml(p.toUpperCase()) + " — AGGREGATE ATTENDANCE</h2>" +
-      "<table><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>Avg %</th><th>Status</th></tr></thead><tbody>" + rows + "</tbody></table>";
-  }).join("");
-  var lecRows = d.lecturerRows.map(function(r) {
-    return "<tr><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
-      "</td><td>" + r.taught + "h</td><td>" + r.missed + "h</td></tr>";
-  }).join("");
-  var w = window.open("", "_blank");
-  if (!w) return;
-  w.document.write("<!DOCTYPE html><html><head><title>Remedial Summary</title><style>" + eocnsReportStyles() + "</style></head><body>" +
-    "<div class=\"sub\">EOCNS Quality Assurance Department · Remedial Classes Report · Confidential</div>" +
-    "<h1>EOCNS QUALITY ASSURANCE REPORT<span class=\"gold\">REMEDIAL CLASSES — COMPREHENSIVE SUMMARY</span></h1>" +
-    "<div class=\"sub\">" + escapeHtml(d.start) + " – " + escapeHtml(d.end) + "<br/>Aggregate Student &amp; Lecturer Performance</div><hr class=\"rule\"/>" +
-    "<h2>EXECUTIVE OVERVIEW</h2>" +
-    "<p>This summary consolidates course-specific attendance for the remedial period. Percentages reflect only the courses each student is required to offer. Lecturer hours are totalled from remedial lecture logs.</p>" +
-    tables +
-    "<h2>LECTURER HOURS — PERIOD COMBINED</h2>" +
-    "<table><thead><tr><th>Lecturer</th><th>Courses</th><th>Hrs Taught</th><th>Hrs Missed</th></tr></thead><tbody>" +
-    lecRows + "</tbody></table>" +
-    "<div class=\"footer\">Report prepared by Quality Assurance Department · Method: official Remedial Enrolment List<br/>— End of Comprehensive Summary —</div></body></html>");
-  w.document.close();
-  setTimeout(function() { w.print(); }, 400);
+    tables += "<h2 class='sec'>" + escapeHtml(p) + "</h2><table class='data'><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>Avg %</th><th>Band</th></tr></thead><tbody>" + rows + "</tbody></table>";
+  });
+  var amendments = await collectReportAmendments({ from: d.start, to: d.end, entities: ["remedial", "remedial_enrolment", "remedial_logs", "students"] });
+  var period = (d.start || "") + " – " + (d.end || "");
+  var body = reportLetterheadHtml(
+    "EOCNS Quality Assurance Report — Remedial Summary",
+    "Comprehensive Student & Lecturer Performance",
+    period
+  );
+  body += "<h2 class='sec'>Executive overview</h2>";
+  body += "<div class='kpi'>" +
+    "<div><div class='lab'>Registered</div><div class='val' style='color:#1B3A6B'>" + (d.registered || 0) + "</div></div>" +
+    "<div><div class='lab'>Avg attendance</div><div class='val' style='color:#B8860B'>" + (d.avg != null ? d.avg : "—") + "%</div></div>" +
+    "<div class='absent'><div class='lab'>Zero att.</div><div class='val'>" + (d.zero || 0) + "</div></div>" +
+    "</div>";
+  body += "<div style='margin:8px 0'>" + svgDonut(Number(d.avg || 0), 140, "Period avg") + "</div>";
+  body += tables;
+  body += "<h2 class='sec'>Lecturer hours — period combined</h2>";
+  body += "<table class='data'><thead><tr><th>Lecturer</th><th>Courses</th><th>Hrs taught</th><th>Hrs missed</th></tr></thead><tbody>" +
+    (lecRows || "<tr><td colspan='4'>No logs</td></tr>") + "</tbody></table>";
+  body += reportGlossaryHtml([
+    ["Excellent / Good / At risk / Critical", "Bands at ≥80%, ≥65%, ≥40%, and below 40% average course-specific attendance."]
+  ]);
+  body += reportAmendmentsHtml(amendments);
+  openReportWindow("EOCNS Remedial Summary — " + period, body, meta.officer, meta.format);
 }
+
 
 // legacy stubs so old listeners don't crash
 async function renderRemedialTable() { showRemTab("setup"); }
@@ -4165,6 +4322,11 @@ async function publishPendingListToRepo(message) {
   document.getElementById("btnBuildWeeklyQa") && document.getElementById("btnBuildWeeklyQa").addEventListener("click", buildWeeklyQaReport);
   document.getElementById("btnPrintWeeklyQa") && document.getElementById("btnPrintWeeklyQa").addEventListener("click", function() { printWeeklyProfessionalPack(); });
   document.getElementById("btnPrintMonthlyQa") && document.getElementById("btnPrintMonthlyQa").addEventListener("click", function() { printMonthlyProfessionalPack(); });
+
+  document.getElementById("btnGenerateStudentRegister")?.addEventListener("click", function() { generateStudentRegisterReport(); });
+  document.getElementById("btnGenerateHostelReportDash")?.addEventListener("click", function() { generateHostelReport(); });
+  document.getElementById("btnGenerateHostelReport")?.addEventListener("click", function() { generateHostelReport(); });
+
   document.getElementById("btnPrintDailyReport") && document.getElementById("btnPrintDailyReport").addEventListener("click", printDailyLectureReport);
   document.getElementById("btnBuildMonthlyQa") && document.getElementById("btnBuildMonthlyQa").addEventListener("click", buildMonthlyQaReport);
   document.getElementById("btnAddProgramme") && document.getElementById("btnAddProgramme").addEventListener("click", addProgrammePrompt);
@@ -6755,90 +6917,13 @@ function formatDateLong(iso) {
 /* printDailyLectureReport defined once */
 
 
-function printWeeklyProfessionalPack(payload) {
-  var p = payload || window.__weeklyQaPayload;
-  if (!p) { alert("Build the weekly report first."); return; }
-  var compliance = p.scheduled ? Math.round((p.delivered / p.scheduled) * 1000) / 10 : 0;
-  var courseRows = (p.courseRows || []).map(function(r) {
-    return "<tr><td>" + escapeHtml(r.course) + "</td><td>" + escapeHtml(r.lecturer) + "</td><td>" + r.sched +
-      "</td><td>" + r.deliv + "</td><td>" + r.missed + "</td><td>" + r.hrs + "</td><td>" + escapeHtml(r.status) +
-      "</td><td>" + r.pct + "</td></tr>";
-  }).join("");
-  var dayRows = (p.dayRows || []).map(function(r) {
-    return "<tr><td>" + escapeHtml(r.date) + "</td><td>" + escapeHtml(r.day) + "</td><td>" + escapeHtml(r.course) +
-      "</td><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml(r.topic) + "</td><td>" + escapeHtml(r.time) +
-      "</td><td>" + escapeHtml(r.hrs) + "</td></tr>";
-  }).join("");
-  var pie = [
-    { label: "Delivered", value: p.delivered, color: "#0f766e" },
-    { label: "Missed", value: p.missed, color: "#b91c1c" }
-  ].filter(function(x) { return x.value > 0; });
-  var bars = (p.courseRows || []).slice(0, 10).map(function(r) {
-    return { label: String(r.course).slice(0, 8), value: r.deliv, color: "#1d4ed8" };
-  });
-  var w = window.open("", "_blank");
-  if (!w) return;
-  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Weekly QA Report</title><style>" + eocnsReportStyles() + "</style></head><body>" +
-    "<h1>EOCNS QA REPORT — WEEKLY<span class=\"gold\">Staff Teaching Commitment &amp; Lecture Attendance</span></h1>" +
-    "<div class=\"sub\"><strong>" + escapeHtml(classLabelFromKey(p.classKey)) + "</strong><br/>" +
-    escapeHtml(p.periodLabel) + "<br/>Generated: " + new Date().toLocaleString() + " · Excluded: " + escapeHtml(p.excluded || "None") + "</div>" +
-    "<hr class=\"rule\"/>" +
-    "<h2>WEEKLY SUMMARY</h2>" +
-    "<div class=\"kpi\">" +
-    "<div class=\"k-sched\"><strong>" + p.scheduled + "</strong><span>Scheduled</span></div>" +
-    "<div class=\"k-del\"><strong>" + p.delivered + "</strong><span>Delivered</span></div>" +
-    "<div class=\"k-miss\"><strong>" + p.missed + "</strong><span>Missed</span></div>" +
-    "<div class=\"k-rate\"><strong>" + compliance + "%</strong><span>Compliance</span></div></div>" +
-    "<p>Teaching delivery for this window stands at <strong>" + compliance + "%</strong> " +
-    "(" + p.delivered + " of " + p.scheduled + " scheduled contact sessions logged as held). " +
-    (p.missed ? (p.missed + " session(s) were missed and should be rescheduled or explained in audit.") : "No missed sessions were recorded.") + "</p>" +
-    "<h2>COURSE COMPLIANCE</h2>" +
-    "<table><thead><tr><th>Course</th><th>Lecturer(s)</th><th>Sched</th><th>Deliv</th><th>Missed</th><th>Hrs Del</th><th>Status</th><th>%</th></tr></thead><tbody>" +
-    (courseRows || "<tr><td colspan=\"8\">No course data.</td></tr>") + "</tbody></table>" +
-    "<h2>VISUAL ANALYSIS</h2><div class=\"charts\">" +
-    (typeof svgPie === "function" ? svgPie(pie, 160) : "") +
-    (typeof svgBars === "function" ? svgBars(bars, 340, 150) : "") + "</div>" +
-    "<h2>DAY-BY-DAY BREAKDOWN</h2>" +
-    "<table><thead><tr><th>Date</th><th>Day</th><th>Course</th><th>Lecturer</th><th>Topic</th><th>Time</th><th>Hrs</th></tr></thead><tbody>" +
-    (dayRows || "<tr><td colspan=\"7\">No lectures logged in range.</td></tr>") + "</tbody></table>" +
-    "<div class=\"footer\">— End of Weekly QA Report — · EOCNS QA Attendance System</div></body></html>");
-  w.document.close();
-  setTimeout(function() { w.print(); }, 400);
-}
 
-function printMonthlyProfessionalPack(payload) {
-  var p = payload || window.__monthlyQaPayload;
-  if (!p) { alert("Build the monthly report first."); return; }
-  var w = window.open("", "_blank");
-  if (!w) return;
-  var courseRows = (p.courseRows || []).map(function(r) {
-    return "<tr><td>" + escapeHtml(r.course) + "</td><td>" + r.scheduled + "</td><td>" + r.held + "</td><td>" + r.missed + "</td><td>" + r.rate + "%</td></tr>";
-  }).join("");
-  var pie = [
-    { label: "Held", value: p.delivered, color: "#0f766e" },
-    { label: "Missed", value: p.missed, color: "#b91c1c" }
-  ].filter(function(x) { return x.value > 0; });
-  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Monthly QA Report</title><style>" + eocnsReportStyles() + "</style></head><body>" +
-    "<h1>EOCNS — MONTHLY QA REPORT<span class=\"gold\">Lecture Delivery &amp; Compliance Analysis</span></h1>" +
-    "<div class=\"sub\"><strong>" + escapeHtml(classLabelFromKey(p.classKey)) + "</strong><br/>Reporting period: " + escapeHtml(p.monthLabel) +
-    " · Generated " + new Date().toLocaleString() + "</div><hr class=\"rule\"/>" +
-    "<h2>EXECUTIVE SUMMARY</h2>" +
-    "<div class=\"kpi\">" +
-    "<div class=\"k-sched\"><strong>" + p.scheduled + "</strong><span>Scheduled</span></div>" +
-    "<div class=\"k-del\"><strong>" + p.delivered + "</strong><span>Delivered</span></div>" +
-    "<div class=\"k-miss\"><strong>" + p.missed + "</strong><span>Missed</span></div>" +
-    "<div class=\"k-rate\"><strong>" + p.rate + "%</strong><span>Compliance</span></div></div>" +
-    "<p>Over <strong>" + escapeHtml(p.monthLabel) + "</strong>, the class recorded <strong>" + p.rate + "%</strong> delivery compliance. " +
-    "This pack is intended for academic board review and continuous quality improvement.</p>" +
-    "<h2>COURSE PERFORMANCE</h2>" +
-    "<table><thead><tr><th>Course</th><th>Scheduled</th><th>Held</th><th>Missed</th><th>Rate</th></tr></thead><tbody>" +
-    (courseRows || "<tr><td colspan=\"5\">No data</td></tr>") + "</tbody></table>" +
-    "<h2>VISUAL ANALYSIS</h2><div class=\"charts\">" +
-    (typeof svgPie === "function" ? svgPie(pie, 160) : "") + "</div>" +
-    "<div class=\"footer\">— End of Monthly QA Report — · Eastern Oak College of Nursing Sciences</div></body></html>");
-  w.document.close();
-  setTimeout(function() { w.print(); }, 400);
-}
+/* printWeeklyProfessionalPack defined once */
+
+
+
+/* printMonthlyProfessionalPack defined once */
+
 
 
 function downloadAttendanceAsWord() {
@@ -7260,54 +7345,9 @@ async function buildRemWeekly() {
     '</div><p class="muted-note">Course-specific rates use the official enrolment list. Print for the full professional pack.</p></div>';
 }
 
-function printRemWeeklyPack() {
-  var d = window.__remWeekly;
-  if (!d) { alert("Build weekly analysis first"); return; }
-  var byProg = {};
-  d.studentRows.forEach(function(s) {
-    var p = s.programme || "Other";
-    byProg[p] = byProg[p] || [];
-    byProg[p].push(s);
-  });
-  var progTables = Object.keys(byProg).map(function(p) {
-    var rows = byProg[p].map(function(s, i) {
-      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.matric) +
-        "</td><td>" + escapeHtml((s.courses || []).join(", ")) + "</td><td>" + s.present + "/" + s.possible +
-        "</td><td>" + (s.pct != null ? s.pct + "%" : "—") + "</td></tr>";
-    }).join("");
-    return "<h2>STUDENT ATTENDANCE — " + escapeHtml(p.toUpperCase()) + " (Course-Specific)</h2>" +
-      "<table><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>Enrolled Courses</th><th>Sess. P/Poss</th><th>%</th></tr></thead><tbody>" +
-      rows + "</tbody></table>";
-  }).join("");
-  var lecRows = d.lecturerRows.map(function(r) {
-    return "<tr><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
-      "</td><td>" + r.taught + "h</td><td>" + r.missed + "h</td></tr>";
-  }).join("");
-  var perfectNames = d.perfect.slice(0, 8).map(function(s) { return s.name; }).join(", ");
-  var w = window.open("", "_blank");
-  if (!w) return;
-  w.document.write("<!DOCTYPE html><html><head><title>Remedial Weekly QA</title><style>" + eocnsReportStyles() +
-    ".pill{display:inline-block;padding:10px 14px;margin:4px;border-radius:8px;border:1px solid #c5cdd8;text-align:center;min-width:90px}" +
-    ".pill strong{display:block;font-size:1.3rem}</style></head><body>" +
-    "<div class=\"sub\">EOCNS Quality Assurance Department · Remedial Classes Report · Confidential</div>" +
-    "<h1>EOCNS QUALITY ASSURANCE REPORT<span class=\"gold\">FOR THE REMEDIAL CLASSES</span></h1>" + sessionCoverHtml() +
-    "<div class=\"sub\">" + escapeHtml(d.start) + " – " + escapeHtml(d.end) + "<br/>Course-Specific Student &amp; Lecturer Attendance Analysis</div><hr class=\"rule\"/>" +
-    "<h2>EXECUTIVE SUMMARY</h2>" +
-    "<div class=\"kpi\">" +
-    "<div class=\"k-sched\"><strong>" + d.registered + "</strong><span>Registered</span></div>" +
-    "<div class=\"k-del\"><strong>" + d.lectureDays + "</strong><span>Lecture days</span></div>" +
-    "<div class=\"k-rate\"><strong>" + d.avg + "%</strong><span>Avg attendance</span></div>" +
-    "<div class=\"k-miss\"><strong>" + d.zero + "</strong><span>Zero att.</span></div></div>" +
-    "<p>Method: Attendance % is calculated only against the specific courses each student is enrolled in (official Remedial Enrolment List). Presence is counted only on days when those enrolled courses were taught.</p>" +
-    (perfectNames ? ("<p><strong>" + d.perfect.length + " perfect (100%):</strong> " + escapeHtml(perfectNames) + (d.perfect.length > 8 ? " …" : "") + "</p>") : "") +
-    "<h2>LECTURER ATTENDANCE &amp; HOURS</h2>" +
-    "<table><thead><tr><th>Lecturer</th><th>Courses</th><th>Hrs Taught</th><th>Hrs Missed</th></tr></thead><tbody>" +
-    (lecRows || "<tr><td colspan=\"4\">No logs</td></tr>") + "</tbody></table>" +
-    progTables +
-    amendmentFooterHtml(d.logsIn || []) + "<div class=\"footer\">Report prepared by Quality Assurance Department · Generated " + new Date().toLocaleString() + "<br/>— End of Report —</div></body></html>");
-  w.document.close();
-  setTimeout(function() { w.print(); }, 400);
-}
+
+/* printRemWeeklyPack once */
+
 
 async function buildRemSummary() {
   var start = document.getElementById("remSumStart").value;
@@ -7325,46 +7365,9 @@ async function buildRemSummary() {
   if (el) el.innerHTML = '<div class="pro-report"><h3>Summary ready</h3><p class="muted-note">' + data.registered + ' enrolled · avg ' + data.avg + '% · Print summary pack for full tables.</p></div>';
 }
 
-function printRemSummaryPack() {
-  var d = window.__remSummary;
-  if (!d) { alert("Build summary first"); return; }
-  var byProg = {};
-  d.studentRows.forEach(function(s) {
-    var p = s.programme || "Other";
-    byProg[p] = byProg[p] || [];
-    byProg[p].push(s);
-  });
-  Object.keys(byProg).forEach(function(p) {
-    byProg[p].sort(function(a, b) { return (b.pct || 0) - (a.pct || 0); });
-  });
-  var tables = Object.keys(byProg).map(function(p) {
-    var rows = byProg[p].map(function(s, i) {
-      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.matric) +
-        "</td><td>" + (s.pct != null ? s.pct + "%" : "—") + "</td><td>" + escapeHtml(s.status) + "</td></tr>";
-    }).join("");
-    return "<h2>" + escapeHtml(p.toUpperCase()) + " — AGGREGATE ATTENDANCE</h2>" +
-      "<table><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>Avg %</th><th>Status</th></tr></thead><tbody>" + rows + "</tbody></table>";
-  }).join("");
-  var lecRows = d.lecturerRows.map(function(r) {
-    return "<tr><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
-      "</td><td>" + r.taught + "h</td><td>" + r.missed + "h</td></tr>";
-  }).join("");
-  var w = window.open("", "_blank");
-  if (!w) return;
-  w.document.write("<!DOCTYPE html><html><head><title>Remedial Summary</title><style>" + eocnsReportStyles() + "</style></head><body>" +
-    "<div class=\"sub\">EOCNS Quality Assurance Department · Remedial Classes Report · Confidential</div>" +
-    "<h1>EOCNS QUALITY ASSURANCE REPORT<span class=\"gold\">REMEDIAL CLASSES — COMPREHENSIVE SUMMARY</span></h1>" +
-    "<div class=\"sub\">" + escapeHtml(d.start) + " – " + escapeHtml(d.end) + "<br/>Aggregate Student &amp; Lecturer Performance</div><hr class=\"rule\"/>" +
-    "<h2>EXECUTIVE OVERVIEW</h2>" +
-    "<p>This summary consolidates course-specific attendance for the remedial period. Percentages reflect only the courses each student is required to offer. Lecturer hours are totalled from remedial lecture logs.</p>" +
-    tables +
-    "<h2>LECTURER HOURS — PERIOD COMBINED</h2>" +
-    "<table><thead><tr><th>Lecturer</th><th>Courses</th><th>Hrs Taught</th><th>Hrs Missed</th></tr></thead><tbody>" +
-    lecRows + "</tbody></table>" +
-    "<div class=\"footer\">Report prepared by Quality Assurance Department · Method: official Remedial Enrolment List<br/>— End of Comprehensive Summary —</div></body></html>");
-  w.document.close();
-  setTimeout(function() { w.print(); }, 400);
-}
+
+/* printRemSummaryPack once */
+
 
 // legacy stubs so old listeners don't crash
 async function renderRemedialTable() { showRemTab("setup"); }
@@ -8884,5 +8887,117 @@ window.renderCoursesTable = renderCoursesTable;
 window.renderTimetableEditor = renderTimetableEditor;
 window.addTimetableSlot = addTimetableSlot;
 window.saveTimetableLocal = saveTimetableLocal;
+
+
+
+/** Full student register — institutional snapshot */
+async function generateStudentRegisterReport() {
+  var meta = await promptOfficerAndFormat("Student Master Register");
+  if (!meta) return;
+  var students = await getAll("students");
+  students = students.slice().sort(function(a, b) {
+    return String(a.name || "").localeCompare(String(b.name || ""));
+  });
+  var byProg = {};
+  students.forEach(function(s) {
+    var k = (s.programme || "Unspecified") + " · L" + (s.level || "?");
+    byProg[k] = byProg[k] || [];
+    byProg[k].push(s);
+  });
+  var active = students.filter(function(s) { return !s.status || String(s.status).toLowerCase() === "active"; }).length;
+  var female = students.filter(function(s) { return String(s.gender || "").toLowerCase().indexOf("f") === 0; }).length;
+  var male = students.filter(function(s) { return String(s.gender || "").toLowerCase().indexOf("m") === 0; }).length;
+  var amendments = await collectReportAmendments({ entities: ["students"] });
+  var body = reportLetterheadHtml(
+    "Student Master Register",
+    "Full institutional roll — programmes, levels & status",
+    "Snapshot as at " + new Date().toLocaleString()
+  );
+  body += "<h2 class='sec'>Register snapshot</h2>";
+  body += "<div class='kpi'>" +
+    "<div><div class='lab'>Total on roll</div><div class='val' style='color:#1B3A6B'>" + students.length + "</div></div>" +
+    "<div class='present'><div class='lab'>Active</div><div class='val'>" + active + "</div></div>" +
+    "<div><div class='lab'>Female</div><div class='val' style='color:#1B3A6B'>" + female + "</div></div>" +
+    "<div><div class='lab'>Male</div><div class='val' style='color:#1B3A6B'>" + male + "</div></div>" +
+    "</div>";
+  // gender donut approx
+  var genPct = students.length ? Math.round((female / students.length) * 1000) / 10 : 0;
+  body += "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center'>" + svgDonut(genPct, 130, "% female") +
+    "<p style='font-size:12px;max-width:360px'>This register is the master list used for attendance sheets, QA logs and remedial enrolment. Inactive records remain listed for audit but are excluded from operational counts where filters apply.</p></div>";
+  Object.keys(byProg).sort().forEach(function(k) {
+    var rows = byProg[k].map(function(s, i) {
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
+        "</td><td>" + escapeHtml(s.serial || "") + "</td><td>" + escapeHtml(s.gender || "") +
+        "</td><td>" + escapeHtml(s.hostel || "") + "</td><td>" + escapeHtml(s.status || "Active") + "</td></tr>";
+    }).join("");
+    body += "<h2 class='sec'>" + escapeHtml(k) + " <span style='font-weight:500;color:#64748b'>(" + byProg[k].length + ")</span></h2>";
+    body += "<table class='data'><thead><tr><th>#</th><th>Name</th><th>Reg. No</th><th>Serial</th><th>Gender</th><th>Hostel</th><th>Status</th></tr></thead><tbody>" + rows + "</tbody></table>";
+  });
+  body += reportGlossaryHtml([
+    ["Serial", "Class list number used on attendance sheets."],
+    ["Active / Inactive", "Inactive students are retained for history but should not appear on new attendance sheets."]
+  ]);
+  body += reportAmendmentsHtml(amendments);
+  openReportWindow("EOCNS Student Master Register", body, meta.officer, meta.format);
+}
+
+/** Hostel occupancy & distribution report */
+async function generateHostelReport() {
+  var meta = await promptOfficerAndFormat("Hostel Distribution Report");
+  if (!meta) return;
+  var students = (await getAll("students")).filter(function(s) {
+    return !s.status || String(s.status).toLowerCase() === "active";
+  });
+  var byHostel = {};
+  students.forEach(function(s) {
+    var h = (s.hostel || "").trim() || "Unassigned";
+    byHostel[h] = byHostel[h] || [];
+    byHostel[h].push(s);
+  });
+  var hostels = Object.keys(byHostel).sort();
+  var barRows = hostels.map(function(h) {
+    return { label: h, value: byHostel[h].length, max: students.length || 1 };
+  });
+  // convert counts to % of total for bar chart
+  var barPct = barRows.map(function(r) {
+    return { label: r.label + " (" + r.value + ")", value: students.length ? (r.value / students.length) * 100 : 0 };
+  });
+  var amendments = await collectReportAmendments({ entities: ["students"] });
+  var body = reportLetterheadHtml(
+    "Hostel Distribution Report",
+    "Active students by hostel assignment (from master list)",
+    "Snapshot as at " + new Date().toLocaleString()
+  );
+  body += "<h2 class='sec'>Overview</h2>";
+  body += "<div class='kpi'>" +
+    "<div><div class='lab'>Active students</div><div class='val' style='color:#1B3A6B'>" + students.length + "</div></div>" +
+    "<div><div class='lab'>Hostel groups</div><div class='val' style='color:#1B3A6B'>" + hostels.length + "</div></div>" +
+    "<div class='absent'><div class='lab'>Unassigned</div><div class='val'>" + (byHostel["Unassigned"] || []).length + "</div></div>" +
+    "</div>";
+  body += "<h2 class='sec'>Share of students by hostel</h2>" + svgHBarRows(barPct, 360);
+  hostels.forEach(function(h) {
+    var list = byHostel[h].slice().sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
+    var rows = list.map(function(s, i) {
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
+        "</td><td>" + escapeHtml(s.programme || "") + "</td><td>" + escapeHtml(String(s.level || "")) +
+        "</td><td>" + escapeHtml(s.gender || "") + "</td></tr>";
+    }).join("");
+    body += "<h2 class='sec'>" + escapeHtml(h) + " — " + list.length + " student(s)</h2>";
+    body += "<table class='data'><thead><tr><th>#</th><th>Name</th><th>Reg. No</th><th>Programme</th><th>Level</th><th>Gender</th></tr></thead><tbody>" + rows + "</tbody></table>";
+  });
+  body += reportGlossaryHtml([
+    ["Hostel assignment", "Taken from the student master list (not biometric machine location IDs)."],
+    ["Unassigned", "Active students with a blank hostel field — update the master list, then republish."]
+  ]);
+  body += reportAmendmentsHtml(amendments);
+  openReportWindow("EOCNS Hostel Report", body, meta.officer, meta.format);
+}
+
+window.generateStudentRegisterReport = generateStudentRegisterReport;
+window.generateHostelReport = generateHostelReport;
+window.printWeeklyProfessionalPack = printWeeklyProfessionalPack;
+window.printMonthlyProfessionalPack = printMonthlyProfessionalPack;
+window.printRemWeeklyPack = printRemWeeklyPack;
+window.printRemSummaryPack = printRemSummaryPack;
 
 })();
