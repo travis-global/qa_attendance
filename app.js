@@ -1,3 +1,4 @@
+/* EOCNS build v56 — report scope fix */
 (() => {
 "use strict";
 const THEME_KEY = "eocns-theme";
@@ -2236,6 +2237,8 @@ function formatDateLong(iso) {
 }
 
 async function printDailyLectureReport() {
+  // bound to window at end of definition for boot listeners
+
   var meta = await promptOfficerAndFormat("Today's Lecture(s) Report");
   if (!meta) return;
   var date = (document.getElementById("qaDailyDate") && document.getElementById("qaDailyDate").value) || "";
@@ -2389,6 +2392,8 @@ async function printDailyLectureReport() {
 
   openReportWindow("EOCNS Daily Lecture Report — " + date, body, meta.officer, meta.format);
 }
+window.printDailyLectureReport = printDailyLectureReport;
+
 
 
 async function printWeeklyProfessionalPack(payload) {
@@ -2451,6 +2456,8 @@ async function printWeeklyProfessionalPack(payload) {
   body += reportAmendmentsHtml(amendments);
   openReportWindow("EOCNS Weekly QA — " + period, body, meta.officer, meta.format);
 }
+window.printWeeklyProfessionalPack = printWeeklyProfessionalPack;
+
 
 
 
@@ -2492,6 +2499,8 @@ async function printMonthlyProfessionalPack(payload) {
   body += reportAmendmentsHtml(amendments);
   openReportWindow("EOCNS Monthly QA — " + period, body, meta.officer, meta.format);
 }
+window.printMonthlyProfessionalPack = printMonthlyProfessionalPack;
+
 
 
 
@@ -4318,12 +4327,12 @@ async function publishPendingListToRepo(message) {
   document.getElementById("btnBuildWeeklyQa") && document.getElementById("btnBuildWeeklyQa").addEventListener("click", buildWeeklyQaReport);
   document.getElementById("btnPrintWeeklyQa") && document.getElementById("btnPrintWeeklyQa").addEventListener("click", function() {
     if (typeof window.printWeeklyProfessionalPack === "function") window.printWeeklyProfessionalPack();
-    else if (typeof printWeeklyProfessionalPack === "function") printWeeklyProfessionalPack();
+    else if (typeof window.printWeeklyProfessionalPack === "function") printWeeklyProfessionalPack();
     else alert("Weekly report is still loading. Build the week first, then hard-refresh if needed.");
   });
   document.getElementById("btnPrintMonthlyQa") && document.getElementById("btnPrintMonthlyQa").addEventListener("click", function() {
     if (typeof window.printMonthlyProfessionalPack === "function") window.printMonthlyProfessionalPack();
-    else if (typeof printMonthlyProfessionalPack === "function") printMonthlyProfessionalPack();
+    else if (typeof window.printMonthlyProfessionalPack === "function") printMonthlyProfessionalPack();
     else alert("Monthly report is still loading. Build the month first, then hard-refresh if needed.");
   });
 
@@ -4332,22 +4341,12 @@ async function publishPendingListToRepo(message) {
   document.getElementById("btnGenerateHostelReport")?.addEventListener("click", function() { generateHostelDistributionReport(); });
 
   
-  // Report API on window — functions may be nested; boot listeners must not depend on local scope
-  try {
-    if (typeof printDailyLectureReport === "function") window.printDailyLectureReport = printDailyLectureReport;
-    if (typeof printWeeklyProfessionalPack === "function") window.printWeeklyProfessionalPack = printWeeklyProfessionalPack;
-    if (typeof printMonthlyProfessionalPack === "function") window.printMonthlyProfessionalPack = printMonthlyProfessionalPack;
-    if (typeof printRemWeeklyPack === "function") window.printRemWeeklyPack = printRemWeeklyPack;
-    if (typeof printRemSummaryPack === "function") window.printRemSummaryPack = printRemSummaryPack;
-    if (typeof generateStudentRegisterReport === "function") window.generateStudentRegisterReport = generateStudentRegisterReport;
-    if (typeof generateHostelDistributionReport === "function") window.generateHostelDistributionReport = generateHostelDistributionReport;
-    if (typeof promptOfficerAndFormat === "function") window.promptOfficerAndFormat = promptOfficerAndFormat;
-    if (typeof openReportWindow === "function") window.openReportWindow = openReportWindow;
-  } catch (bindRepErr) { console.warn("report bind", bindRepErr); }
+  // Report API on window — assignments happen next to each function definition; this only wires clicks safely
+  try { /* report functions attach themselves to window when defined */ } catch (bindRepErr) { console.warn("report bind", bindRepErr); }
 
 document.getElementById("btnPrintDailyReport") && document.getElementById("btnPrintDailyReport").addEventListener("click", function() {
     if (typeof window.printDailyLectureReport === "function") window.printDailyLectureReport();
-    else if (typeof printDailyLectureReport === "function") printDailyLectureReport();
+    else if (typeof window.printDailyLectureReport === "function") printDailyLectureReport();
     else alert("Daily report is still loading. Hard-refresh the page.");
   });
   document.getElementById("btnBuildMonthlyQa") && document.getElementById("btnBuildMonthlyQa").addEventListener("click", buildMonthlyQaReport);
@@ -9026,19 +9025,19 @@ window.printRemSummaryPack = printRemSummaryPack;
 
 // Ensure report generators are globally reachable for boot listeners
 try {
-  if (typeof printDailyLectureReport === "function") window.printDailyLectureReport = printDailyLectureReport;
+  if (typeof window.printDailyLectureReport === "function") window.printDailyLectureReport = printDailyLectureReport;
 } catch (_) {}
 try {
-  if (typeof printWeeklyProfessionalPack === "function") window.printWeeklyProfessionalPack = printWeeklyProfessionalPack;
+  if (typeof window.printWeeklyProfessionalPack === "function") window.printWeeklyProfessionalPack = printWeeklyProfessionalPack;
 } catch (_) {}
 try {
-  if (typeof printMonthlyProfessionalPack === "function") window.printMonthlyProfessionalPack = printMonthlyProfessionalPack;
+  if (typeof window.printMonthlyProfessionalPack === "function") window.printMonthlyProfessionalPack = printMonthlyProfessionalPack;
 } catch (_) {}
 try {
-  if (typeof printRemWeeklyPack === "function") window.printRemWeeklyPack = printRemWeeklyPack;
+  if (typeof window.printRemWeeklyPack === "function") window.printRemWeeklyPack = printRemWeeklyPack;
 } catch (_) {}
 try {
-  if (typeof printRemSummaryPack === "function") window.printRemSummaryPack = printRemSummaryPack;
+  if (typeof window.printRemSummaryPack === "function") window.printRemSummaryPack = printRemSummaryPack;
 } catch (_) {}
 try {
   if (typeof generateStudentRegisterReport === "function") window.generateStudentRegisterReport = generateStudentRegisterReport;
