@@ -1,4 +1,4 @@
-/* EOCNS build v56 — report scope fix */
+/* EOCNS build v57 — outer bare report refs removed */
 (() => {
 "use strict";
 const THEME_KEY = "eocns-theme";
@@ -3000,6 +3000,8 @@ async function printRemWeeklyPack() {
   body += reportAmendmentsHtml(amendments);
   openReportWindow("EOCNS Remedial Weekly — " + period, body, meta.officer, meta.format);
 }
+window.printRemWeeklyPack = printRemWeeklyPack;
+
 
 
 async function buildRemSummary() {
@@ -3069,6 +3071,8 @@ async function printRemSummaryPack() {
   body += reportAmendmentsHtml(amendments);
   openReportWindow("EOCNS Remedial Summary — " + period, body, meta.officer, meta.format);
 }
+window.printRemSummaryPack = printRemSummaryPack;
+
 
 
 // legacy stubs so old listeners don't crash
@@ -4326,28 +4330,25 @@ async function publishPendingListToRepo(message) {
   document.getElementById("qaDailyClass") && document.getElementById("qaDailyClass").addEventListener("change", renderQaDaily);
   document.getElementById("btnBuildWeeklyQa") && document.getElementById("btnBuildWeeklyQa").addEventListener("click", buildWeeklyQaReport);
   document.getElementById("btnPrintWeeklyQa") && document.getElementById("btnPrintWeeklyQa").addEventListener("click", function() {
-    if (typeof window.printWeeklyProfessionalPack === "function") window.printWeeklyProfessionalPack();
-    else if (typeof window.printWeeklyProfessionalPack === "function") printWeeklyProfessionalPack();
-    else alert("Weekly report is still loading. Build the week first, then hard-refresh if needed.");
+    if (typeof window.printWeeklyProfessionalPack === "function") return window.printWeeklyProfessionalPack();
+    alert("Build the weekly report first. If this persists, hard-refresh (Ctrl+Shift+R).");
   });
   document.getElementById("btnPrintMonthlyQa") && document.getElementById("btnPrintMonthlyQa").addEventListener("click", function() {
-    if (typeof window.printMonthlyProfessionalPack === "function") window.printMonthlyProfessionalPack();
-    else if (typeof window.printMonthlyProfessionalPack === "function") printMonthlyProfessionalPack();
-    else alert("Monthly report is still loading. Build the month first, then hard-refresh if needed.");
+    if (typeof window.printMonthlyProfessionalPack === "function") return window.printMonthlyProfessionalPack();
+    alert("Build the monthly report first. If this persists, hard-refresh (Ctrl+Shift+R).");
   });
 
-  document.getElementById("btnGenerateStudentRegister")?.addEventListener("click", function() { generateStudentRegisterReport(); });
-  document.getElementById("btnGenerateHostelReportDash")?.addEventListener("click", function() { generateHostelDistributionReport(); });
-  document.getElementById("btnGenerateHostelReport")?.addEventListener("click", function() { generateHostelDistributionReport(); });
+  document.getElementById("btnGenerateStudentRegister")?.addEventListener("click", function() { if (typeof window.generateStudentRegisterReport === "function") window.generateStudentRegisterReport(); else alert("Register report not ready — hard-refresh."); });
+  document.getElementById("btnGenerateHostelReportDash")?.addEventListener("click", function() { if (typeof window.generateHostelDistributionReport === "function") window.generateHostelDistributionReport(); else alert("Hostel report not ready — hard-refresh."); });
+  document.getElementById("btnGenerateHostelReport")?.addEventListener("click", function() { if (typeof window.generateHostelDistributionReport === "function") window.generateHostelDistributionReport(); else alert("Hostel report not ready — hard-refresh."); });
 
   
   // Report API on window — assignments happen next to each function definition; this only wires clicks safely
   try { /* report functions attach themselves to window when defined */ } catch (bindRepErr) { console.warn("report bind", bindRepErr); }
 
 document.getElementById("btnPrintDailyReport") && document.getElementById("btnPrintDailyReport").addEventListener("click", function() {
-    if (typeof window.printDailyLectureReport === "function") window.printDailyLectureReport();
-    else if (typeof window.printDailyLectureReport === "function") printDailyLectureReport();
-    else alert("Daily report is still loading. Hard-refresh the page.");
+    if (typeof window.printDailyLectureReport === "function") return window.printDailyLectureReport();
+    alert("Daily report is still loading. Hard-refresh the page (Ctrl+Shift+R).");
   });
   document.getElementById("btnBuildMonthlyQa") && document.getElementById("btnBuildMonthlyQa").addEventListener("click", buildMonthlyQaReport);
   document.getElementById("btnAddProgramme") && document.getElementById("btnAddProgramme").addEventListener("click", addProgrammePrompt);
@@ -8961,6 +8962,8 @@ async function generateStudentRegisterReport() {
   body += reportAmendmentsHtml(amendments);
   openReportWindow("EOCNS Student Master Register", body, meta.officer, meta.format);
 }
+window.generateStudentRegisterReport = generateStudentRegisterReport;
+
 
 /** Hostel occupancy & distribution report */
 async function generateHostelDistributionReport() {
@@ -9013,37 +9016,9 @@ async function generateHostelDistributionReport() {
   body += reportAmendmentsHtml(amendments);
   openReportWindow("EOCNS Hostel Report", body, meta.officer, meta.format);
 }
-
-window.generateStudentRegisterReport = generateStudentRegisterReport;
-window.generateHostelReport = generateHostelReport;
 window.generateHostelDistributionReport = generateHostelDistributionReport;
-window.printWeeklyProfessionalPack = printWeeklyProfessionalPack;
-window.printMonthlyProfessionalPack = printMonthlyProfessionalPack;
-window.printRemWeeklyPack = printRemWeeklyPack;
-window.printRemSummaryPack = printRemSummaryPack;
 
 
-// Ensure report generators are globally reachable for boot listeners
-try {
-  if (typeof window.printDailyLectureReport === "function") window.printDailyLectureReport = printDailyLectureReport;
-} catch (_) {}
-try {
-  if (typeof window.printWeeklyProfessionalPack === "function") window.printWeeklyProfessionalPack = printWeeklyProfessionalPack;
-} catch (_) {}
-try {
-  if (typeof window.printMonthlyProfessionalPack === "function") window.printMonthlyProfessionalPack = printMonthlyProfessionalPack;
-} catch (_) {}
-try {
-  if (typeof window.printRemWeeklyPack === "function") window.printRemWeeklyPack = printRemWeeklyPack;
-} catch (_) {}
-try {
-  if (typeof window.printRemSummaryPack === "function") window.printRemSummaryPack = printRemSummaryPack;
-} catch (_) {}
-try {
-  if (typeof generateStudentRegisterReport === "function") window.generateStudentRegisterReport = generateStudentRegisterReport;
-} catch (_) {}
-try {
-  if (typeof generateHostelDistributionReport === "function") window.generateHostelDistributionReport = generateHostelDistributionReport;
-} catch (_) {}
+// Report generators bind to window inside openDB boot (where they are defined).
 
 })();
