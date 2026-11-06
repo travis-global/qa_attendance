@@ -12766,5 +12766,89 @@
     "user": "QA Officer",
     "source": "system",
     "id": 641
+  },
+  {
+    "ref": "REF/EOCNS/QA/1637",
+    "action": "create",
+    "entity": "courses",
+    "entityId": "PRAC 101",
+    "reason": "Course added: PRAC 101",
+    "details": {},
+    "timestamp": "2026-11-06T14:10:59.555Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 642
+  },
+  {
+    "ref": "REF/EOCNS/QA/1638",
+    "action": "create",
+    "entity": "courses",
+    "entityId": "NUS 113",
+    "reason": "Course added: NUS 113",
+    "details": {},
+    "timestamp": "2026-11-06T14:11:41.840Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 643
+  },
+  {
+    "ref": "REF/EOCNS/QA/1639",
+    "action": "create",
+    "entity": "courses",
+    "entityId": "NUR 111",
+    "reason": "Course added: NUR 111",
+    "details": {},
+    "timestamp": "2026-11-06T14:12:25.678Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 644
+  },
+  {
+    "ref": "REF/EOCNS/QA/1640",
+    "action": "create",
+    "entity": "courses",
+    "entityId": "GNS 102",
+    "reason": "Course added: GNS 102",
+    "details": {},
+    "timestamp": "2026-11-06T14:12:48.337Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 645
+  },
+  {
+    "ref": "REF/EOCNS/QA/1641",
+    "action": "create",
+    "entity": "courses",
+    "entityId": "GNS 111",
+    "reason": "Course added: GNS 111",
+    "details": {},
+    "timestamp": "2026-11-06T14:13:13.973Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 646
+  },
+  {
+    "ref": "REF/EOCNS/QA/1642",
+    "action": "create",
+    "entity": "courses",
+    "entityId": "NUS 112",
+    "reason": "Course added: NUS 112",
+    "details": {},
+    "timestamp": "2026-11-06T14:13:35.954Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 647
+  },
+  {
+    "ref": "REF/EOCNS/QA/1643",
+    "action": "create",
+    "entity": "courses",
+    "entityId": "NUS 111",
+    "reason": "Course added: NUS 111",
+    "details": {},
+    "timestamp": "2026-11-06T14:14:00.365Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 648
   }
 ]
