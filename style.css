@@ -1161,3 +1161,17 @@ body.role-viewer #viewerModeBanner { display: block; }
 .profile-meta { flex: 1; min-width: 200px; }
 .record-section { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border,#e2e8f0); }
 .record-section h4 { margin: 0 0 8px; color: #0d9488; font-size: 0.95rem; }
+
+
+/* Attendance sheet reg no under name */
+.att-reg {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-top: 2px;
+}
+.absent-bulk-actions .btn--sm {
+  padding: 0.25rem 0.65rem;
+  font-size: 0.8rem;
+}

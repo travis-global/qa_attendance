@@ -264,6 +264,48 @@ function normalizeProgramme(p) {
   if (/^midwifery$|^mid$/i.test(t)) return "Midwifery";
   return t;
 }
+
+/** Temporary reg numbers (TMP-… / TEMP-…) sort after permanent ones. */
+function isTempRegNo(reg) {
+  var r = String(reg || "").trim().toUpperCase();
+  if (!r) return true; // blank treated as temporary / last
+  return r.indexOf("TMP-") === 0 || r.indexOf("TEMP-") === 0 || r.indexOf("TMP/") === 0 ||
+    r.indexOf("TEMPORARY") === 0 || /\bTMP\b/.test(r);
+}
+
+/** Sort key for reg numbers: permanent first (natural), then temporary. */
+function compareStudentsByRegNo(a, b) {
+  var ra = String(a.regNo || a.reg_no || "").trim();
+  var rb = String(b.regNo || b.reg_no || "").trim();
+  var ta = isTempRegNo(ra);
+  var tb = isTempRegNo(rb);
+  if (ta !== tb) return ta ? 1 : -1; // permanent before temporary
+  // natural-ish: split digits and text
+  var na = ra.toUpperCase();
+  var nb = rb.toUpperCase();
+  if (na && nb && na !== nb) {
+    var pa = na.match(/(\d+|\D+)/g) || [na];
+    var pb = nb.match(/(\d+|\D+)/g) || [nb];
+    var n = Math.max(pa.length, pb.length);
+    for (var i = 0; i < n; i++) {
+      var xa = pa[i] || "";
+      var xb = pb[i] || "";
+      var da = /^\d+$/.test(xa);
+      var db = /^\d+$/.test(xb);
+      if (da && db) {
+        var diff = parseInt(xa, 10) - parseInt(xb, 10);
+        if (diff) return diff;
+      } else {
+        var c = xa.localeCompare(xb);
+        if (c) return c;
+      }
+    }
+  } else if (na !== nb) {
+    return na.localeCompare(nb);
+  }
+  return String(a.name || "").localeCompare(String(b.name || ""));
+}
+
 async function generateTempRegNo(programme) {
   const year = String(new Date().getFullYear()).slice(-2);
   const code = getProgrammeCode(programme);
@@ -1582,7 +1624,7 @@ async function renderHostelRoster() {
     if (hostelF === "__unset") return !h;
     if (hostelF) return h === hostelF;
     return true;
-  }).sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
+  }).sort(compareStudentsByRegNo);
   var body = document.getElementById("hostelRosterBody");
   if (!body) return;
   body.innerHTML = list.length ? list.map(function(s) {
@@ -5676,8 +5718,8 @@ async function loadQaAbsentRoster(classKey) {
     }
     return okP && okL;
   });
-  // sort by name
-  list.sort(function(a, b) { return String(a.name || "").localeCompare(String(b.name || "")); });
+  // permanent reg nos first, temporary (TMP-…) last; within group by reg no
+  list.sort(compareStudentsByRegNo);
   QA_ABSENT_ROSTER = list.map(function(s, i) {
     return { id: s.id, name: s.name || "", regNo: s.regNo || "", serial: s.serial != null ? String(s.serial) : String(i + 1) };
   });
@@ -5713,6 +5755,28 @@ function renderQaAbsentList(query) {
       ev.preventDefault();
     });
   });
+}
+
+
+function selectAllQaAbsent() {
+  var q = String((document.getElementById("qaAbsentSearch") && document.getElementById("qaAbsentSearch").value) || "").toLowerCase().trim();
+  var rows = QA_ABSENT_ROSTER.filter(function(s) {
+    if (!q) return true;
+    return (s.name || "").toLowerCase().indexOf(q) >= 0 ||
+      (s.regNo || "").toLowerCase().indexOf(q) >= 0 ||
+      (s.serial || "").indexOf(q) >= 0;
+  });
+  rows.forEach(function(s) { QA_ABSENT_SELECTED.add(s.id); });
+  renderQaAbsentList(q);
+  renderQaAbsentTags();
+  syncQaAbsentHidden();
+}
+
+function clearAllQaAbsent() {
+  QA_ABSENT_SELECTED = new Set();
+  renderQaAbsentList((document.getElementById("qaAbsentSearch") && document.getElementById("qaAbsentSearch").value) || "");
+  renderQaAbsentTags();
+  syncQaAbsentHidden();
 }
 
 function toggleQaAbsent(id) {
@@ -5774,6 +5838,17 @@ async function initQaAbsentPicker(classKey, preselected) {
     });
   }
   var search = document.getElementById("qaAbsentSearch");
+  var btnAll = document.getElementById("btnQaAbsentSelectAll");
+  var btnClr = document.getElementById("btnQaAbsentClearAll");
+  if (btnAll && !btnAll._wired) {
+    btnAll._wired = true;
+    btnAll.addEventListener("click", function(e) { e.preventDefault(); selectAllQaAbsent(); });
+  }
+  if (btnClr && !btnClr._wired) {
+    btnClr._wired = true;
+    btnClr.addEventListener("click", function(e) { e.preventDefault(); clearAllQaAbsent(); });
+  }
+
   if (search) {
     search.value = "";
     search.oninput = function() { renderQaAbsentList(search.value); };
@@ -6461,7 +6536,8 @@ async function buildAttendanceSheet() {
   var rows = list.map(function(s, i) {
     var cells = "";
     for (var c = 0; c < colCount; c++) cells += "<td class=\"att-mark-cell\"></td>";
-    return "<tr><td class=\"att-sn\">" + (i + 1) + "</td><td class=\"att-name\">" + escapeHtml(s.name) + "</td>" + cells + "</tr>";
+    var regNote = s.regNo ? (" <span class=\"att-reg\">" + escapeHtml(s.regNo) + (isTempRegNo(s.regNo) ? " · temp" : "") + "</span>") : "";
+    return "<tr><td class=\"att-sn\">" + (i + 1) + "</td><td class=\"att-name\">" + escapeHtml(s.name) + regNote + "</td>" + cells + "</tr>";
   }).join("");
 
   var sigLines = "";
