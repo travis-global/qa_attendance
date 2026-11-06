@@ -17,53 +17,5 @@
     "absent": [],
     "updatedAt": "2026-10-28T14:07:24.597Z",
     "createdAt": "2026-10-28T14:07:24.597Z"
-  },
-  {
-    "id": "qa_mw3qqu5harxl",
-    "date": "2026-10-26",
-    "classKey": "100_nursing",
-    "course": "NUS 114",
-    "lecturer": "Dr. Jacinta Obimma",
-    "status": "Held",
-    "duration": 123,
-    "start": "10:05",
-    "end": "12:08",
-    "topic": "Revision",
-    "objectives": "Revision",
-    "lectureSummary": "Revision",
-    "assignment": "None was given",
-    "remark": "Class participation was above average",
-    "absent": [
-      "ANUBIA PERPETUAL SOBECHI",
-      "JOY CHINAZAEKPERE ASOJUA",
-      "NWUZOR ONYINYECHI A."
-    ],
-    "absentDetails": [
-      {
-        "id": "stu_mvusjuz7ekrzs",
-        "name": "ANUBIA PERPETUAL SOBECHI",
-        "regNo": "EOCNS/26/0023/GNS",
-        "serial": ""
-      },
-      {
-        "id": "stu_mvsa27y634fx7",
-        "name": "JOY CHINAZAEKPERE ASOJUA",
-        "regNo": "EOCNS/26/0049/GNS",
-        "serial": ""
-      },
-      {
-        "id": "stu_mvuqnhqvy2qjq",
-        "name": "NWUZOR ONYINYECHI A.",
-        "regNo": "TMP-EOCNS/26/0002/GNS",
-        "serial": ""
-      }
-    ],
-    "updatedAt": "2026-11-05T16:09:25.540Z",
-    "createdAt": "2026-11-05T16:09:25.540Z",
-    "amendments": [],
-    "sessionId": "sess_mvt9hjbtg2q3o",
-    "sessionName": "2026/2027 SESSION",
-    "semesterId": "sess_mvt9hjbtg2q3o_s1",
-    "semesterName": "1st Semester"
   }
 ]
