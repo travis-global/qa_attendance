@@ -4324,8 +4324,8 @@ async function publishPendingListToRepo(message) {
   document.getElementById("btnPrintMonthlyQa") && document.getElementById("btnPrintMonthlyQa").addEventListener("click", function() { printMonthlyProfessionalPack(); });
 
   document.getElementById("btnGenerateStudentRegister")?.addEventListener("click", function() { generateStudentRegisterReport(); });
-  document.getElementById("btnGenerateHostelReportDash")?.addEventListener("click", function() { generateHostelReport(); });
-  document.getElementById("btnGenerateHostelReport")?.addEventListener("click", function() { generateHostelReport(); });
+  document.getElementById("btnGenerateHostelReportDash")?.addEventListener("click", function() { generateHostelDistributionReport(); });
+  document.getElementById("btnGenerateHostelReport")?.addEventListener("click", function() { generateHostelDistributionReport(); });
 
   document.getElementById("btnPrintDailyReport") && document.getElementById("btnPrintDailyReport").addEventListener("click", printDailyLectureReport);
   document.getElementById("btnBuildMonthlyQa") && document.getElementById("btnBuildMonthlyQa").addEventListener("click", buildMonthlyQaReport);
@@ -8942,7 +8942,7 @@ async function generateStudentRegisterReport() {
 }
 
 /** Hostel occupancy & distribution report */
-async function generateHostelReport() {
+async function generateHostelDistributionReport() {
   var meta = await promptOfficerAndFormat("Hostel Distribution Report");
   if (!meta) return;
   var students = (await getAll("students")).filter(function(s) {
@@ -8995,6 +8995,7 @@ async function generateHostelReport() {
 
 window.generateStudentRegisterReport = generateStudentRegisterReport;
 window.generateHostelReport = generateHostelReport;
+window.generateHostelDistributionReport = generateHostelDistributionReport;
 window.printWeeklyProfessionalPack = printWeeklyProfessionalPack;
 window.printMonthlyProfessionalPack = printMonthlyProfessionalPack;
 window.printRemWeeklyPack = printRemWeeklyPack;
