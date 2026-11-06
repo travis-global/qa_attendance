@@ -5758,6 +5758,31 @@ function renderQaAbsentList(query) {
 }
 
 
+
+/** Mark all (filtered) students present — removes them from the absent set. */
+function markAllQaPresent() {
+  var q = String((document.getElementById("qaAbsentSearch") && document.getElementById("qaAbsentSearch").value) || "").toLowerCase().trim();
+  var rows = QA_ABSENT_ROSTER.filter(function(s) {
+    if (!q) return true;
+    return (s.name || "").toLowerCase().indexOf(q) >= 0 ||
+      (s.regNo || "").toLowerCase().indexOf(q) >= 0 ||
+      (s.serial || "").indexOf(q) >= 0;
+  });
+  if (!q) {
+    QA_ABSENT_SELECTED = new Set();
+  } else {
+    rows.forEach(function(s) { QA_ABSENT_SELECTED.delete(s.id); });
+  }
+  renderQaAbsentList(q);
+  renderQaAbsentTags();
+  syncQaAbsentHidden();
+}
+
+/** Mark all (filtered) students absent. Click individual rows afterward to set some back to present. */
+function markAllQaAbsent() {
+  selectAllQaAbsent();
+}
+
 function selectAllQaAbsent() {
   var q = String((document.getElementById("qaAbsentSearch") && document.getElementById("qaAbsentSearch").value) || "").toLowerCase().trim();
   var rows = QA_ABSENT_ROSTER.filter(function(s) {
@@ -5838,15 +5863,20 @@ async function initQaAbsentPicker(classKey, preselected) {
     });
   }
   var search = document.getElementById("qaAbsentSearch");
-  var btnAll = document.getElementById("btnQaAbsentSelectAll");
+  var btnPresent = document.getElementById("btnQaAllPresent");
+  var btnAbsent = document.getElementById("btnQaAllAbsent") || document.getElementById("btnQaAbsentSelectAll");
   var btnClr = document.getElementById("btnQaAbsentClearAll");
-  if (btnAll && !btnAll._wired) {
-    btnAll._wired = true;
-    btnAll.addEventListener("click", function(e) { e.preventDefault(); selectAllQaAbsent(); });
+  if (btnPresent && !btnPresent._wired) {
+    btnPresent._wired = true;
+    btnPresent.addEventListener("click", function(e) { e.preventDefault(); markAllQaPresent(); });
+  }
+  if (btnAbsent && !btnAbsent._wired) {
+    btnAbsent._wired = true;
+    btnAbsent.addEventListener("click", function(e) { e.preventDefault(); markAllQaAbsent(); });
   }
   if (btnClr && !btnClr._wired) {
     btnClr._wired = true;
-    btnClr.addEventListener("click", function(e) { e.preventDefault(); clearAllQaAbsent(); });
+    btnClr.addEventListener("click", function(e) { e.preventDefault(); markAllQaPresent(); });
   }
 
   if (search) {

@@ -994,12 +994,13 @@
           <label class="field"><span class="field__label">Remarks</span><textarea id="qaEntryRemark" rows="2" placeholder="Class participation, notes…"></textarea></label>
           <div class="field field--full" id="qaAbsentPickerWrap">
             <span class="field__label">Absent students</span>
-            <p class="muted-note" style="margin:4px 0 8px">Pick from the master list for this programme &amp; level (same for timetable and extra lectures). First-time log does not need REF — only edits do.</p>
+            <p class="muted-note" style="margin:4px 0 8px">Pick absentees from the master list for this programme &amp; level. Use <b>All present</b>, then click only those who missed the lecture (click again to return them to present). First-time log does not need REF — only edits do.</p>
             <input type="search" id="qaAbsentSearch" class="absent-search" placeholder="Search by name or reg. no…" autocomplete="off" />
             <div class="absent-bulk-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 6px;align-items:center">
-              <button type="button" class="btn btn--ghost btn--sm" id="btnQaAbsentSelectAll" title="Mark all listed students absent">Select all</button>
-              <button type="button" class="btn btn--ghost btn--sm" id="btnQaAbsentClearAll" title="Clear absent selection">Clear all</button>
-              <span class="muted-note" style="font-size:0.78rem">Select all applies to the current search filter (or the full class if search is empty).</span>
+              <button type="button" class="btn btn--primary btn--sm" id="btnQaAllPresent" title="Mark everyone in the list as present (clear absentees)">All present</button>
+              <button type="button" class="btn btn--ghost btn--sm" id="btnQaAllAbsent" title="Mark everyone in the list as absent">All absent</button>
+              <button type="button" class="btn btn--ghost btn--sm" id="btnQaAbsentClearAll" title="Clear absent selection">Clear selection</button>
+              <span class="muted-note" style="font-size:0.78rem">Use <b>All present</b>, then click only students who were absent. Click a marked name again to set them back to present. Search narrows bulk actions.</span>
             </div>
             <div class="student-list" id="qaAbsentStudentList" style="max-height:200px;overflow:auto;border:1px solid var(--border,#e2e8f0);border-radius:0 0 8px 8px;margin-top:-1px"></div>
             <div class="absent-tags" id="qaAbsentTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:28px"></div>
@@ -1163,7 +1164,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=58"></script>
+  <script src="app.js?v=59"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>
