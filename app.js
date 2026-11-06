@@ -1555,7 +1555,7 @@ openDB().then(async () => {
 
   // QA module
   seedQaDatalists();
-  const todayStr = (function() { var d = new Date(); return d.toISOString().slice(0, 10); 
+  const todayStr = (function() { var d = new Date(); return d.toISOString().slice(0, 10); })();
 async function renderHostelRoster() {
   await loadStudents();
   await fillProgrammeLevelSelects();
@@ -4304,10 +4304,6 @@ async function publishPendingListToRepo(message) {
   return body;
 }
 
-
-
-
-})();
   if (document.getElementById("qaDailyDate") && !document.getElementById("qaDailyDate").value) {
     document.getElementById("qaDailyDate").value = todayStr;
   }
@@ -4320,14 +4316,40 @@ async function publishPendingListToRepo(message) {
   document.getElementById("qaDailyDate") && document.getElementById("qaDailyDate").addEventListener("change", renderQaDaily);
   document.getElementById("qaDailyClass") && document.getElementById("qaDailyClass").addEventListener("change", renderQaDaily);
   document.getElementById("btnBuildWeeklyQa") && document.getElementById("btnBuildWeeklyQa").addEventListener("click", buildWeeklyQaReport);
-  document.getElementById("btnPrintWeeklyQa") && document.getElementById("btnPrintWeeklyQa").addEventListener("click", function() { printWeeklyProfessionalPack(); });
-  document.getElementById("btnPrintMonthlyQa") && document.getElementById("btnPrintMonthlyQa").addEventListener("click", function() { printMonthlyProfessionalPack(); });
+  document.getElementById("btnPrintWeeklyQa") && document.getElementById("btnPrintWeeklyQa").addEventListener("click", function() {
+    if (typeof window.printWeeklyProfessionalPack === "function") window.printWeeklyProfessionalPack();
+    else if (typeof printWeeklyProfessionalPack === "function") printWeeklyProfessionalPack();
+    else alert("Weekly report is still loading. Build the week first, then hard-refresh if needed.");
+  });
+  document.getElementById("btnPrintMonthlyQa") && document.getElementById("btnPrintMonthlyQa").addEventListener("click", function() {
+    if (typeof window.printMonthlyProfessionalPack === "function") window.printMonthlyProfessionalPack();
+    else if (typeof printMonthlyProfessionalPack === "function") printMonthlyProfessionalPack();
+    else alert("Monthly report is still loading. Build the month first, then hard-refresh if needed.");
+  });
 
   document.getElementById("btnGenerateStudentRegister")?.addEventListener("click", function() { generateStudentRegisterReport(); });
   document.getElementById("btnGenerateHostelReportDash")?.addEventListener("click", function() { generateHostelDistributionReport(); });
   document.getElementById("btnGenerateHostelReport")?.addEventListener("click", function() { generateHostelDistributionReport(); });
 
-  document.getElementById("btnPrintDailyReport") && document.getElementById("btnPrintDailyReport").addEventListener("click", printDailyLectureReport);
+  
+  // Report API on window — functions may be nested; boot listeners must not depend on local scope
+  try {
+    if (typeof printDailyLectureReport === "function") window.printDailyLectureReport = printDailyLectureReport;
+    if (typeof printWeeklyProfessionalPack === "function") window.printWeeklyProfessionalPack = printWeeklyProfessionalPack;
+    if (typeof printMonthlyProfessionalPack === "function") window.printMonthlyProfessionalPack = printMonthlyProfessionalPack;
+    if (typeof printRemWeeklyPack === "function") window.printRemWeeklyPack = printRemWeeklyPack;
+    if (typeof printRemSummaryPack === "function") window.printRemSummaryPack = printRemSummaryPack;
+    if (typeof generateStudentRegisterReport === "function") window.generateStudentRegisterReport = generateStudentRegisterReport;
+    if (typeof generateHostelDistributionReport === "function") window.generateHostelDistributionReport = generateHostelDistributionReport;
+    if (typeof promptOfficerAndFormat === "function") window.promptOfficerAndFormat = promptOfficerAndFormat;
+    if (typeof openReportWindow === "function") window.openReportWindow = openReportWindow;
+  } catch (bindRepErr) { console.warn("report bind", bindRepErr); }
+
+document.getElementById("btnPrintDailyReport") && document.getElementById("btnPrintDailyReport").addEventListener("click", function() {
+    if (typeof window.printDailyLectureReport === "function") window.printDailyLectureReport();
+    else if (typeof printDailyLectureReport === "function") printDailyLectureReport();
+    else alert("Daily report is still loading. Hard-refresh the page.");
+  });
   document.getElementById("btnBuildMonthlyQa") && document.getElementById("btnBuildMonthlyQa").addEventListener("click", buildMonthlyQaReport);
   document.getElementById("btnAddProgramme") && document.getElementById("btnAddProgramme").addEventListener("click", addProgrammePrompt);
   document.getElementById("btnAddLevel") && document.getElementById("btnAddLevel").addEventListener("click", addLevelPrompt);
@@ -9000,5 +9022,29 @@ window.printWeeklyProfessionalPack = printWeeklyProfessionalPack;
 window.printMonthlyProfessionalPack = printMonthlyProfessionalPack;
 window.printRemWeeklyPack = printRemWeeklyPack;
 window.printRemSummaryPack = printRemSummaryPack;
+
+
+// Ensure report generators are globally reachable for boot listeners
+try {
+  if (typeof printDailyLectureReport === "function") window.printDailyLectureReport = printDailyLectureReport;
+} catch (_) {}
+try {
+  if (typeof printWeeklyProfessionalPack === "function") window.printWeeklyProfessionalPack = printWeeklyProfessionalPack;
+} catch (_) {}
+try {
+  if (typeof printMonthlyProfessionalPack === "function") window.printMonthlyProfessionalPack = printMonthlyProfessionalPack;
+} catch (_) {}
+try {
+  if (typeof printRemWeeklyPack === "function") window.printRemWeeklyPack = printRemWeeklyPack;
+} catch (_) {}
+try {
+  if (typeof printRemSummaryPack === "function") window.printRemSummaryPack = printRemSummaryPack;
+} catch (_) {}
+try {
+  if (typeof generateStudentRegisterReport === "function") window.generateStudentRegisterReport = generateStudentRegisterReport;
+} catch (_) {}
+try {
+  if (typeof generateHostelDistributionReport === "function") window.generateHostelDistributionReport = generateHostelDistributionReport;
+} catch (_) {}
 
 })();
