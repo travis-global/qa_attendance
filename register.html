@@ -70,26 +70,26 @@
       <div class="row">
         <div>
           <label>Gender</label>
-          <select id="gender"><option value="">—</option><option>Female</option><option>Male</option></select>
+          <select id="gender" required><option value="">—</option><option>Female</option><option>Male</option></select>
         </div>
         <div>
-          <label>Phone</label>
+          <label>Phone <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></label>
           <input id="phone" type="tel" />
         </div>
       </div>
-      <label>Hostel</label>
+      <label>Hostel <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></label>
       <select id="hostel">
         <option value="">— Not set —</option>
         <option>Hostel 1</option>
         <option>Hostel 2</option>
         <option>Off-campus</option>
       </select>
-      <label>Passport photograph *</label>
+      <label>Passport photograph <span style="font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></label>
       <div class="photo">
         <div class="frame" id="preview">Photo</div>
         <div>
-          <input type="file" id="photo" accept="image/*" required />
-          <p class="note">Clear passport-style photo. Compressed automatically before upload.</p>
+          <input type="file" id="photo" accept="image/*" />
+          <p class="note">Optional. Clear passport-style photo if available — compressed automatically. You may submit without a photo.</p>
         </div>
       </div>
       <button type="submit" id="submitBtn">Submit for review</button>
@@ -138,8 +138,7 @@ document.getElementById("photo").addEventListener("change", async (e) => {
 document.getElementById("regForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   if (document.getElementById("hpCompany").value) return;
-  if (!photoDataUrl) { alert("Please upload a passport photograph."); return; }
-  const btn = document.getElementById("submitBtn");
+    const btn = document.getElementById("submitBtn");
   const msg = document.getElementById("msg");
   btn.disabled = true;
   msg.className = "msg";
@@ -153,8 +152,13 @@ document.getElementById("regForm").addEventListener("submit", async (e) => {
     gender: document.getElementById("gender").value,
     phone: document.getElementById("phone").value.trim(),
     hostel: document.getElementById("hostel").value,
-    photoDataUrl,
+    photoDataUrl: photoDataUrl || "",
   };
+  if (!student.name || !student.email || !student.regNo || !student.programme || !student.level || !student.gender) {
+    alert("Please complete all required fields (name, email, reg. no, programme, level, gender). Phone and photo are optional.");
+    btn.disabled = false;
+    return;
+  }
   try {
     const res = await fetch(WORKER, {
       method: "POST",

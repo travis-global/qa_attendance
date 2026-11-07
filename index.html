@@ -8,10 +8,36 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=36" />
+  <link rel="stylesheet" href="style.css?v=37" />
   <!-- pages-deploy: actions+nojekyll -->
 </head>
 <body class="role-viewer">
+  <!-- Officer login gate: blocks ~80% of views until PIN sign-in -->
+  <div id="officerLoginGate" class="officer-gate" hidden role="dialog" aria-modal="true" aria-labelledby="officerGateTitle">
+    <div class="officer-gate__backdrop"></div>
+    <div class="officer-gate__card">
+      <div class="officer-gate__crest">
+        <img src="https://www.easternoak.org/images/Eastern-OAK-logo-201.png" alt="EOCNS crest" />
+      </div>
+      <p class="officer-gate__eyebrow">Eastern Oak College of Nursing Sciences</p>
+      <h2 id="officerGateTitle" class="officer-gate__title">Officer access required</h2>
+      <p class="officer-gate__lead">
+        <strong id="officerGateViewName">This section</strong> is restricted to signed-in Quality Assurance officers.
+        Lecture logging, master lists, reports, hostel runs, and remedial tools are not available in public view.
+      </p>
+      <div class="officer-gate__form">
+        <label class="officer-gate__label" for="officerGatePin">QA Officer PIN</label>
+        <input type="password" id="officerGatePin" class="officer-gate__input" placeholder="Enter officer PIN" autocomplete="current-password" />
+        <p id="officerGateError" class="officer-gate__error" hidden></p>
+        <div class="officer-gate__actions">
+          <button type="button" class="btn btn--primary" id="btnOfficerGateLogin">Sign in &amp; continue</button>
+          <button type="button" class="btn btn--ghost" id="btnOfficerGateCancel">Back to dashboard</button>
+        </div>
+      </div>
+      <p class="officer-gate__hint">You can also sign in anytime under <strong>Settings → QA Officer</strong>.</p>
+    </div>
+  </div>
+
   <div id="dirtyBanner" class="dirty-banner" hidden role="status"></div>
   <div id="masterLoadBanner" class="master-load-banner" hidden role="status"></div>
   <div class="app">
@@ -30,27 +56,27 @@
         </div>
         <div class="nav-section">
           <p class="nav-section__label">Core Systems</p>
-          <a href="#" class="nav-item" data-view="students">Students</a>
-          <a href="#" class="nav-item" data-view="pending">Pending registrations</a>
-          <a href="#" class="nav-item" data-view="lecturers">Lecturers</a>
-          <a href="#" class="nav-item" data-view="hostel">Hostel</a>
-          <a href="#" class="nav-item" data-view="discipline">Discipline</a>
-          <a href="#" class="nav-item" data-view="attendance">Attendance sheets</a>
-          <a href="#" class="nav-item" data-view="sessions">Sessions</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="students">Students</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="pending">Pending registrations</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="lecturers">Lecturers</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="hostel">Hostel</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="discipline">Discipline</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="attendance">Attendance sheets</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="sessions">Sessions</a>
         </div>
         <div class="nav-section">
           <p class="nav-section__label">Quality Assurance</p>
-          <a href="#" class="nav-item" data-view="timetable-board">Timetable board</a>
-          <a href="#" class="nav-item" data-view="qa-daily">Daily QA</a>
-          <a href="#" class="nav-item" data-view="qa-weekly">Weekly QA</a>
-          <a href="#" class="nav-item" data-view="qa-monthly">Monthly QA</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="timetable-board">Timetable board</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="qa-daily">Daily QA</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="qa-weekly">Weekly QA</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="qa-monthly">Monthly QA</a>
         </div>
         <div class="nav-section">
           <p class="nav-section__label">System</p>
-          <a href="#" class="nav-item" data-view="remedial">Remedial</a>
-          <a href="#" class="nav-item" data-view="reports">Reports & Export</a>
-          <a href="#" class="nav-item" data-view="lecturer-hours">Lecturer hours</a>
-          <a href="#" class="nav-item" data-view="audit">Audit Log</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="remedial">Remedial</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="reports">Reports & Export</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="lecturer-hours">Lecturer hours</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="audit">Audit Log</a>
           <a href="#" class="nav-item" data-view="settings">Settings</a>
         </div>
       </nav>
@@ -85,9 +111,15 @@
       </header>
       <main class="content" id="content">
         <div id="viewerModeBanner" class="card viewer-mode-banner" style="margin-bottom:12px;padding:10px 14px;border-left:4px solid #b45309" hidden>
-          <strong>View only</strong>
-          <span class="muted-note" style="margin-left:8px">Contact QA to update records. Sign in under Settings if you are the QA officer.</span>
+        <div class="viewer-mode-banner__inner">
+          <span class="viewer-mode-banner__badge">Public view</span>
+          <div>
+            <strong>Most features are locked.</strong>
+            Students, lecturers, QA logging, hostel, remedial, reports and audit require a QA Officer sign-in.
+            Open <button type="button" class="linkish" id="btnBannerGoSettings">Settings</button> or use the login panel when you open a restricted section.
+          </div>
         </div>
+      </div>
         <div id="sessionContextBanner" class="card" style="margin-bottom:12px;padding:10px 14px;border-left:4px solid #0d9488" hidden>
           <strong id="sessionContextTitle">No active session</strong>
           <span class="muted-note" id="sessionContextDetail" style="margin-left:8px"></span>
@@ -751,7 +783,7 @@
 <div class="card" style="margin-bottom:16px">
             <div class="card__header"><h3>QA Officer access</h3></div>
             <div class="card__body">
-              <p class="muted-note" style="margin-top:0">Everyone can view. Editing, creating records, and downloads require QA Officer sign-in. PIN is stored in <code>data/config.json</code> in the repository. Use <strong>Change officer PIN</strong> below after a leak or rotation — it verifies the current PIN, then updates the repository via the publish worker.</p>
+              <p class="muted-note" style="margin-top:0">Public visitors only see the dashboard summary. Master data, lecture logging, reports, hostel, remedial and audit require QA Officer sign-in. PIN is stored in <code>data/config.json</code> in the repository. Use <strong>Change officer PIN</strong> below after a leak or rotation — it verifies the current PIN, then updates the repository via the publish worker.</p>
               <div id="qaAuthLoggedOut">
                 <div class="form-grid" style="max-width:360px">
                   <label class="field field--full"><span class="field__label">Officer PIN</span><input type="password" id="qaPinInput" placeholder="Enter QA PIN" autocomplete="off" /></label>
@@ -1184,7 +1216,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=60"></script>
+  <script src="app.js?v=61"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

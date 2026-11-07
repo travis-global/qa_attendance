@@ -1175,3 +1175,133 @@ body.role-viewer #viewerModeBanner { display: block; }
   padding: 0.25rem 0.65rem;
   font-size: 0.8rem;
 }
+
+
+/* —— Officer login gate —— */
+.officer-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.officer-gate[hidden] { display: none !important; }
+.officer-gate__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+}
+.officer-gate__card {
+  position: relative;
+  width: min(440px, 100%);
+  background: var(--surface, #fff);
+  color: var(--text, #0f172a);
+  border-radius: 16px;
+  padding: 28px 26px 22px;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,.35);
+  border: 1px solid rgba(27, 58, 107, 0.12);
+  text-align: center;
+}
+.officer-gate__crest img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border-radius: 12px;
+}
+.officer-gate__eyebrow {
+  margin: 10px 0 4px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b8860b;
+  font-weight: 700;
+}
+.officer-gate__title {
+  margin: 0 0 8px;
+  font-family: "Plus Jakarta Sans", Inter, sans-serif;
+  font-size: 1.35rem;
+  color: #1B3A6B;
+}
+.officer-gate__lead {
+  margin: 0 0 18px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--muted, #64748b);
+}
+.officer-gate__form { text-align: left; }
+.officer-gate__label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted, #64748b);
+  margin-bottom: 6px;
+}
+.officer-gate__input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border, #e2e8f0);
+  font-size: 1rem;
+  margin-bottom: 10px;
+  background: var(--surface-2, #f8fafc);
+}
+.officer-gate__error {
+  color: #b91c1c;
+  font-size: 0.85rem;
+  margin: 0 0 8px;
+}
+.officer-gate__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+.officer-gate__hint {
+  margin: 16px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted, #64748b);
+}
+.nav-item--officer.is-locked {
+  opacity: 0.72;
+  position: relative;
+}
+.nav-item--officer.is-locked::after {
+  content: "🔒";
+  font-size: 0.7rem;
+  margin-left: 6px;
+  opacity: 0.85;
+}
+.viewer-mode-banner__inner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.viewer-mode-banner__badge {
+  flex-shrink: 0;
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+button.linkish {
+  background: none;
+  border: none;
+  color: #1B3A6B;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font: inherit;
+}
+body.role-officer .nav-item--officer.is-locked::after { content: none; }

@@ -38,7 +38,73 @@ const titles = {
   audit: { title: "Audit Log", subtitle: "Every change with REF/EOCNS/QA" },
   settings: { title: "Settings", subtitle: "Roles, letterhead and system preferences" },
 };
+/** Views anyone may open without officer PIN (login lives under Settings). */
+var PUBLIC_VIEWS = { dashboard: true, settings: true };
+
+/** Everything else is officer-only (logging, master lists, QA, reports, remedial, hostel, …). */
+function isOfficerOnlyView(viewId) {
+  return !PUBLIC_VIEWS[viewId];
+}
+
+function openOfficerLoginGate(targetView) {
+  var gate = document.getElementById("officerLoginGate");
+  if (gate) {
+    gate.hidden = false;
+    gate.setAttribute("data-target-view", targetView || "");
+    var nameEl = document.getElementById("officerGateViewName");
+    if (nameEl) {
+      var meta = titles[targetView] || { title: targetView || "this section" };
+      nameEl.textContent = meta.title || targetView || "this section";
+    }
+    var pin = document.getElementById("officerGatePin");
+    if (pin) { pin.value = ""; setTimeout(function() { try { pin.focus(); } catch (_) {} }, 50); }
+  }
+  // Always send viewers to a safe public surface
+  try {
+    document.querySelectorAll(".nav-item").forEach(function(el) {
+      el.classList.toggle("active", el.dataset.view === "dashboard");
+    });
+    document.querySelectorAll(".view").forEach(function(el) {
+      el.classList.toggle("active", el.id === "view-dashboard");
+    });
+    var titleEl = document.getElementById("pageTitle");
+    var subEl = document.getElementById("pageSubtitle");
+    if (titleEl) titleEl.textContent = (titles.dashboard && titles.dashboard.title) || "Dashboard";
+    if (subEl) subEl.textContent = (titles.dashboard && titles.dashboard.subtitle) || "";
+  } catch (_) {}
+}
+
+function closeOfficerLoginGate() {
+  var gate = document.getElementById("officerLoginGate");
+  if (gate) { gate.hidden = true; gate.removeAttribute("data-target-view"); }
+}
+
+function tryOfficerGateLogin() {
+  var pin = (document.getElementById("officerGatePin") && document.getElementById("officerGatePin").value || "").trim();
+  var err = document.getElementById("officerGateError");
+  var expected = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA";
+  if (!pin) {
+    if (err) { err.hidden = false; err.textContent = "Enter the QA officer PIN."; }
+    return;
+  }
+  if (pin !== expected) {
+    if (err) { err.hidden = false; err.textContent = "Incorrect PIN. Access remains locked."; }
+    return;
+  }
+  if (err) err.hidden = true;
+  setQaOfficer(true);
+  var gate = document.getElementById("officerLoginGate");
+  var target = (gate && gate.getAttribute("data-target-view")) || "dashboard";
+  closeOfficerLoginGate();
+  showView(target);
+}
+
 function showView(viewId) {
+  if (isOfficerOnlyView(viewId) && !isQaOfficer()) {
+    openOfficerLoginGate(viewId);
+    return;
+  }
+  closeOfficerLoginGate();
   document.querySelectorAll(".nav-item").forEach((el) => el.classList.toggle("active", el.dataset.view === viewId));
   document.querySelectorAll(".view").forEach((el) => el.classList.toggle("active", el.id === "view-" + viewId));
   const meta = titles[viewId] || { title: "EOCNS", subtitle: "" };
@@ -520,13 +586,16 @@ async function saveStudent(e) {
   const photoDataUrl = (document.getElementById("studentPhotoDataUrl") && document.getElementById("studentPhotoDataUrl").value) || "";
   const reason = document.getElementById("auditReason").value.trim();
   const officialRef = document.getElementById("auditRef").value.trim();
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to create or update student records."); return; }
   if (!name) { alert("Student name is required."); return; }
+  if (!programme) { alert("Programme is required."); return; }
+  if (!level) { alert("Level is required."); return; }
   if (id) {
     if (!reason) { alert("A reason is required when editing master data."); return; }
     if (!officialRef) { alert("Please enter the official Reference Number from the approved letter."); return; }
     if (!/^REF\/EOCNS\/QA\//i.test(officialRef)) { alert("Reference Number should start with REF/EOCNS/QA/"); return; }
   }
-  if (!regNo) regNo = await generateTempRegNo(programme);
+  if (!regNo) regNo = await generateTempRegNo(programme || "Nursing");
   const conflict = studentsCache.find(s => s.regNo === regNo && s.id !== id);
   if (conflict) { alert("Registration number already used by " + conflict.name); return; }
   const now = new Date().toISOString();
@@ -1614,6 +1683,8 @@ function closeHostelRunModal() {
 
 
 async function generateHostelReport() {
+  if (!isQaOfficer()) { openOfficerLoginGate("hostel"); return; }
+
   const statusEl = document.getElementById("hostelStatus");
   if (!hostelParsedRows) {
     setHostelStatus("Upload a gate export first.", "error");
@@ -5251,6 +5322,20 @@ function updateQaOfficerUI() {
   if (inn) inn.hidden = !loggedIn;
   var vb = document.getElementById("viewerModeBanner");
   if (vb) vb.hidden = !!loggedIn;
+  document.body.classList.toggle("role-officer", !!loggedIn);
+  document.body.classList.toggle("role-viewer", !loggedIn);
+  document.querySelectorAll(".nav-item--officer").forEach(function(el) {
+    el.classList.toggle("is-locked", !loggedIn);
+    el.setAttribute("title", loggedIn ? "" : "QA Officer sign-in required");
+  });
+  // If signed out while on a protected view, bounce to dashboard
+  if (!loggedIn) {
+    var active = document.querySelector(".view.active");
+    var vid = active && active.id ? active.id.replace(/^view-/, "") : "";
+    if (vid && isOfficerOnlyView(vid)) {
+      try { showView("dashboard"); } catch (_) {}
+    }
+  }
 }
 
 
@@ -5370,6 +5455,12 @@ async function changeQaOfficerPin() {
 function initQaOfficerUI() {
   setQaOfficer(isQaOfficer());
   updateQaOfficerUI();
+  document.getElementById("btnOfficerGateLogin")?.addEventListener("click", function() { tryOfficerGateLogin(); });
+  document.getElementById("btnBannerGoSettings")?.addEventListener("click", function() { showView("settings"); });
+  document.getElementById("btnOfficerGateCancel")?.addEventListener("click", function() { closeOfficerLoginGate(); showView("dashboard"); });
+  document.getElementById("officerGatePin")?.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") { e.preventDefault(); tryOfficerGateLogin(); }
+  });
   document.getElementById("btnQaLogin")?.addEventListener("click", () => {
     const pin = (document.getElementById("qaPinInput")?.value || "").trim();
     const err = document.getElementById("qaAuthError");
@@ -6795,6 +6886,8 @@ async function buildMonthlyQaReport() {
 
 
 async function buildAttendanceSheet() {
+  if (!isQaOfficer()) { openOfficerLoginGate("attendance"); return; }
+
   await loadStudents();
   await fillProgrammeLevelSelects();
   var prog = (document.getElementById("attProgramme") && document.getElementById("attProgramme").value) || "";
@@ -6866,6 +6959,8 @@ async function buildAttendanceSheet() {
     "</div>";
 }
 function printAttendanceSheet() {
+  if (!isQaOfficer()) { openOfficerLoginGate("attendance"); return; }
+
   var root = document.getElementById("attendancePrintRoot");
   if (!root) { alert("Build a sheet first (programme + level)."); return; }
   window.print();
