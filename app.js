@@ -5696,6 +5696,19 @@ async function githubPutFile(token, path, contentText, message) {
   return putRes.json();
 }
 
+
+async function safePublishJson(path, localRows, label) {
+  var local = Array.isArray(localRows) ? localRows : [];
+  var remote = null;
+  try { remote = await fetchRepoJson(path + "?t=" + Date.now()); } catch (_) { remote = null; }
+  var remoteLen = Array.isArray(remote) ? remote.length : 0;
+  if (local.length === 0 && remoteLen > 0) {
+    console.warn("publish guard: skipped empty", label, "remote has", remoteLen);
+    return { skipped: true, reason: "local empty, remote has " + remoteLen + " " + label, remoteLen: remoteLen };
+  }
+  return { skipped: false, body: JSON.stringify(localRows, null, 2) };
+}
+
 async function publishAllToRepo() {
   if (!isQaOfficer()) return;
   var pin = (document.getElementById("qaPublishPin") && document.getElementById("qaPublishPin").value || "").trim();
@@ -5716,38 +5729,45 @@ async function publishAllToRepo() {
   try {
     var students = shapeStudentsForRepo(await getAll("students"));
     var files = {};
-    files[DATA_FILES.students] = JSON.stringify(students, null, 2);
-    files[DATA_FILES.lecturers] = JSON.stringify(await getAll("lecturers"), null, 2);
-    files[DATA_FILES.sessions] = JSON.stringify(await getAll("sessions"), null, 2);
-    files[DATA_FILES.qa_entries] = JSON.stringify(await getAll("qa_entries"), null, 2);
-    files[DATA_FILES.audit] = JSON.stringify(await getAll("audit"), null, 2);
-    try { files[DATA_FILES.discipline] = JSON.stringify(await getAll("discipline"), null, 2); } catch (_) {}
-    try { files[DATA_FILES.pending_students] = JSON.stringify(await getAll("pending_students"), null, 2); } catch (_) {}
-    files[DATA_FILES.programmes] = JSON.stringify(await getAll("programmes"), null, 2);
-    files[DATA_FILES.levels] = JSON.stringify(await getAll("levels"), null, 2);
-    files[DATA_FILES.courses] = JSON.stringify(await getAll("courses"), null, 2);
-    if (TIMETABLES_CACHE) files[DATA_FILES.timetables] = JSON.stringify(TIMETABLES_CACHE, null, 2);
-    files[DATA_FILES.attendance] = JSON.stringify(await getAll("attendance"), null, 2);
-    files[DATA_FILES.hostel_runs] = JSON.stringify(await getAll("hostel_runs"), null, 2);
-    files[DATA_FILES.remedial] = JSON.stringify(await getAll("remedial"), null, 2);
-    files[DATA_FILES.remedial_enrolment] = JSON.stringify(await getAll("remedial_enrolment"), null, 2);
-    files[DATA_FILES.remedial_assignments] = JSON.stringify(await getAll("remedial_assignments"), null, 2);
-    files[DATA_FILES.remedial_logs] = JSON.stringify(await getAll("remedial_logs"), null, 2);
+    var skipped = [];
+    async function putFile(path, rows, label) {
+      var r = await safePublishJson(path, rows, label);
+      if (r.skipped) { skipped.push(label + " (" + r.reason + ")"); return; }
+      files[path] = r.body;
+    }
+    await putFile(DATA_FILES.students, students, "students");
+    await putFile(DATA_FILES.lecturers, await getAll("lecturers"), "lecturers");
+    await putFile(DATA_FILES.sessions, await getAll("sessions"), "sessions");
+    await putFile(DATA_FILES.qa_entries, await getAll("qa_entries"), "qa_entries");
+    await putFile(DATA_FILES.audit, await getAll("audit"), "audit");
+    try { await putFile(DATA_FILES.discipline, await getAll("discipline"), "discipline"); } catch (_) {}
+    try { await putFile(DATA_FILES.pending_students, await getAll("pending_students"), "pending_students"); } catch (_) {}
+    await putFile(DATA_FILES.programmes, await getAll("programmes"), "programmes");
+    await putFile(DATA_FILES.levels, await getAll("levels"), "levels");
+    await putFile(DATA_FILES.courses, await getAll("courses"), "courses");
+    if (TIMETABLES_CACHE && typeof TIMETABLES_CACHE === "object" && Object.keys(TIMETABLES_CACHE).length) {
+      files[DATA_FILES.timetables] = JSON.stringify(TIMETABLES_CACHE, null, 2);
+    }
+    try { await putFile(DATA_FILES.attendance, await getAll("attendance"), "attendance"); } catch (_) {}
+    try { await putFile(DATA_FILES.hostel_runs, await getAll("hostel_runs"), "hostel_runs"); } catch (_) {}
+    try { await putFile(DATA_FILES.remedial, await getAll("remedial"), "remedial"); } catch (_) {}
+    try { await putFile(DATA_FILES.remedial_enrolment, await getAll("remedial_enrolment"), "remedial_enrolment"); } catch (_) {}
+    try { await putFile(DATA_FILES.remedial_assignments, await getAll("remedial_assignments"), "remedial_assignments"); } catch (_) {}
+    try { await putFile(DATA_FILES.remedial_logs, await getAll("remedial_logs"), "remedial_logs"); } catch (_) {}
     try {
-      var rm = await getAll("remedial_meta");
-      var metaVal = (rm[0] && rm[0].value) || { sessionId: "", programmes: [], levels: [] };
-      files[DATA_FILES.remedial_meta] = JSON.stringify(metaVal, null, 2);
+      var rmeta = await getAll("remedial_meta");
+      var metaVal = (rmeta[0] && (rmeta[0].value !== undefined ? rmeta[0].value : rmeta[0])) || {};
+      if (metaVal && typeof metaVal === "object") files[DATA_FILES.remedial_meta] = JSON.stringify(metaVal, null, 2);
     } catch (_) {}
     try {
       var rt = await getAll("remedial_timetable");
-      var ttVal = (rt[0] && rt[0].value) || { slots: [] };
+      var ttVal = (rt[0] && rt[0].value) || (rt[0] || { slots: [] });
       files[DATA_FILES.remedial_timetable] = JSON.stringify(ttVal, null, 2);
     } catch (_) {}
-
-    var key = (APP_CONFIG.publishWorkerKey || "").trim();
-    var headers = { "Content-Type": "application/json" };
-    if (key) headers["X-EOCNS-Key"] = key;
-
+    if (skipped.length) {
+      console.warn("Publish guard skipped:", skipped.join("; "));
+      if (status) status.textContent = "Protecting repo: skipped empty local for " + skipped.join(", ") + ". Other files still publishing…";
+    }
     var res = await fetch(workerUrl.replace(/\/$/, ""), {
       method: "POST",
       headers: headers,
