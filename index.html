@@ -305,6 +305,26 @@
             </div>
           </div>
 
+
+          <div class="card" style="margin-bottom:16px">
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+              <h3 style="margin:0">3. Master hostel attendance sheet</h3>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span class="count-pill" id="hostelRunsCount">0 runs</span>
+                <button type="button" class="btn btn--ghost btn--sm" id="btnRefreshHostelRuns">Refresh</button>
+              </div>
+            </div>
+            <div class="card__body">
+              <p class="muted-note">Every generated hostel report is stored here as a master record (published with <strong>Publish</strong> to <code>data/hostel_runs.json</code>). QA officers can <strong>Edit</strong> marks only with an official <strong>REF</strong> and reason; changes are written to the audit log and listed on the run.</p>
+              <div style="overflow:auto">
+                <table class="data-table">
+                  <thead><tr><th>Period</th><th>Students</th><th>Absentees</th><th>Total fine</th><th>Created</th><th>Amendments</th><th class="qa-edit-only"></th></tr></thead>
+                  <tbody id="hostelRunsBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
           <div class="card" id="hostelResults" hidden>
             <div class="card__header"><h3>Preview — Absentees only</h3></div>
             <div class="card__body" style="overflow-x:auto">
@@ -1164,7 +1184,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=59"></script>
+  <script src="app.js?v=60"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>
@@ -1217,5 +1237,39 @@
       </form>
     </div>
   </div>
+
+  <div class="modal" id="hostelRunModal" hidden>
+    <div class="modal__backdrop" id="hostelRunModalBackdrop"></div>
+    <div class="modal__dialog" style="max-width:960px;width:96%">
+      <div class="modal__header">
+        <h3 id="hostelRunModalTitle">Hostel run</h3>
+        <button type="button" class="btn btn--ghost btn--sm" id="btnCloseHostelRunModal" aria-label="Close">×</button>
+      </div>
+      <div class="modal__body">
+        <div id="hostelRunModalMeta"></div>
+        <div id="hostelRunModalTable"></div>
+        <div id="hostelRunAmendBlock" hidden style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border,#e2e8f0)">
+          <p class="muted-note" style="margin:0 0 8px">Editing the master hostel sheet requires an official REF and a reason (same standard as lecture log amendments).</p>
+          <div class="form-grid">
+            <label class="field field--full"><span class="field__label">Official REF <span class="req">*</span></span>
+              <input type="text" id="hostelRunEditRef" placeholder="REF/EOCNS/QA/####" autocomplete="off" />
+            </label>
+            <label class="field field--full"><span class="field__label">Reason for change <span class="req">*</span></span>
+              <textarea id="hostelRunEditReason" rows="2" placeholder="e.g. Student was on clinical posting — mark present for 12th"></textarea>
+            </label>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <h4 style="margin:0 0 6px;font-size:0.9rem">Amendment history</h4>
+          <ul id="hostelRunAmendmentsList" style="margin:0;padding-left:18px"></ul>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button type="button" class="btn btn--ghost" id="btnCancelHostelRunEdit">Close</button>
+        <button type="button" class="btn btn--primary" id="btnSaveHostelRunEdit">Save with REF</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

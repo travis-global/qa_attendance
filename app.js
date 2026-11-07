@@ -1406,6 +1406,213 @@ function downloadHostelWorkbook(absentees, dayHeaders, filename) {
   XLSX.writeFile(wb, filename);
 }
 
+
+/** List saved hostel runs (master sheet) — newest first. */
+async function renderHostelRunsMaster() {
+  var body = document.getElementById("hostelRunsBody");
+  var countEl = document.getElementById("hostelRunsCount");
+  if (!body) return;
+  var runs = [];
+  try { runs = await getAll("hostel_runs"); } catch (_) { runs = []; }
+  runs = (runs || []).slice().sort(function(a, b) {
+    return String(b.createdAt || b.updatedAt || "").localeCompare(String(a.createdAt || a.updatedAt || ""));
+  });
+  if (countEl) countEl.textContent = runs.length + " run" + (runs.length === 1 ? "" : "s");
+  if (!runs.length) {
+    body.innerHTML = '<tr><td colspan="7" class="muted-note">No hostel runs saved yet. Generate a report from a gate export to create the first master record.</td></tr>';
+    return;
+  }
+  body.innerHTML = runs.map(function(r) {
+    var period = (r.start || "?") + " → " + (r.end || "?");
+    var amendN = (r.amendments && r.amendments.length) || 0;
+    return '<tr data-hr-id="' + escapeHtml(r.id) + '">' +
+      '<td>' + escapeHtml(period) + '</td>' +
+      '<td>' + escapeHtml(String(r.studentCount != null ? r.studentCount : (r.matrix ? r.matrix.length : "—"))) + '</td>' +
+      '<td>' + escapeHtml(String(r.absenteeCount != null ? r.absenteeCount : (r.rows ? r.rows.length : "—"))) + '</td>' +
+      '<td>₦' + Number(r.totalFine || 0).toLocaleString("en-NG") + '</td>' +
+      '<td>' + escapeHtml((r.createdAt || "").slice(0, 16).replace("T", " ")) + '</td>' +
+      '<td>' + (amendN ? (amendN + " edit(s)") : "—") + '</td>' +
+      '<td class="qa-edit-only" style="white-space:nowrap">' +
+        '<button type="button" class="btn btn--ghost btn--sm" data-hr-view="' + escapeHtml(r.id) + '">View</button> ' +
+        '<button type="button" class="btn btn--ghost btn--sm" data-hr-edit="' + escapeHtml(r.id) + '">Edit</button>' +
+      '</td></tr>';
+  }).join("");
+  body.querySelectorAll("[data-hr-view]").forEach(function(btn) {
+    btn.addEventListener("click", function() { openHostelRunViewer(btn.getAttribute("data-hr-view"), false); });
+  });
+  body.querySelectorAll("[data-hr-edit]").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      if (!isQaOfficer()) { alert("Sign in as QA Officer to edit the hostel master sheet."); return; }
+      openHostelRunViewer(btn.getAttribute("data-hr-edit"), true);
+    });
+  });
+}
+
+async function openHostelRunViewer(id, editable) {
+  var runs = await getAll("hostel_runs");
+  var run = (runs || []).find(function(r) { return r.id === id; });
+  if (!run) { alert("Hostel run not found."); return; }
+  window.__hostelEditRun = run;
+  window.__hostelEditMode = !!editable;
+  var modal = document.getElementById("hostelRunModal");
+  var title = document.getElementById("hostelRunModalTitle");
+  var meta = document.getElementById("hostelRunModalMeta");
+  var tableWrap = document.getElementById("hostelRunModalTable");
+  var amendBox = document.getElementById("hostelRunAmendBlock");
+  if (title) title.textContent = (editable ? "Edit" : "View") + " hostel run · " + (run.start || "") + " → " + (run.end || "");
+  if (meta) {
+    meta.innerHTML = "<p class='muted-note' style='margin:0 0 8px'><strong>Rate:</strong> ₦" + Number(run.rate || 0).toLocaleString("en-NG") +
+      "/day · <strong>Absentees:</strong> " + (run.absenteeCount || 0) +
+      " · <strong>Total fine:</strong> ₦" + Number(run.totalFine || 0).toLocaleString("en-NG") +
+      " · <strong>Students:</strong> " + (run.studentCount || (run.matrix && run.matrix.length) || "—") +
+      "</p>";
+  }
+  var headers = run.dayHeaders || (run.dateKeys || []).map(function(k) { return k.slice(8); });
+  var rowsSrc = (run.matrix && run.matrix.length) ? run.matrix : (run.rows || []);
+  // Absentees-only fallback for older runs
+  var show = rowsSrc;
+  var head = "<tr><th>#</th><th>Name</th><th>Reg. No</th><th>Hostel</th>" +
+    headers.map(function(h) { return "<th>" + escapeHtml(String(h)) + "</th>"; }).join("") +
+    "<th>Days</th><th>Fine (₦)</th></tr>";
+  var body = show.map(function(r, i) {
+    var marks = r.dayMarks || [];
+    var markCells = headers.map(function(_, di) {
+      var m = marks[di] || "";
+      if (editable) {
+        return '<td><select data-hr-mark="' + i + ':' + di + '" class="hr-mark-sel">' +
+          '<option value="P"' + (m === "P" ? " selected" : "") + '>P</option>' +
+          '<option value="A"' + (m === "A" ? " selected" : "") + '>A</option>' +
+          '</select></td>';
+      }
+      return "<td>" + escapeHtml(m || "—") + "</td>";
+    }).join("");
+    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(r.name || "") + "</td><td>" + escapeHtml(r.regNo || "") +
+      "</td><td>" + escapeHtml(r.hostel || "") + "</td>" + markCells +
+      "<td data-hr-days='" + i + "'>" + (r.absentDays != null ? r.absentDays : "—") + "</td>" +
+      "<td data-hr-fine='" + i + "'>" + Number(r.fine || 0).toLocaleString("en-NG") + "</td></tr>";
+  }).join("");
+  if (tableWrap) tableWrap.innerHTML = "<div style='overflow:auto;max-height:50vh'><table class='data-table' id='hostelRunEditTable'><thead>" + head + "</thead><tbody>" + body + "</tbody></table></div>";
+  if (amendBox) {
+    amendBox.hidden = !editable;
+    var refEl = document.getElementById("hostelRunEditRef");
+    var reasonEl = document.getElementById("hostelRunEditReason");
+    if (refEl) refEl.value = "";
+    if (reasonEl) reasonEl.value = "";
+  }
+  var hist = document.getElementById("hostelRunAmendmentsList");
+  if (hist) {
+    var am = run.amendments || [];
+    hist.innerHTML = am.length ? am.map(function(a) {
+      return "<li><strong>" + escapeHtml(a.ref || "") + "</strong> — " + escapeHtml(a.reason || "") +
+        " <span class='muted-note'>(" + escapeHtml((a.at || "").slice(0, 16).replace("T", " ")) + (a.by ? " · " + escapeHtml(a.by) : "") + ")</span></li>";
+    }).join("") : "<li class='muted-note'>No amendments yet.</li>";
+  }
+  var saveBtn = document.getElementById("btnSaveHostelRunEdit");
+  if (saveBtn) saveBtn.hidden = !editable;
+  if (modal) modal.hidden = false;
+
+  if (editable && tableWrap) {
+    tableWrap.querySelectorAll("select.hr-mark-sel").forEach(function(sel) {
+      sel.addEventListener("change", function() {
+        recalcHostelRunEditPreview();
+      });
+    });
+  }
+}
+
+function recalcHostelRunEditPreview() {
+  var run = window.__hostelEditRun;
+  if (!run) return;
+  var rate = Number(run.rate || 0);
+  var table = document.getElementById("hostelRunEditTable");
+  if (!table) return;
+  var rowsSrc = (run.matrix && run.matrix.length) ? run.matrix : (run.rows || []);
+  var nDays = (run.dayHeaders || run.dateKeys || []).length;
+  rowsSrc.forEach(function(r, i) {
+    var absent = 0;
+    for (var di = 0; di < nDays; di++) {
+      var sel = table.querySelector('select[data-hr-mark="' + i + ':' + di + '"]');
+      var m = sel ? sel.value : ((r.dayMarks || [])[di] || "A");
+      if (m === "A") absent++;
+    }
+    var daysEl = table.querySelector('[data-hr-days="' + i + '"]');
+    var fineEl = table.querySelector('[data-hr-fine="' + i + '"]');
+    if (daysEl) daysEl.textContent = String(absent);
+    if (fineEl) fineEl.textContent = (absent * rate).toLocaleString("en-NG");
+  });
+}
+
+async function saveHostelRunEdit() {
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to edit."); return; }
+  var run = window.__hostelEditRun;
+  if (!run) return;
+  var ref = (document.getElementById("hostelRunEditRef") && document.getElementById("hostelRunEditRef").value || "").trim();
+  var reason = (document.getElementById("hostelRunEditReason") && document.getElementById("hostelRunEditReason").value || "").trim();
+  if (!ref) { alert("Official REF is required to edit the hostel master sheet."); return; }
+  if (!reason) { alert("Reason for change is required."); return; }
+  var table = document.getElementById("hostelRunEditTable");
+  var rate = Number(run.rate || 0);
+  var nDays = (run.dayHeaders || run.dateKeys || []).length;
+  var rowsSrc = (run.matrix && run.matrix.length) ? run.matrix : (run.rows || []);
+  var changes = [];
+  rowsSrc.forEach(function(r, i) {
+    var marks = [];
+    var absent = 0;
+    for (var di = 0; di < nDays; di++) {
+      var sel = table && table.querySelector('select[data-hr-mark="' + i + ':' + di + '"]');
+      var prev = (r.dayMarks || [])[di] || "";
+      var m = sel ? sel.value : prev;
+      marks.push(m);
+      if (m === "A") absent++;
+      if (sel && m !== prev) {
+        changes.push({ student: r.name || r.regNo || ("#" + i), dayIndex: di, from: prev, to: m });
+      }
+    }
+    r.dayMarks = marks;
+    r.absentDays = absent;
+    r.fine = absent * rate;
+  });
+  if (run.matrix && run.matrix.length) run.matrix = rowsSrc;
+  // rebuild absentees rows
+  run.rows = rowsSrc.filter(function(r) { return (r.absentDays || 0) > 0; }).map(function(r) {
+    return { name: r.name, hostel: r.hostel, regNo: r.regNo || "", absentDays: r.absentDays, fine: r.fine, programme: r.programme || "", level: r.level || "", dayMarks: r.dayMarks || [] };
+  });
+  run.absenteeCount = run.rows.length;
+  run.totalFine = run.rows.reduce(function(s, r) { return s + Number(r.fine || 0); }, 0);
+  run.studentCount = rowsSrc.length;
+  run.updatedAt = new Date().toISOString();
+  if (!run.amendments) run.amendments = [];
+  run.amendments.push({
+    ref: ref,
+    reason: reason,
+    at: run.updatedAt,
+    by: "QA Officer",
+    changes: changes.slice(0, 200)
+  });
+  await put("hostel_runs", run);
+  try {
+    await writeAudit({
+      action: "update",
+      entity: "hostel_runs",
+      entityId: run.id,
+      reason: reason,
+      details: { ref: ref, start: run.start, end: run.end, changeCount: changes.length, absenteeCount: run.absenteeCount, totalFine: run.totalFine }
+    });
+  } catch (_) {}
+  markDirty("hostel run edit");
+  alert("Hostel master sheet updated under " + ref + ". Publish so other devices see the change.");
+  closeHostelRunModal();
+  await renderHostelRunsMaster();
+}
+
+function closeHostelRunModal() {
+  var modal = document.getElementById("hostelRunModal");
+  if (modal) modal.hidden = true;
+  window.__hostelEditRun = null;
+  window.__hostelEditMode = false;
+}
+
+
 async function generateHostelReport() {
   const statusEl = document.getElementById("hostelStatus");
   if (!hostelParsedRows) {
@@ -1427,25 +1634,71 @@ async function generateHostelReport() {
     const absentees = buildAbsenteeRowsHostel(result.students, result.attendance, result.dates, rate);
     renderHostelPreview(absentees, dayHeaders, rate);
     window.__lastHostelReport = { absentees: absentees, dayHeaders: dayHeaders, rate: rate, startDate: startDate, endDate: endDate, students: result.students, dates: result.dates };
-    // Persist run for audit trail (snapshot of hostel at report time)
+    // Persist full master run (editable by QA with REF; published to data/hostel_runs.json)
+    var dateKeys = (result.dates || []).map(function(d) { return toDateKeyHostel(d); });
+    var matrix = [];
+    Object.keys(result.students || {}).forEach(function(sid) {
+      var meta = result.students[sid] || {};
+      var presentSet = result.attendance[sid] || new Set();
+      var dayMarks = dateKeys.map(function(k) { return presentSet.has ? (presentSet.has(k) ? "P" : "A") : (presentSet[k] ? "P" : "A"); });
+      // presentSet may be a Set
+      if (presentSet && typeof presentSet.has === "function") {
+        dayMarks = dateKeys.map(function(k) { return presentSet.has(k) ? "P" : "A"; });
+      }
+      var absentDays = dayMarks.filter(function(m) { return m === "A"; }).length;
+      matrix.push({
+        studentId: sid,
+        name: meta.name || "",
+        regNo: meta.regNo || "",
+        hostel: meta.hostel || "",
+        programme: meta.programme || "",
+        level: meta.level || "",
+        dayMarks: dayMarks,
+        absentDays: absentDays,
+        fine: absentDays * rate
+      });
+    });
+    matrix.sort(function(a, b) {
+      var ha = String(a.hostel || "");
+      var hb = String(b.hostel || "");
+      if (ha !== hb) return ha.localeCompare(hb);
+      return String(a.name || "").localeCompare(String(b.name || ""));
+    });
     const run = {
       id: "hr_" + Date.now().toString(36),
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       start: toDateKeyHostel(startDate),
       end: toDateKeyHostel(endDate),
       rate: rate,
+      dateKeys: dateKeys,
+      dayHeaders: dayHeaders,
       absenteeCount: absentees.length,
       totalFine: absentees.reduce(function(s, r) { return s + r.fine; }, 0),
+      studentCount: matrix.length,
       rows: absentees.map(function(r) {
-        return { name: r.name, hostel: r.hostel, regNo: r.regNo || "", absentDays: r.absentDays, fine: r.fine, programme: r.programme || "", level: r.level || "" };
+        return { name: r.name, hostel: r.hostel, regNo: r.regNo || "", absentDays: r.absentDays, fine: r.fine, programme: r.programme || "", level: r.level || "", dayMarks: r.dayMarks || [] };
       }),
-      note: "Hostel labels taken from student master at generation time. Machine Location ID ignored."
+      matrix: matrix,
+      amendments: [],
+      note: "Hostel labels taken from student master at generation time. Machine Location ID ignored.",
+      source: "gate_export"
     };
     stampSessionFields(run);
-  await put("hostel_runs", run);
+    await put("hostel_runs", run);
+    try {
+      await writeAudit({
+        action: "create",
+        entity: "hostel_runs",
+        entityId: run.id,
+        reason: "Hostel attendance run generated from gate export",
+        details: { start: run.start, end: run.end, rate: run.rate, absenteeCount: run.absenteeCount, totalFine: run.totalFine, studentCount: run.studentCount }
+      });
+    } catch (audErr) { console.warn("hostel audit", audErr); }
     markDirty("hostel report");
-    setHostelStatus("Report ready · " + absentees.length + " absentees · master hostels used · saved locally (Publish to keep).", "ok");
+    setHostelStatus("Report ready · " + absentees.length + " absentees · saved to master hostel sheet (Publish to keep on all devices).", "ok");
     renderProfessionalHostelPreview(absentees, dayHeaders, rate, startDate, endDate);
+    try { await renderHostelRunsMaster(); } catch (_) {}
   } catch (err) {
     console.error(err);
     setHostelStatus("Failed: " + (err.message || String(err)), "error");
@@ -1595,6 +1848,13 @@ openDB().then(async () => {
     const results = document.getElementById("hostelResults");
     if (results) results.hidden = true;
   });
+
+  document.getElementById("btnRefreshHostelRuns")?.addEventListener("click", function() { renderHostelRunsMaster(); });
+  document.getElementById("btnCloseHostelRunModal")?.addEventListener("click", closeHostelRunModal);
+  document.getElementById("btnCancelHostelRunEdit")?.addEventListener("click", closeHostelRunModal);
+  document.getElementById("btnSaveHostelRunEdit")?.addEventListener("click", function() { saveHostelRunEdit(); });
+  document.getElementById("hostelRunModalBackdrop")?.addEventListener("click", closeHostelRunModal);
+
 
   // QA module
   seedQaDatalists();
