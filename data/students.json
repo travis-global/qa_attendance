@@ -10,6 +10,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvushczvayk97"
   },
   {
@@ -23,6 +24,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvs9sf0ar5n1h"
   },
   {
@@ -36,6 +38,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvuqkwj4jxpg4"
   },
   {
@@ -49,6 +52,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvs9weg9bwro3"
   },
   {
@@ -62,6 +66,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvutdrx8ric9j"
   },
   {
@@ -75,6 +80,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvsa1ixajo7p5"
   },
   {
@@ -88,7 +94,22 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvus6j4xiyiyj"
+  },
+  {
+    "serial": "",
+    "name": "ALI PHILOMINA OWO",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0014/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mw67dn6h9zseo"
   },
   {
     "serial": "",
@@ -101,6 +122,7 @@
     "status": "Active",
     "gender": "Male",
     "phone": "",
+    "email": "",
     "id": "stu_mvuvud1olx5d9"
   },
   {
@@ -114,6 +136,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvut5nvk7ujtg"
   },
   {
@@ -127,6 +150,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdach9mpa2"
   },
   {
@@ -140,6 +164,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacikidli"
   },
   {
@@ -153,6 +178,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacn2nxla"
   },
   {
@@ -166,6 +192,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvuskvyq43dmp"
   },
   {
@@ -179,6 +206,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacbd3ah0"
   },
   {
@@ -192,6 +220,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusjuz7ekrzs"
   },
   {
@@ -205,6 +234,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvs9zw3zonn45"
   },
   {
@@ -218,6 +248,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusbc9awsly1"
   },
   {
@@ -231,6 +262,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvuszawbbvyhs"
   },
   {
@@ -244,6 +276,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacfkn0tn"
   },
   {
@@ -257,6 +290,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdaccyvwcj"
   },
   {
@@ -270,6 +304,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdaccp539e"
   },
   {
@@ -283,6 +318,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdact60iwr"
   },
   {
@@ -296,6 +332,7 @@
     "status": "Active",
     "gender": "Male",
     "phone": "",
+    "email": "",
     "id": "stu_mvuse3qdx34vp"
   },
   {
@@ -309,6 +346,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacg4sae8"
   },
   {
@@ -322,6 +360,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdaco1opwx"
   },
   {
@@ -335,6 +374,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdac8q3req"
   },
   {
@@ -348,6 +388,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvs9x0s03o79p"
   },
   {
@@ -361,6 +402,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacb9ybem"
   },
   {
@@ -374,6 +416,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacswa9nh"
   },
   {
@@ -387,6 +430,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacppx2hn"
   },
   {
@@ -400,6 +444,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacdgjitg"
   },
   {
@@ -413,6 +458,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdaci05e3p"
   },
   {
@@ -426,6 +472,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdac9fx74v"
   },
   {
@@ -439,6 +486,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacldpf3b"
   },
   {
@@ -452,6 +500,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacqoeexw"
   },
   {
@@ -465,6 +514,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdace5eqsw"
   },
   {
@@ -478,6 +528,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdac98xsdi"
   },
   {
@@ -491,6 +542,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdactoqmr1"
   },
   {
@@ -504,6 +556,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdac9k90w1"
   },
   {
@@ -517,6 +570,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacr05m2j"
   },
   {
@@ -530,6 +584,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdac82qi9z"
   },
   {
@@ -543,6 +598,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvus9jlzexih6"
   },
   {
@@ -556,6 +612,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacei0dw3"
   },
   {
@@ -569,6 +626,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacoj4i46"
   },
   {
@@ -582,6 +640,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusi1cjdbl4v"
   },
   {
@@ -595,6 +654,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusn8llu2sh6"
   },
   {
@@ -608,6 +668,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvutaw9y5l9ra"
   },
   {
@@ -621,6 +682,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvs9t8ea938j5"
   },
   {
@@ -634,6 +696,7 @@
     "status": "Active",
     "gender": "Male",
     "phone": "",
+    "email": "",
     "id": "stu_mvus5mbd6apei"
   },
   {
@@ -647,6 +710,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvs9upequhniy"
   },
   {
@@ -660,6 +724,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacohrlsj"
   },
   {
@@ -673,6 +738,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacqp30ft"
   },
   {
@@ -686,7 +752,22 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvutlmmo85qb9"
+  },
+  {
+    "serial": "",
+    "name": "DEBORAH JUSTICE NKWUDA",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0013/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mw67d51mp9wjb"
   },
   {
     "serial": "",
@@ -699,6 +780,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvussxva4yqga"
   },
   {
@@ -712,6 +794,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvus7j7sm9fvd"
   },
   {
@@ -725,6 +808,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusrwbjh5tdf"
   },
   {
@@ -738,6 +822,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdaciga39e"
   },
   {
@@ -751,6 +836,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacg31flp"
   },
   {
@@ -764,6 +850,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacmzduyr"
   },
   {
@@ -777,6 +864,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacldcr9n"
   },
   {
@@ -790,6 +878,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusj3yrg6aky"
   },
   {
@@ -803,6 +892,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusyisjz94s0"
   },
   {
@@ -816,6 +906,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacdnw9gh"
   },
   {
@@ -829,6 +920,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvus39fetji4l"
   },
   {
@@ -842,6 +934,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvus2lij4nj1m"
   },
   {
@@ -855,6 +948,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacni6oyy"
   },
   {
@@ -868,6 +962,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvs9ypcwwrc67"
   },
   {
@@ -881,6 +976,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusgi7ofd5f2"
   },
   {
@@ -894,6 +990,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacroebrp"
   },
   {
@@ -907,6 +1004,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacanbgyn"
   },
   {
@@ -920,6 +1018,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvs9y1k88z8na"
   },
   {
@@ -933,6 +1032,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvs9vfeplwhks"
   },
   {
@@ -946,7 +1046,22 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacurcvj0"
+  },
+  {
+    "serial": "",
+    "name": "IGWE CHINAZAEKPERE GIFT",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0006/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mw67704txzjg8"
   },
   {
     "serial": "",
@@ -959,6 +1074,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvs98wh5p9wl4"
   },
   {
@@ -972,6 +1088,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacpn8cj5"
   },
   {
@@ -985,6 +1102,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacqxi6oa"
   },
   {
@@ -998,6 +1116,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdachqxkye"
   },
   {
@@ -1011,6 +1130,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvutfa7oa0sxs"
   },
   {
@@ -1024,6 +1144,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdackzk8m3"
   },
   {
@@ -1037,6 +1158,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvsa27y634fx7"
   },
   {
@@ -1050,6 +1172,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacje8tsn"
   },
   {
@@ -1063,6 +1186,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvut4p5cz6i16"
   },
   {
@@ -1076,6 +1200,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdaclb96tu"
   },
   {
@@ -1089,6 +1214,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacksgwcs"
   },
   {
@@ -1102,6 +1228,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacrqvw23"
   },
   {
@@ -1115,6 +1242,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvutitt5cul62"
   },
   {
@@ -1128,6 +1256,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacpbsbsd"
   },
   {
@@ -1141,6 +1270,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacm0vm38"
   },
   {
@@ -1154,7 +1284,22 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvut1kwa5st7x"
+  },
+  {
+    "serial": "",
+    "name": "NNUBIA PERPETUAL S.",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0010/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mw67adicgi2fl"
   },
   {
     "serial": "",
@@ -1167,6 +1312,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvut6bmvqvkb2"
   },
   {
@@ -1180,6 +1326,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvutaaa7rev1c"
   },
   {
@@ -1193,7 +1340,22 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvuvhs537c9h1"
+  },
+  {
+    "serial": "",
+    "name": "NWONUMARA NNEKA I.",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0008/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mw678r1u6tqw3"
   },
   {
     "serial": "",
@@ -1206,6 +1368,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvuqnhqvy2qjq"
   },
   {
@@ -1219,6 +1382,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvutjlzdukcm7"
   },
   {
@@ -1232,7 +1396,22 @@
     "status": "Active",
     "gender": "Male",
     "phone": "",
+    "email": "",
     "id": "stu_mvs97qu2t30of"
+  },
+  {
+    "serial": "",
+    "name": "OGBONNA CHINECHEREM E.",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0007/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mw677pi8uzxb6"
   },
   {
     "serial": "",
@@ -1245,6 +1424,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvutfwoi47rfc"
   },
   {
@@ -1258,6 +1438,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacamifn8"
   },
   {
@@ -1271,6 +1452,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvuqp5gp9bco2"
   },
   {
@@ -1284,6 +1466,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusajpbujcny"
   },
   {
@@ -1297,6 +1480,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvs9r9mcnoi4p"
   },
   {
@@ -1310,6 +1494,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvuswtwcheowa"
   },
   {
@@ -1323,6 +1508,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusr6d2j8kaa"
   },
   {
@@ -1336,7 +1522,36 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvuqo9eva0kwf"
+  },
+  {
+    "serial": "",
+    "name": "OKORIE BLESSING CHUKWU",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0011/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mw67bbj36qvgm"
+  },
+  {
+    "serial": "",
+    "name": "OKORO GIFT",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0009/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mw679ph9b040e"
   },
   {
     "serial": "11",
@@ -1349,6 +1564,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdaca2nvyk"
   },
   {
@@ -1362,6 +1578,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusmd3df2hl5"
   },
   {
@@ -1375,6 +1592,7 @@
     "status": "Active",
     "gender": "Male",
     "phone": "",
+    "email": "",
     "id": "stu_mvuscfxa4lhed"
   },
   {
@@ -1388,6 +1606,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdac8leuhu"
   },
   {
@@ -1401,6 +1620,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvut0gx6e9ck9"
   },
   {
@@ -1414,6 +1634,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdac9nlhud"
   },
   {
@@ -1427,6 +1648,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusxpyc8bz5r"
   },
   {
@@ -1440,6 +1662,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacnmw0qu"
   },
   {
@@ -1453,6 +1676,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacfq5dhv"
   },
   {
@@ -1466,6 +1690,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvsa3h5h69t45"
   },
   {
@@ -1479,6 +1704,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdace74bh7"
   },
   {
@@ -1492,6 +1718,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacjavm2e"
   },
   {
@@ -1505,6 +1732,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacmwo1ln"
   },
   {
@@ -1518,6 +1746,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvutd4x0xkesu"
   },
   {
@@ -1531,6 +1760,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdachdxepl"
   },
   {
@@ -1544,6 +1774,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvus4i5v1cebt"
   },
   {
@@ -1557,6 +1788,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvutbp8dike3c"
   },
   {
@@ -1570,6 +1802,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacehprqe"
   },
   {
@@ -1583,6 +1816,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacg08aia"
   },
   {
@@ -1596,6 +1830,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacki4wjo"
   },
   {
@@ -1609,6 +1844,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacf2v41g"
   },
   {
@@ -1622,6 +1858,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvus8jm0h2wzg"
   },
   {
@@ -1635,6 +1872,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdact8l3nk"
   },
   {
@@ -1648,6 +1886,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacbg992e"
   },
   {
@@ -1661,6 +1900,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdaccorrl8"
   },
   {
@@ -1674,6 +1914,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacifi3up"
   },
   {
@@ -1687,6 +1928,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacgqfr22"
   },
   {
@@ -1700,6 +1942,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvutgnuj2crpt"
   },
   {
@@ -1713,6 +1956,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacqif7ex"
   },
   {
@@ -1726,6 +1970,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvutehxvqvlxr"
   },
   {
@@ -1739,7 +1984,22 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacl50nzb"
+  },
+  {
+    "serial": "",
+    "name": "UDEH NGOZI EMELIA",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0012/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mw67cn0ptp552"
   },
   {
     "serial": "",
@@ -1752,6 +2012,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusomywj99lo"
   },
   {
@@ -1765,6 +2026,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvuqpqlvpn2fl"
   },
   {
@@ -1778,6 +2040,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdacsfieq1"
   },
   {
@@ -1791,6 +2054,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvut9mhyt7pwf"
   },
   {
@@ -1804,6 +2068,7 @@
     "status": "Active",
     "gender": "Female",
     "phone": "",
+    "email": "",
     "id": "stu_mvusfrg49oa12"
   },
   {
@@ -1817,6 +2082,7 @@
     "status": "Active",
     "gender": "",
     "phone": "",
+    "email": "",
     "id": "stu_mvrzdac7jzp9s"
   }
 ]
