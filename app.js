@@ -91,8 +91,15 @@ function tryOfficerGateLogin() {
     if (err) { err.hidden = false; err.textContent = "Incorrect PIN. Access remains locked."; }
     return;
   }
+  var nameInput = document.getElementById("officerGateName");
+  var officerName = (nameInput && nameInput.value || "").trim();
+  if (!officerName) officerName = ensureQaOfficerName("");
+  if (!officerName) {
+    if (err) { err.hidden = false; err.textContent = "Enter your full name for the audit trail."; }
+    return;
+  }
   if (err) err.hidden = true;
-  setQaOfficer(true);
+  setQaOfficer(true, officerName);
   var gate = document.getElementById("officerLoginGate");
   var target = (gate && gate.getAttribute("data-target-view")) || "dashboard";
   closeOfficerLoginGate();
@@ -308,10 +315,28 @@ async function writeAudit(opts) {
     const num = await nextRefNumber();
     ref = "REF/EOCNS/QA/" + String(num).padStart(4, "0");
   }
+  var when = new Date();
+  var timestamp = when.toISOString();
+  var officer = (opts.officer || opts.user || "").trim();
+  if (!officer && typeof getQaOfficerName === "function") officer = getQaOfficerName();
+  if (!officer) officer = "QA Officer (name not recorded at sign-in)";
   await put("audit", {
-    ref: ref, action: opts.action, entity: opts.entity, entityId: opts.entityId,
-    reason: opts.reason || "", details: opts.details || {},
-    timestamp: new Date().toISOString(), user: "QA Officer",
+    ref: ref,
+    action: opts.action,
+    entity: opts.entity,
+    entityId: opts.entityId,
+    reason: opts.reason || "",
+    details: opts.details || {},
+    timestamp: timestamp,
+    at: timestamp,
+    createdAt: timestamp,
+    // Human-readable local time for audit tables
+    whenLocal: when.toLocaleString("en-GB", {
+      weekday: "short", year: "numeric", month: "short", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+    }),
+    user: officer,
+    officer: officer,
     source: opts.externalRef ? "official-letter" : "system",
   });
   return ref;
@@ -1178,18 +1203,36 @@ async function renderAuditLog() {
   if (denied) denied.hidden = true;
   if (officer) officer.hidden = false;
   var list = await getAll("audit");
-  list.sort(function(a, b) { return String(b.at || b.createdAt || "").localeCompare(String(a.at || a.createdAt || "")); });
+  list.sort(function(a, b) {
+    return String(b.timestamp || b.at || b.createdAt || "").localeCompare(String(a.timestamp || a.at || a.createdAt || ""));
+  });
   var el = document.getElementById("auditList");
   if (!el) return;
   if (!list.length) {
     el.innerHTML = "<p class=\"muted-note\">No audit entries yet.</p>";
     return;
   }
-  el.innerHTML = "<table class=\"data-table\"><thead><tr><th>When</th><th>Action</th><th>Entity</th><th>Reason / REF</th><th>By</th></tr></thead><tbody>" +
-    list.slice(0, 200).map(function(a) {
-      return "<tr><td>" + escapeHtml((a.at || a.createdAt || "").slice(0, 19).replace("T", " ")) +
-        "</td><td>" + escapeHtml(a.action || "") + "</td><td>" + escapeHtml((a.entity || "") + " " + (a.entityId || "")) +
-        "</td><td>" + escapeHtml(a.reason || a.externalRef || "—") + "</td><td>" + escapeHtml(a.officer || "QA") + "</td></tr>";
+  el.innerHTML = "<table class=\"data-table\"><thead><tr><th>When (exact)</th><th>Action</th><th>Entity</th><th>Reason / REF</th><th>Who (officer)</th></tr></thead><tbody>" +
+    list.slice(0, 300).map(function(a) {
+      var when = a.whenLocal || "";
+      if (!when) {
+        var iso = a.timestamp || a.at || a.createdAt || "";
+        if (iso) {
+          try {
+            when = new Date(iso).toLocaleString("en-GB", {
+              weekday: "short", year: "numeric", month: "short", day: "2-digit",
+              hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+            });
+          } catch (_) { when = String(iso).replace("T", " ").slice(0, 19); }
+        } else when = "—";
+      }
+      var who = a.officer || a.user || "—";
+      var reason = (a.reason || "—") + (a.ref ? (" · " + a.ref) : "");
+      return "<tr><td style=\"white-space:nowrap\">" + escapeHtml(when) +
+        "</td><td>" + escapeHtml(a.action || "") +
+        "</td><td>" + escapeHtml((a.entity || "") + (a.entityId ? (" · " + a.entityId) : "")) +
+        "</td><td>" + escapeHtml(reason) +
+        "</td><td>" + escapeHtml(who) + "</td></tr>";
     }).join("") + "</tbody></table>";
 }
 async function refreshDashboardStats() {
@@ -5608,15 +5651,41 @@ function isQaOfficer() {
   try { return sessionStorage.getItem(QA_PIN_KEY) === "1"; } catch (_) { return false; }
 }
 
-function setQaOfficer(on) {
+function getQaOfficerName() {
   try {
-    if (on) sessionStorage.setItem(QA_PIN_KEY, "1");
-    else sessionStorage.removeItem(QA_PIN_KEY);
+    return (sessionStorage.getItem(QA_OFFICER_NAME_KEY) || "").trim();
+  } catch (_) { return ""; }
+}
+
+/** Require a real officer display name for the session (used on every audit row). */
+function ensureQaOfficerName(existingHint) {
+  var current = getQaOfficerName() || (existingHint || "").trim();
+  var name = current;
+  if (!name) {
+    name = prompt("Enter your full name as QA Officer (recorded on every audit entry):", "");
+  }
+  name = (name || "").trim();
+  if (!name) return null;
+  try { sessionStorage.setItem(QA_OFFICER_NAME_KEY, name); } catch (_) {}
+  return name;
+}
+
+function setQaOfficer(on, officerName) {
+  try {
+    if (on) {
+      sessionStorage.setItem(QA_PIN_KEY, "1");
+      if (officerName && String(officerName).trim()) {
+        sessionStorage.setItem(QA_OFFICER_NAME_KEY, String(officerName).trim());
+      }
+    } else {
+      sessionStorage.removeItem(QA_PIN_KEY);
+      sessionStorage.removeItem(QA_OFFICER_NAME_KEY);
+    }
   } catch (_) {}
   document.body.classList.toggle("role-officer", !!on);
   document.body.classList.toggle("role-viewer", !on);
   updateQaOfficerUI();
-  try { renderAuditLog(); } catch (_) {}
+  try { if (typeof renderAuditLog === "function") renderAuditLog(); } catch (_) {}
 }
 
 function updateQaOfficerUI() {
@@ -5625,6 +5694,8 @@ function updateQaOfficerUI() {
   const inn = document.getElementById("qaAuthLoggedIn");
   if (out) out.hidden = loggedIn;
   if (inn) inn.hidden = !loggedIn;
+  var nameEl = document.getElementById("qaSignedInOfficerName");
+  if (nameEl) nameEl.textContent = loggedIn ? (getQaOfficerName() || "—") : "—";
   var vb = document.getElementById("viewerModeBanner");
   if (vb) vb.hidden = !!loggedIn;
   document.body.classList.toggle("role-officer", !!loggedIn);
@@ -5766,13 +5837,23 @@ function initQaOfficerUI() {
   document.getElementById("officerGatePin")?.addEventListener("keydown", function(e) {
     if (e.key === "Enter") { e.preventDefault(); tryOfficerGateLogin(); }
   });
-  document.getElementById("btnQaLogin")?.addEventListener("click", () => {
+    document.getElementById("btnQaLogin")?.addEventListener("click", () => {
     const pin = (document.getElementById("qaPinInput")?.value || "").trim();
     const err = document.getElementById("qaAuthError");
     if (pin === (APP_CONFIG.qaPin || "EOCNS-QA")) {
-      setQaOfficer(true);
+      var officerName = (document.getElementById("qaOfficerNameInput") && document.getElementById("qaOfficerNameInput").value || "").trim();
+      if (!officerName) {
+        officerName = ensureQaOfficerName("");
+      }
+      if (!officerName) {
+        if (err) { err.hidden = false; err.textContent = "Enter your full name — it is recorded on every audit entry."; }
+        return;
+      }
+      setQaOfficer(true, officerName);
       if (err) err.hidden = true;
       if (document.getElementById("qaPinInput")) document.getElementById("qaPinInput").value = "";
+      var nameEl = document.getElementById("qaSignedInOfficerName");
+      if (nameEl) nameEl.textContent = officerName;
     } else {
       if (err) { err.hidden = false; err.textContent = "Incorrect PIN."; }
     }
