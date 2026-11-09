@@ -2454,14 +2454,14 @@ async function importFullSnapshot(file) {
   var msg = "Snapshot loaded · students " + (counts.students || 0) +
     " · lecturers " + (counts.lecturers || 0) +
     " · QA entries " + (counts.qa_entries || 0) +
-    ". Publish to re
+    ". Publish to repository to make it permanent on GitHub.";
+  alert(msg);
+}
 try {
   window.exportFullSnapshot = exportFullSnapshot;
   window.importFullSnapshot = importFullSnapshot;
 } catch (_) {}
-pository to make it permanent on GitHub.";
-  alert(msg);
-}
+
 
 
 
