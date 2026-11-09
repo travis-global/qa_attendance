@@ -18270,5 +18270,209 @@
     "user": "QA Officer",
     "source": "official-letter",
     "id": 875
+  },
+  {
+    "ref": "REF/EOCNS/QA/16",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mw679ph9b040e",
+    "reason": "Removed from master list",
+    "details": {
+      "name": "OKORO GIFT",
+      "regNo": "TMP-EOCNS/26/0009/GNS"
+    },
+    "timestamp": "2026-11-09T18:50:11.996Z",
+    "user": "QA Officer",
+    "source": "official-letter",
+    "id": 876
+  },
+  {
+    "ref": "REF/EOCNS/QA/16",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mw67bbj36qvgm",
+    "reason": "Removed from master list",
+    "details": {
+      "name": "OKORIE BLESSING CHUKWU",
+      "regNo": "TMP-EOCNS/26/0011/GNS"
+    },
+    "timestamp": "2026-11-09T18:50:39.117Z",
+    "user": "QA Officer",
+    "source": "official-letter",
+    "id": 877
+  },
+  {
+    "ref": "REF/EOCNS/QA/1021",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mw9maskc29hkq",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mw9maskc29hkq",
+        "name": "OGBA JANEFRANCES CHIAMAKA",
+        "regNo": "EOCNS/26/0072/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "Hostel 1",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-09T18:51:35.580Z",
+        "updatedAt": "2026-11-09T18:51:35.580Z"
+      }
+    },
+    "timestamp": "2026-11-09T18:51:35.581Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 878
+  },
+  {
+    "ref": "REF/EOCNS/QA/1022",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mw9mbo2jhjppt",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mw9mbo2jhjppt",
+        "name": "NKWUDA PRECIOUS CHINWE",
+        "regNo": "EOCNS/26/0063/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "Off-campus",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-09T18:52:16.411Z",
+        "updatedAt": "2026-11-09T18:52:16.411Z"
+      }
+    },
+    "timestamp": "2026-11-09T18:52:16.412Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 879
+  },
+  {
+    "ref": "REF/EOCNS/QA/1023",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mw9mcwpoc5abz",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mw9mcwpoc5abz",
+        "name": "CHIDINMA IBE R.",
+        "regNo": "EOCNS/26/0046/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "Hostel 1",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-09T18:53:14.268Z",
+        "updatedAt": "2026-11-09T18:53:14.268Z"
+      }
+    },
+    "timestamp": "2026-11-09T18:53:14.269Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 880
+  },
+  {
+    "ref": "REF/EOCNS/QA/1024",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mw9mdsbg02k7f",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mw9mdsbg02k7f",
+        "name": "ODO CALLISTA KELECHI",
+        "regNo": "EOCNS/26/0076/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "Hostel 1",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-09T18:53:55.228Z",
+        "updatedAt": "2026-11-09T18:53:55.228Z"
+      }
+    },
+    "timestamp": "2026-11-09T18:53:55.230Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 881
+  },
+  {
+    "ref": "REF/EOCNS/QA/1025",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mw9mfbzhnze8w",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mw9mfbzhnze8w",
+        "name": "OLAPO LATEEFAH AYOMIDE",
+        "regNo": "EOCNS/26/0070/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "Hostel 1",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-09T18:55:07.373Z",
+        "updatedAt": "2026-11-09T18:55:07.373Z"
+      }
+    },
+    "timestamp": "2026-11-09T18:55:07.375Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 882
+  },
+  {
+    "ref": "REF/EOCNS/QA/16",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac7jzp9s",
+    "reason": "HOSTEL UPDATE",
+    "details": {
+      "before": {
+        "id": "stu_mvrzdac7jzp9s",
+        "name": "Winner Ifeoma Joseph",
+        "regNo": "EOCNS/200/0001/MID",
+        "programme": "Midwifery",
+        "level": "300",
+        "gender": "",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "email": "",
+        "serial": "1",
+        "createdAt": "2026-11-09T18:47:19.109Z",
+        "updatedAt": "2026-11-09T18:47:19.109Z"
+      },
+      "after": {
+        "id": "stu_mvrzdac7jzp9s",
+        "name": "Winner Ifeoma Joseph",
+        "regNo": "EOCNS/24/0001/MID",
+        "programme": "Midwifery",
+        "level": 300,
+        "gender": "",
+        "hostel": "Off-campus",
+        "status": "Active",
+        "phone": "",
+        "email": "",
+        "serial": "1",
+        "createdAt": "2026-11-09T18:47:19.109Z",
+        "updatedAt": "2026-11-09T18:56:46.496Z"
+      },
+      "photoChanged": false
+    },
+    "timestamp": "2026-11-09T18:56:46.496Z",
+    "user": "QA Officer",
+    "source": "official-letter",
+    "id": 883
   }
 ]
