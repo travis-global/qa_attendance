@@ -2308,33 +2308,77 @@ async function exportFullSnapshot() {
 }
 
 async function importFullSnapshot(file) {
-  if (!isQaOfficer()) return;
+  if (!isQaOfficer()) { alert("Sign in as QA Officer to import a snapshot."); return; }
+  if (!file) return;
   if (!confirm("Import snapshot? This overwrites local master data with the file contents. Publish afterwards to update the repository.")) return;
-  var snap = JSON.parse(await file.text());
+  var text;
+  try { text = await file.text(); } catch (e) { alert("Could not read file."); return; }
+  var snap;
+  try { snap = JSON.parse(text); } catch (e) { alert("Invalid JSON. Use an EOCNS snapshot or full backup file."); return; }
+  // Support full backup v2 shape: { format: "eocns-full-backup", data: { students: [...] } }
+  if (snap && snap.format === "eocns-full-backup" && snap.data) {
+    try {
+      await restoreFullBackupFromFile(file);
+    } catch (err) {
+      alert("Full backup restore failed: " + (err && err.message ? err.message : String(err)));
+    }
+    return;
+  }
+  // Also accept { data: { students: ... } } without format tag
+  if (snap && snap.data && (snap.data.students || snap.data.lecturers) && !snap.students) {
+    snap = snap.data;
+  }
   async function replaceStore(name, rows) {
+    if (!Array.isArray(rows)) return 0;
     var existing = await getAll(name);
     for (var i = 0; i < existing.length; i++) {
       var key = existing[i].id != null ? existing[i].id : (existing[i].code != null ? existing[i].code : existing[i].key);
-      if (key != null) await del(name, key);
+      if (key != null) {
+        try { await del(name, key); } catch (_) {}
+      }
     }
-    for (var j = 0; j < (rows || []).length; j++) await put(name, rows[j]);
+    var n = 0;
+    for (var j = 0; j < rows.length; j++) {
+      try {
+        var row = rows[j];
+        if (name === "students") row = studentFromRepo(row);
+        await put(name, row);
+        n++;
+      } catch (err) { console.warn("import", name, err); }
+    }
+    return n;
   }
-  if (snap.students) await replaceStore("students", snap.students.map(studentFromRepo));
-  if (snap.lecturers) await replaceStore("lecturers", snap.lecturers);
-  if (snap.sessions) await replaceStore("sessions", snap.sessions);
-  if (snap.qa_entries) await replaceStore("qa_entries", snap.qa_entries);
-  if (snap.programmes) await replaceStore("programmes", snap.programmes);
-  if (snap.levels) await replaceStore("levels", snap.levels);
-  if (snap.courses) await replaceStore("courses", snap.courses);
-  if (snap.attendance) await replaceStore("attendance", snap.attendance);
-  if (snap.hostel_runs) await replaceStore("hostel_runs", snap.hostel_runs);
-  if (snap.remedial) await replaceStore("remedial", snap.remedial);
-  if (snap.timetables) TIMETABLES_CACHE = snap.timetables;
+  var counts = {};
+  try {
+    if (snap.students) counts.students = await replaceStore("students", snap.students);
+    if (snap.lecturers) counts.lecturers = await replaceStore("lecturers", snap.lecturers);
+    if (snap.sessions) counts.sessions = await replaceStore("sessions", snap.sessions);
+    if (snap.qa_entries) counts.qa_entries = await replaceStore("qa_entries", snap.qa_entries);
+    if (snap.audit) counts.audit = await replaceStore("audit", snap.audit);
+    if (snap.programmes) counts.programmes = await replaceStore("programmes", snap.programmes);
+    if (snap.levels) counts.levels = await replaceStore("levels", snap.levels);
+    if (snap.courses) counts.courses = await replaceStore("courses", snap.courses);
+    if (snap.attendance) counts.attendance = await replaceStore("attendance", snap.attendance);
+    if (snap.hostel_runs) counts.hostel_runs = await replaceStore("hostel_runs", snap.hostel_runs);
+    if (snap.remedial) counts.remedial = await replaceStore("remedial", snap.remedial);
+    if (snap.discipline) counts.discipline = await replaceStore("discipline", snap.discipline);
+    if (snap.pending_students) counts.pending_students = await replaceStore("pending_students", snap.pending_students);
+    if (snap.timetables) TIMETABLES_CACHE = snap.timetables;
+  } catch (err) {
+    alert("Import failed part-way: " + (err && err.message ? err.message : String(err)));
+    return;
+  }
   markDirty("snapshot import");
-  await renderStudentsTable();
-  refreshDashboardStats();
-  alert("Snapshot loaded into this browser. Publish to repository to make it permanent.");
+  try { await renderStudentsTable(); } catch (_) {}
+  try { await renderLecturersTable(); } catch (_) {}
+  try { refreshDashboardStats(); } catch (_) {}
+  var msg = "Snapshot loaded · students " + (counts.students || 0) +
+    " · lecturers " + (counts.lecturers || 0) +
+    " · QA entries " + (counts.qa_entries || 0) +
+    ". Publish to repository to make it permanent on GitHub.";
+  alert(msg);
 }
+
 
 
 
@@ -4805,6 +4849,20 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
   document.getElementById("btnExportSnapshot") && document.getElementById("btnExportSnapshot").addEventListener("click", exportFullSnapshot);
   document.getElementById("btnImportSnapshot") && document.getElementById("btnImportSnapshot").addEventListener("click", function() {
     document.getElementById("snapshotFileInput") && document.getElementById("snapshotFileInput").click();
+  });
+
+  document.getElementById("btnFullBackupDownload") && document.getElementById("btnFullBackupDownload").addEventListener("click", function() {
+    if (typeof downloadFullBackup === "function") downloadFullBackup();
+  });
+  document.getElementById("btnFullBackupRestore") && document.getElementById("btnFullBackupRestore").addEventListener("click", function() {
+    var inp = document.getElementById("fullBackupFileInput");
+    if (inp) inp.click();
+  });
+  document.getElementById("fullBackupFileInput") && document.getElementById("fullBackupFileInput").addEventListener("change", function(e) {
+    if (e.target.files && e.target.files[0] && typeof restoreFullBackupFromFile === "function") {
+      restoreFullBackupFromFile(e.target.files[0]);
+      e.target.value = "";
+    }
   });
   document.getElementById("snapshotFileInput") && document.getElementById("snapshotFileInput").addEventListener("change", function(e) {
     if (e.target.files && e.target.files[0]) importFullSnapshot(e.target.files[0]);
@@ -7373,34 +7431,7 @@ async function exportFullSnapshot() {
   downloadJsonReport("EOCNS_Snapshot_" + new Date().toISOString().slice(0, 10) + ".json", snap);
 }
 
-async function importFullSnapshot(file) {
-  if (!isQaOfficer()) return;
-  if (!confirm("Import snapshot? This overwrites local master data with the file contents. Publish afterwards to update the repository.")) return;
-  var snap = JSON.parse(await file.text());
-  async function replaceStore(name, rows) {
-    var existing = await getAll(name);
-    for (var i = 0; i < existing.length; i++) {
-      var key = existing[i].id != null ? existing[i].id : (existing[i].code != null ? existing[i].code : existing[i].key);
-      if (key != null) await del(name, key);
-    }
-    for (var j = 0; j < (rows || []).length; j++) await put(name, rows[j]);
-  }
-  if (snap.students) await replaceStore("students", snap.students.map(studentFromRepo));
-  if (snap.lecturers) await replaceStore("lecturers", snap.lecturers);
-  if (snap.sessions) await replaceStore("sessions", snap.sessions);
-  if (snap.qa_entries) await replaceStore("qa_entries", snap.qa_entries);
-  if (snap.programmes) await replaceStore("programmes", snap.programmes);
-  if (snap.levels) await replaceStore("levels", snap.levels);
-  if (snap.courses) await replaceStore("courses", snap.courses);
-  if (snap.attendance) await replaceStore("attendance", snap.attendance);
-  if (snap.hostel_runs) await replaceStore("hostel_runs", snap.hostel_runs);
-  if (snap.remedial) await replaceStore("remedial", snap.remedial);
-  if (snap.timetables) TIMETABLES_CACHE = snap.timetables;
-  markDirty("snapshot import");
-  await renderStudentsTable();
-  refreshDashboardStats();
-  alert("Snapshot loaded into this browser. Publish to repository to make it permanent.");
-}
+/* importFullSnapshot: single definition above */
 
 
 
