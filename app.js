@@ -2708,6 +2708,21 @@ function openReportWindow(title, bodyHtml, officer, format) {
 
 
 
+
+  // Expose report design helpers for generators defined outside this boot block
+  try {
+    window.eocnsReportStyles = eocnsReportStyles;
+    window.reportLetterheadHtml = reportLetterheadHtml;
+    window.reportSignatureHtml = reportSignatureHtml;
+    window.promptOfficerAndFormat = promptOfficerAndFormat;
+    window.collectReportAmendments = collectReportAmendments;
+    window.reportAmendmentsHtml = reportAmendmentsHtml;
+    window.reportGlossaryHtml = reportGlossaryHtml;
+    window.svgDonut = svgDonut;
+    window.svgHBarRows = svgHBarRows;
+    window.openReportWindow = openReportWindow;
+  } catch (e) { console.warn("report helper bind", e); }
+
 function classLabelFromKey(key) {
   var m = String(key || "").match(/^(\d+)_(.+)$/);
   if (!m) return String(key || "CLASS").replace(/_/g, " ").toUpperCase();
@@ -7251,272 +7266,7 @@ function svgBars(items, width, height) {
   return '<svg width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '">' + bars + '</svg>';
 }
 
-function renderProfessionalHostelPreview(absentees, dayHeaders, rate, startDate, endDate) {
-  var host = document.getElementById("hostelResults");
-  if (!host) return;
-  var byHostel = {};
-  absentees.forEach(function(r) {
-    byHostel[r.hostel] = byHostel[r.hostel] || { count: 0, fine: 0 };
-    byHostel[r.hostel].count += 1;
-    byHostel[r.hostel].fine += r.fine;
-  });
-  var totalFine = absentees.reduce(function(s, r) { return s + r.fine; }, 0);
-  var colors = ["#0d9488", "#1d4ed8", "#b45309", "#be123c", "#6d28d9"];
-  var pieSlices = Object.keys(byHostel).map(function(k, i) {
-    return { label: k, value: byHostel[k].count, color: colors[i % colors.length] };
-  });
-  var barItems = Object.keys(byHostel).map(function(k, i) {
-    return { label: k.replace("Hostel ", "H"), value: Math.round(byHostel[k].fine), color: colors[i % colors.length] };
-  });
-  var period = toDateKeyHostel(startDate) + " → " + toDateKeyHostel(endDate);
-  var summaryHtml =
-    '<div class="pro-report" style="margin-top:16px">' +
-    '<h3 style="margin:0 0 8px">Executive summary — Hostel boarding fee</h3>' +
-    '<p style="margin:0 0 12px;line-height:1.5">Period <strong>' + period + '</strong>. Rate <strong>' + formatNairaHostel(rate) + '</strong> per absent night. ' +
-    '<strong>' + absentees.length + '</strong> students incurred charges totalling <strong>' + formatNairaHostel(totalFine) + '</strong>. ' +
-    'Hostel labels use the <em>majority Location ID</em> (1 → Hostel 1, 2 → Hostel 2) on check-ins in the period; the student master list is the fallback when Location ID is missing or tied.</p>' +
-    '<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin-bottom:16px">' +
-    '<div><div class="muted-note">Absentees by hostel</div>' + svgPie(pieSlices, 150) + '</div>' +
-    '<div><div class="muted-note">Fines by hostel (₦)</div>' + svgBars(barItems, 280, 130) + '</div></div>' +
-    '<button type="button" class="btn btn--primary" id="btnPrintHostelPack">Print professional hostel pack</button>' +
-    '</div>';
-  var existing = host.querySelector(".pro-report");
-  if (existing) existing.remove();
-  host.insertAdjacentHTML("beforeend", summaryHtml);
-  document.getElementById("btnPrintHostelPack") && document.getElementById("btnPrintHostelPack").addEventListener("click", function() {
-    printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, endDate, pieSlices, barItems);
-  });
-}
-
-function printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, endDate, pieSlices, barItems) {
-  var totalFine = absentees.reduce(function(s, r) { return s + r.fine; }, 0);
-  var period = toDateKeyHostel(startDate) + " to " + toDateKeyHostel(endDate);
-  var rows = absentees.map(function(r, i) {
-    return "<tr><td>" + (i + 1) + "</td><td>" + r.name + "</td><td>" + (r.regNo || "") + "</td><td>" + r.hostel +
-      "</td><td>" + r.absentDays + "</td><td>" + formatNairaHostel(r.fine) + "</td></tr>";
-  }).join("");
-  var w = window.open("", "_blank");
-  if (!w) return;
-  w.document.write("<!DOCTYPE html><html><head><title>EOCNS Hostel Boarding Fee Report</title><style>" +
-    "body{font-family:Georgia,'Times New Roman',serif;color:#111;padding:28px;max-width:900px;margin:0 auto}" +
-    "h1{color:#1B3A6B;text-align:center;margin-bottom:4px;font-size:1.35rem}" +
-    ".sub{text-align:center;color:#555;margin-bottom:20px;font-size:13px}" +
-    "h2{color:#1B3A6B;font-size:1.05rem;border-bottom:2px solid #1B3A6B;padding-bottom:4px;margin-top:28px}" +
-    "table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}" +
-    "th{background:#1B3A6B;color:#fff;padding:7px 8px;text-align:left} td{border:1px solid #ccc;padding:6px 8px}" +
-    "tr:nth-child(even) td{background:#f5f7fb}" +
-    ".kpi{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}" +
-    ".kpi div{flex:1;min-width:120px;background:#f0f9f8;border:1px solid #99e6df;border-radius:8px;padding:12px;text-align:center}" +
-    ".kpi strong{display:block;font-size:1.25rem;color:#0f766e}" +
-    "p.narrative{line-height:1.55;font-size:13px}" +
-    "@media print{body{padding:12px}}</style></head><body>" +
-    "<h1>Eastern Oak College of Nursing Sciences</h1>" +
-    "<div class=\"sub\">Hostel Boarding Fee / Absentee Report · Official QA Pack</div>" +
-    "<h2>1. Executive summary</h2>" +
-    "<p class=\"narrative\">This report covers <strong>" + period + "</strong> at a charge of <strong>" + formatNairaHostel(rate) +
-    "</strong> per absent night. <strong>" + absentees.length + "</strong> students were absent on one or more nights, generating a combined liability of <strong>" +
-    formatNairaHostel(totalFine) + "</strong>. Hostel placement prefers majority biometric Location ID for the period (stable 1/2), with master-list fallback when the device field is empty or tied. Occasional software mix-ups can still appear — use REF edit on the master run if a row is wrong. Historical published runs remain unchanged if a student is later moved between hostels.</p>" +
-    "<div class=\"kpi\"><div><strong>" + absentees.length + "</strong>Absentees</div>" +
-    "<div><strong>" + formatNairaHostel(totalFine) + "</strong>Total due</div>" +
-    "<div><strong>" + formatNairaHostel(rate) + "</strong>Daily rate</div></div>" +
-    "<h2>2. Distribution</h2>" +
-    "<div style=\"display:flex;gap:24px;flex-wrap:wrap;align-items:center\">" + svgPie(pieSlices, 160) + svgBars(barItems, 300, 140) + "</div>" +
-    "<h2>3. Student liability schedule</h2>" +
-    "<table><thead><tr><th>#</th><th>Name</th><th>Reg. No</th><th>Hostel (master)</th><th>Days</th><th>Amount</th></tr></thead><tbody>" +
-    rows + "</tbody></table>" +
-    "<h2>4. Certification</h2>" +
-    "<p class=\"narrative\">Prepared via the EOCNS QA Attendance System. Location ID majority used for hostel classification; master list as fallback.</p>" +
-    "<p style=\"margin-top:36px\">QA Officer: ______________________ &nbsp;&nbsp; Date: ______________</p>" +
-    "</body></html>");
-  w.document.close();
-  setTimeout(function() { w.print(); }, 350);
-}
-
-async function printFullQaPack() {
-  var entries = window.__lastReportEntries;
-  if (!entries || !entries.length) {
-    // build from filters
-    await renderReportsView();
-    entries = window.__lastReportEntries || [];
-  }
-  if (!entries.length) { alert("No lecture logs in the selected range. Set From/To and filter first."); return; }
-  var held = entries.filter(function(e) { return e.status === "Held"; }).length;
-  var missed = entries.filter(function(e) { return e.status === "Missed"; }).length;
-  var partial = entries.filter(function(e) { return e.status === "Partial"; }).length;
-  var other = entries.length - held - missed - partial;
-  var pie = [
-    { label: "Held", value: held, color: "#0d9488" },
-    { label: "Missed", value: missed, color: "#be123c" },
-    { label: "Partial", value: partial, color: "#b45309" },
-    { label: "Other", value: other, color: "#64748b" }
-  ].filter(function(x) { return x.value > 0; });
-  var byCourse = {};
-  entries.forEach(function(e) {
-    var c = e.course || "Unknown";
-    byCourse[c] = byCourse[c] || { held: 0, total: 0 };
-    byCourse[c].total += 1;
-    if (e.status === "Held") byCourse[c].held += 1;
-  });
-  var bars = Object.keys(byCourse).slice(0, 8).map(function(c) {
-    return { label: c.slice(0, 8), value: byCourse[c].held, color: "#1d4ed8" };
-  });
-  var compliance = entries.length ? Math.round((held / entries.length) * 100) : 0;
-  var blocks = entries.map(function(e, i) {
-    return "<tr><td>" + (i + 1) + "</td><td>" + (e.date || "") + "</td><td>" + (e.course || "") + "</td><td>" + (e.lecturer || "") +
-      "</td><td>" + (e.status || "") + "</td><td>" + (e.topic || "—") + "</td></tr>";
-  }).join("");
-  var w = window.open("", "_blank");
-  if (!w) return;
-  w.document.write("<!DOCTYPE html><html><head><title>EOCNS QA Lecture Compliance Pack</title><style>" +
-    "body{font-family:Georgia,serif;color:#111;padding:28px;max-width:920px;margin:0 auto}" +
-    "h1{color:#1B3A6B;text-align:center;font-size:1.35rem;margin-bottom:4px}" +
-    ".sub{text-align:center;color:#555;margin-bottom:18px;font-size:13px}" +
-    "h2{color:#1B3A6B;font-size:1.05rem;border-bottom:2px solid #1B3A6B;padding-bottom:4px;margin-top:26px}" +
-    "table{width:100%;border-collapse:collapse;font-size:12px} th{background:#1B3A6B;color:#fff;padding:7px} td{border:1px solid #ccc;padding:6px}" +
-    "tr:nth-child(even) td{background:#f5f7fb} p{line-height:1.55;font-size:13px}" +
-    ".kpi{display:flex;gap:10px;flex-wrap:wrap}.kpi div{flex:1;min-width:110px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px;text-align:center}" +
-    ".kpi strong{display:block;font-size:1.2rem;color:#1d4ed8}" +
-    "</style></head><body>" +
-    "<h1>Eastern Oak College of Nursing Sciences</h1>" +
-    "<div class=\"sub\">Quality Assurance · Lecture Compliance Pack</div>" +
-    "<h2>1. Executive summary</h2>" +
-    "<p>This pack consolidates <strong>" + entries.length + "</strong> lecture log entries. Delivery compliance (status Held) stands at <strong>" +
-    compliance + "%</strong> (" + held + " held, " + missed + " missed, " + partial + " partial). Charts below summarise status mix and held sessions by course. Detailed logs follow for audit and filing.</p>" +
-    "<div class=\"kpi\"><div><strong>" + entries.length + "</strong>Logs</div><div><strong>" + compliance + "%</strong>Held rate</div>" +
-    "<div><strong>" + missed + "</strong>Missed</div></div>" +
-    "<h2>2. Status mix & course delivery</h2>" +
-    "<div style=\"display:flex;gap:20px;flex-wrap:wrap;align-items:center\">" + svgPie(pie, 150) + svgBars(bars, 320, 140) + "</div>" +
-    "<h2>3. Lecture log register</h2>" +
-    "<table><thead><tr><th>#</th><th>Date</th><th>Course</th><th>Lecturer</th><th>Status</th><th>Topic</th></tr></thead><tbody>" +
-    blocks + "</tbody></table>" +
-    "<h2>4. Certification</h2><p>Generated by the EOCNS QA Attendance System for internal quality review.</p>" +
-    "<p style=\"margin-top:32px\">QA Officer: ______________________ &nbsp;&nbsp; Date: ______________</p>" +
-    "</body></html>");
-  w.document.close();
-  setTimeout(function() { w.print(); }, 350);
-}
-
-async function renderTimetableBoard() {
-  await ensureTimetables();
-  var key = (document.getElementById("ttBoardClass") && document.getElementById("ttBoardClass").value) || "100_nursing";
-  var tt = TIMETABLES_CACHE[key] || { slots: [] };
-  var days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
-  var byDay = { 0: [], 1: [], 2: [], 3: [], 4: [] };
-  (tt.slots || []).forEach(function(s) {
-    var d = Number(s.weekday);
-    if (byDay[d]) byDay[d].push(s);
-  });
-  var cols = days.map(function(name, d) {
-    var cells = (byDay[d] || []).map(function(s) {
-      return '<button type="button" class="tt-slot" data-tt-code="' + escapeHtml(s.code || "") + '" data-tt-start="' + escapeHtml(s.start || "") + '">' +
-        '<strong>' + escapeHtml(s.code || "?") + '</strong><span>' + escapeHtml((s.start || "") + "–" + (s.end || "")) + '</span></button>';
-    }).join("") || '<span class="muted-note">—</span>';
-    return '<div class="tt-col"><div class="tt-col-h">' + name + '</div>' + cells + '</div>';
-  }).join("");
-  var board = document.getElementById("timetableBoard");
-  if (board) board.innerHTML = '<div class="card__body"><div class="tt-grid">' + cols + '</div></div>';
-  board && board.querySelectorAll(".tt-slot").forEach(function(btn) {
-    btn.addEventListener("click", async function() {
-      if (!isQaOfficer()) { alert("Sign in as QA Officer to log from the board."); return; }
-      await openQaEntryForm(null);
-      document.getElementById("qaEntryClass").value = key;
-      var code = btn.getAttribute("data-tt-code");
-      var start = btn.getAttribute("data-tt-start");
-      var courseSel = document.getElementById("qaEntryCourse");
-      if (courseSel && code) {
-        for (var i = 0; i < courseSel.options.length; i++) {
-          if (courseSel.options[i].value.indexOf(code) === 0) { courseSel.selectedIndex = i; break; }
-        }
-      }
-      if (start && document.getElementById("qaEntryStart")) document.getElementById("qaEntryStart").value = start.length === 4 ? ("0" + start) : start;
-      calcQaDurationMinutes();
-    });
-  });
-}
-
-async function importStudentsCsv(file) {
-  if (!isQaOfficer()) return;
-  var text = await file.text();
-  var lines = text.split(/\r?\n/).filter(function(l) { return l.trim(); });
-  if (lines.length < 2) { alert("CSV needs a header row and data."); return; }
-  function splitCsv(line) {
-    var out = [], cur = "", q = false;
-    for (var i = 0; i < line.length; i++) {
-      var ch = line[i];
-      if (ch === '"') { q = !q; continue; }
-      if (ch === "," && !q) { out.push(cur.trim()); cur = ""; continue; }
-      cur += ch;
-    }
-    out.push(cur.trim());
-    return out;
-  }
-  var headers = splitCsv(lines[0]).map(function(h) { return h.toLowerCase(); });
-  var idx = function(names) {
-    for (var i = 0; i < names.length; i++) {
-      var j = headers.indexOf(names[i]);
-      if (j >= 0) return j;
-    }
-    return -1;
-  };
-  var iName = idx(["name", "full name", "names of students", "student name"]);
-  var iReg = idx(["regno", "reg no", "reg. no", "registration number", "reg"]);
-  var iProg = idx(["programme", "program", "department"]);
-  var iLevel = idx(["level"]);
-  var iHostel = idx(["hostel"]);
-  if (iName < 0) { alert("CSV must include a Name column."); return; }
-  var added = 0;
-  for (var r = 1; r < lines.length; r++) {
-    var cols = splitCsv(lines[r]);
-    var name = cols[iName];
-    if (!name) continue;
-    var rec = {
-      id: "stu_" + Date.now().toString(36) + r,
-      name: name,
-      regNo: iReg >= 0 ? (cols[iReg] || "") : "",
-      programme: iProg >= 0 ? (cols[iProg] || "") : "",
-      level: iLevel >= 0 ? (cols[iLevel] || "") : "",
-      hostel: iHostel >= 0 ? (cols[iHostel] || "") : "",
-      status: "Active",
-      gender: "",
-      phone: "",
-      createdAt: new Date().toISOString()
-    };
-    await put("students", rec);
-    added++;
-  }
-  await writeAudit({ action: "create", entity: "students", entityId: "csv_import", reason: "Imported " + added + " students from CSV" });
-  markDirty("student import");
-  await renderStudentsTable();
-  alert("Imported " + added + " students. Publish when ready.");
-}
-
-async function exportFullSnapshot() {
-  if (!isQaOfficer()) return;
-  var snap = {
-    exportedAt: new Date().toISOString(),
-    students: shapeStudentsForRepo(await getAll("students")),
-    lecturers: await getAll("lecturers"),
-    sessions: await getAll("sessions"),
-    qa_entries: await getAll("qa_entries"),
-    audit: await getAll("audit"),
-    programmes: await getAll("programmes"),
-    levels: await getAll("levels"),
-    courses: await getAll("courses"),
-    attendance: await getAll("attendance"),
-    hostel_runs: await getAll("hostel_runs"),
-    remedial: await getAll("remedial"),
-    timetables: TIMETABLES_CACHE || {}
-  };
-  downloadJsonReport("EOCNS_Snapshot_" + new Date().toISOString().slice(0, 10) + ".json", snap);
-}
-
-/* importFullSnapshot: single definition above */
-
-
-
-
-/* eocnsReportStyles defined once above */
-
+/* renderProfessionalHostelPreview: primary definition earlier */
 
 function formatTimeNice(t) {
   if (!t) return "";
@@ -9568,55 +9318,125 @@ window.generateStudentRegisterReport = generateStudentRegisterReport;
 
 /** Hostel occupancy & distribution report */
 async function generateHostelDistributionReport() {
-  var meta = await promptOfficerAndFormat("Hostel Distribution Report");
+  if (typeof isQaOfficer === "function" && !isQaOfficer()) {
+    if (typeof openOfficerLoginGate === "function") openOfficerLoginGate("hostel");
+    else alert("Sign in as QA Officer to generate the hostel distribution report.");
+    return;
+  }
+  var promptFn = window.promptOfficerAndFormat || (typeof promptOfficerAndFormat === "function" ? promptOfficerAndFormat : null);
+  var letterhead = window.reportLetterheadHtml || (typeof reportLetterheadHtml === "function" ? reportLetterheadHtml : null);
+  var openWin = window.openReportWindow || (typeof openReportWindow === "function" ? openReportWindow : null);
+  var glossary = window.reportGlossaryHtml || (typeof reportGlossaryHtml === "function" ? reportGlossaryHtml : function() { return ""; });
+  var amendmentsHtml = window.reportAmendmentsHtml || (typeof reportAmendmentsHtml === "function" ? reportAmendmentsHtml : function() { return ""; });
+  var collectAmd = window.collectReportAmendments || (typeof collectReportAmendments === "function" ? collectReportAmendments : async function() { return []; });
+  var bars = window.svgHBarRows || (typeof svgHBarRows === "function" ? svgHBarRows : function() { return ""; });
+  var donut = window.svgDonut || (typeof svgDonut === "function" ? svgDonut : function() { return ""; });
+  if (!promptFn || !letterhead || !openWin) {
+    alert("Report engine is still loading. Hard-refresh the page (Ctrl+Shift+R), sign in as QA Officer, then try again.");
+    return;
+  }
+  var meta = await promptFn("Hostel Distribution Report");
   if (!meta) return;
+
   var students = (await getAll("students")).filter(function(s) {
     return !s.status || String(s.status).toLowerCase() === "active";
   });
+  if (!students.length) {
+    alert("No active students on the master list. Load or publish students first.");
+    return;
+  }
+
   var byHostel = {};
+  var byProgramme = {};
+  var unassigned = 0;
   students.forEach(function(s) {
     var h = (s.hostel || "").trim() || "Unassigned";
+    if (h === "Unassigned") unassigned++;
     byHostel[h] = byHostel[h] || [];
     byHostel[h].push(s);
+    var p = (s.programme || "—").trim() || "—";
+    byProgramme[p] = (byProgramme[p] || 0) + 1;
   });
-  var hostels = Object.keys(byHostel).sort();
-  var barRows = hostels.map(function(h) {
-    return { label: h, value: byHostel[h].length, max: students.length || 1 };
+  var hostels = Object.keys(byHostel).sort(function(a, b) {
+    if (a === "Unassigned") return 1;
+    if (b === "Unassigned") return -1;
+    return a.localeCompare(b);
   });
-  // convert counts to % of total for bar chart
-  var barPct = barRows.map(function(r) {
-    return { label: r.label + " (" + r.value + ")", value: students.length ? (r.value / students.length) * 100 : 0 };
+
+  var barPct = hostels.map(function(h) {
+    var n = byHostel[h].length;
+    return { label: h + " (" + n + ")", value: students.length ? (n / students.length) * 100 : 0 };
   });
-  var amendments = await collectReportAmendments({ entities: ["students"] });
-  var body = reportLetterheadHtml(
+  var largest = hostels.filter(function(h) { return h !== "Unassigned"; }).sort(function(a, b) {
+    return byHostel[b].length - byHostel[a].length;
+  })[0] || "—";
+  var largestN = largest !== "—" ? byHostel[largest].length : 0;
+  var coverage = students.length ? Math.round(((students.length - unassigned) / students.length) * 1000) / 10 : 0;
+
+  var amendments = [];
+  try { amendments = await collectAmd({ entities: ["students"] }); } catch (_) {}
+
+  var body = letterhead(
     "Hostel Distribution Report",
-    "Active students by hostel assignment (from master list)",
-    "Snapshot as at " + new Date().toLocaleString()
+    "QUALITY ASSURANCE DEPARTMENT · Master register snapshot",
+    "As at " + new Date().toLocaleString() + " · Active students only"
   );
-  body += "<h2 class='sec'>Overview</h2>";
+
+  body += "<h2 class='sec'>Executive overview</h2>";
   body += "<div class='kpi'>" +
     "<div><div class='lab'>Active students</div><div class='val' style='color:#1B3A6B'>" + students.length + "</div></div>" +
-    "<div><div class='lab'>Hostel groups</div><div class='val' style='color:#1B3A6B'>" + hostels.length + "</div></div>" +
-    "<div class='absent'><div class='lab'>Unassigned</div><div class='val'>" + (byHostel["Unassigned"] || []).length + "</div></div>" +
+    "<div><div class='lab'>Hostel groups</div><div class='val' style='color:#1B3A6B'>" + hostels.filter(function(h){return h!=="Unassigned";}).length + "</div></div>" +
+    "<div><div class='lab'>Assignment coverage</div><div class='val' style='color:" + (coverage >= 90 ? "#1B7A3D" : "#B8860B") + "'>" + coverage + "%</div></div>" +
+    "<div class='absent'><div class='lab'>Unassigned</div><div class='val'>" + unassigned + "</div></div>" +
     "</div>";
-  body += "<h2 class='sec'>Share of students by hostel</h2>" + svgHBarRows(barPct, 360);
+
+  body += "<p class='narrative'>This pack is a <strong>master-list distribution</strong> (where students are recorded as living), not a biometric gate absentee run. " +
+    "Gate / Location ID logic applies only when you <em>Generate &amp; download report</em> from an uploaded ZKTeco file. " +
+    "Largest assigned group: <strong>" + escapeHtml(largest) + "</strong> (" + largestN + ").</p>";
+
+  body += "<h2 class='sec'>Share by hostel</h2>";
+  if (students.length) {
+    var assignedPct = coverage;
+    body += "<div style='display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:center;margin:12px 0 8px'>" +
+      donut(assignedPct, 120, "Assigned") + bars(barPct, 340) + "</div>";
+  } else {
+    body += bars(barPct, 360);
+  }
+
+  body += "<h2 class='sec'>Programme mix (active)</h2>";
+  var progRows = Object.keys(byProgramme).sort().map(function(p) {
+    return { label: p + " (" + byProgramme[p] + ")", value: students.length ? (byProgramme[p] / students.length) * 100 : 0 };
+  });
+  body += bars(progRows, 360);
+
   hostels.forEach(function(h) {
-    var list = byHostel[h].slice().sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
+    var list = byHostel[h].slice();
+    if (typeof compareStudentsByRegNo === "function") list.sort(compareStudentsByRegNo);
+    else list.sort(function(a, b) { return String(a.regNo || "").localeCompare(String(b.regNo || "")) || String(a.name || "").localeCompare(String(b.name || "")); });
     var rows = list.map(function(s, i) {
-      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
+      var reg = s.regNo || "";
+      var temp = (typeof isTempRegNo === "function" && isTempRegNo(reg)) ? " <span class='cell-sub'>temp</span>" : "";
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name || "") + "</td><td>" + escapeHtml(reg) + temp +
         "</td><td>" + escapeHtml(s.programme || "") + "</td><td>" + escapeHtml(String(s.level || "")) +
         "</td><td>" + escapeHtml(s.gender || "") + "</td></tr>";
     }).join("");
     body += "<h2 class='sec'>" + escapeHtml(h) + " — " + list.length + " student(s)</h2>";
-    body += "<table class='data'><thead><tr><th>#</th><th>Name</th><th>Reg. No</th><th>Programme</th><th>Level</th><th>Gender</th></tr></thead><tbody>" + rows + "</tbody></table>";
+    body += "<table class='data'><thead><tr><th>#</th><th>Name</th><th>Reg. No</th><th>Programme</th><th>Level</th><th>Gender</th></tr></thead><tbody>" +
+      (rows || "<tr><td colspan='6'>No students</td></tr>") + "</tbody></table>";
   });
-  body += reportGlossaryHtml([
-    ["Hostel assignment", "Taken from the student master list (not biometric machine location IDs)."],
-    ["Unassigned", "Active students with a blank hostel field — update the master list, then republish."]
+
+  body += glossary([
+    ["Hostel assignment (this report)", "Taken from the student master list field at the moment of generation."],
+    ["Unassigned", "Active students with a blank hostel on the master list."],
+    ["Coverage", "Share of active students with a non-blank hostel field."],
+    ["Gate / Location ID report", "Separate action: upload ZKTeco export then “Generate & download report” — that run uses majority Location ID for hostel labels."],
+    ["Temporary reg", "TMP-… numbers sort after permanent registration numbers in each table."]
   ]);
-  body += reportAmendmentsHtml(amendments);
-  openReportWindow("EOCNS Hostel Report", body, meta.officer, meta.format);
+  body += amendmentsHtml(amendments);
+  openWin("EOCNS Hostel Distribution Report", body, meta.officer, meta.format);
 }
+window.generateHostelDistributionReport = generateHostelDistributionReport;
+
 window.generateHostelDistributionReport = generateHostelDistributionReport;
 
 
