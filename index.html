@@ -272,7 +272,7 @@
         </section>
         <section class="view" id="view-hostel">
           <div class="page-toolbar" style="margin-bottom:12px">
-            <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Hostel assignments come from the student master list.</p></div>
+            <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Hostel on reports: majority Location ID (1/2) from the gate file; master list only if Location ID is missing or tied.</p></div>
             <div class="page-toolbar__right"><button type="button" class="btn btn--primary" id="btnGenerateHostelReport">Generate hostel distribution report</button></div>
           </div>
 
@@ -297,7 +297,7 @@
           <div class="card" style="margin-bottom:16px">
             <div class="card__header"><h3>Master hostel roster</h3></div>
             <div class="card__body">
-              <p class="muted-note">Hostel assignment always comes from the <strong>student master list</strong>, not the biometric machine Location ID (machines often mix Hostel 1 / 2). Moving a student between hostels does not rewrite past published reports; new reports use the current master hostel.</p>
+              <p class="muted-note">Hostel on each run uses <strong>majority Location ID</strong> from punches (1 = Hostel 1, 2 = Hostel 2). If Location ID is missing or tied 1–2, the <strong>student master list</strong> is used. Occasional ZK mix-ups: edit the saved run with REF. Upload both machines for the period when possible.</p>
               <div class="form-grid">
                 <label class="field"><span class="field__label">Filter by hostel</span>
                   <select id="hostelRosterFilter">
@@ -1216,7 +1216,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=63"></script>
+  <script src="app.js?v=64"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

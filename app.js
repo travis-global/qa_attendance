@@ -1309,6 +1309,33 @@ function parseAttendanceDateHostel(raw) {
   return null;
 }
 
+/** Map ZKTeco Location ID cell → 1, 2, or null. */
+function parseHostelLocationId(raw) {
+  if (raw === "" || raw == null) return null;
+  if (typeof raw === "number" && isFinite(raw)) {
+    var n = Math.round(raw);
+    if (n === 1 || n === 2) return n;
+  }
+  var t = String(raw).trim();
+  if (!t) return null;
+  if (/^1$/.test(t) || /^0*1$/.test(t)) return 1;
+  if (/^2$/.test(t) || /^0*2$/.test(t)) return 2;
+  // Common export variants: "Location 1", "H1", "Hostel 1", device codes ending in 1/2
+  var m = t.match(/(?:^|[^0-9])([12])(?:[^0-9]|$)/);
+  if (m) return Number(m[1]);
+  var low = t.toLowerCase();
+  if (low.indexOf("hostel 1") >= 0 || low.indexOf("hostel1") >= 0 || /\bh1\b/.test(low)) return 1;
+  if (low.indexOf("hostel 2") >= 0 || low.indexOf("hostel2") >= 0 || /\bh2\b/.test(low)) return 2;
+  return null;
+}
+
+/**
+ * Hostel resolution for a period:
+ * 1) Majority Location ID on C/IN punches in range (1 → hostel1Name, 2 → hostel2Name)
+ * 2) Else student master list hostel
+ * 3) Else Unassigned
+ * Master list is still used for name/reg matching. Conflicts (machine vs master) are flagged.
+ */
 async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, hostel2Name) {
   const headerIndex = {};
   rows[0].forEach((v, i) => {
@@ -1319,7 +1346,9 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
   const noCol = headerIndex["No."];
   const dateCol = headerIndex["Date/Time"];
   const statusCol = headerIndex["Status"];
-  // Location ID intentionally ignored for hostel placement (machine mixes 1/2).
+  const locCol = headerIndex["Location ID"];
+  const h1 = hostel1Name || "Hostel 1";
+  const h2 = hostel2Name || "Hostel 2";
   const master = await getAll("students");
   function normName(n) {
     return String(n || "").toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -1341,6 +1370,7 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
   }
   const students = {};
   const attendance = {};
+  const locVotes = {}; // studentId -> { "1": n, "2": n }
   for (let r = 1; r < rows.length; r++) {
     const row = rows[r];
     const rawName = row[nameCol];
@@ -1349,22 +1379,23 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     const name = String(rawName).trim();
     const studentId = normalizeStudentIdHostel(studentIdRaw);
     const masterStu = resolveMaster(name, studentId);
-    // Hostel ALWAYS from master list when known
-    let hostel = "Unassigned (set on Students master)";
-    if (masterStu && masterStu.hostel) hostel = masterStu.hostel;
-    else if (masterStu) hostel = "Unassigned (set on Students master)";
-    // Do not use machine Location ID for hostel name
     if (!(studentId in students)) {
       students[studentId] = {
         name: masterStu ? masterStu.name : name,
-        hostel: hostel,
+        hostel: "Unassigned",
+        hostelSource: "pending",
         regNo: masterStu ? (masterStu.regNo || "") : "",
         programme: masterStu ? (masterStu.programme || "") : "",
         level: masterStu ? (masterStu.level || "") : "",
         masterId: masterStu ? masterStu.id : null,
-        matched: !!masterStu
+        masterHostel: masterStu && masterStu.hostel ? String(masterStu.hostel).trim() : "",
+        matched: !!masterStu,
+        locationIdMajority: null,
+        locationVotes: { "1": 0, "2": 0 },
+        hostelConflict: false
       };
       attendance[studentId] = new Set();
+      locVotes[studentId] = { "1": 0, "2": 0 };
     }
     const rawDate = row[dateCol];
     if (rawDate === "" || rawDate == null) continue;
@@ -1372,15 +1403,49 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     if (!attendanceDate) continue;
     if (attendanceDate < startDate || attendanceDate > endDate) continue;
     const status = String(row[statusCol] || "").trim().toUpperCase();
-    if (status === "C/IN") attendance[studentId].add(toDateKeyHostel(attendanceDate));
+    if (status === "C/IN") {
+      attendance[studentId].add(toDateKeyHostel(attendanceDate));
+      if (locCol != null) {
+        var lid = parseHostelLocationId(row[locCol]);
+        if (lid === 1 || lid === 2) locVotes[studentId][String(lid)]++;
+      }
+    }
   }
+  // Resolve hostel from majority Location ID, then master list
+  Object.keys(students).forEach(function(sid) {
+    var st = students[sid];
+    var v = locVotes[sid] || { "1": 0, "2": 0 };
+    st.locationVotes = { "1": v["1"], "2": v["2"] };
+    var maj = null;
+    if (v["1"] > v["2"]) maj = 1;
+    else if (v["2"] > v["1"]) maj = 2;
+    // tie or zero: leave maj null
+    st.locationIdMajority = maj;
+    var fromMachine = null;
+    if (maj === 1) fromMachine = h1;
+    if (maj === 2) fromMachine = h2;
+    if (fromMachine) {
+      st.hostel = fromMachine;
+      st.hostelSource = "location_id";
+      if (st.masterHostel && st.masterHostel !== fromMachine &&
+          st.masterHostel.toLowerCase().indexOf("unassigned") < 0) {
+        st.hostelConflict = true;
+      }
+    } else if (st.masterHostel) {
+      st.hostel = st.masterHostel;
+      st.hostelSource = "master_list";
+    } else {
+      st.hostel = "Unassigned (no Location ID majority / master hostel)";
+      st.hostelSource = "unassigned";
+    }
+  });
   const dates = [];
   const cursor = new Date(startDate);
   while (cursor <= endDate) {
     dates.push(new Date(cursor));
     cursor.setDate(cursor.getDate() + 1);
   }
-  return { students, attendance, dates };
+  return { students, attendance, dates, hostel1Name: h1, hostel2Name: h2 };
 }
 
 function ordinalSuffixHostel(n) {
@@ -1752,7 +1817,7 @@ async function generateHostelReport() {
       }),
       matrix: matrix,
       amendments: [],
-      note: "Hostel labels taken from student master at generation time. Machine Location ID ignored.",
+      note: "Hostel from majority Location ID (1/2) on C/IN punches in period; master list used when Location ID is missing or tied.",
       source: "gate_export"
     };
     stampSessionFields(run);
@@ -1767,7 +1832,21 @@ async function generateHostelReport() {
       });
     } catch (audErr) { console.warn("hostel audit", audErr); }
     markDirty("hostel report");
-    setHostelStatus("Report ready · " + absentees.length + " absentees · saved to master hostel sheet (Publish to keep on all devices).", "ok");
+    var locN = 0, mastN = 0, confN = 0, unN = 0;
+    Object.keys(result.students || {}).forEach(function(sid) {
+      var st = result.students[sid];
+      if (st.hostelSource === "location_id") locN++;
+      else if (st.hostelSource === "master_list") mastN++;
+      else unN++;
+      if (st.hostelConflict) confN++;
+    });
+    setHostelStatus(
+      "Report ready · " + absentees.length + " absentees · hostel via Location ID " + locN +
+      " · master fallback " + mastN + " · unassigned " + unN +
+      (confN ? (" · " + confN + " machine≠master conflicts") : "") +
+      " · saved to master sheet (Publish to keep on all devices).",
+      "ok"
+    );
     renderProfessionalHostelPreview(absentees, dayHeaders, rate, startDate, endDate);
     try { await renderHostelRunsMaster(); } catch (_) {}
   } catch (err) {
@@ -2022,7 +2101,7 @@ function renderProfessionalHostelPreview(absentees, dayHeaders, rate, startDate,
     '<h3 style="margin:0 0 8px">Executive summary — Hostel boarding fee</h3>' +
     '<p style="margin:0 0 12px;line-height:1.5">Period <strong>' + period + '</strong>. Rate <strong>' + formatNairaHostel(rate) + '</strong> per absent night. ' +
     '<strong>' + absentees.length + '</strong> students incurred charges totalling <strong>' + formatNairaHostel(totalFine) + '</strong>. ' +
-    'Hostel labels are taken from the <em>student master list</em> (not the biometric machine), so mixed Location IDs do not mis-assign students.</p>' +
+    'Hostel labels use the <em>majority Location ID</em> (1 → Hostel 1, 2 → Hostel 2) on check-ins in the period; the student master list is the fallback when Location ID is missing or tied.</p>' +
     '<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin-bottom:16px">' +
     '<div><div class="muted-note">Absentees by hostel</div>' + svgPie(pieSlices, 150) + '</div>' +
     '<div><div class="muted-note">Fines by hostel (₦)</div>' + svgBars(barItems, 280, 130) + '</div></div>' +
@@ -2063,7 +2142,7 @@ function printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, end
     "<h2>1. Executive summary</h2>" +
     "<p class=\"narrative\">This report covers <strong>" + period + "</strong> at a charge of <strong>" + formatNairaHostel(rate) +
     "</strong> per absent night. <strong>" + absentees.length + "</strong> students were absent on one or more nights, generating a combined liability of <strong>" +
-    formatNairaHostel(totalFine) + "</strong>. Hostel placement is resolved exclusively from the college student master register so that biometric Location ID errors cannot mis-assign a resident to the wrong hostel. Historical published runs remain unchanged if a student is later moved between hostels.</p>" +
+    formatNairaHostel(totalFine) + "</strong>. Hostel placement prefers majority biometric Location ID for the period (stable 1/2), with master-list fallback when the device field is empty or tied. Occasional software mix-ups can still appear — use REF edit on the master run if a row is wrong. Historical published runs remain unchanged if a student is later moved between hostels.</p>" +
     "<div class=\"kpi\"><div><strong>" + absentees.length + "</strong>Absentees</div>" +
     "<div><strong>" + formatNairaHostel(totalFine) + "</strong>Total due</div>" +
     "<div><strong>" + formatNairaHostel(rate) + "</strong>Daily rate</div></div>" +
@@ -2073,7 +2152,7 @@ function printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, end
     "<table><thead><tr><th>#</th><th>Name</th><th>Reg. No</th><th>Hostel (master)</th><th>Days</th><th>Amount</th></tr></thead><tbody>" +
     rows + "</tbody></table>" +
     "<h2>4. Certification</h2>" +
-    "<p class=\"narrative\">Prepared via the EOCNS QA Attendance System. Machine Location ID was not used for hostel classification.</p>" +
+    "<p class=\"narrative\">Prepared via the EOCNS QA Attendance System. Location ID majority used for hostel classification; master list as fallback.</p>" +
     "<p style=\"margin-top:36px\">QA Officer: ______________________ &nbsp;&nbsp; Date: ______________</p>" +
     "</body></html>");
   w.document.close();
@@ -7195,7 +7274,7 @@ function renderProfessionalHostelPreview(absentees, dayHeaders, rate, startDate,
     '<h3 style="margin:0 0 8px">Executive summary — Hostel boarding fee</h3>' +
     '<p style="margin:0 0 12px;line-height:1.5">Period <strong>' + period + '</strong>. Rate <strong>' + formatNairaHostel(rate) + '</strong> per absent night. ' +
     '<strong>' + absentees.length + '</strong> students incurred charges totalling <strong>' + formatNairaHostel(totalFine) + '</strong>. ' +
-    'Hostel labels are taken from the <em>student master list</em> (not the biometric machine), so mixed Location IDs do not mis-assign students.</p>' +
+    'Hostel labels use the <em>majority Location ID</em> (1 → Hostel 1, 2 → Hostel 2) on check-ins in the period; the student master list is the fallback when Location ID is missing or tied.</p>' +
     '<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin-bottom:16px">' +
     '<div><div class="muted-note">Absentees by hostel</div>' + svgPie(pieSlices, 150) + '</div>' +
     '<div><div class="muted-note">Fines by hostel (₦)</div>' + svgBars(barItems, 280, 130) + '</div></div>' +
@@ -7236,7 +7315,7 @@ function printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, end
     "<h2>1. Executive summary</h2>" +
     "<p class=\"narrative\">This report covers <strong>" + period + "</strong> at a charge of <strong>" + formatNairaHostel(rate) +
     "</strong> per absent night. <strong>" + absentees.length + "</strong> students were absent on one or more nights, generating a combined liability of <strong>" +
-    formatNairaHostel(totalFine) + "</strong>. Hostel placement is resolved exclusively from the college student master register so that biometric Location ID errors cannot mis-assign a resident to the wrong hostel. Historical published runs remain unchanged if a student is later moved between hostels.</p>" +
+    formatNairaHostel(totalFine) + "</strong>. Hostel placement prefers majority biometric Location ID for the period (stable 1/2), with master-list fallback when the device field is empty or tied. Occasional software mix-ups can still appear — use REF edit on the master run if a row is wrong. Historical published runs remain unchanged if a student is later moved between hostels.</p>" +
     "<div class=\"kpi\"><div><strong>" + absentees.length + "</strong>Absentees</div>" +
     "<div><strong>" + formatNairaHostel(totalFine) + "</strong>Total due</div>" +
     "<div><strong>" + formatNairaHostel(rate) + "</strong>Daily rate</div></div>" +
@@ -7246,7 +7325,7 @@ function printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, end
     "<table><thead><tr><th>#</th><th>Name</th><th>Reg. No</th><th>Hostel (master)</th><th>Days</th><th>Amount</th></tr></thead><tbody>" +
     rows + "</tbody></table>" +
     "<h2>4. Certification</h2>" +
-    "<p class=\"narrative\">Prepared via the EOCNS QA Attendance System. Machine Location ID was not used for hostel classification.</p>" +
+    "<p class=\"narrative\">Prepared via the EOCNS QA Attendance System. Location ID majority used for hostel classification; master list as fallback.</p>" +
     "<p style=\"margin-top:36px\">QA Officer: ______________________ &nbsp;&nbsp; Date: ______________</p>" +
     "</body></html>");
   w.document.close();
