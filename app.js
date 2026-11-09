@@ -540,10 +540,11 @@ async function openStudentForm(id) {
   if (!isQaOfficer()) { alert("Sign in as QA Officer in Settings to add or edit records."); return; }
   await fillProgrammeLevelSelects();
   const modal = document.getElementById("studentModal");
+  if (!modal) { alert("Student form is missing from the page. Hard-refresh and try again."); return; }
   document.getElementById("studentForm").reset();
   document.getElementById("studentId").value = "";
   document.getElementById("auditReason").value = "";
-  document.getElementById("auditRef").value = "";
+  document.getElementById("auditRef").value = "REF/EOCNS/QA/";
   if (document.getElementById("studentPhotoDataUrl")) document.getElementById("studentPhotoDataUrl").value = "";
   if (document.getElementById("studentPhotoPreview")) document.getElementById("studentPhotoPreview").innerHTML = "—";
   if (document.getElementById("studentPhotoInput")) document.getElementById("studentPhotoInput").value = "";
@@ -553,69 +554,196 @@ async function openStudentForm(id) {
     if (el) { el.hidden = !showAudit; el.style.display = showAudit ? "" : "none"; }
   });
   if (id) {
-    const s = studentsCache.find(x => x.id === id);
-    if (!s) return;
+    // Prefer cache, fall back to full store (session filter can hide a row from cache)
+    var s = (studentsCache || []).find(function(x) { return x.id === id; });
+    if (!s) {
+      try {
+        var all = await getAll("students");
+        s = (all || []).find(function(x) { return x.id === id; });
+      } catch (_) {}
+    }
+    if (!s) { alert("Could not load that student record. Refresh the Students list and try again."); return; }
     document.getElementById("studentModalTitle").textContent = "Edit Student";
     document.getElementById("studentId").value = s.id;
     document.getElementById("studentName").value = s.name || "";
     document.getElementById("studentRegNo").value = s.regNo || "";
-    document.getElementById("studentProgramme").value = s.programme || "";
-    document.getElementById("studentLevel").value = s.level || "";
+    // Ensure programme/level options exist even if master catalogue drifted
+    var progEl = document.getElementById("studentProgramme");
+    var lvlEl = document.getElementById("studentLevel");
+    var progVal = s.programme || "";
+    var lvlVal = s.level != null && s.level !== "" ? String(s.level) : "";
+    if (progEl && progVal) {
+      var hasP = Array.prototype.some.call(progEl.options, function(o) { return o.value === progVal; });
+      if (!hasP) {
+        var op = document.createElement("option");
+        op.value = progVal; op.textContent = progVal;
+        progEl.appendChild(op);
+      }
+      progEl.value = progVal;
+    }
+    if (lvlEl && lvlVal) {
+      var hasL = Array.prototype.some.call(lvlEl.options, function(o) { return String(o.value) === lvlVal; });
+      if (!hasL) {
+        var ol = document.createElement("option");
+        ol.value = lvlVal; ol.textContent = lvlVal;
+        lvlEl.appendChild(ol);
+      }
+      lvlEl.value = lvlVal;
+    }
     document.getElementById("studentGender").value = s.gender || "";
-    document.getElementById("studentHostel").value = s.hostel || "";
+    var hostEl = document.getElementById("studentHostel");
+    if (hostEl) {
+      var hv = s.hostel || "";
+      if (hv && !Array.prototype.some.call(hostEl.options, function(o) { return o.value === hv; })) {
+        var oh = document.createElement("option");
+        oh.value = hv; oh.textContent = hv;
+        hostEl.appendChild(oh);
+      }
+      hostEl.value = hv;
+    }
     document.getElementById("studentStatus").value = s.status || "Active";
     document.getElementById("studentPhone").value = s.phone || "";
+    if (s.photoDataUrl) {
+      if (document.getElementById("studentPhotoDataUrl")) document.getElementById("studentPhotoDataUrl").value = s.photoDataUrl;
+      if (document.getElementById("studentPhotoPreview")) {
+        document.getElementById("studentPhotoPreview").innerHTML = '<img src="' + s.photoDataUrl + '" alt="" style="width:100%;height:100%;object-fit:cover" />';
+      }
+    }
   } else {
     document.getElementById("studentModalTitle").textContent = "Add Student";
   }
   modal.hidden = false;
-  document.getElementById("studentName").focus();
+  try { document.getElementById("studentName").focus(); } catch (_) {}
 }
 function closeStudentForm() { document.getElementById("studentModal").hidden = true; }
 async function saveStudent(e) {
-  e.preventDefault();
-  const id = document.getElementById("studentId").value || null;
-  const name = document.getElementById("studentName").value.trim();
-  let regNo = document.getElementById("studentRegNo").value.trim();
-  const programme = document.getElementById("studentProgramme").value;
-  const level = document.getElementById("studentLevel").value;
-  const gender = document.getElementById("studentGender").value;
-  const hostel = document.getElementById("studentHostel").value.trim();
-  const status = document.getElementById("studentStatus").value || "Active";
-  const phone = document.getElementById("studentPhone").value.trim();
-  const photoDataUrl = (document.getElementById("studentPhotoDataUrl") && document.getElementById("studentPhotoDataUrl").value) || "";
-  const reason = document.getElementById("auditReason").value.trim();
-  const officialRef = document.getElementById("auditRef").value.trim();
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to create or update student records."); return; }
-  if (!name) { alert("Student name is required."); return; }
-  if (!programme) { alert("Programme is required."); return; }
-  if (!level) { alert("Level is required."); return; }
-  if (id) {
-    if (!reason) { alert("A reason is required when editing master data."); return; }
-    if (!officialRef) { alert("Please enter the official Reference Number from the approved letter."); return; }
-    if (!/^REF\/EOCNS\/QA\//i.test(officialRef)) { alert("Reference Number should start with REF/EOCNS/QA/"); return; }
+  if (e && e.preventDefault) e.preventDefault();
+  try {
+    const id = (document.getElementById("studentId") && document.getElementById("studentId").value || "").trim() || null;
+    const name = (document.getElementById("studentName") && document.getElementById("studentName").value || "").trim();
+    let regNo = (document.getElementById("studentRegNo") && document.getElementById("studentRegNo").value || "").trim();
+    const programme = (document.getElementById("studentProgramme") && document.getElementById("studentProgramme").value || "").trim();
+    const level = (document.getElementById("studentLevel") && document.getElementById("studentLevel").value || "").trim();
+    const gender = (document.getElementById("studentGender") && document.getElementById("studentGender").value || "").trim();
+    const hostel = (document.getElementById("studentHostel") && document.getElementById("studentHostel").value || "").trim();
+    const status = (document.getElementById("studentStatus") && document.getElementById("studentStatus").value) || "Active";
+    const phone = (document.getElementById("studentPhone") && document.getElementById("studentPhone").value || "").trim();
+    const photoDataUrl = (document.getElementById("studentPhotoDataUrl") && document.getElementById("studentPhotoDataUrl").value) || "";
+    const reason = (document.getElementById("auditReason") && document.getElementById("auditReason").value || "").trim();
+    let officialRef = (document.getElementById("auditRef") && document.getElementById("auditRef").value || "").trim();
+
+    if (!isQaOfficer()) { alert("Sign in as QA Officer to create or update student records."); return; }
+    if (!name) { alert("Student name is required."); return; }
+    if (!programme) { alert("Programme is required. Choose a programme from the list (or add it under Settings / catalogue)."); return; }
+    if (!level) { alert("Level is required."); return; }
+
+    if (id) {
+      if (!reason) { alert("A reason is required when editing master data."); return; }
+      if (!officialRef || officialRef === "REF/EOCNS/QA/") {
+        alert("Enter the full Official Reference Number (e.g. REF/EOCNS/QA/0042).");
+        return;
+      }
+      // Allow officers to type the number after the prefix; normalise common forms
+      if (!/^REF\/EOCNS\/QA\//i.test(officialRef)) {
+        if (/^\d+$/.test(officialRef)) officialRef = "REF/EOCNS/QA/" + officialRef.padStart(4, "0");
+        else {
+          alert("Reference Number should start with REF/EOCNS/QA/");
+          return;
+        }
+      }
+    }
+
+    if (!regNo) regNo = await generateTempRegNo(programme || "Nursing");
+
+    // Conflict check against full store (not only session-filtered cache)
+    var allStudents = [];
+    try { allStudents = await getAll("students"); } catch (_) { allStudents = studentsCache || []; }
+    const regKey = String(regNo).trim().toLowerCase();
+    const conflict = (allStudents || []).find(function(s) {
+      return s && s.id !== id && String(s.regNo || "").trim().toLowerCase() === regKey;
+    });
+    if (conflict) { alert("Registration number already used by " + (conflict.name || conflict.regNo)); return; }
+
+    const now = new Date().toISOString();
+    var levelNum = level;
+    if (level !== "" && !isNaN(Number(level))) levelNum = Number(level);
+
+    if (id) {
+      var existing = (allStudents || []).find(function(s) { return s.id === id; });
+      if (!existing) existing = (studentsCache || []).find(function(s) { return s.id === id; });
+      if (!existing) {
+        alert("Original student record not found in the database. The list may be out of date — refresh, then try again.");
+        return;
+      }
+      var student = Object.assign({}, existing, {
+        id: existing.id || id,
+        name: name,
+        regNo: regNo,
+        programme: programme,
+        level: levelNum,
+        gender: gender,
+        hostel: hostel,
+        status: status,
+        phone: phone,
+        photoDataUrl: photoDataUrl || existing.photoDataUrl || "",
+        updatedAt: now
+      });
+      if (photoDataUrl) student.photoUpdatedAt = now;
+      // Audit without full photo blobs (avoids IndexedDB failures on large passports)
+      var beforeSlim = Object.assign({}, existing);
+      var afterSlim = Object.assign({}, student);
+      delete beforeSlim.photoDataUrl;
+      delete afterSlim.photoDataUrl;
+      await writeAudit({
+        action: "update",
+        entity: "students",
+        entityId: id,
+        reason: reason,
+        details: {
+          before: beforeSlim,
+          after: afterSlim,
+          photoChanged: !!(photoDataUrl && photoDataUrl !== (existing.photoDataUrl || ""))
+        },
+        externalRef: officialRef
+      });
+      await put("students", student);
+    } else {
+      var studentNew = {
+        id: generateId("stu"),
+        name: name,
+        regNo: regNo,
+        programme: programme,
+        level: levelNum,
+        gender: gender,
+        hostel: hostel,
+        status: status,
+        phone: phone,
+        photoDataUrl: photoDataUrl || "",
+        createdAt: now,
+        updatedAt: now
+      };
+      if (photoDataUrl) studentNew.photoUpdatedAt = now;
+      var createSlim = Object.assign({}, studentNew);
+      delete createSlim.photoDataUrl;
+      await writeAudit({
+        action: "create",
+        entity: "students",
+        entityId: studentNew.id,
+        reason: "New student registration",
+        details: { student: createSlim }
+      });
+      await put("students", studentNew);
+    }
+    closeStudentForm();
+    markDirty(id ? "student update" : "student create");
+    await renderStudentsTable();
+    try { refreshDashboardStats(); } catch (_) {}
+  } catch (err) {
+    console.error("saveStudent", err);
+    alert("Could not save student: " + (err && err.message ? err.message : String(err)));
   }
-  if (!regNo) regNo = await generateTempRegNo(programme || "Nursing");
-  const conflict = studentsCache.find(s => s.regNo === regNo && s.id !== id);
-  if (conflict) { alert("Registration number already used by " + conflict.name); return; }
-  const now = new Date().toISOString();
-  if (id) {
-    const existing = studentsCache.find(s => s.id === id);
-    const student = Object.assign({}, existing, { name, regNo, programme, level: level ? Number(level) : null, gender, hostel, status, phone, photoDataUrl: photoDataUrl || existing.photoDataUrl || "", updatedAt: now });
-    if (photoDataUrl) student.photoUpdatedAt = now;
-    await writeAudit({ action: "update", entity: "students", entityId: id, reason, details: { before: existing, after: student }, externalRef: officialRef });
-    await put("students", student);
-  } else {
-    const student = { id: generateId("stu"), name, regNo, programme, level: level ? Number(level) : null, gender, hostel, status, phone, photoDataUrl: photoDataUrl || "", createdAt: now, updatedAt: now };
-    if (photoDataUrl) student.photoUpdatedAt = now;
-    await writeAudit({ action: "create", entity: "students", entityId: student.id, reason: "New student registration", details: { student } });
-    await put("students", student);
-  }
-  closeStudentForm();
-  markDirty();
-  await renderStudentsTable();
-  refreshDashboardStats();
 }
+
 let lecturersCache = [];
 async function loadLecturers() {
   lecturersCache = await getAll("lecturers");
