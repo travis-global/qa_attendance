@@ -15542,5 +15542,41 @@
     "user": "QA Officer",
     "source": "official-letter",
     "id": 811
+  },
+  {
+    "ref": "REF/EOCNS/QA/1019",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mw9jxj0fx5tx",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-09",
+      "course": "NUS 114 — Human Physiology I",
+      "status": "Held",
+      "classKey": "100_nursing",
+      "amended": false
+    },
+    "timestamp": "2026-11-09T17:45:17.444Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 812
+  },
+  {
+    "ref": "REF/EOCNS/QA/1020",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mw9k6jlv928b",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-09",
+      "course": "NUS 117 — Medical Microbiology",
+      "status": "Held",
+      "classKey": "100_nursing",
+      "amended": false
+    },
+    "timestamp": "2026-11-09T17:52:18.120Z",
+    "user": "QA Officer",
+    "source": "system",
+    "id": 813
   }
 ]
