@@ -5859,10 +5859,20 @@ async function publishAllToRepo() {
       console.warn("Publish guard skipped:", skipped.join("; "));
       if (status) status.textContent = "Protecting repo: skipped empty local for " + skipped.join(", ") + ". Other files still publishing…";
     }
+    var fileKeys = Object.keys(files);
+    if (!fileKeys.length) {
+      throw new Error("Nothing to publish — every store was empty or skipped by the safety guard. Your local data may not have loaded into IndexedDB. Import your snapshot first, then publish again.");
+    }
+    var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
+    if (!key) {
+      throw new Error("publishWorkerKey missing in data/config.json — cannot authorize the publish worker.");
+    }
+    var headers = { "Content-Type": "application/json", "X-EOCNS-Key": key };
     var res = await fetch(workerUrl.replace(/\/$/, ""), {
       method: "POST",
       headers: headers,
       body: JSON.stringify({
+        action: "publish",
         message: "Update master data via EOCNS QA System",
         publishKey: key,
         files: files
