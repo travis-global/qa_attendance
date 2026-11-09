@@ -10,9 +10,10 @@ permissions:
   pages: write
   id-token: write
 
+# Do not cancel an in-flight Pages deploy — overlapping deploys fail with HTTP 400
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
