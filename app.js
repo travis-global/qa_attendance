@@ -2454,7 +2454,12 @@ async function importFullSnapshot(file) {
   var msg = "Snapshot loaded · students " + (counts.students || 0) +
     " · lecturers " + (counts.lecturers || 0) +
     " · QA entries " + (counts.qa_entries || 0) +
-    ". Publish to repository to make it permanent on GitHub.";
+    ". Publish to re
+try {
+  window.exportFullSnapshot = exportFullSnapshot;
+  window.importFullSnapshot = importFullSnapshot;
+} catch (_) {}
+pository to make it permanent on GitHub.";
   alert(msg);
 }
 
@@ -4940,7 +4945,11 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
   document.getElementById("ttClassKey") && document.getElementById("ttClassKey").addEventListener("change", renderTimetableEditor);
   document.getElementById("btnDownloadAudit") && document.getElementById("btnDownloadAudit").addEventListener("click", downloadAuditJson);
   document.getElementById("btnPrintFullQaPack") && document.getElementById("btnPrintFullQaPack").addEventListener("click", printFullQaPack);
-  document.getElementById("btnExportSnapshot") && document.getElementById("btnExportSnapshot").addEventListener("click", exportFullSnapshot);
+  document.getElementById("btnExportSnapshot") && document.getElementById("btnExportSnapshot").addEventListener("click", function() {
+    if (typeof window.exportFullSnapshot === "function") window.exportFullSnapshot();
+    else if (typeof exportFullSnapshot === "function") exportFullSnapshot();
+    else alert("Snapshot export is still loading. Hard-refresh, then try again.");
+  });
   document.getElementById("btnImportSnapshot") && document.getElementById("btnImportSnapshot").addEventListener("click", function() {
     document.getElementById("snapshotFileInput") && document.getElementById("snapshotFileInput").click();
   });
@@ -4959,7 +4968,11 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
     }
   });
   document.getElementById("snapshotFileInput") && document.getElementById("snapshotFileInput").addEventListener("change", function(e) {
-    if (e.target.files && e.target.files[0]) importFullSnapshot(e.target.files[0]);
+    if (e.target.files && e.target.files[0]) {
+      var imp = window.importFullSnapshot || (typeof importFullSnapshot === "function" ? importFullSnapshot : null);
+      if (imp) imp(e.target.files[0]);
+      else alert("Snapshot import is still loading. Hard-refresh, then try again.");
+    }
     e.target.value = "";
   });
   document.getElementById("btnImportStudentsCsv") && document.getElementById("btnImportStudentsCsv").addEventListener("click", function() {
@@ -5630,7 +5643,10 @@ function initQaOfficerUI() {
     const panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = true;
   });
-  document.getElementById("btnExportStudents")?.addEventListener("click", exportFullSnapshot);
+  document.getElementById("btnExportStudents")?.addEventListener("click", function() {
+    if (typeof window.exportFullSnapshot === "function") window.exportFullSnapshot();
+    else alert("Snapshot export is still loading. Hard-refresh the page, then try again.");
+  });
   document.getElementById("btnPublishAll")?.addEventListener("click", () => {
     if (!isQaOfficer()) return;
     const panel = document.getElementById("qaTokenPanel");
