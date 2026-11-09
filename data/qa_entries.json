@@ -65,5 +65,790 @@
     "sessionName": "2026/2027 SESSION",
     "semesterId": "sess_mvt9hjbtg2q3o_s1",
     "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8260v9rtfj",
+    "date": "2026-10-26",
+    "classKey": "100_nursing",
+    "course": "NUS 117 — Medical Microbiology",
+    "lecturer": "Dr. Ogbuinya Eda",
+    "status": "Held",
+    "duration": 80,
+    "start": "12:40",
+    "end": "14:00",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "Revision",
+    "remark": "Above average",
+    "absent": [
+      "NWUZOR ONYINYECHI A."
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqnhqvy2qjq",
+        "name": "NWUZOR ONYINYECHI A.",
+        "regNo": "TMP-EOCNS/26/0002/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-08T16:40:14.560Z",
+    "createdAt": "2026-11-08T16:40:14.560Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw82vf2udwk4",
+    "date": "2026-11-08",
+    "classKey": "100_nursing",
+    "course": "NUR 111 — Foundation of Nursing/Emergency Care",
+    "lecturer": "Mrs. Beatrice Ojinkama",
+    "status": "Held",
+    "duration": 60,
+    "start": "08:40",
+    "end": "09:40",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "NWUZOR ONYINYECHI SUCCESS"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvutjlzdukcm7",
+        "name": "NWUZOR ONYINYECHI SUCCESS",
+        "regNo": "EOCNS/26/0064/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-08T16:59:59.382Z",
+    "createdAt": "2026-11-08T16:59:59.382Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw82zw4c0nvz",
+    "date": "2026-10-26",
+    "classKey": "100_nursing",
+    "course": "NUR 111 — Foundation of Nursing/Emergency Care",
+    "lecturer": "Mrs. Beatrice Ojinkama",
+    "status": "Held",
+    "duration": 59,
+    "start": "08:40",
+    "end": "09:39",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "NWUZOR ONYINYECHI SUCCESS"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvutjlzdukcm7",
+        "name": "NWUZOR ONYINYECHI SUCCESS",
+        "regNo": "EOCNS/26/0064/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-08T17:03:28.092Z",
+    "createdAt": "2026-11-08T17:03:28.092Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw86ccfjg265",
+    "date": "2026-10-27",
+    "classKey": "100_nursing",
+    "course": "NUS 115 — Introduction to Sociology",
+    "lecturer": "Mrs. Anthonia Arua",
+    "status": "Held",
+    "duration": 151,
+    "start": "09:03",
+    "end": "11:34",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "NWUZOR ONYINYECHI SUCCESS",
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvutjlzdukcm7",
+        "name": "NWUZOR ONYINYECHI SUCCESS",
+        "regNo": "EOCNS/26/0064/GNS",
+        "serial": ""
+      },
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-08T18:37:07.949Z",
+    "createdAt": "2026-11-08T18:37:07.949Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8izut3ptct",
+    "date": "2026-10-27",
+    "classKey": "100_nursing",
+    "course": "PRAC 101 — Practicum/Study Skills",
+    "lecturer": "Mr. Emmanuel Icheku",
+    "status": "Held",
+    "duration": 58,
+    "start": "14:02",
+    "end": "15:00",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-09T00:31:20.247Z",
+    "createdAt": "2026-11-09T00:31:20.247Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8j3pljx8ma",
+    "date": "2026-10-27",
+    "classKey": "100_nursing",
+    "course": "NUR 111 — Foundation of Nursing/Emergency Care",
+    "lecturer": "Mrs. Beatrice Ojinkama",
+    "status": "Held",
+    "duration": 152,
+    "start": "09:03",
+    "end": "11:35",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-09T00:34:20.119Z",
+    "createdAt": "2026-11-09T00:34:20.119Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8j9qh7gwgu",
+    "date": "2026-10-28",
+    "classKey": "100_nursing",
+    "course": "NUS 113 — Human Anatomy",
+    "lecturer": "Mr. Simon Udu",
+    "status": "Held",
+    "duration": 113,
+    "start": "08:00",
+    "end": "09:53",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [],
+    "absentDetails": [],
+    "updatedAt": "2026-11-09T00:39:01.195Z",
+    "createdAt": "2026-11-09T00:39:01.195Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8jbzbhd9q9",
+    "date": "2026-10-28",
+    "classKey": "100_nursing",
+    "course": "NUS 117 — Medical Microbiology",
+    "lecturer": "Dr. Ogbuinya Eda",
+    "status": "Held",
+    "duration": 216,
+    "start": "09:54",
+    "end": "13:30",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [],
+    "absentDetails": [],
+    "updatedAt": "2026-11-09T00:40:45.964Z",
+    "createdAt": "2026-11-09T00:40:45.964Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8jj86pd1hx",
+    "date": "2026-10-29",
+    "classKey": "100_nursing",
+    "course": "NUS 113 — Human Anatomy",
+    "lecturer": "Mr. Simon Udu",
+    "status": "Held",
+    "duration": 24,
+    "start": "11:38",
+    "end": "12:02",
+    "topic": "Cell",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [],
+    "absentDetails": [],
+    "updatedAt": "2026-11-09T00:46:24.048Z",
+    "createdAt": "2026-11-09T00:46:24.048Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8jma8wmvsu",
+    "date": "2026-10-29",
+    "classKey": "100_nursing",
+    "course": "PRAC 101 — Practicum/Study Skills",
+    "lecturer": "Mr. Emmanuel Icheku",
+    "status": "Held",
+    "duration": 24,
+    "start": "11:38",
+    "end": "12:02",
+    "topic": "Effective Techniques Of Studying",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [],
+    "absentDetails": [],
+    "updatedAt": "2026-11-09T00:48:46.688Z",
+    "createdAt": "2026-11-09T00:48:46.688Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8jsyw8cwsl",
+    "date": "2026-10-30",
+    "classKey": "100_nursing",
+    "course": "NUS 112 — Applied Physics",
+    "lecturer": "Mr. Jude Nweze",
+    "status": "Held",
+    "duration": 124,
+    "start": "09:20",
+    "end": "11:24",
+    "topic": "Definition of science, Relevance of physics Characteristics and nature of physics.",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-09T00:53:58.567Z",
+    "createdAt": "2026-11-09T00:53:58.567Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8jx7zppss4",
+    "date": "2026-10-30",
+    "classKey": "100_nursing",
+    "course": "NUS 111 — Applied Chemistry",
+    "lecturer": "Dr. Kennedy Ogunwa",
+    "status": "Held",
+    "duration": 136,
+    "start": "11:42",
+    "end": "13:58",
+    "topic": "Introduction to Chemistry",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-09T00:57:16.980Z",
+    "createdAt": "2026-11-09T00:57:16.980Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8k1jxqqpxb",
+    "date": "2026-11-02",
+    "classKey": "100_nursing",
+    "course": "NUS 114 — Human Physiology I",
+    "lecturer": "Dr. Jacinta Obimma",
+    "status": "Held",
+    "duration": 110,
+    "start": "08:30",
+    "end": "10:20",
+    "topic": "Cell membrane, Definition, Functions and Types.",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-09T01:00:39.085Z",
+    "createdAt": "2026-11-09T01:00:39.085Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8k3uw5zt6n",
+    "date": "2026-11-02",
+    "classKey": "100_nursing",
+    "course": "NUR 111 — Foundation of Nursing/Emergency Care",
+    "lecturer": "Mrs. Beatrice Ojinkama",
+    "status": "Held",
+    "duration": 100,
+    "start": "10:20",
+    "end": "12:00",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-09T01:02:26.597Z",
+    "createdAt": "2026-11-09T01:02:26.597Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8k7zd8d1ej",
+    "date": "2026-11-03",
+    "classKey": "100_nursing",
+    "course": "NUS 116 — Use of Computer",
+    "lecturer": "Mr. Emmanuel Icheku",
+    "status": "Held",
+    "duration": 100,
+    "start": "08:30",
+    "end": "10:10",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-09T01:05:39.019Z",
+    "createdAt": "2026-11-09T01:05:39.019Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8kaq5ik1fk",
+    "date": "2026-11-03",
+    "classKey": "100_nursing",
+    "course": "NUS 115 — Introduction to Sociology",
+    "lecturer": "Mrs. Anthonia Arua",
+    "status": "Held",
+    "duration": 94,
+    "start": "12:35",
+    "end": "14:09",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-09T01:07:47.046Z",
+    "createdAt": "2026-11-09T01:07:47.046Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8kctxramao",
+    "date": "2026-11-03",
+    "classKey": "100_nursing",
+    "course": "PRAC 101 — Practicum/Study Skills",
+    "lecturer": "Mr. Emmanuel Icheku",
+    "status": "Held",
+    "duration": 50,
+    "start": "14:10",
+    "end": "15:00",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-09T01:09:25.263Z",
+    "createdAt": "2026-11-09T01:09:25.263Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8kfcd4t2n1",
+    "date": "2026-11-04",
+    "classKey": "100_nursing",
+    "course": "NUS 113 — Human Anatomy",
+    "lecturer": "Mr. Simon Udu",
+    "status": "Held",
+    "duration": 97,
+    "start": "08:18",
+    "end": "09:55",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-09T01:11:22.452Z",
+    "createdAt": "2026-11-09T01:11:22.452Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8khd4k2mah",
+    "date": "2026-11-04",
+    "classKey": "100_nursing",
+    "course": "NUS 117 — Medical Microbiology",
+    "lecturer": "Dr. Ogbuinya Eda",
+    "status": "Held",
+    "duration": 95,
+    "start": "09:55",
+    "end": "11:30",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [],
+    "absentDetails": [],
+    "updatedAt": "2026-11-09T01:12:56.756Z",
+    "createdAt": "2026-11-09T01:12:56.756Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8kjy8zjix6",
+    "date": "2026-11-05",
+    "classKey": "100_nursing",
+    "course": "NUS 117 — Medical Microbiology",
+    "lecturer": "Dr. Ogbuinya Eda",
+    "status": "Held",
+    "duration": 70,
+    "start": "08:40",
+    "end": "09:50",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-09T01:14:57.443Z",
+    "createdAt": "2026-11-09T01:14:57.443Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8kljcsqrjb",
+    "date": "2026-11-05",
+    "classKey": "100_nursing",
+    "course": "NUS 113 — Human Anatomy",
+    "lecturer": "Mr. Simon Udu",
+    "status": "Held",
+    "duration": 118,
+    "start": "12:02",
+    "end": "14:00",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-09T01:16:11.452Z",
+    "createdAt": "2026-11-09T01:16:11.452Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8ko923uag6",
+    "date": "2026-11-05",
+    "classKey": "100_nursing",
+    "course": "GNS 111 — Citizenship Education",
+    "lecturer": "Mrs. Ngozi Nwaubani",
+    "status": "Held",
+    "duration": 59,
+    "start": "14:01",
+    "end": "15:00",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-09T01:18:18.074Z",
+    "createdAt": "2026-11-09T01:18:18.074Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8kspxisl5a",
+    "date": "2026-11-06",
+    "classKey": "100_nursing",
+    "course": "NUS 112 — Applied Physics",
+    "lecturer": "Mr. Jude Nweze",
+    "status": "Held",
+    "duration": 75,
+    "start": "08:40",
+    "end": "09:55",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [],
+    "absentDetails": [],
+    "updatedAt": "2026-11-09T01:21:46.565Z",
+    "createdAt": "2026-11-09T01:21:46.565Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8kup897p19",
+    "date": "2026-11-06",
+    "classKey": "100_nursing",
+    "course": "NUS 111 — Applied Chemistry",
+    "lecturer": "Dr. Kennedy Ogunwa",
+    "status": "Held",
+    "duration": 116,
+    "start": "12:19",
+    "end": "14:15",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [],
+    "absentDetails": [],
+    "updatedAt": "2026-11-09T01:23:18.964Z",
+    "createdAt": "2026-11-09T01:23:18.964Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mw8kwrhnpqc5",
+    "date": "2026-11-06",
+    "classKey": "100_nursing",
+    "course": "GNS 111 — Citizenship Education",
+    "lecturer": "Mrs. Ngozi Nwaubani",
+    "status": "Held",
+    "duration": 40,
+    "start": "14:20",
+    "end": "15:00",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "None was given",
+    "remark": "Above average",
+    "absent": [],
+    "absentDetails": [],
+    "updatedAt": "2026-11-09T01:24:55.211Z",
+    "createdAt": "2026-11-09T01:24:55.211Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
   }
 ]
