@@ -126,7 +126,7 @@ function showView(viewId) {
   if (viewId === "sessions") renderSessionsList();
   if (viewId === "dashboard") refreshDashboardStats();
   if (viewId === "audit") renderAuditLog();
-  if (viewId === "hostel") { initHostelView(); renderHostelRoster(); }
+  if (viewId === "hostel") { initHostelView(); renderHostelRoster(); try { renderBioQueues(); } catch (_) {} }
   if (viewId === "timetable-board") renderTimetableBoard();
   if (viewId === "qa-daily") renderQaDaily();
   if (viewId === "qa-weekly") initQaWeeklyView();
@@ -172,7 +172,7 @@ window.addEventListener("beforeunload", function(e) {
 });
 
 const DB_NAME = "eocns_attendance";
-const DB_VERSION = 10;
+const DB_VERSION = 11;
 let db = null;
 
 async function resetLocalDatabase() {
@@ -242,6 +242,9 @@ function openDB() {
         }
         if (!database.objectStoreNames.contains("hostel_runs")) {
           database.createObjectStore("hostel_runs", { keyPath: "id" });
+        }
+        if (!database.objectStoreNames.contains("biometric_pending")) {
+          database.createObjectStore("biometric_pending", { keyPath: "id" });
         }
         if (!database.objectStoreNames.contains("remedial")) {
           database.createObjectStore("remedial", { keyPath: "id" });
@@ -1483,17 +1486,24 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
   }
   const byNo = {};
   const byName = {};
+  var byAlias = {};
   master.forEach(function(s) {
     if (s.serial) byNo[String(s.serial).trim()] = s;
     if (s.regNo) byNo[String(s.regNo).trim().toUpperCase()] = s;
     const nn = normName(s.name);
     if (nn) byName[nn] = s;
+    (s.bioAliases || []).forEach(function(a) {
+      var an = normName(a);
+      if (an) byAlias[an] = s;
+    });
   });
   function resolveMaster(name, studentId) {
     if (studentId && byNo[String(studentId).trim()]) return byNo[String(studentId).trim()];
     if (studentId && byNo[String(studentId).trim().toUpperCase()]) return byNo[String(studentId).trim().toUpperCase()];
     const nn = normName(name);
     if (nn && byName[nn]) return byName[nn];
+    // alias from biometric import (machine spelling → site student)
+    if (nn && byAlias && byAlias[nn]) return byAlias[nn];
     return null;
   }
   const students = {};
@@ -1995,6 +2005,7 @@ openDB().then(async () => {
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
   try { refreshDashboardStats(); } catch (e) { console.warn("stats", e); }
   initQaOfficerUI();
+  try { initBiometricMapUI(); } catch (e) { console.warn("biometric ui", e); }
 
   document.getElementById("btnRefreshPending")?.addEventListener("click", function() { renderPendingRegistrations({ fromRepo: true }); });
   document.getElementById("btnClosePendingReview")?.addEventListener("click", closePendingReview);
@@ -5161,6 +5172,7 @@ const DATA_FILES = {
   timetables: "data/timetables.json",
   attendance: "data/attendance.json",
   hostel_runs: "data/hostel_runs.json",
+  biometric_pending: "data/biometric_pending.json",
   remedial: "data/remedial.json",
   remedial_meta: "data/remedial_meta.json",
   remedial_enrolment: "data/remedial_enrolment.json",
@@ -5884,6 +5896,7 @@ async function hydrateAllFromRepoIfEmpty() {
   await fillIfEmpty("courses", DATA_FILES.courses, "courses");
   await fillIfEmpty("attendance", DATA_FILES.attendance, "attendance");
   await fillIfEmpty("hostel_runs", DATA_FILES.hostel_runs, "hostel runs");
+  try { await fillIfEmpty("biometric_pending", DATA_FILES.biometric_pending, "biometric pending"); } catch (_) {}
   await fillIfEmpty("remedial", DATA_FILES.remedial, "remedial");
   await fillIfEmpty("remedial_enrolment", DATA_FILES.remedial_enrolment, "remedial enrolment");
   await fillIfEmpty("remedial_assignments", DATA_FILES.remedial_assignments, "remedial assignments");
@@ -5929,7 +5942,7 @@ var SYNC_STORES = [
   ["students", "students"], ["lecturers", "lecturers"], ["sessions", "sessions"], ["qa_entries", "qa_entries"],
   ["audit", "audit"], ["discipline", "discipline"], ["pending_students", "pending_students"],
   ["programmes", "programmes"], ["levels", "levels"], ["courses", "courses"], ["attendance", "attendance"],
-  ["hostel_runs", "hostel_runs"], ["remedial", "remedial"], ["remedial_enrolment", "remedial_enrolment"],
+  ["hostel_runs", "hostel_runs"], ["biometric_pending", "biometric_pending"], ["remedial", "remedial"], ["remedial_enrolment", "remedial_enrolment"],
   ["remedial_assignments", "remedial_assignments"], ["remedial_logs", "remedial_logs"]
 ];
 function textFingerprint(t) {
@@ -6137,6 +6150,7 @@ async function publishAllToRepo() {
     }
     try { await putFile(DATA_FILES.attendance, await getAll("attendance"), "attendance"); } catch (_) {}
     try { await putFile(DATA_FILES.hostel_runs, await getAll("hostel_runs"), "hostel_runs"); } catch (_) {}
+    try { await putFile(DATA_FILES.biometric_pending, await getAll("biometric_pending"), "biometric_pending"); } catch (_) {}
     try { await putFile(DATA_FILES.remedial, await getAll("remedial"), "remedial"); } catch (_) {}
     try { await putFile(DATA_FILES.remedial_enrolment, await getAll("remedial_enrolment"), "remedial_enrolment"); } catch (_) {}
     try { await putFile(DATA_FILES.remedial_assignments, await getAll("remedial_assignments"), "remedial_assignments"); } catch (_) {}
@@ -9583,6 +9597,541 @@ window.generateHostelDistributionReport = generateHostelDistributionReport;
 
 window.generateHostelDistributionReport = generateHostelDistributionReport;
 
+
+
+// =========================================================
+// BIOMETRIC DEVICE USER IMPORT + NAME MATCH → serial link
+// Site official name is never overwritten by machine spelling.
+// =========================================================
+
+function bioNormTokens(name) {
+  var raw = String(name || "").toLowerCase()
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!raw) return [];
+  return raw.split(" ").filter(function(t) { return t.length; });
+}
+
+/** Expand glued tokens using candidate dictionary (site name parts). */
+function bioExpandAgainst(machineTokens, siteTokens) {
+  var out = [];
+  machineTokens.forEach(function(t) {
+    if (siteTokens.indexOf(t) >= 0) { out.push(t); return; }
+    // try split glued word into consecutive site tokens
+    var rest = t;
+    var parts = [];
+    var guard = 0;
+    while (rest && guard++ < 8) {
+      var hit = null;
+      for (var i = 0; i < siteTokens.length; i++) {
+        var st = siteTokens[i];
+        if (st.length >= 2 && rest.indexOf(st) === 0) {
+          if (!hit || st.length > hit.length) hit = st;
+        }
+      }
+      if (hit) { parts.push(hit); rest = rest.slice(hit.length); }
+      else break;
+    }
+    if (parts.length && !rest) parts.forEach(function(p) { out.push(p); });
+    else out.push(t);
+  });
+  return out;
+}
+
+/** Score 0–1: order-insensitive token match with initial support. */
+function bioNameScore(machineName, siteName) {
+  var a = bioNormTokens(machineName);
+  var b = bioNormTokens(siteName);
+  if (!a.length || !b.length) return 0;
+  a = bioExpandAgainst(a, b);
+  // Exact normalized equality
+  if (a.join(" ") === b.join(" ")) return 1;
+  var used = {};
+  var hits = 0;
+  var weight = 0;
+  a.forEach(function(ta) {
+    var best = 0;
+    var bestJ = -1;
+    for (var j = 0; j < b.length; j++) {
+      if (used[j]) continue;
+      var tb = b[j];
+      var s = 0;
+      if (ta === tb) s = 1;
+      else if (ta.length === 1 && tb.charAt(0) === ta) s = 0.72;
+      else if (tb.length === 1 && ta.charAt(0) === tb) s = 0.72;
+      else if (ta.length > 1 && tb.length > 1 && (tb.indexOf(ta) === 0 || ta.indexOf(tb) === 0)) s = 0.8;
+      if (s > best) { best = s; bestJ = j; }
+    }
+    if (bestJ >= 0 && best > 0) {
+      used[bestJ] = true;
+      hits += best;
+    }
+    weight += 1;
+  });
+  // Penalize large length mismatch slightly
+  var lenPen = Math.abs(a.length - b.length) * 0.04;
+  var score = weight ? (hits / Math.max(a.length, b.length)) : 0;
+  score = Math.max(0, score - lenPen);
+  return Math.min(1, score);
+}
+
+function bioParseUserRows(rows) {
+  if (!rows || !rows.length) return { ok: false, message: "Empty file.", users: [] };
+  var header = rows[0].map(function(c) { return String(c == null ? "" : c).trim(); });
+  var idx = {};
+  header.forEach(function(h, i) {
+    var k = h.toLowerCase();
+    idx[k] = i;
+  });
+  function findCol(cands) {
+    for (var i = 0; i < cands.length; i++) {
+      if (idx[cands[i]] != null) return idx[cands[i]];
+    }
+    // partial
+    for (var h in idx) {
+      for (var j = 0; j < cands.length; j++) {
+        if (h.indexOf(cands[j]) >= 0) return idx[h];
+      }
+    }
+    return null;
+  }
+  var nameCol = findCol(["name", "user name", "username", "employee name", "person name"]);
+  var noCol = findCol(["no.", "no", "user id", "userid", "id", "enrollment id", "enroll id", "badge", "pin"]);
+  if (nameCol == null || noCol == null) {
+    return {
+      ok: false,
+      message: "Need columns for User ID/No. and Name. Found: " + header.filter(Boolean).join(", "),
+      users: []
+    };
+  }
+  var users = [];
+  var seen = {};
+  for (var r = 1; r < rows.length; r++) {
+    var row = rows[r] || [];
+    var name = String(row[nameCol] == null ? "" : row[nameCol]).trim();
+    var no = row[noCol];
+    if (no == null || no === "") continue;
+    no = String(no).trim();
+    if (!name || !no) continue;
+    if (seen[no]) continue;
+    seen[no] = true;
+    users.push({ machineNo: no, machineName: name });
+  }
+  return { ok: true, users: users, message: users.length + " device users read." };
+}
+
+async function bioLoadSheetFile(file) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onerror = function() { reject(new Error("Could not read file")); };
+    reader.onload = function(e) {
+      try {
+        if (typeof XLSX === "undefined") {
+          reject(new Error("Excel library not loaded — refresh the page"));
+          return;
+        }
+        var data = new Uint8Array(e.target.result);
+        var wb = XLSX.read(data, { type: "array" });
+        var sheet = wb.Sheets[wb.SheetNames[0]];
+        var rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+        resolve(rows);
+      } catch (err) { reject(err); }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+async function bioRankMatches(machineName, students) {
+  var scored = [];
+  for (var i = 0; i < students.length; i++) {
+    var s = students[i];
+    var sc = bioNameScore(machineName, s.name || "");
+    if (sc <= 0) continue;
+    scored.push({
+      studentId: s.id,
+      name: s.name,
+      regNo: s.regNo || "",
+      serial: s.serial || "",
+      programme: s.programme || "",
+      level: s.level,
+      score: sc
+    });
+  }
+  scored.sort(function(a, b) { return b.score - a.score; });
+  return scored;
+}
+
+async function bioLinkStudentSerial(studentId, machineNo, machineName, deviceLabel, score, mode) {
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === studentId; });
+  if (!s) throw new Error("Student not found");
+  // conflict: another student already has this serial
+  var clash = all.find(function(x) {
+    return x.id !== studentId && String(x.serial || "").trim() === String(machineNo).trim();
+  });
+  if (clash) {
+    throw new Error("Machine No. " + machineNo + " already linked to " + (clash.name || clash.regNo));
+  }
+  var beforeSerial = s.serial || "";
+  s.serial = String(machineNo).trim();
+  s.updatedAt = new Date().toISOString();
+  // optional alias for future matching — do not change official name
+  if (!s.bioAliases) s.bioAliases = [];
+  var mn = String(machineName || "").trim();
+  if (mn && s.bioAliases.indexOf(mn) < 0) s.bioAliases.push(mn);
+  if (deviceLabel) s.bioDeviceLabel = deviceLabel;
+  await put("students", s);
+  try {
+    await writeAudit({
+      action: "update",
+      entity: "students",
+      entityId: s.id,
+      reason: "Biometric machine ID linked (" + (mode || "match") + ")",
+      details: {
+        serialBefore: beforeSerial,
+        serialAfter: s.serial,
+        machineName: mn,
+        deviceLabel: deviceLabel || "",
+        score: score != null ? score : null,
+        siteNameKept: s.name
+      }
+    });
+  } catch (_) {}
+  return s;
+}
+
+async function bioImportAndMatch() {
+  if (!isQaOfficer()) { openOfficerLoginGate("hostel"); return; }
+  var fileInput = document.getElementById("bioUserFile");
+  var status = document.getElementById("bioImportStatus");
+  var file = fileInput && fileInput.files && fileInput.files[0];
+  if (!file) {
+    if (status) status.textContent = "Choose a device user export file first.";
+    return;
+  }
+  var deviceLabel = (document.getElementById("bioDeviceLabel") && document.getElementById("bioDeviceLabel").value) || "Hostel 1";
+  if (status) status.textContent = "Reading device users…";
+  try {
+    var rows = await bioLoadSheetFile(file);
+    var parsed = bioParseUserRows(rows);
+    if (!parsed.ok) {
+      if (status) status.textContent = parsed.message;
+      return;
+    }
+    var students = await getAll("students");
+    students = (students || []).filter(function(s) {
+      return !s.status || String(s.status).toLowerCase() === "active";
+    });
+    var AUTO_MIN = 0.85;
+    var AUTO_GAP = 0.12;
+    var CLARIFY_MIN = 0.55;
+    var autoN = 0, clarifyN = 0, unlinkedN = 0, skipN = 0, conflictN = 0;
+    // clear previous pending for this device optional — keep all devices' pools
+    for (var u = 0; u < parsed.users.length; u++) {
+      var user = parsed.users[u];
+      // already linked?
+      var already = students.find(function(s) {
+        return String(s.serial || "").trim() === String(user.machineNo).trim();
+      });
+      if (already) { skipN++; continue; }
+      var ranked = await bioRankMatches(user.machineName, students);
+      var best = ranked[0];
+      var second = ranked[1];
+      var bestScore = best ? best.score : 0;
+      var secondScore = second ? second.score : 0;
+      var uniqueStrong = best && bestScore >= AUTO_MIN && (bestScore - secondScore) >= AUTO_GAP;
+      // also reject if best already has different serial that isn't empty? allow overwrite only if empty serial
+      if (uniqueStrong && best.serial && String(best.serial).trim() && String(best.serial).trim() !== String(user.machineNo).trim()) {
+        // student already has another machine id — send to clarify
+        uniqueStrong = false;
+      }
+      if (uniqueStrong) {
+        try {
+          await bioLinkStudentSerial(best.studentId, user.machineNo, user.machineName, deviceLabel, bestScore, "auto");
+          autoN++;
+          // refresh local students list serial
+          var st = students.find(function(s) { return s.id === best.studentId; });
+          if (st) st.serial = String(user.machineNo).trim();
+        } catch (err) {
+          conflictN++;
+          await put("biometric_pending", {
+            id: "bio_" + Date.now().toString(36) + "_" + u,
+            machineNo: user.machineNo,
+            machineName: user.machineName,
+            deviceLabel: deviceLabel,
+            status: "conflict",
+            note: err.message || String(err),
+            suggestions: ranked.slice(0, 5),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          });
+        }
+        continue;
+      }
+      if (best && bestScore >= CLARIFY_MIN) {
+        clarifyN++;
+        await put("biometric_pending", {
+          id: "bio_" + Date.now().toString(36) + "_" + u,
+          machineNo: user.machineNo,
+          machineName: user.machineName,
+          deviceLabel: deviceLabel,
+          status: "clarify",
+          suggestions: ranked.slice(0, 5).map(function(r) {
+            return { studentId: r.studentId, name: r.name, regNo: r.regNo, score: Math.round(r.score * 1000) / 10, serial: r.serial };
+          }),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+      } else {
+        unlinkedN++;
+        await put("biometric_pending", {
+          id: "bio_" + Date.now().toString(36) + "_" + u,
+          machineNo: user.machineNo,
+          machineName: user.machineName,
+          deviceLabel: deviceLabel,
+          status: "unlinked",
+          suggestions: ranked.slice(0, 3).map(function(r) {
+            return { studentId: r.studentId, name: r.name, regNo: r.regNo, score: Math.round(r.score * 1000) / 10 };
+          }),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+      }
+    }
+    markDirty("biometric import");
+    if (status) {
+      status.textContent = "Done · auto-linked " + autoN + " · clarify " + clarifyN +
+        " · unlinked pool " + unlinkedN + " · already linked " + skipN +
+        (conflictN ? (" · conflicts " + conflictN) : "") +
+        ". Official site names were not changed. Publish when ready.";
+    }
+    var sum = document.getElementById("bioImportSummary");
+    if (sum) {
+      sum.hidden = false;
+      sum.innerHTML =
+        '<div class="bio-kpi"><div class="lab">Auto-linked</div><div class="val">' + autoN + '</div></div>' +
+        '<div class="bio-kpi"><div class="lab">Clarify</div><div class="val">' + clarifyN + '</div></div>' +
+        '<div class="bio-kpi"><div class="lab">Unlinked</div><div class="val">' + unlinkedN + '</div></div>' +
+        '<div class="bio-kpi"><div class="lab">Already OK</div><div class="val">' + skipN + '</div></div>';
+    }
+    await renderBioQueues();
+    try { await renderStudentsTable(); } catch (_) {}
+  } catch (err) {
+    console.error(err);
+    if (status) status.textContent = "Import failed: " + (err.message || String(err));
+  }
+}
+
+async function renderBioQueues() {
+  var clarifyBody = document.getElementById("bioClarifyBody");
+  var unlinkedBody = document.getElementById("bioUnlinkedBody");
+  var list = [];
+  try { list = await getAll("biometric_pending"); } catch (_) { list = []; }
+  list = (list || []).filter(function(x) { return x && x.status !== "linked"; });
+  var clarify = list.filter(function(x) { return x.status === "clarify" || x.status === "conflict"; });
+  var unlinked = list.filter(function(x) { return x.status === "unlinked"; });
+  if (clarifyBody) {
+    if (!clarify.length) {
+      clarifyBody.innerHTML = '<tr><td colspan="5" class="muted-note">No rows waiting.</td></tr>';
+    } else {
+      clarifyBody.innerHTML = clarify.map(function(row) {
+        var sug = (row.suggestions || []).map(function(s) {
+          return '<div class="bio-match-list">' +
+            escapeHtml(s.name) + ' · ' + escapeHtml(s.regNo || "—") +
+            ' · ' + (s.score != null ? s.score + "%" : "") +
+            (isQaOfficer() ? (' <button type="button" class="btn btn--ghost btn--sm" data-bio-link="' +
+              escapeHtml(row.id) + '" data-stu="' + escapeHtml(s.studentId) + '">Link</button>') : "") +
+            '</div>';
+        }).join("") || '<span class="muted-note">No suggestions</span>';
+        if (row.note) sug += '<div class="muted-note">' + escapeHtml(row.note) + '</div>';
+        return '<tr>' +
+          '<td>' + escapeHtml(row.machineNo) + '</td>' +
+          '<td>' + escapeHtml(row.machineName) + '</td>' +
+          '<td>' + escapeHtml(row.deviceLabel || "") + '</td>' +
+          '<td>' + sug + '</td>' +
+          '<td class="qa-edit-only">' +
+            (isQaOfficer() ? (
+              '<button type="button" class="btn btn--ghost btn--sm" data-bio-to-unlinked="' + escapeHtml(row.id) + '">Move to pool</button> ' +
+              '<button type="button" class="btn btn--ghost btn--sm" data-bio-discard="' + escapeHtml(row.id) + '">Discard</button>'
+            ) : "—") +
+          '</td></tr>';
+      }).join("");
+    }
+  }
+  if (unlinkedBody) {
+    if (!unlinked.length) {
+      unlinkedBody.innerHTML = '<tr><td colspan="5" class="muted-note">Pool empty.</td></tr>';
+    } else {
+      unlinkedBody.innerHTML = unlinked.map(function(row) {
+        return '<tr>' +
+          '<td>' + escapeHtml(row.machineNo) + '</td>' +
+          '<td>' + escapeHtml(row.machineName) + '</td>' +
+          '<td>' + escapeHtml(row.deviceLabel || "") + '</td>' +
+          '<td>' + escapeHtml((row.createdAt || "").slice(0, 16).replace("T", " ")) + '</td>' +
+          '<td class="qa-edit-only">' +
+            (isQaOfficer() ? (
+              '<button type="button" class="btn btn--primary btn--sm" data-bio-create="' + escapeHtml(row.id) + '">Create student</button> ' +
+              '<button type="button" class="btn btn--ghost btn--sm" data-bio-discard="' + escapeHtml(row.id) + '">Discard</button>'
+            ) : "—") +
+          '</td></tr>';
+      }).join("");
+    }
+  }
+  // wire buttons
+  document.querySelectorAll("[data-bio-link]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!isQaOfficer()) return;
+      var pid = btn.getAttribute("data-bio-link");
+      var sid = btn.getAttribute("data-stu");
+      try {
+        var pending = (await getAll("biometric_pending")).find(function(x) { return x.id === pid; });
+        if (!pending) return;
+        var score = null;
+        (pending.suggestions || []).forEach(function(s) {
+          if (s.studentId === sid) score = (s.score != null ? s.score / 100 : null);
+        });
+        await bioLinkStudentSerial(sid, pending.machineNo, pending.machineName, pending.deviceLabel, score, "manual");
+        await del("biometric_pending", pid);
+        markDirty("biometric link");
+        await renderBioQueues();
+        try { await renderStudentsTable(); } catch (_) {}
+      } catch (err) {
+        alert(err.message || String(err));
+      }
+    });
+  });
+  document.querySelectorAll("[data-bio-to-unlinked]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      var pid = btn.getAttribute("data-bio-to-unlinked");
+      var pending = (await getAll("biometric_pending")).find(function(x) { return x.id === pid; });
+      if (!pending) return;
+      pending.status = "unlinked";
+      pending.updatedAt = new Date().toISOString();
+      await put("biometric_pending", pending);
+      markDirty("biometric pool");
+      await renderBioQueues();
+    });
+  });
+  document.querySelectorAll("[data-bio-discard]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if (!confirm("Discard this device user from the queue? You can re-import the file later.")) return;
+      await del("biometric_pending", btn.getAttribute("data-bio-discard"));
+      markDirty("biometric discard");
+      await renderBioQueues();
+    });
+  });
+  document.querySelectorAll("[data-bio-create]").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      openBioCreateStudentModal(btn.getAttribute("data-bio-create"));
+    });
+  });
+}
+
+async function openBioCreateStudentModal(pendingId) {
+  if (!isQaOfficer()) return;
+  var pending = (await getAll("biometric_pending")).find(function(x) { return x.id === pendingId; });
+  if (!pending) return;
+  await fillProgrammeLevelSelects();
+  // copy options into bio selects
+  ["bioCreateProgramme", "bioCreateLevel"].forEach(function(id) {
+    var el = document.getElementById(id);
+    var srcId = id === "bioCreateProgramme" ? "studentProgramme" : "studentLevel";
+    var src = document.getElementById(srcId);
+    if (el && src) el.innerHTML = src.innerHTML;
+  });
+  document.getElementById("bioCreatePendingId").value = pendingId;
+  document.getElementById("bioCreateName").value = pending.machineName || "";
+  document.getElementById("bioCreateMachineName").value = pending.machineName || "";
+  document.getElementById("bioCreateSerial").value = pending.machineNo || "";
+  document.getElementById("bioCreateRegNo").value = "";
+  if (pending.deviceLabel && document.getElementById("bioCreateHostel")) {
+    var h = document.getElementById("bioCreateHostel");
+    if (pending.deviceLabel.indexOf("1") >= 0) h.value = "Hostel 1";
+    else if (pending.deviceLabel.indexOf("2") >= 0) h.value = "Hostel 2";
+  }
+  document.getElementById("bioCreateStudentModal").hidden = false;
+}
+
+function closeBioCreateStudentModal() {
+  var m = document.getElementById("bioCreateStudentModal");
+  if (m) m.hidden = true;
+}
+
+async function confirmBioCreateStudent() {
+  if (!isQaOfficer()) return;
+  var pendingId = document.getElementById("bioCreatePendingId").value;
+  var name = (document.getElementById("bioCreateName").value || "").trim();
+  var serial = (document.getElementById("bioCreateSerial").value || "").trim();
+  var regNo = (document.getElementById("bioCreateRegNo").value || "").trim();
+  var programme = (document.getElementById("bioCreateProgramme").value || "").trim();
+  var level = (document.getElementById("bioCreateLevel").value || "").trim();
+  var hostel = (document.getElementById("bioCreateHostel").value || "").trim();
+  var gender = (document.getElementById("bioCreateGender").value || "").trim();
+  if (!name) { alert("Official site name is required."); return; }
+  if (!serial) { alert("Machine No. / serial is required."); return; }
+  if (!programme || !level) { alert("Programme and level are required."); return; }
+  var all = await getAll("students");
+  if (all.find(function(s) { return String(s.serial || "").trim() === serial; })) {
+    alert("That machine No. is already linked to another student.");
+    return;
+  }
+  if (!regNo) regNo = await generateTempRegNo(programme);
+  if (all.find(function(s) { return String(s.regNo || "").toLowerCase() === regNo.toLowerCase(); })) {
+    alert("Registration number already in use.");
+    return;
+  }
+  var now = new Date().toISOString();
+  var student = {
+    id: generateId("stu"),
+    name: name,
+    regNo: regNo,
+    serial: serial,
+    programme: programme,
+    level: level !== "" && !isNaN(Number(level)) ? Number(level) : level,
+    gender: gender,
+    hostel: hostel,
+    status: "Active",
+    phone: "",
+    photoDataUrl: "",
+    bioAliases: [],
+    createdAt: now,
+    updatedAt: now
+  };
+  var pending = (await getAll("biometric_pending")).find(function(x) { return x.id === pendingId; });
+  if (pending && pending.machineName && pending.machineName !== name) {
+    student.bioAliases = [pending.machineName];
+  }
+  await put("students", student);
+  try {
+    await writeAudit({
+      action: "create",
+      entity: "students",
+      entityId: student.id,
+      reason: "Created from biometric device user",
+      details: { serial: serial, machineName: pending && pending.machineName, siteName: name }
+    });
+  } catch (_) {}
+  if (pendingId) {
+    try { await del("biometric_pending", pendingId); } catch (_) {}
+  }
+  markDirty("biometric create student");
+  closeBioCreateStudentModal();
+  await renderBioQueues();
+  try { await renderStudentsTable(); } catch (_) {}
+  alert("Student created on the master list with serial " + serial + ". Site name: " + name);
+}
+
+function initBiometricMapUI() {
+  document.getElementById("btnBioImportMatch")?.addEventListener("click", function() { bioImportAndMatch(); });
+  document.getElementById("btnBioRefreshQueues")?.addEventListener("click", function() { renderBioQueues(); });
+  document.getElementById("btnCloseBioCreate")?.addEventListener("click", closeBioCreateStudentModal);
+  document.getElementById("btnCancelBioCreate")?.addEventListener("click", closeBioCreateStudentModal);
+  document.getElementById("bioCreateStudentBackdrop")?.addEventListener("click", closeBioCreateStudentModal);
+  document.getElementById("btnConfirmBioCreate")?.addEventListener("click", function() { confirmBioCreateStudent(); });
+  try { renderBioQueues(); } catch (_) {}
+}
 
 // Report generators bind to window inside openDB boot (where they are defined).
 

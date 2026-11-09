@@ -15,6 +15,7 @@ const ALLOWED_PATHS = new Set([
   "data/timetables.json",
   "data/attendance.json",
   "data/hostel_runs.json",
+  "data/biometric_pending.json",
   "data/remedial.json",
   "data/remedial_logs.json",
   "data/remedial_timetable.json",

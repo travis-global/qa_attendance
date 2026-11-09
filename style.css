@@ -1305,3 +1305,19 @@ button.linkish {
   font: inherit;
 }
 body.role-officer .nav-item--officer.is-locked::after { content: none; }
+
+.bio-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+.bio-summary .bio-kpi {
+  background: var(--surface-2, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.bio-summary .bio-kpi .lab { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.bio-summary .bio-kpi .val { font-size: 1.25rem; font-weight: 700; color: #1B3A6B; }
+.bio-match-list { font-size: 0.82rem; line-height: 1.35; }
+.bio-match-list button { margin-top: 4px; }
