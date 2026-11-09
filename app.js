@@ -2977,16 +2977,37 @@ async function printDailyLectureReport() {
   var dept = classLabel;
   var period = classLabel + " · " + sessionName + " · " + formatDateLong(date);
 
+  function statusRemark(st) {
+    var s = String(st || "").trim();
+    if (!s) return "Did not hold";
+    if (s.toLowerCase() === "held") return "Held";
+    if (s.toLowerCase() === "partial") return "Did not hold (partial)";
+    if (s.toLowerCase() === "missed") return "Did not hold";
+    return "Did not hold (" + s + ")";
+  }
+  function entryForSlot(slot) {
+    var code = String(slot.code || slot.courseCode || "").trim().toLowerCase();
+    var title = String(slot.title || slot.course || "").trim().toLowerCase();
+    var found = null;
+    entries.forEach(function(e) {
+      var c = String(e.course || "").trim().toLowerCase();
+      if (code && c.indexOf(code) >= 0) found = e;
+      else if (title && (c === title || c.indexOf(title) >= 0 || title.indexOf(c) >= 0)) found = e;
+    });
+    return found;
+  }
   var scheduleRows = slots.map(function(s, i) {
+    var ent = entryForSlot(s);
+    var remark = ent ? statusRemark(ent.status) : "Did not hold";
     return "<tr><td style='text-align:center'>" + (i + 1) + "</td><td>" + escapeHtml(s.title || s.course || "") +
       "</td><td>" + escapeHtml(s.code || s.courseCode || "") + "</td><td>" + escapeHtml(formatTimeNice(s.start)) +
-      "</td><td>" + escapeHtml(formatTimeNice(s.end)) + "</td><td>" + escapeHtml(s.remark || "") + "</td></tr>";
+      "</td><td>" + escapeHtml(formatTimeNice(s.end)) + "</td><td>" + escapeHtml(remark) + "</td></tr>";
   }).join("");
   if (!scheduleRows && entries.length) {
     scheduleRows = entries.map(function(e, i) {
       return "<tr><td style='text-align:center'>" + (i + 1) + "</td><td>" + escapeHtml(e.course || "") +
         "</td><td></td><td>" + escapeHtml(formatTimeNice(e.start)) + "</td><td>" + escapeHtml(formatTimeNice(e.end)) +
-        "</td><td>" + escapeHtml(e.status || "") + "</td></tr>";
+        "</td><td>" + escapeHtml(statusRemark(e.status)) + "</td></tr>";
     }).join("");
   }
 
@@ -2997,11 +3018,13 @@ async function printDailyLectureReport() {
 
   var allAbsentMap = {};
   var courseBlocks = "";
+  // Only status === Held is expanded as a full lecture report. All others = Did not hold.
   var heldEntries = entries.filter(function(e) {
-    var st = String(e.status || "").toLowerCase();
-    return st === "held" || st === "partial" || st === "delivered" || !st;
+    return String(e.status || "").trim().toLowerCase() === "held";
   });
-  if (!heldEntries.length) heldEntries = entries.slice();
+  var notHeldEntries = entries.filter(function(e) {
+    return String(e.status || "").trim().toLowerCase() !== "held";
+  });
 
   heldEntries.forEach(function(e, idx) {
     var absentList = resolveAbsent(e.absentDetails && e.absentDetails.length ? e.absentDetails : e.absent);
@@ -3036,6 +3059,19 @@ async function printDailyLectureReport() {
     }
     if (idx < heldEntries.length - 1) courseBlocks += "<div style='page-break-after:always'></div>";
   });
+
+  if (typeof notHeldEntries !== "undefined" && notHeldEntries.length) {
+    courseBlocks += "<h2 class='sec'>Lectures that did not hold</h2>";
+    courseBlocks += "<p class='narrative'>Only lectures with status <strong>Held</strong> receive a full course report. The sessions below are recorded as <strong>Did not hold</strong>.</p>";
+    courseBlocks += "<table class='data'><thead><tr><th>S/N</th><th>Course</th><th>Lecturer</th><th>Logged status</th><th>Remark</th></tr></thead><tbody>";
+    notHeldEntries.forEach(function(e, i) {
+      courseBlocks += "<tr><td style='text-align:center'>" + (i + 1) + "</td><td>" + escapeHtml(e.course || "—") +
+        "</td><td>" + escapeHtml(e.lecturer || "—") + "</td><td>" + escapeHtml(e.status || "—") +
+        "</td><td>Did not hold</td></tr>";
+    });
+    courseBlocks += "</tbody></table>";
+  }
+
 
   if (courseBlocks) {
     body += "<div style='page-break-after:always'></div>" + courseBlocks;
@@ -3102,7 +3138,7 @@ async function printWeeklyProfessionalPack(payload) {
   var compliance = p.scheduled ? Math.round((p.delivered / p.scheduled) * 1000) / 10 : 0;
   var courseRows = (p.courseRows || []).map(function(r) {
     var st = String(r.status || "");
-    var stColor = st.indexOf("Fully Delivered") >= 0 ? "#1B7A3D" : st.indexOf("Missed") >= 0 ? "#B91C1C" : st.indexOf("Partial") >= 0 ? "#B8860B" : st.indexOf("Over") >= 0 ? "#1d4ed8" : "#64748b";
+    var stColor = st.indexOf("Fully Delivered") >= 0 ? "#1B7A3D" : st.indexOf("Did not hold") >= 0 || st.indexOf("Missed") >= 0 ? "#B91C1C" : st.indexOf("Partial") >= 0 ? "#B8860B" : st.indexOf("Over") >= 0 ? "#1d4ed8" : "#64748b";
     return "<tr><td><b>" + escapeHtml(r.course) + "</b></td><td>" + escapeHtml(r.lecturers || r.lecturer || "—") +
       "</td><td style='text-align:center'>" + r.scheduled + "</td><td style='text-align:center;color:#1B7A3D;font-weight:600'>" + r.delivered +
       "</td><td style='text-align:center;color:#B91C1C;font-weight:600'>" + (r.missed || "—") +
@@ -6074,6 +6110,20 @@ async function syncFromRepoIfClean() {
       var text = await fetchRepoText(path);
       var rows = JSON.parse(text);
       if (!Array.isArray(rows)) throw new Error("not a list");
+      var PROTECT = { qa_entries: 1, students: 1, audit: 1, lecturers: 1 };
+      if (PROTECT[store]) {
+        var localNow = [];
+        try { localNow = await getAll(store); } catch (_) {}
+        if (localNow.length && rows.length < localNow.length) {
+          console.warn("repo sync: refusing shorter remote for", store, rows.length, "<", localNow.length);
+          rows = mergeRecordsById(localNow, rows);
+          if (store === "students") rows = rows.map(function(r) { return studentFromRepo(r); });
+          await replaceStoreFromRepoRows(store, rows);
+          await put("meta", { key: "repoFp:" + store, value: textFingerprint(JSON.stringify(rows)) });
+          changed.push(store + "(merged-protect)");
+          continue;
+        }
+      }
       await replaceStoreFromRepoRows(store, rows);
       await put("meta", { key: "repoFp:" + store, value: textFingerprint(text) });
       changed.push(store);
@@ -6179,16 +6229,62 @@ async function githubPutFile(token, path, contentText, message) {
 }
 
 
+
+/** Prefer newer record by updatedAt/createdAt; keep all ids from both sides. */
+function mergeRecordsById(localRows, remoteRows) {
+  var map = {};
+  function ts(r) {
+    return String((r && (r.updatedAt || r.createdAt || r.timestamp || r.at)) || "");
+  }
+  function ingest(rows) {
+    (rows || []).forEach(function(r) {
+      if (!r || r.id == null) return;
+      var id = String(r.id);
+      if (!map[id] || ts(r) >= ts(map[id])) map[id] = r;
+    });
+  }
+  ingest(remoteRows);
+  ingest(localRows);
+  return Object.keys(map).map(function(k) { return map[k]; });
+}
+
+async function fetchRemoteList(path) {
+  try {
+    var rows = await fetchRepoJson(path + "?t=" + Date.now());
+    return Array.isArray(rows) ? rows : [];
+  } catch (_) {
+    return [];
+  }
+}
+
 async function safePublishJson(path, localRows, label) {
   var local = Array.isArray(localRows) ? localRows : [];
-  var remote = null;
-  try { remote = await fetchRepoJson(path + "?t=" + Date.now()); } catch (_) { remote = null; }
-  var remoteLen = Array.isArray(remote) ? remote.length : 0;
+  var remote = [];
+  try {
+    var rem = await fetchRepoJson(path + "?t=" + Date.now());
+    if (Array.isArray(rem)) remote = rem;
+  } catch (_) { remote = []; }
+  var remoteLen = remote.length;
   if (local.length === 0 && remoteLen > 0) {
     console.warn("publish guard: skipped empty", label, "remote has", remoteLen);
-    return { skipped: true, reason: "local empty, remote has " + remoteLen + " " + label, remoteLen: remoteLen };
+    return { skipped: true, reason: "local empty, remote has " + remoteLen + " " + label, remoteLen: remoteLen, merged: remote };
   }
-  return { skipped: false, body: JSON.stringify(localRows, null, 2) };
+  var MERGE = {
+    students: 1, lecturers: 1, sessions: 1, qa_entries: 1, audit: 1,
+    discipline: 1, pending_students: 1, programmes: 1, levels: 1, courses: 1,
+    attendance: 1, hostel_runs: 1, biometric_pending: 1, remedial: 1,
+    remedial_enrolment: 1, remedial_assignments: 1, remedial_logs: 1
+  };
+  var merged = local;
+  if (MERGE[label] && remoteLen) merged = mergeRecordsById(local, remote);
+  return {
+    skipped: false,
+    body: JSON.stringify(merged, null, 2),
+    merged: merged,
+    localLen: local.length,
+    remoteLen: remoteLen,
+    publishedLen: merged.length
+  };
 }
 
 async function publishAllToRepo() {
@@ -6212,10 +6308,18 @@ async function publishAllToRepo() {
     var students = shapeStudentsForRepo(await getAll("students"));
     var files = {};
     var skipped = [];
+    var publishLens = {};
     async function putFile(path, rows, label) {
       var r = await safePublishJson(path, rows, label);
       if (r.skipped) { skipped.push(label + " (" + r.reason + ")"); return; }
       files[path] = r.body;
+      publishLens[label] = r.publishedLen != null ? r.publishedLen : (Array.isArray(rows) ? rows.length : 0);
+      // Persist merged union locally so a refresh cannot drop rows this browser just published
+      if (r.merged && Array.isArray(r.merged) && (label === "qa_entries" || label === "students" || label === "audit" || label === "lecturers" || label === "sessions")) {
+        try {
+          await replaceStoreFromRepoRows(label, label === "students" ? r.merged.map(studentFromRepo) : r.merged);
+        } catch (e) { console.warn("local merge write", label, e); }
+      }
     }
     await putFile(DATA_FILES.students, students, "students");
     await putFile(DATA_FILES.lecturers, await getAll("lecturers"), "lecturers");
@@ -6283,48 +6387,40 @@ async function publishAllToRepo() {
     clearDirty();
     try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
     try { await put("meta", { key: "lastPublishAt", value: new Date().toISOString() }); } catch (_) {}
-    if (status) status.textContent = "Published via worker: " + ((body.updated && body.updated.join(", ")) || "ok") + ". Clearing local cache and reloading from repository…";
-    // After successful publish: wipe local operational stores and re-read from repo
-    // so this browser matches GitHub Pages (Device B sees the same after load/refresh).
+    if (status) status.textContent = "Published via worker: " + ((body.updated && body.updated.join(", ")) || "ok") + ". Verifying (local data kept — no wipe)…";
+    // STRONG PUBLISH: never wipe IndexedDB after publish. Merged lists already saved locally.
     try {
+      EOCNS_DIRTY = false;
+      clearDirty();
+      try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
+      try { await put("meta", { key: "lastPublishAt", value: new Date().toISOString() }); } catch (_) {}
       for (var si = 0; si < SYNC_STORES.length; si++) {
-        try { await clearStore(SYNC_STORES[si][0]); } catch (_) {}
-      }
-      try {
-        var metaAll = await getAll("meta");
-        for (var mi = 0; mi < metaAll.length; mi++) {
-          var mk = metaAll[mi] && metaAll[mi].key;
-          if (mk && (String(mk).indexOf("repoFp:") === 0 || mk === "dirty")) {
-            try { await del("meta", mk); } catch (_) {}
-          }
-        }
-        await put("meta", { key: "dirty", value: false });
-      } catch (_) {}
-      TIMETABLES_CACHE = null;
-      try { PROGRAMMES_CACHE = null; LEVELS_CACHE = null; } catch (_) {}
-      await new Promise(function(r) { setTimeout(r, 3000); });
-      var syncOk = false;
-      try {
-        await syncFromRepoIfClean();
-        syncOk = true;
-      } catch (e1) {
-        console.warn("post-publish sync attempt 1", e1);
-        await new Promise(function(r) { setTimeout(r, 2000); });
+        var storeName = SYNC_STORES[si][0];
         try {
-          await syncFromRepoIfClean();
-          syncOk = true;
-        } catch (e2) {
-          console.warn("post-publish sync attempt 2", e2);
+          var localRows = await getAll(storeName);
+          await put("meta", { key: "repoFp:" + storeName, value: textFingerprint(JSON.stringify(localRows)) });
+        } catch (_) {}
+      }
+      await new Promise(function(r) { setTimeout(r, 2500); });
+      var verifyNotes = [];
+      try {
+        var remoteQa = await fetchRemoteList(DATA_FILES.qa_entries);
+        var localQa = await getAll("qa_entries");
+        if (remoteQa.length < localQa.length) {
+          verifyNotes.push("qa_entries: remote " + remoteQa.length + " < local " + localQa.length + " (propagation lag — local kept)");
+        } else {
+          verifyNotes.push("qa_entries verified (" + remoteQa.length + ")");
         }
-      }
+      } catch (_) { verifyNotes.push("qa verify deferred"); }
       if (status) {
-        status.textContent = syncOk
-          ? "Published and local cache refreshed from repository. Other devices will see this after they load/refresh the site."
-          : "Published OK. If lists look empty, hard-refresh this page (GitHub Pages may still be updating).";
+        status.textContent = "Published successfully. Local lecture logs and master data were kept. " +
+          verifyNotes.join(" · ") +
+          ". Other devices: hard-refresh after ~30s. If a device is behind, Publish again from the browser that has the full data.";
       }
+      try { await refreshCachesAfterSync(); } catch (_) {}
     } catch (postErr) {
-      console.warn("post-publish reload", postErr);
-      if (status) status.textContent = "Published OK, but local reload had an issue: " + (postErr.message || postErr) + ". Hard-refresh this page.";
+      console.warn("post-publish verify", postErr);
+      if (status) status.textContent = "Published OK. Local data was kept (no wipe). " + (postErr.message || postErr);
     }
     var panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = true;
