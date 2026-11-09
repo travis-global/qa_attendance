@@ -5200,6 +5200,7 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
 // Master list: data/students.json in the repository
 // =========================================================
 const QA_PIN_KEY = "eocns-qa-session";
+const QA_OFFICER_NAME_KEY = "eocns-qa-officer-name";
 /* PIN from APP_CONFIG.qaPin / data/config.json */
 const REPO_OWNER = "travis-global";
 const REPO_NAME = "qa_attendance";
