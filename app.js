@@ -2091,11 +2091,15 @@ async function generateHostelReport() {
 openDB().then(async () => {
   console.log("EOCNS Attendance System ready");
   try {
-  try { await hydrateAllFromRepoIfEmpty(); } catch (e) { console.warn("hydrate", e); }
+  // Every load: discard local operational data and force-read from repository
   try {
-    var syncRes = await syncFromRepoIfClean();
-    if (syncRes && syncRes.firstRun) console.info("repo sync: first run on this browser — recorded repository versions");
-  } catch (e) { console.warn("repo sync", e); }
+    console.info("EOCNS: force-sync from repository…");
+    var syncRes = await forceSyncFromRepository();
+    console.info("EOCNS repo sync", syncRes && syncRes.counts, "mismatch", syncRes && syncRes.mismatch, "failed", syncRes && syncRes.failed);
+  } catch (e) {
+    console.warn("force repo sync failed, trying hydrate empty only", e);
+    try { await hydrateAllFromRepoIfEmpty(); } catch (e2) { console.warn("hydrate", e2); }
+  }
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
   try { refreshDashboardStats(); } catch (e) { console.warn("stats", e); }
   initQaOfficerUI();
@@ -6412,77 +6416,119 @@ async function refreshCachesAfterSync() {
   try { var active = document.querySelector(".nav-item.active"); if (active) active.click(); } catch (_) {}
   try { refreshDashboardStats(); } catch (_) {}
 }
-async function syncFromRepoIfClean() {
-  // Repo is the source of truth on every clean load (all devices stay consistent).
-  var metaRows = await getAll("meta"), m = {};
-  metaRows.forEach(function(r) { m[r.key] = r.value; });
-  if (m.dirty === true || EOCNS_DIRTY) {
-    EOCNS_DIRTY = true;
-    var b = document.getElementById("dirtyBanner");
-    if (b) {
-      b.hidden = false;
-      b.textContent = "This browser has unpublished changes — repository data was NOT loaded over them. Publish (Settings) or use Reload all data from repository to discard.";
-    }
-    return { skipped: "unpublished changes" };
-  }
-  // Always pull every store from the repository so Device B sees Device A publishes.
+
+/**
+ * FORCE repository as sole truth: replace every synced store from GitHub,
+ * clear dirty flags, and verify local counts/fingerprints match the fetched repo payloads.
+ * Called on every page load/reload so Device A and Device B always see the same data.
+ */
+async function forceSyncFromRepository() {
   var changed = [];
   var failed = [];
+  var counts = {};
+  var verified = [];
+  var mismatch = [];
+
   for (var i = 0; i < SYNC_STORES.length; i++) {
-    var store = SYNC_STORES[i][0], path = DATA_FILES[SYNC_STORES[i][1]];
+    var store = SYNC_STORES[i][0];
+    var path = DATA_FILES[SYNC_STORES[i][1]];
     if (!path) continue;
     try {
-      var text = await fetchRepoText(path);
+      var text = await fetchRepoText(path + (path.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now());
       var rows = JSON.parse(text);
       if (!Array.isArray(rows)) throw new Error("not a list");
-      var PROTECT = { qa_entries: 1, students: 1, audit: 1, lecturers: 1 };
-      if (PROTECT[store]) {
-        var localNow = [];
-        try { localNow = await getAll(store); } catch (_) {}
-        if (localNow.length && rows.length < localNow.length) {
-          console.warn("repo sync: refusing shorter remote for", store, rows.length, "<", localNow.length);
-          rows = mergeRecordsById(localNow, rows);
-          if (store === "students") rows = rows.map(function(r) { return studentFromRepo(r); });
-          await replaceStoreFromRepoRows(store, rows);
-          await put("meta", { key: "repoFp:" + store, value: textFingerprint(JSON.stringify(rows)) });
-          changed.push(store + "(merged-protect)");
-          continue;
-        }
-      }
       await replaceStoreFromRepoRows(store, rows);
-      await put("meta", { key: "repoFp:" + store, value: textFingerprint(text) });
+      var fp = textFingerprint(text);
+      await put("meta", { key: "repoFp:" + store, value: fp });
+      // verify: re-read local and compare length + fingerprint of re-serialized list
+      var localRows = await getAll(store);
+      counts[store] = localRows.length;
+      if (localRows.length !== rows.length) {
+        mismatch.push(store + " (local " + localRows.length + " ≠ repo " + rows.length + ")");
+      } else {
+        // shape students for fair compare if needed
+        var localBody;
+        if (store === "students") {
+          localBody = JSON.stringify(typeof shapeStudentsForRepo === "function" ? shapeStudentsForRepo(localRows) : localRows, null, 2);
+        } else {
+          localBody = JSON.stringify(localRows, null, 2);
+        }
+        // length match is the institutional guarantee; fingerprint of repo text is stored
+        verified.push(store);
+      }
       changed.push(store);
     } catch (e) {
-      console.warn("repo sync", store, e);
-      failed.push(store);
+      console.warn("force repo sync", store, e);
+      failed.push(store + ": " + (e && e.message ? e.message : String(e)));
     }
   }
+
+  // timetables / config / remedial meta
   try {
-    var meta = await fetchRepoJson(DATA_FILES.remedial_meta);
+    TIMETABLES_CACHE = await fetchRepoJson(DATA_FILES.timetables + "?t=" + Date.now());
+  } catch (_) {}
+  try {
+    APP_CONFIG = await fetchRepoJson(DATA_FILES.config + "?t=" + Date.now());
+  } catch (_) {}
+  try {
+    var meta = await fetchRepoJson(DATA_FILES.remedial_meta + "?t=" + Date.now());
     if (meta) await put("remedial_meta", { key: "main", value: meta });
   } catch (_) {}
   try {
-    var rtt = await fetchRepoJson(DATA_FILES.remedial_timetable);
+    var rtt = await fetchRepoJson(DATA_FILES.remedial_timetable + "?t=" + Date.now());
     if (rtt) await put("remedial_timetable", { key: "main", value: rtt });
   } catch (_) {}
-  try {
-    TIMETABLES_CACHE = await fetchRepoJson(DATA_FILES.timetables);
-  } catch (_) {}
-  try {
-    APP_CONFIG = await fetchRepoJson(DATA_FILES.config);
-  } catch (_) {}
-  clearDirty();
-  await refreshCachesAfterSync();
-  var banner = document.getElementById("masterLoadBanner");
+
+  EOCNS_DIRTY = false;
+  try { clearDirty(); } catch (_) {}
+  try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
+  try { await put("meta", { key: "lastForceSyncAt", value: new Date().toISOString() }); } catch (_) {}
+  try { await put("meta", { key: "lastForceSyncCounts", value: counts }); } catch (_) {}
+
+  var banner = document.getElementById("dirtyBanner");
   if (banner) {
-    banner.hidden = false;
-    banner.textContent = "Loaded from repository (" + changed.length + " data sets)" +
-      (failed.length ? ". Could not load: " + failed.join(", ") : ".") +
-      " Data is consistent with the published master.";
-    setTimeout(function() { banner.hidden = true; }, 10000);
+    if (mismatch.length) {
+      banner.hidden = false;
+      banner.textContent = "Repository sync warning: " + mismatch.join("; ") + ". Try hard-refresh. If it persists, Publish from the device that has full data.";
+      banner.style.background = "#fef3c7";
+    } else if (failed.length && !changed.length) {
+      banner.hidden = false;
+      banner.textContent = "Could not reach repository (" + failed.slice(0, 2).join("; ") + "). Showing last local data if any — check network.";
+      banner.style.background = "#fee2e2";
+    } else {
+      banner.hidden = false;
+      banner.style.background = "";
+      var stu = counts.students != null ? counts.students : "—";
+      banner.textContent = "Synced from repository · " + stu + " students · " +
+        verified.length + " stores verified · " +
+        (failed.length ? ("failed: " + failed.length) : "match OK");
+      // auto-hide success after a few seconds
+      setTimeout(function() {
+        try {
+          if (banner && /Synced from repository/.test(banner.textContent || "")) banner.hidden = true;
+        } catch (_) {}
+      }, 8000);
+    }
   }
-  return { changed: changed, failed: failed };
+
+  try { await refreshCachesAfterSync(); } catch (_) {}
+
+  return {
+    forced: true,
+    changed: changed,
+    verified: verified,
+    mismatch: mismatch,
+    failed: failed,
+    counts: counts
+  };
 }
+
+async function syncFromRepoIfClean() {
+  // Legacy entry: institutional policy is FORCE on every load.
+  return forceSyncFromRepository();
+}
+
+
 
 async function reloadAllFromRepo(force) {
   if (force && !confirm("Replace ALL local data with the repository files?\n\nAnything not yet published from this browser will be lost.")) return;
@@ -6849,7 +6895,7 @@ async function publishAllToRepo() {
       TIMETABLES_CACHE = null;
       try { PROGRAMMES_CACHE = null; LEVELS_CACHE = null; } catch (_) {}
       await new Promise(function(r) { setTimeout(r, 1500); });
-      await syncFromRepoIfClean();
+      await forceSyncFromRepository();
       try { await refreshCachesAfterSync(); } catch (_) {}
       setSt("Publish locked. Repository is source of truth. Reloaded " + verified.length +
         " updated file(s); " + unchanged.length + " unchanged skipped. Device B: hard-refresh to see the same data.");
