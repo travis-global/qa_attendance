@@ -1,1 +1,86 @@
-[]
+[
+  {
+    "code": "BIO 101",
+    "name": "Biology",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "GNS 102",
+    "name": "Communication in English",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "GNS 111",
+    "name": "Citizenship Education",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUR 111",
+    "name": "Foundation of Nursing/Emergency Care",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUS 111",
+    "name": "Applied Chemistry",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUS 112",
+    "name": "Applied Physics",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUS 113",
+    "name": "Human Anatomy",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUS 114",
+    "name": "Human Physiology I",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUS 115",
+    "name": "Introduction to Sociology",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUS 116",
+    "name": "Use of Computer",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "NUS 117",
+    "name": "Medical Microbiology",
+    "classKeys": [
+      "100_nursing"
+    ]
+  },
+  {
+    "code": "PRAC 101",
+    "name": "Practicum/Study Skills",
+    "classKeys": [
+      "100_nursing"
+    ]
+  }
+]
