@@ -24168,5 +24168,1177 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1091
+  },
+  {
+    "ref": "REF/EOCNS/QA/1210",
+    "action": "create",
+    "entity": "students",
+    "entityId": "csv_import",
+    "reason": "Imported 127 students from CSV · defaults — / 300",
+    "details": {
+      "added": 127,
+      "skippedDup": 3,
+      "skippedEmpty": 0,
+      "photos": 0,
+      "fileName": "reg_numbers_2026-11-10.csv"
+    },
+    "timestamp": "2026-11-10T13:32:45.876Z",
+    "at": "2026-11-10T13:32:45.876Z",
+    "createdAt": "2026-11-10T13:32:45.876Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:32:45",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1092
+  },
+  {
+    "ref": "REF/EOCNS/QA/1211",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mw68l7w89ysv3",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "ITUMA EMMANUEL AGEH",
+        "regNo": "EOCNS/24/0117/GNS",
+        "programme": "Nursing",
+        "level": "300"
+      },
+      "csvName": "ITUMA EMMANUEL",
+      "csvRegNo": "EOCNS/24/0117/GNS"
+    },
+    "timestamp": "2026-11-10T13:33:17.596Z",
+    "at": "2026-11-10T13:33:17.596Z",
+    "createdAt": "2026-11-10T13:33:17.596Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:33:17",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1093
+  },
+  {
+    "ref": "REF/EOCNS/QA/1212",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacje8tsn",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Joy Onyekachi Ucha",
+        "regNo": "EOCNS/200/0039/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Joy Onyekachi Ucha",
+      "csvRegNo": "EOCNS/24/0040/MID"
+    },
+    "timestamp": "2026-11-10T13:33:34.012Z",
+    "at": "2026-11-10T13:33:34.012Z",
+    "createdAt": "2026-11-10T13:33:34.012Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:33:34",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1094
+  },
+  {
+    "ref": "REF/EOCNS/QA/1213",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacjavm2e",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Precious Chinwendu Uzoma",
+        "regNo": "EOCNS/200/0040/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Uzoma Precious chinwendu",
+      "csvRegNo": "EOCNS/24/0041/MID"
+    },
+    "timestamp": "2026-11-10T13:33:43.136Z",
+    "at": "2026-11-10T13:33:43.136Z",
+    "createdAt": "2026-11-10T13:33:43.136Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:33:43",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1095
+  },
+  {
+    "ref": "REF/EOCNS/QA/1214",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaci05e3p",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Chinedu Francis Ekwe",
+        "regNo": "EOCNS/24/0036/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Chinedu Francis",
+      "csvRegNo": "EOCNS/24/0036/MID"
+    },
+    "timestamp": "2026-11-10T13:33:52.942Z",
+    "at": "2026-11-10T13:33:52.942Z",
+    "createdAt": "2026-11-10T13:33:52.942Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:33:52",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1096
+  },
+  {
+    "ref": "REF/EOCNS/QA/1215",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdachdxepl",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Precious Ogochukwu Chukwuma",
+        "regNo": "EOCNS/200/0031/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Chukwuma precious Ogochukwu",
+      "csvRegNo": "EOCNS/24/0032/MID"
+    },
+    "timestamp": "2026-11-10T13:34:03.940Z",
+    "at": "2026-11-10T13:34:03.940Z",
+    "createdAt": "2026-11-10T13:34:03.940Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:34:03",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1097
+  },
+  {
+    "ref": "REF/EOCNS/QA/1216",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacg31flp",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Emmanuel Chinemerem Onyebuchi",
+        "regNo": "EOCNS/200/0029/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Emmanuel Chinemerem Onyebuchi",
+      "csvRegNo": "EOCNS/24/0030/MID"
+    },
+    "timestamp": "2026-11-10T13:34:07.655Z",
+    "at": "2026-11-10T13:34:07.655Z",
+    "createdAt": "2026-11-10T13:34:07.655Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:34:07",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1098
+  },
+  {
+    "ref": "REF/EOCNS/QA/1217",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdachqxkye",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "John Janet Otaka",
+        "regNo": "EOCNS/200/0033/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Otaka John Janet",
+      "csvRegNo": "EOCNS/24/0034/MID"
+    },
+    "timestamp": "2026-11-10T13:34:12.027Z",
+    "at": "2026-11-10T13:34:12.027Z",
+    "createdAt": "2026-11-10T13:34:12.027Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:34:12",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1099
+  },
+  {
+    "ref": "REF/EOCNS/QA/1218",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacksgwcs",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Mary Chisom Ugwu",
+        "regNo": "EOCNS/200/0042/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Ugwu Mary Chisom",
+      "csvRegNo": "EOCNS/24/0043/MID"
+    },
+    "timestamp": "2026-11-10T13:34:16.871Z",
+    "at": "2026-11-10T13:34:16.871Z",
+    "createdAt": "2026-11-10T13:34:16.871Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:34:16",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1100
+  },
+  {
+    "ref": "REF/EOCNS/QA/1219",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaccp539e",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Blessing Ngozi Nwigbo",
+        "regNo": "EOCNS/200/0015/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Blessing Ngozi Nwigbo",
+      "csvRegNo": "EOCNS/24/0016/MID"
+    },
+    "timestamp": "2026-11-10T13:34:45.771Z",
+    "at": "2026-11-10T13:34:45.771Z",
+    "createdAt": "2026-11-10T13:34:45.771Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:34:45",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1101
+  },
+  {
+    "ref": "REF/EOCNS/QA/1220",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacb9ybem",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Chidimma Esther Okechukwu",
+        "regNo": "EOCNS/200/0013/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Okechukwu Chidimma Esther",
+      "csvRegNo": "EOCNS/24/0014/MID"
+    },
+    "timestamp": "2026-11-10T13:34:50.604Z",
+    "at": "2026-11-10T13:34:50.604Z",
+    "createdAt": "2026-11-10T13:34:50.604Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:34:50",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1102
+  },
+  {
+    "ref": "REF/EOCNS/QA/1221",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacehprqe",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Promise Amaka Ikechukwu",
+        "regNo": "EOCNS/200/0023/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Promise Amaka Ikechukwu",
+      "csvRegNo": "EOCNS/24/0024/MID"
+    },
+    "timestamp": "2026-11-10T13:34:54.076Z",
+    "at": "2026-11-10T13:34:54.076Z",
+    "createdAt": "2026-11-10T13:34:54.076Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:34:54",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1103
+  },
+  {
+    "ref": "REF/EOCNS/QA/1222",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacg08aia",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Promise Chinasa Aneh",
+        "regNo": "EOCNS/200/0027/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Aneh Promise chinasa",
+      "csvRegNo": "EOCNS/24/0028/MID"
+    },
+    "timestamp": "2026-11-10T13:34:57.567Z",
+    "at": "2026-11-10T13:34:57.567Z",
+    "createdAt": "2026-11-10T13:34:57.567Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:34:57",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1104
+  },
+  {
+    "ref": "REF/EOCNS/QA/1223",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacldcr9n",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Eunice Chinagorom Nwankwo",
+        "regNo": "EOCNS/200/0044/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Nwankwo Eunice chinagorom",
+      "csvRegNo": "EOCNS/24/0045/MID"
+    },
+    "timestamp": "2026-11-10T13:35:01.241Z",
+    "at": "2026-11-10T13:35:01.241Z",
+    "createdAt": "2026-11-10T13:35:01.241Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:01",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1105
+  },
+  {
+    "ref": "REF/EOCNS/QA/1224",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacldpf3b",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Chinemerem Deborah Okpuru",
+        "regNo": "EOCNS/200/0045/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "OKPURU CHINEMEREM DEBORAH",
+      "csvRegNo": "EOCNS/24/0046/MID"
+    },
+    "timestamp": "2026-11-10T13:35:04.537Z",
+    "at": "2026-11-10T13:35:04.537Z",
+    "createdAt": "2026-11-10T13:35:04.537Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:04",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1106
+  },
+  {
+    "ref": "REF/EOCNS/QA/1225",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacdnw9gh",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Fatima Adaeze Haruna",
+        "regNo": "EOCNS/200/0018/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Fatima Adaeze Haruna",
+      "csvRegNo": "EOCNS/24/0019/MID"
+    },
+    "timestamp": "2026-11-10T13:35:07.299Z",
+    "at": "2026-11-10T13:35:07.299Z",
+    "createdAt": "2026-11-10T13:35:07.299Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:07",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1107
+  },
+  {
+    "ref": "REF/EOCNS/QA/1226",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacikidli",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Amarachi Precious Obioha",
+        "regNo": "EOCNS/200/0034/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Obioha Amarachi precious",
+      "csvRegNo": "EOCNS/24/0035/MID"
+    },
+    "timestamp": "2026-11-10T13:35:11.433Z",
+    "at": "2026-11-10T13:35:11.433Z",
+    "createdAt": "2026-11-10T13:35:11.433Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:11",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1108
+  },
+  {
+    "ref": "REF/EOCNS/QA/1227",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacqif7ex",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Uchechi Glory Emeka",
+        "regNo": "EOCNS/200/0061/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Emeka uchechi Glory",
+      "csvRegNo": "EOCNS/24/0066/MID"
+    },
+    "timestamp": "2026-11-10T13:35:14.841Z",
+    "at": "2026-11-10T13:35:14.841Z",
+    "createdAt": "2026-11-10T13:35:14.841Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:14",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1109
+  },
+  {
+    "ref": "REF/EOCNS/QA/1228",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacl50nzb",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Uchenna Ozo Arua",
+        "regNo": "EOCNS/24/0047/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Uchenna Arua",
+      "csvRegNo": "EOCNS/24/0047/MID"
+    },
+    "timestamp": "2026-11-10T13:35:17.982Z",
+    "at": "2026-11-10T13:35:17.982Z",
+    "createdAt": "2026-11-10T13:35:17.982Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:17",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1110
+  },
+  {
+    "ref": "REF/EOCNS/QA/1229",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaclb96tu",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Makuochukwu Divine-Gift Obasi",
+        "regNo": "EOCNS/200/0047/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Obasi Makuochukwu Divine Gift",
+      "csvRegNo": "EOCNS/24/0048/MID"
+    },
+    "timestamp": "2026-11-10T13:35:22.035Z",
+    "at": "2026-11-10T13:35:22.035Z",
+    "createdAt": "2026-11-10T13:35:22.035Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:22",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1111
+  },
+  {
+    "ref": "REF/EOCNS/QA/1230",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaca2nvyk",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Oluchi Philomina Nwafor",
+        "regNo": "EOCNS/200/0011/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Nwafor Oluchi Philomina",
+      "csvRegNo": "EOCNS/24/0012/MID"
+    },
+    "timestamp": "2026-11-10T13:35:26.505Z",
+    "at": "2026-11-10T13:35:26.505Z",
+    "createdAt": "2026-11-10T13:35:26.505Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:26",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1112
+  },
+  {
+    "ref": "REF/EOCNS/QA/1231",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacgqfr22",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Success Onyinyechi Nwankwo",
+        "regNo": "EOCNS/200/0030/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "SUCCESS ONYINYECHI NWANKWO",
+      "csvRegNo": "EOCNS/24/0031/MID"
+    },
+    "timestamp": "2026-11-10T13:35:30.110Z",
+    "at": "2026-11-10T13:35:30.110Z",
+    "createdAt": "2026-11-10T13:35:30.110Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:30",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1113
+  },
+  {
+    "ref": "REF/EOCNS/QA/1232",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacmzduyr",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Esther Chidalu Michael",
+        "regNo": "EOCNS/200/0049/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Michael Esther Chidalu",
+      "csvRegNo": "EOCNS/24/0050/MID"
+    },
+    "timestamp": "2026-11-10T13:35:32.987Z",
+    "at": "2026-11-10T13:35:32.987Z",
+    "createdAt": "2026-11-10T13:35:32.987Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:32",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1114
+  },
+  {
+    "ref": "REF/EOCNS/QA/1233",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacm0vm38",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Ngozi Virginia Aloh",
+        "regNo": "EOCNS/200/0048/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Aloh Ngozi Virginia",
+      "csvRegNo": "EOCNS/24/0049/MID"
+    },
+    "timestamp": "2026-11-10T13:35:38.013Z",
+    "at": "2026-11-10T13:35:38.013Z",
+    "createdAt": "2026-11-10T13:35:38.013Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:38",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1115
+  },
+  {
+    "ref": "REF/EOCNS/QA/1234",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacei0dw3",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Chizoba Assumpta Ikeme",
+        "regNo": "EOCNS/200/0020/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Ikeme Chizoba assumpta",
+      "csvRegNo": "EOCNS/24/0021/MID"
+    },
+    "timestamp": "2026-11-10T13:35:41.292Z",
+    "at": "2026-11-10T13:35:41.292Z",
+    "createdAt": "2026-11-10T13:35:41.292Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:41",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1116
+  },
+  {
+    "ref": "REF/EOCNS/QA/1235",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac9fx74v",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Chinelo Glory Orji",
+        "regNo": "EOCNS/200/0006/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Chinelo glory Orji",
+      "csvRegNo": "EOCNS/24/0007/MID"
+    },
+    "timestamp": "2026-11-10T13:35:42.930Z",
+    "at": "2026-11-10T13:35:42.930Z",
+    "createdAt": "2026-11-10T13:35:42.930Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:42",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1117
+  },
+  {
+    "ref": "REF/EOCNS/QA/1236",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac7jzp9s",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Winner Ifeoma Joseph",
+        "regNo": "EOCNS/200/0001/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Joseph Ifeoma Winner",
+      "csvRegNo": "EOCNS/24/0001/MID"
+    },
+    "timestamp": "2026-11-10T13:35:44.747Z",
+    "at": "2026-11-10T13:35:44.747Z",
+    "createdAt": "2026-11-10T13:35:44.747Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:44",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1118
+  },
+  {
+    "ref": "REF/EOCNS/QA/1237",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacqp30ft",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Daniella Chiwendu Obiahu",
+        "regNo": "EOCNS/200/0062/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Daniella Chiwendu OBiahu",
+      "csvRegNo": "EOCNS/24/0067/MID"
+    },
+    "timestamp": "2026-11-10T13:35:53.423Z",
+    "at": "2026-11-10T13:35:53.423Z",
+    "createdAt": "2026-11-10T13:35:53.423Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:53",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1119
+  },
+  {
+    "ref": "REF/EOCNS/QA/1238",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacf2v41g",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Rechael Chidiogo Chibuzor",
+        "regNo": "EOCNS/200/0024/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Chibuzor Rechael chidiogo",
+      "csvRegNo": "EOCNS/24/0025/MID"
+    },
+    "timestamp": "2026-11-10T13:35:58.842Z",
+    "at": "2026-11-10T13:35:58.842Z",
+    "createdAt": "2026-11-10T13:35:58.842Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:35:58",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1120
+  },
+  {
+    "ref": "REF/EOCNS/QA/1239",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac8q3req",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Chiamaka Precious Onwe",
+        "regNo": "EOCNS/200/0003/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Precious Chiamaka Onwe",
+      "csvRegNo": "EOCNS/24/0003/MID"
+    },
+    "timestamp": "2026-11-10T13:36:03.922Z",
+    "at": "2026-11-10T13:36:03.922Z",
+    "createdAt": "2026-11-10T13:36:03.922Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:03",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1121
+  },
+  {
+    "ref": "REF/EOCNS/QA/1240",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacswa9nh",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Chidubem Okoli",
+        "regNo": "EOCNS/200/0067/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "OKOLI CHIDUBEM",
+      "csvRegNo": "EOCNS/24/0073/MID"
+    },
+    "timestamp": "2026-11-10T13:36:05.604Z",
+    "at": "2026-11-10T13:36:05.604Z",
+    "createdAt": "2026-11-10T13:36:05.604Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:05",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1122
+  },
+  {
+    "ref": "REF/EOCNS/QA/1241",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdac82qi9z",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Chisom Favour Udeh",
+        "regNo": "EOCNS/200/0002/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Chisom favour Udeh",
+      "csvRegNo": "EOCNS/24/0002/MID"
+    },
+    "timestamp": "2026-11-10T13:36:07.166Z",
+    "at": "2026-11-10T13:36:07.166Z",
+    "createdAt": "2026-11-10T13:36:07.166Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:07",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1123
+  },
+  {
+    "ref": "REF/EOCNS/QA/1242",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdach9mpa2",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Amarachi Nwuguru Okeh",
+        "regNo": "EOCNS/200/0032/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Okeh Amarachi Nwuguru",
+      "csvRegNo": "EOCNS/24/0033/MID"
+    },
+    "timestamp": "2026-11-10T13:36:08.642Z",
+    "at": "2026-11-10T13:36:08.642Z",
+    "createdAt": "2026-11-10T13:36:08.642Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:08",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1124
+  },
+  {
+    "ref": "REF/EOCNS/QA/1243",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacanbgyn",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Grace Mmesoma Okafor",
+        "regNo": "EOCNS/200/0010/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Grace Mmesoma Okafor",
+      "csvRegNo": "EOCNS/24/0011/MID"
+    },
+    "timestamp": "2026-11-10T13:36:10.661Z",
+    "at": "2026-11-10T13:36:10.661Z",
+    "createdAt": "2026-11-10T13:36:10.661Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:10",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1125
+  },
+  {
+    "ref": "REF/EOCNS/QA/1244",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdact8l3nk",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Rita Ebubechi Egbere",
+        "regNo": "EOCNS/200/0070/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Egbere Rita Ebubechi",
+      "csvRegNo": "EOCNS/24/0076/MID"
+    },
+    "timestamp": "2026-11-10T13:36:14.909Z",
+    "at": "2026-11-10T13:36:14.909Z",
+    "createdAt": "2026-11-10T13:36:14.909Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:14",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1126
+  },
+  {
+    "ref": "REF/EOCNS/QA/1245",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacohrlsj",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Cynthia Chizaram Eze",
+        "regNo": "EOCNS/200/0054/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Eze Cynthia Chizaram",
+      "csvRegNo": "EOCNS/24/0059/MID"
+    },
+    "timestamp": "2026-11-10T13:36:17.018Z",
+    "at": "2026-11-10T13:36:17.018Z",
+    "createdAt": "2026-11-10T13:36:17.018Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:17",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1127
+  },
+  {
+    "ref": "REF/EOCNS/QA/1246",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdaco1opwx",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Chiamaka Grace Okoro",
+        "regNo": "EOCNS/200/0055/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Chiamaka Grace Okoro",
+      "csvRegNo": "EOCNS/24/0060/MID"
+    },
+    "timestamp": "2026-11-10T13:36:19.369Z",
+    "at": "2026-11-10T13:36:19.369Z",
+    "createdAt": "2026-11-10T13:36:19.369Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:19",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1128
+  },
+  {
+    "ref": "REF/EOCNS/QA/1247",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacoj4i46",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Christabel Ginika Okwor",
+        "regNo": "EOCNS/200/0056/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Okwor Ginika Christabel",
+      "csvRegNo": "EOCNS/24/0061/MID"
+    },
+    "timestamp": "2026-11-10T13:36:21.447Z",
+    "at": "2026-11-10T13:36:21.447Z",
+    "createdAt": "2026-11-10T13:36:21.447Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:21",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1129
+  },
+  {
+    "ref": "REF/EOCNS/QA/1248",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacurcvj0",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Ifedirichukwu Christopher Ezeabia",
+        "regNo": "EOCNS/200/0072/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "IFEDIRICHUKWU CHRISTOPHER EZEABIA",
+      "csvRegNo": "EOCNS/24/0070/MID"
+    },
+    "timestamp": "2026-11-10T13:36:26.600Z",
+    "at": "2026-11-10T13:36:26.600Z",
+    "createdAt": "2026-11-10T13:36:26.600Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:26",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1130
+  },
+  {
+    "ref": "REF/EOCNS/QA/1249",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacnmw0qu",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Peace Chidera Agu",
+        "regNo": "EOCNS/200/0052/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "PEACE CHIDERA AGU",
+      "csvRegNo": "EOCNS/24/0057/MID"
+    },
+    "timestamp": "2026-11-10T13:36:28.960Z",
+    "at": "2026-11-10T13:36:28.960Z",
+    "createdAt": "2026-11-10T13:36:28.960Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:28",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1131
+  },
+  {
+    "ref": "REF/EOCNS/QA/1250",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacppx2hn",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Chinaza Misharck Ikenna",
+        "regNo": "EOCNS/200/0059/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "IKENNA CHINAZA MISHARCK",
+      "csvRegNo": "EOCNS/24/0064/MID"
+    },
+    "timestamp": "2026-11-10T13:36:33.509Z",
+    "at": "2026-11-10T13:36:33.509Z",
+    "createdAt": "2026-11-10T13:36:33.509Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:33",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1132
+  },
+  {
+    "ref": "REF/EOCNS/QA/1251",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacqxi6oa",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "John Chukwu Ube",
+        "regNo": "EOCNS/200/0060/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Ube John chukwu",
+      "csvRegNo": "EOCNS/24/0065/MID"
+    },
+    "timestamp": "2026-11-10T13:36:36.727Z",
+    "at": "2026-11-10T13:36:36.727Z",
+    "createdAt": "2026-11-10T13:36:36.727Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:36",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1133
+  },
+  {
+    "ref": "REF/EOCNS/QA/1252",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdace74bh7",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Precious Chiamaka Nwogidi",
+        "regNo": "EOCNS/200/0021/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Precious chiamaka Nwogidi",
+      "csvRegNo": "EOCNS/24/0022/MID"
+    },
+    "timestamp": "2026-11-10T13:36:40.146Z",
+    "at": "2026-11-10T13:36:40.146Z",
+    "createdAt": "2026-11-10T13:36:40.146Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:40",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1134
+  },
+  {
+    "ref": "REF/EOCNS/QA/1253",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacpn8cj5",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Jennifer Chinecherem Emeka",
+        "regNo": "EOCNS/200/0058/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Emeka Jennifer Chinecherem",
+      "csvRegNo": "EOCNS/24/0063/MID"
+    },
+    "timestamp": "2026-11-10T13:36:41.844Z",
+    "at": "2026-11-10T13:36:41.844Z",
+    "createdAt": "2026-11-10T13:36:41.844Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:41",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1135
+  },
+  {
+    "ref": "REF/EOCNS/QA/1254",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacpbsbsd",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Mmesoma Emmanuella Okeke",
+        "regNo": "EOCNS/200/0057/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Okeke Mmesoma Emmanuella",
+      "csvRegNo": "EOCNS/24/0062/MID"
+    },
+    "timestamp": "2026-11-10T13:36:44.083Z",
+    "at": "2026-11-10T13:36:44.083Z",
+    "createdAt": "2026-11-10T13:36:44.083Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:44",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1136
+  },
+  {
+    "ref": "REF/EOCNS/QA/1255",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacroebrp",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Gideon Ugah Odoh",
+        "regNo": "EOCNS/200/0066/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Gideon Ugah Odoh",
+      "csvRegNo": "EOCNS/24/0071/MID"
+    },
+    "timestamp": "2026-11-10T13:36:46.138Z",
+    "at": "2026-11-10T13:36:46.138Z",
+    "createdAt": "2026-11-10T13:36:46.138Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:46",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1137
+  },
+  {
+    "ref": "REF/EOCNS/QA/1256",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdacrqvw23",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "Miracle Chioma Egbe",
+        "regNo": "EOCNS/200/0064/MID",
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "csvName": "Miracle chioma Egbe",
+      "csvRegNo": "EOCNS/24/0069/MID"
+    },
+    "timestamp": "2026-11-10T13:36:47.855Z",
+    "at": "2026-11-10T13:36:47.855Z",
+    "createdAt": "2026-11-10T13:36:47.855Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:36:47",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1138
   }
 ]
