@@ -163,7 +163,7 @@
                 Upload the <strong>user list</strong> from each ZKTeco device (not the attendance log).
                 Strong unique name matches are linked automatically: the machine <em>User ID / No.</em> is stored as the student <strong>serial</strong>.
                 The <strong>name on this site always stays the official name</strong> — machine spelling is only used for matching.
-                Ambiguous rows need officer confirmation. Leftovers stay in the unlinked pool until you create a student card or discard them.
+                Ambiguous rows need officer confirmation. <strong>Unlinked people are omitted from hostel reports</strong> until reviewed; regenerate the report after linking. Leftovers stay in the unlinked pool until you create a student card or discard them.
               </p>
               <div class="form-grid" style="margin-top:12px">
                 <label class="field"><span class="field__label">Device / hostel tag</span>
@@ -1297,7 +1297,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=75"></script>
+  <script src="app.js?v=76"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

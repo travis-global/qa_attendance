@@ -1600,7 +1600,6 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     var maj = null;
     if (v["1"] > v["2"]) maj = 1;
     else if (v["2"] > v["1"]) maj = 2;
-    // tie or zero: leave maj null
     st.locationIdMajority = maj;
     var fromMachine = null;
     if (maj === 1) fromMachine = h1;
@@ -1620,13 +1619,56 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
       st.hostelSource = "unassigned";
     }
   });
+
+
+  // INSTITUTIONAL RULE: only master-linked students appear on the hostel report.
+  // Unmatched machine users are held in the review queue; after linking, regenerate.
+  var pendingNos = {};
+  try {
+    var qlist = await getAll("biometric_pending");
+    (qlist || []).forEach(function(q) {
+      if (!q || q.status === "linked") return;
+      if (q.machineNo != null && String(q.machineNo).trim() !== "") {
+        pendingNos[String(q.machineNo).trim()] = true;
+      }
+    });
+  } catch (_) {}
+
+  var excludedPending = [];
+  Object.keys(students).forEach(function(sid) {
+    var st = students[sid];
+    var key = String(sid).trim();
+    var linked = false;
+    if (st && st.matched && st.masterId) linked = true;
+    if (byNo[key]) linked = true;
+    if (st && st.regNo && byNo[String(st.regNo).trim().toUpperCase()]) linked = true;
+    // Anyone still sitting in the open review queue stays off the report
+    if (pendingNos[key]) linked = false;
+    if (!linked) {
+      excludedPending.push({
+        machineNo: key,
+        name: (st && st.name) || "",
+        reason: pendingNos[key] ? "awaiting officer review" : "not linked to master list"
+      });
+      delete students[sid];
+      delete attendance[sid];
+    }
+  });
+
   const dates = [];
   const cursor = new Date(startDate);
   while (cursor <= endDate) {
     dates.push(new Date(cursor));
     cursor.setDate(cursor.getDate() + 1);
   }
-  return { students, attendance, dates, hostel1Name: h1, hostel2Name: h2 };
+  return {
+    students: students,
+    attendance: attendance,
+    dates: dates,
+    hostel1Name: h1,
+    hostel2Name: h2,
+    excludedPending: excludedPending
+  };
 }
 
 function ordinalSuffixHostel(n) {
@@ -1948,6 +1990,11 @@ async function generateHostelReport() {
   try {
     const result = await computeHostelAttendance(hostelParsedRows, startDate, endDate, hostel1Name, hostel2Name);
     try { await queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name); } catch (e) { console.warn("hostel unmatched queue", e); }
+    var excludedN = (result.excludedPending && result.excludedPending.length) || 0;
+    if (excludedN && statusEl) {
+      /* status finalized later; stash for message */
+      result._excludedN = excludedN;
+    }
 
     const dayHeaders = buildDayHeadersHostel(result.dates);
     const absentees = buildAbsenteeRowsHostel(result.students, result.attendance, result.dates, rate);
@@ -2023,10 +2070,12 @@ async function generateHostelReport() {
       else unN++;
       if (st.hostelConflict) confN++;
     });
+    var exN = (result._excludedN || (result.excludedPending && result.excludedPending.length) || 0);
     setHostelStatus(
       "Report ready · " + absentees.length + " absentees · hostel via Location ID " + locN +
       " · master fallback " + mastN + " · unassigned " + unN +
       (confN ? (" · " + confN + " machine≠master conflicts") : "") +
+      (exN ? (" · " + exN + " unreviewed machine user(s) held out until linked") : "") +
       " · saved to master sheet (Publish to keep on all devices).",
       "ok"
     );
@@ -10705,7 +10754,20 @@ function initBiometricMapUI() {
 // =========================================================
 
 async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) {
-  if (!result || !result.students) return;
+  // Prefer excludedPending (people held off the report); fall back to scanning students map
+  var candidates = [];
+  if (result && result.excludedPending && result.excludedPending.length) {
+    result.excludedPending.forEach(function(ex) {
+      candidates.push({ machineNo: String(ex.machineNo || "").trim(), name: ex.name || "" });
+    });
+  } else if (result && result.students) {
+    Object.keys(result.students).forEach(function(sid) {
+      var st = result.students[sid];
+      if (st && st.matched && st.masterId) return;
+      candidates.push({ machineNo: String(sid).trim(), name: (st && st.name) || "" });
+    });
+  }
+  if (!candidates.length) return;
   var master = await getAll("students");
   var bySerial = {};
   master.forEach(function(s) {
@@ -10717,19 +10779,16 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
     if (q && q.status !== "linked" && q.machineNo) openKeys[String(q.machineNo).trim()] = true;
   });
   var added = 0;
-  var sids = Object.keys(result.students);
-  for (var i = 0; i < sids.length; i++) {
-    var sid = sids[i];
-    var st = result.students[sid];
-    var machineNo = String(sid).trim();
+  for (var i = 0; i < candidates.length; i++) {
+    var machineNo = candidates[i].machineNo;
+    var stName = candidates[i].name || "";
     if (!machineNo) continue;
     if (bySerial[machineNo]) continue;
-    if (st.matched && st.masterId) continue;
     if (openKeys[machineNo]) continue;
     var ranked = [];
     try {
       master.forEach(function(s) {
-        var sc = (typeof bioNameScore === "function") ? bioNameScore(st.name || "", s.name || "") : 0;
+        var sc = (typeof bioNameScore === "function") ? bioNameScore(stName, s.name || "") : 0;
         if (sc >= 0.45) {
           ranked.push({
             studentId: s.id,
@@ -10747,8 +10806,8 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
       id: "bio_h_" + Date.now().toString(36) + "_" + machineNo + "_" + i,
       kind: "hostel",
       machineNo: machineNo,
-      machineName: st.name || "",
-      deviceLabel: st.hostel || hostel1Name || "Gate export",
+      machineName: stName,
+      deviceLabel: hostel1Name || "Gate export",
       status: status,
       suggestions: ranked.slice(0, 5),
       createdAt: new Date().toISOString(),
@@ -10762,9 +10821,9 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
     try { await renderBioQueues(); } catch (_) {}
     setTimeout(function() {
       if (isQaOfficer() && confirm(
-        added + " machine user(s) from this gate file are not linked to the master list.\n\n" +
-        "Open the biometric match queues to link them batch by batch?\n\n" +
-        "(Hostel → section 0, or continue Generate and link later.)"
+        added + " machine user(s) are NOT on this hostel report until you review and link them.\n\n" +
+        "They are held in the match queue. After you link someone, Generate again to include them.\n\n" +
+        "Open batch review now?"
       )) {
         try { showView("hostel"); } catch (_) {}
         var card = document.getElementById("biometricMapCard");
