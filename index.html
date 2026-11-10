@@ -1272,7 +1272,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=73"></script>
+  <script src="app.js?v=74"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>
@@ -1390,6 +1390,57 @@
       <div class="modal__footer">
         <button type="button" class="btn btn--ghost" id="btnCancelBioCreate">Cancel</button>
         <button type="button" class="btn btn--primary" id="btnConfirmBioCreate">Create &amp; link</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal" id="studentCsvImportModal" hidden>
+    <div class="modal__backdrop" id="studentCsvImportBackdrop"></div>
+    <div class="modal__dialog" style="max-width:480px">
+      <div class="modal__header">
+        <h3>Import students from CSV</h3>
+        <button type="button" class="icon-btn" id="btnCloseStudentCsvImport" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal__body">
+        <p class="muted-note" style="margin-top:0">
+          Use when the file is for one class, or leave programme/level blank to take values from the CSV columns.
+          Recognised name headers include <strong>Name</strong>, <strong>Names</strong>, Full name, etc.
+        </p>
+        <div class="form-grid">
+          <label class="field field--full">
+            <span class="field__label">Default programme (optional)</span>
+            <select id="csvImportProgramme">
+              <option value="">— Use CSV / leave blank —</option>
+            </select>
+          </label>
+          <label class="field field--full">
+            <span class="field__label">Default level (optional)</span>
+            <select id="csvImportLevel">
+              <option value="">— Use CSV / leave blank —</option>
+            </select>
+          </label>
+          <label class="field field--full">
+            <span class="field__label">If row has no programme/level</span>
+            <select id="csvImportFillMode">
+              <option value="defaults">Fill from defaults above when CSV cell empty</option>
+              <option value="force">Always use defaults (override CSV)</option>
+              <option value="csv_only">CSV only (ignore defaults)</option>
+            </select>
+          </label>
+          <label class="field field--full">
+            <span class="field__label">CSV file *</span>
+            <input type="file" id="csvImportFileInput" accept=".csv,text/csv" />
+          </label>
+        </div>
+        <p class="muted-note" id="csvImportHint" style="margin-bottom:0">
+          Columns: Name/Names, Reg No, Program/Programme, Level, Gender, Hostel, Phone, Photo (optional).
+          Duplicate registration numbers are skipped.
+        </p>
+      </div>
+      <div class="modal__footer">
+        <button type="button" class="btn btn--ghost" id="btnCancelStudentCsvImport">Cancel</button>
+        <button type="button" class="btn btn--primary" id="btnConfirmStudentCsvImport">Import</button>
       </div>
     </div>
   </div>

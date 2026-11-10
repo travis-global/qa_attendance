@@ -2444,26 +2444,60 @@ async function renderTimetableBoard() {
   });
 }
 
-async function importStudentsCsv(file) {
-  if (!isQaOfficer()) return;
+async function importStudentsCsv(file, options) {
+  if (!isQaOfficer()) {
+    alert("Sign in as QA Officer to import students.");
+    return;
+  }
+  if (!file) {
+    alert("Choose a CSV file.");
+    return;
+  }
+  options = options || {};
+  var defaultProgramme = String(options.programme || "").trim();
+  var defaultLevel = String(options.level || "").trim();
+  var fillMode = options.fillMode || "defaults"; // defaults | force | csv_only
+
   var text = await file.text();
+  // Strip BOM
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
   var lines = text.split(/\r?\n/).filter(function(l) { return l.trim(); });
-  if (lines.length < 2) { alert("CSV needs a header row and data."); return; }
+  if (lines.length < 2) { alert("CSV needs a header row and at least one data row."); return; }
+
   function splitCsv(line) {
     var out = [], cur = "", q = false;
     for (var i = 0; i < line.length; i++) {
       var ch = line[i];
-      if (ch === '"') { q = !q; continue; }
+      if (ch === '"') {
+        if (q && line[i + 1] === '"') { cur += '"'; i++; continue; }
+        q = !q; continue;
+      }
       if (ch === "," && !q) { out.push(cur.trim()); cur = ""; continue; }
       cur += ch;
     }
     out.push(cur.trim());
     return out;
   }
+  function normHeader(h) {
+    return String(h || "").toLowerCase()
+      .replace(/^\ufeff/, "")
+      .replace(/\./g, "")
+      .replace(/_/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
   function idx(headers, names) {
     for (var i = 0; i < names.length; i++) {
-      var j = headers.indexOf(names[i]);
+      var want = normHeader(names[i]);
+      var j = headers.indexOf(want);
       if (j >= 0) return j;
+    }
+    // soft contains match
+    for (var i2 = 0; i2 < names.length; i2++) {
+      var w = normHeader(names[i2]);
+      for (var h = 0; h < headers.length; h++) {
+        if (headers[h] === w || headers[h].indexOf(w) >= 0 || w.indexOf(headers[h]) >= 0) return h;
+      }
     }
     return -1;
   }
@@ -2471,17 +2505,14 @@ async function importStudentsCsv(file) {
     if (!raw) return "";
     var v = String(raw).trim();
     if (!v) return "";
-    // data URL already
     if (/^data:image\//i.test(v)) {
       try {
-        // re-compress via image element if possible
         var blob = await (await fetch(v)).blob();
         var f = new File([blob], "p.jpg", { type: blob.type || "image/jpeg" });
         if (typeof compressPassportImage === "function") return await compressPassportImage(f, 480, 0.72);
-        return v;
+        return v.length < 220000 ? v : "";
       } catch (_) { return v.length < 220000 ? v : ""; }
     }
-    // http(s) URL
     if (/^https?:\/\//i.test(v)) {
       try {
         var res = await fetch(v, { mode: "cors" });
@@ -2497,56 +2528,196 @@ async function importStudentsCsv(file) {
     }
     return "";
   }
-  var headers = splitCsv(lines[0]).map(function(h) { return h.toLowerCase().replace(/\./g, "").trim(); });
-  var iName = idx(headers, ["name", "full name", "names of students", "student name"]);
-  var iReg = idx(headers, ["regno", "reg no", "reg no", "registration number", "reg"]);
-  var iProg = idx(headers, ["programme", "program", "department"]);
-  var iLevel = idx(headers, ["level"]);
-  var iHostel = idx(headers, ["hostel"]);
+  function pickProgLevel(csvProg, csvLevel) {
+    var programme = "", level = "";
+    if (fillMode === "force") {
+      programme = defaultProgramme || csvProg || "";
+      level = defaultLevel || csvLevel || "";
+    } else if (fillMode === "csv_only") {
+      programme = csvProg || "";
+      level = csvLevel || "";
+    } else {
+      // defaults: CSV wins when present, else form defaults
+      programme = csvProg || defaultProgramme || "";
+      level = csvLevel || defaultLevel || "";
+    }
+    return { programme: programme, level: level };
+  }
+
+  var headers = splitCsv(lines[0]).map(normHeader);
+  var iName = idx(headers, [
+    "name", "names", "full name", "names of students", "student name",
+    "student names", "fullname of student", "candidate name"
+  ]);
+  var iReg = idx(headers, [
+    "regno", "reg no", "reg number", "registration number", "reg",
+    "registration no", "matric no", "matric number"
+  ]);
+  var iProg = idx(headers, ["programme", "program", "department", "course of study"]);
+  var iLevel = idx(headers, ["level", "class level", "year"]);
+  var iHostel = idx(headers, ["hostel", "hall", "residence"]);
   var iGender = idx(headers, ["gender", "sex"]);
-  var iPhone = idx(headers, ["phone", "mobile", "tel"]);
-  var iPhoto = idx(headers, ["photo", "photo url", "photourl", "image", "image url", "passport", "passport url", "photo_url", "image_url"]);
-  if (iName < 0) { alert("CSV must include a Name column."); return; }
-  var added = 0, photos = 0, failedPhoto = 0;
+  var iPhone = idx(headers, ["phone", "mobile", "tel", "telephone"]);
+  var iPhoto = idx(headers, [
+    "photo", "photo url", "photourl", "image", "image url", "passport",
+    "passport url", "photo_url", "image_url"
+  ]);
+  var iSerial = idx(headers, ["serial", "machine no", "machine id", "user id", "biometric id", "no"]);
+
+  if (iName < 0) {
+    alert("CSV must include a Name column (Name, Names, Full name, Student name, …).\nHeaders found: " + headers.join(", "));
+    return;
+  }
+
+  var added = 0, skippedDup = 0, skippedEmpty = 0, photos = 0, failedPhoto = 0;
   var existing = await getAll("students");
   var regSet = {};
-  existing.forEach(function(s) { if (s.regNo) regSet[String(s.regNo).toLowerCase()] = true; });
+  existing.forEach(function(s) {
+    if (s.regNo) regSet[String(s.regNo).trim().toLowerCase()] = true;
+  });
+
   for (var r = 1; r < lines.length; r++) {
     var cols = splitCsv(lines[r]);
-    var name = cols[iName];
-    if (!name) continue;
-    var regNo = iReg >= 0 ? (cols[iReg] || "") : "";
-    if (regNo && regSet[String(regNo).toLowerCase()]) {
-      continue; // skip duplicate reg
+    var name = (cols[iName] || "").trim();
+    if (!name) { skippedEmpty++; continue; }
+    var regNo = iReg >= 0 ? String(cols[iReg] || "").trim() : "";
+    if (regNo && regSet[regNo.toLowerCase()]) {
+      skippedDup++;
+      continue;
     }
+    var csvProg = iProg >= 0 ? String(cols[iProg] || "").trim() : "";
+    var csvLevel = iLevel >= 0 ? String(cols[iLevel] || "").trim() : "";
+    // Normalise common programme labels
+    if (/^mid/i.test(csvProg)) csvProg = "Midwifery";
+    else if (/^nurs/i.test(csvProg)) csvProg = "Nursing";
+    var pl = pickProgLevel(csvProg, csvLevel);
+    var programme = pl.programme;
+    if (/^mid/i.test(programme)) programme = "Midwifery";
+    else if (/^nurs/i.test(programme)) programme = "Nursing";
+    var levelRaw = pl.level;
+    var level = levelRaw;
+    if (level !== "" && !isNaN(Number(String(level).replace(/[^\d]/g, "")))) {
+      level = Number(String(level).replace(/[^\d]/g, ""));
+    }
+
     var photoDataUrl = "";
     if (iPhoto >= 0 && cols[iPhoto]) {
       photoDataUrl = await photoFromCell(cols[iPhoto]);
       if (photoDataUrl) photos++; else failedPhoto++;
     }
+    var now = new Date().toISOString();
     var rec = {
-      id: "stu_" + Date.now().toString(36) + r,
+      id: "stu_" + Date.now().toString(36) + "_" + r,
       name: name,
       regNo: regNo,
-      programme: iProg >= 0 ? (cols[iProg] || "") : "",
-      level: iLevel >= 0 ? (cols[iLevel] || "") : "",
-      hostel: iHostel >= 0 ? (cols[iHostel] || "") : "",
-      gender: iGender >= 0 ? (cols[iGender] || "") : "",
-      phone: iPhone >= 0 ? (cols[iPhone] || "") : "",
-      photoDataUrl: photoDataUrl,
+      programme: programme,
+      level: level,
+      hostel: iHostel >= 0 ? String(cols[iHostel] || "").trim() : "",
+      gender: iGender >= 0 ? String(cols[iGender] || "").trim() : "",
+      phone: iPhone >= 0 ? String(cols[iPhone] || "").trim() : "",
+      serial: iSerial >= 0 ? String(cols[iSerial] || "").trim() : "",
+      photoDataUrl: photoDataUrl || "",
       status: "Active",
-      createdAt: new Date().toISOString()
+      createdAt: now,
+      updatedAt: now
     };
-    if (photoDataUrl) rec.photoUpdatedAt = rec.createdAt;
+    if (photoDataUrl) rec.photoUpdatedAt = now;
     await put("students", rec);
-    if (regNo) regSet[String(regNo).toLowerCase()] = true;
+    if (regNo) regSet[regNo.toLowerCase()] = true;
     added++;
   }
-  await writeAudit({ action: "create", entity: "students", entityId: "csv_import", reason: "Imported " + added + " students from CSV (photos " + photos + ")" });
+
+  try {
+    await writeAudit({
+      action: "create",
+      entity: "students",
+      entityId: "csv_import",
+      reason: "Imported " + added + " students from CSV" +
+        (defaultProgramme || defaultLevel ? (" · defaults " + (defaultProgramme || "—") + " / " + (defaultLevel || "—")) : ""),
+      details: { added: added, skippedDup: skippedDup, skippedEmpty: skippedEmpty, photos: photos, fileName: file.name || "" }
+    });
+  } catch (_) {}
   markDirty("student import");
-  await renderStudentsTable();
-  alert("Imported " + added + " students" + (iPhoto >= 0 ? (" · passports loaded " + photos + (failedPhoto ? (" · photo failures " + failedPhoto) : "")) : "") + ". Publish when ready.");
+  try { await renderStudentsTable(); } catch (_) {}
+  try { refreshDashboardStats(); } catch (_) {}
+
+  var msg = "Imported " + added + " student(s).";
+  if (skippedDup) msg += " Skipped " + skippedDup + " duplicate reg no.";
+  if (skippedEmpty) msg += " Skipped " + skippedEmpty + " empty name row(s).";
+  if (iPhoto >= 0) msg += " Passports loaded " + photos + (failedPhoto ? (" · failed " + failedPhoto) : "") + ".";
+  if (defaultProgramme || defaultLevel) {
+    msg += " Defaults: " + (defaultProgramme || "(programme from CSV)") + " / " + (defaultLevel || "(level from CSV)") + ".";
+  }
+  msg += " Publish when ready so other devices see them.";
+  alert(msg);
 }
+
+async function openStudentCsvImportModal() {
+  if (!isQaOfficer()) {
+    if (typeof openOfficerLoginGate === "function") openOfficerLoginGate("students");
+    else alert("Sign in as QA Officer to import students.");
+    return;
+  }
+  try { await fillProgrammeLevelSelects(); } catch (_) {}
+  var prog = document.getElementById("csvImportProgramme");
+  var lvl = document.getElementById("csvImportLevel");
+  var srcP = document.getElementById("studentProgramme") || document.getElementById("filterProgramme");
+  var srcL = document.getElementById("studentLevel") || document.getElementById("filterLevel");
+  if (prog && srcP) {
+    var keep = prog.value;
+    prog.innerHTML = '<option value="">— Use CSV / leave blank —</option>' +
+      Array.prototype.slice.call(srcP.options).filter(function(o) { return o.value; }).map(function(o) {
+        return '<option value="' + o.value.replace(/"/g, "&quot;") + '">' + o.textContent + "</option>";
+      }).join("");
+    if (keep) prog.value = keep;
+  }
+  if (lvl && srcL) {
+    var keepL = lvl.value;
+    lvl.innerHTML = '<option value="">— Use CSV / leave blank —</option>' +
+      Array.prototype.slice.call(srcL.options).filter(function(o) { return o.value; }).map(function(o) {
+        return '<option value="' + o.value.replace(/"/g, "&quot;") + '">' + o.textContent + "</option>";
+      }).join("");
+    // ensure 100/200 style options exist
+    if (!lvl.querySelector('option[value="100"]')) {
+      [["100", "100 Level"], ["200", "200 Level"], ["300", "300 Level"]].forEach(function(pair) {
+        var o = document.createElement("option");
+        o.value = pair[0]; o.textContent = pair[1];
+        lvl.appendChild(o);
+      });
+    }
+    if (keepL) lvl.value = keepL;
+  }
+  var fileIn = document.getElementById("csvImportFileInput");
+  if (fileIn) fileIn.value = "";
+  var modal = document.getElementById("studentCsvImportModal");
+  if (modal) modal.hidden = false;
+}
+
+function closeStudentCsvImportModal() {
+  var modal = document.getElementById("studentCsvImportModal");
+  if (modal) modal.hidden = true;
+}
+
+async function confirmStudentCsvImport() {
+  var fileIn = document.getElementById("csvImportFileInput");
+  var file = fileIn && fileIn.files && fileIn.files[0];
+  if (!file) {
+    alert("Choose a CSV file first.");
+    return;
+  }
+  var programme = (document.getElementById("csvImportProgramme") && document.getElementById("csvImportProgramme").value) || "";
+  var level = (document.getElementById("csvImportLevel") && document.getElementById("csvImportLevel").value) || "";
+  var fillMode = (document.getElementById("csvImportFillMode") && document.getElementById("csvImportFillMode").value) || "defaults";
+  closeStudentCsvImportModal();
+  try {
+    await importStudentsCsv(file, { programme: programme, level: level, fillMode: fillMode });
+  } catch (err) {
+    console.error(err);
+    alert("Import failed: " + (err && err.message ? err.message : String(err)));
+  }
+}
+
+
 
 
 async function exportFullSnapshot() {
@@ -5194,12 +5365,21 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
     }
     e.target.value = "";
   });
-  document.getElementById("btnImportStudentsCsv") && document.getElementById("btnImportStudentsCsv").addEventListener("click", function() {
-    document.getElementById("studentsCsvInput") && document.getElementById("studentsCsvInput").click();
+    document.getElementById("btnImportStudentsCsv") && document.getElementById("btnImportStudentsCsv").addEventListener("click", function() {
+    openStudentCsvImportModal();
   });
   document.getElementById("studentsCsvInput") && document.getElementById("studentsCsvInput").addEventListener("change", function(e) {
-    if (e.target.files && e.target.files[0]) importStudentsCsv(e.target.files[0]);
-    e.target.value = "";
+    // legacy hidden input — open modal instead if still triggered
+    if (e.target.files && e.target.files[0]) {
+      importStudentsCsv(e.target.files[0], {});
+      e.target.value = "";
+    }
+  });
+  document.getElementById("btnCloseStudentCsvImport") && document.getElementById("btnCloseStudentCsvImport").addEventListener("click", closeStudentCsvImportModal);
+  document.getElementById("btnCancelStudentCsvImport") && document.getElementById("btnCancelStudentCsvImport").addEventListener("click", closeStudentCsvImportModal);
+  document.getElementById("studentCsvImportBackdrop") && document.getElementById("studentCsvImportBackdrop").addEventListener("click", closeStudentCsvImportModal);
+  document.getElementById("btnConfirmStudentCsvImport") && document.getElementById("btnConfirmStudentCsvImport").addEventListener("click", function() {
+    confirmStudentCsvImport();
   });
   document.getElementById("btnRefreshHostelRoster") && document.getElementById("btnRefreshHostelRoster").addEventListener("click", renderHostelRoster);
   document.getElementById("hostelRosterFilter") && document.getElementById("hostelRosterFilter").addEventListener("change", renderHostelRoster);
