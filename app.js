@@ -134,7 +134,7 @@ function showView(viewId) {
   if (viewId === "dashboard") refreshDashboardStats();
   if (viewId === "audit") renderAuditLog();
   if (viewId === "hostel") { initHostelView(); renderHostelRoster(); try { renderBioQueues(); } catch (_) {} }
-  if (viewId === "timetable-board") renderTimetableBoard();
+  if (viewId === "timetable-board") { if (typeof window.renderTimetableBoard === "function") window.renderTimetableBoard(); else if (typeof renderTimetableBoard === "function") renderTimetableBoard(); }
   if (viewId === "qa-daily") renderQaDaily();
   if (viewId === "qa-weekly") initQaWeeklyView();
   if (viewId === "qa-monthly") initQaMonthlyView();
@@ -2406,6 +2406,7 @@ async function printFullQaPack() {
 }
 
 async function renderTimetableBoard() {
+  window.renderTimetableBoard = renderTimetableBoard;
   await ensureTimetables();
   var key = (document.getElementById("ttBoardClass") && document.getElementById("ttBoardClass").value) || "100_nursing";
   var tt = TIMETABLES_CACHE[key] || { slots: [] };
@@ -5204,7 +5205,11 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
   document.getElementById("hostelRosterFilter") && document.getElementById("hostelRosterFilter").addEventListener("change", renderHostelRoster);
   document.getElementById("hostelRosterProgramme") && document.getElementById("hostelRosterProgramme").addEventListener("change", renderHostelRoster);
   document.getElementById("hostelRosterLevel") && document.getElementById("hostelRosterLevel").addEventListener("change", renderHostelRoster);
-  document.getElementById("btnRenderTtBoard") && document.getElementById("btnRenderTtBoard").addEventListener("click", renderTimetableBoard);
+  if (typeof renderTimetableBoard === "function") window.renderTimetableBoard = renderTimetableBoard;
+  document.getElementById("btnRenderTtBoard") && document.getElementById("btnRenderTtBoard").addEventListener("click", function() {
+    if (typeof window.renderTimetableBoard === "function") window.renderTimetableBoard();
+    else if (typeof renderTimetableBoard === "function") renderTimetableBoard();
+  });
   document.getElementById("qaEntryStart") && document.getElementById("qaEntryStart").addEventListener("change", calcQaDurationMinutes);
   document.getElementById("qaEntryEnd") && document.getElementById("qaEntryEnd").addEventListener("change", calcQaDurationMinutes);
   document.getElementById("qaEntryStart") && document.getElementById("qaEntryStart").addEventListener("input", calcQaDurationMinutes);
