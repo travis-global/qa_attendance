@@ -179,6 +179,8 @@
               </div>
               <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
                 <button type="button" class="btn btn--primary qa-edit-only" id="btnBioImportMatch">Import &amp; match</button>
+                <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnBioBatchClarify">Batch review (clarify)</button>
+                <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnBioBatchUnlinked">Batch unlinked pool</button>
                 <button type="button" class="btn btn--ghost btn--sm" id="btnBioRefreshQueues">Refresh queues</button>
               </div>
               <div id="bioImportStatus" class="muted-note" style="margin-top:10px"></div>
@@ -296,6 +298,29 @@
               <button type="button" class="btn btn--ghost" id="btnBulkDeactivate">Remove from active group</button>
               <button type="button" class="btn btn--ghost" id="btnBulkDeleteStudents" style="color:#b91c1c">Delete selected…</button>
               <span class="muted-note" id="bulkSelectedCount">0 selected</span>
+            </div>
+          </div>
+
+          
+          <div class="card qa-edit-only" id="csvReviewCard" style="margin-bottom:16px">
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+              <h3 style="margin:0">CSV import review queue</h3>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button type="button" class="btn btn--ghost btn--sm" id="btnCsvReviewRefresh">Refresh</button>
+                <button type="button" class="btn btn--primary btn--sm" id="btnCsvReviewBatch">Batch confirm</button>
+              </div>
+            </div>
+            <div class="card__body">
+              <p class="muted-note" style="margin-top:0">
+                Rows where registration number or name conflicted with an existing student are held here until you confirm.
+                Nothing is duplicated until you choose <strong>Confirm link</strong> or <strong>Add as new</strong>. Persists until resolved (Publish keeps the queue).
+              </p>
+              <div style="overflow:auto;max-height:320px">
+                <table class="data-table">
+                  <thead><tr><th>CSV name</th><th>CSV reg</th><th>Issue</th><th>Suggested master</th><th>Action</th></tr></thead>
+                  <tbody id="csvReviewBody"><tr><td colspan="5" class="muted-note">No CSV discrepancies pending.</td></tr></tbody>
+                </table>
+              </div>
             </div>
           </div>
 
@@ -1272,7 +1297,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=74"></script>
+  <script src="app.js?v=75"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

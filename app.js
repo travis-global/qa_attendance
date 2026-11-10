@@ -120,7 +120,7 @@ function showView(viewId) {
   if (titleEl) titleEl.textContent = meta.title;
   if (subEl) subEl.textContent = meta.subtitle;
   try { sessionStorage.setItem("eocns-last-view", viewId); } catch (_) {}
-  if (viewId === "students") renderStudentsTable();
+  if (viewId === "students") { renderStudentsTable(); try { renderCsvReviewQueue(); } catch (_) {} }
   if (viewId === "discipline") renderDisciplineTable();
   if (viewId === "pending") renderPendingRegistrations({ fromRepo: false });
   if (viewId === "lecturers") renderLecturersTable();
@@ -1947,6 +1947,8 @@ async function generateHostelReport() {
   const hostel2Name = (document.getElementById("hostel2Name") && document.getElementById("hostel2Name").value) || "Hostel 2";
   try {
     const result = await computeHostelAttendance(hostelParsedRows, startDate, endDate, hostel1Name, hostel2Name);
+    try { await queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name); } catch (e) { console.warn("hostel unmatched queue", e); }
+
     const dayHeaders = buildDayHeadersHostel(result.dates);
     const absentees = buildAbsenteeRowsHostel(result.students, result.attendance, result.dates, rate);
     renderHostelPreview(absentees, dayHeaders, rate);
@@ -2569,7 +2571,7 @@ async function importStudentsCsv(file, options) {
     return;
   }
 
-  var added = 0, skippedDup = 0, skippedEmpty = 0, photos = 0, failedPhoto = 0;
+  var added = 0, skippedDup = 0, skippedEmpty = 0, photos = 0, failedPhoto = 0, reviewN = 0;
   var existing = await getAll("students");
   var regSet = {};
   existing.forEach(function(s) {
@@ -2581,13 +2583,8 @@ async function importStudentsCsv(file, options) {
     var name = (cols[iName] || "").trim();
     if (!name) { skippedEmpty++; continue; }
     var regNo = iReg >= 0 ? String(cols[iReg] || "").trim() : "";
-    if (regNo && regSet[regNo.toLowerCase()]) {
-      skippedDup++;
-      continue;
-    }
     var csvProg = iProg >= 0 ? String(cols[iProg] || "").trim() : "";
     var csvLevel = iLevel >= 0 ? String(cols[iLevel] || "").trim() : "";
-    // Normalise common programme labels
     if (/^mid/i.test(csvProg)) csvProg = "Midwifery";
     else if (/^nurs/i.test(csvProg)) csvProg = "Nursing";
     var pl = pickProgLevel(csvProg, csvLevel);
@@ -2598,6 +2595,97 @@ async function importStudentsCsv(file, options) {
     var level = levelRaw;
     if (level !== "" && !isNaN(Number(String(level).replace(/[^\d]/g, "")))) {
       level = Number(String(level).replace(/[^\d]/g, ""));
+    }
+    var gender = iGender >= 0 ? String(cols[iGender] || "").trim() : "";
+    var hostel = iHostel >= 0 ? String(cols[iHostel] || "").trim() : "";
+    var phone = iPhone >= 0 ? String(cols[iPhone] || "").trim() : "";
+    var serial = iSerial >= 0 ? String(cols[iSerial] || "").trim() : "";
+
+    // --- discrepancy / already-present detection ---
+    var byReg = regNo ? existing.find(function(s) {
+      return String(s.regNo || "").trim().toLowerCase() === regNo.toLowerCase();
+    }) : null;
+    var nameMatches = [];
+    existing.forEach(function(s) {
+      var sc = (typeof bioNameScore === "function") ? bioNameScore(name, s.name || "") : 0;
+      if (sc >= 0.82) nameMatches.push({ studentId: s.id, name: s.name, regNo: s.regNo || "", score: Math.round(sc * 1000) / 10, serial: s.serial || "" });
+    });
+    nameMatches.sort(function(a, b) { return b.score - a.score; });
+
+    if (byReg) {
+      var sameName = (typeof bioNameScore === "function")
+        ? bioNameScore(name, byReg.name || "") >= 0.85
+        : String(name).toLowerCase() === String(byReg.name || "").toLowerCase();
+      if (sameName) {
+        skippedDup++; // exact presence
+        continue;
+      }
+      // same reg, different name → review queue
+      await put("biometric_pending", {
+        id: "csv_" + Date.now().toString(36) + "_" + r,
+        kind: "csv",
+        status: "csv_review",
+        csvName: name,
+        csvRegNo: regNo,
+        csvProgramme: programme,
+        csvLevel: level,
+        csvGender: gender,
+        csvHostel: hostel,
+        csvPhone: phone,
+        machineName: name,
+        machineNo: regNo,
+        note: "Same reg no on master but name differs (CSV: " + name + " · Master: " + (byReg.name || "") + ")",
+        suggestions: [{ studentId: byReg.id, name: byReg.name, regNo: byReg.regNo || "", score: 100 }].concat(nameMatches.slice(0, 3)),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      reviewN++;
+      continue;
+    }
+    if (!regNo && nameMatches.length && nameMatches[0].score >= 90) {
+      await put("biometric_pending", {
+        id: "csv_" + Date.now().toString(36) + "_" + r,
+        kind: "csv",
+        status: "csv_review",
+        csvName: name,
+        csvRegNo: "",
+        csvProgramme: programme,
+        csvLevel: level,
+        csvGender: gender,
+        csvHostel: hostel,
+        csvPhone: phone,
+        machineName: name,
+        machineNo: "",
+        note: "No reg in CSV; strong name match on master — confirm before adding duplicate",
+        suggestions: nameMatches.slice(0, 5),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      reviewN++;
+      continue;
+    }
+    if (regNo && nameMatches.length && nameMatches[0].score >= 90 &&
+        String(nameMatches[0].regNo || "").toLowerCase() !== regNo.toLowerCase()) {
+      await put("biometric_pending", {
+        id: "csv_" + Date.now().toString(36) + "_" + r,
+        kind: "csv",
+        status: "csv_review",
+        csvName: name,
+        csvRegNo: regNo,
+        csvProgramme: programme,
+        csvLevel: level,
+        csvGender: gender,
+        csvHostel: hostel,
+        csvPhone: phone,
+        machineName: name,
+        machineNo: regNo,
+        note: "Name matches master but reg no differs (CSV: " + regNo + " · Master: " + (nameMatches[0].regNo || "—") + ")",
+        suggestions: nameMatches.slice(0, 5),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      reviewN++;
+      continue;
     }
 
     var photoDataUrl = "";
@@ -2612,10 +2700,10 @@ async function importStudentsCsv(file, options) {
       regNo: regNo,
       programme: programme,
       level: level,
-      hostel: iHostel >= 0 ? String(cols[iHostel] || "").trim() : "",
-      gender: iGender >= 0 ? String(cols[iGender] || "").trim() : "",
-      phone: iPhone >= 0 ? String(cols[iPhone] || "").trim() : "",
-      serial: iSerial >= 0 ? String(cols[iSerial] || "").trim() : "",
+      hostel: hostel,
+      gender: gender,
+      phone: phone,
+      serial: serial,
       photoDataUrl: photoDataUrl || "",
       status: "Active",
       createdAt: now,
@@ -2624,6 +2712,7 @@ async function importStudentsCsv(file, options) {
     if (photoDataUrl) rec.photoUpdatedAt = now;
     await put("students", rec);
     if (regNo) regSet[regNo.toLowerCase()] = true;
+    existing.push(rec);
     added++;
   }
 
@@ -2640,9 +2729,11 @@ async function importStudentsCsv(file, options) {
   markDirty("student import");
   try { await renderStudentsTable(); } catch (_) {}
   try { refreshDashboardStats(); } catch (_) {}
+  try { await renderCsvReviewQueue(); } catch (_) {}
 
   var msg = "Imported " + added + " student(s).";
-  if (skippedDup) msg += " Skipped " + skippedDup + " duplicate reg no.";
+  if (skippedDup) msg += " Skipped " + skippedDup + " exact duplicate(s).";
+  if (reviewN) msg += " " + reviewN + " row(s) sent to CSV review queue (name/reg mismatch).";
   if (skippedEmpty) msg += " Skipped " + skippedEmpty + " empty name row(s).";
   if (iPhoto >= 0) msg += " Passports loaded " + photos + (failedPhoto ? (" · failed " + failedPhoto) : "") + ".";
   if (defaultProgramme || defaultLevel) {
@@ -10595,12 +10686,289 @@ async function confirmBioCreateStudent() {
 
 function initBiometricMapUI() {
   document.getElementById("btnBioImportMatch")?.addEventListener("click", function() { bioImportAndMatch(); });
-  document.getElementById("btnBioRefreshQueues")?.addEventListener("click", function() { renderBioQueues(); });
+  document.getElementById("btnBioRefreshQueues")?.addEventListener("click", function() { renderBioQueues(); try { renderCsvReviewQueue(); } catch (_) {} });
+  document.getElementById("btnBioBatchClarify")?.addEventListener("click", function() { startMatchQueueBatch("clarify"); });
+  document.getElementById("btnBioBatchUnlinked")?.addEventListener("click", function() { startMatchQueueBatch("unlinked"); });
+  document.getElementById("btnCsvReviewBatch")?.addEventListener("click", function() { startMatchQueueBatch("csv"); });
+  document.getElementById("btnCsvReviewRefresh")?.addEventListener("click", function() { renderCsvReviewQueue(); });
+  try { renderCsvReviewQueue(); } catch (_) {}
   document.getElementById("btnCloseBioCreate")?.addEventListener("click", closeBioCreateStudentModal);
   document.getElementById("btnCancelBioCreate")?.addEventListener("click", closeBioCreateStudentModal);
   document.getElementById("bioCreateStudentBackdrop")?.addEventListener("click", closeBioCreateStudentModal);
   document.getElementById("btnConfirmBioCreate")?.addEventListener("click", function() { confirmBioCreateStudent(); });
   try { renderBioQueues(); } catch (_) {}
+}
+
+
+// =========================================================
+// MATCH QUEUE — hostel unmatched + CSV discrepancies (persistent)
+// =========================================================
+
+async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) {
+  if (!result || !result.students) return;
+  var master = await getAll("students");
+  var bySerial = {};
+  master.forEach(function(s) {
+    if (s.serial) bySerial[String(s.serial).trim()] = s;
+  });
+  var existingQ = await getAll("biometric_pending");
+  var openKeys = {};
+  (existingQ || []).forEach(function(q) {
+    if (q && q.status !== "linked" && q.machineNo) openKeys[String(q.machineNo).trim()] = true;
+  });
+  var added = 0;
+  var sids = Object.keys(result.students);
+  for (var i = 0; i < sids.length; i++) {
+    var sid = sids[i];
+    var st = result.students[sid];
+    var machineNo = String(sid).trim();
+    if (!machineNo) continue;
+    if (bySerial[machineNo]) continue;
+    if (st.matched && st.masterId) continue;
+    if (openKeys[machineNo]) continue;
+    var ranked = [];
+    try {
+      master.forEach(function(s) {
+        var sc = (typeof bioNameScore === "function") ? bioNameScore(st.name || "", s.name || "") : 0;
+        if (sc >= 0.45) {
+          ranked.push({
+            studentId: s.id,
+            name: s.name,
+            regNo: s.regNo || "",
+            serial: s.serial || "",
+            score: Math.round(sc * 1000) / 10
+          });
+        }
+      });
+      ranked.sort(function(a, b) { return b.score - a.score; });
+    } catch (_) {}
+    var status = ranked.length && ranked[0].score >= 55 ? "clarify" : "unlinked";
+    await put("biometric_pending", {
+      id: "bio_h_" + Date.now().toString(36) + "_" + machineNo + "_" + i,
+      kind: "hostel",
+      machineNo: machineNo,
+      machineName: st.name || "",
+      deviceLabel: st.hostel || hostel1Name || "Gate export",
+      status: status,
+      suggestions: ranked.slice(0, 5),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+    openKeys[machineNo] = true;
+    added++;
+  }
+  if (added > 0) {
+    markDirty("hostel unmatched queue");
+    try { await renderBioQueues(); } catch (_) {}
+    setTimeout(function() {
+      if (isQaOfficer() && confirm(
+        added + " machine user(s) from this gate file are not linked to the master list.\n\n" +
+        "Open the biometric match queues to link them batch by batch?\n\n" +
+        "(Hostel → section 0, or continue Generate and link later.)"
+      )) {
+        try { showView("hostel"); } catch (_) {}
+        var card = document.getElementById("biometricMapCard");
+        if (card) card.scrollIntoView({ behavior: "smooth", block: "start" });
+        try { startMatchQueueBatch("clarify"); } catch (_) {}
+      }
+    }, 400);
+  }
+}
+
+/**
+ * Walk pending clarify items one-by-one with confirm dialogs.
+ * mode: "clarify" | "unlinked" | "csv"
+ */
+async function startMatchQueueBatch(mode) {
+  if (!isQaOfficer()) { openOfficerLoginGate("hostel"); return; }
+  var list = await getAll("biometric_pending");
+  list = (list || []).filter(function(x) {
+    if (!x || x.status === "linked") return false;
+    if (mode === "csv") return x.kind === "csv" || x.status === "csv_review";
+    if (mode === "unlinked") return x.status === "unlinked";
+    return x.status === "clarify" || x.status === "conflict" || x.status === "csv_review";
+  });
+  if (!list.length) {
+    alert("No items waiting in this queue.");
+    return;
+  }
+  var linked = 0, skipped = 0, toPool = 0;
+  for (var i = 0; i < list.length; i++) {
+    var row = list[i];
+    var sug = row.suggestions || [];
+    var msg = "Item " + (i + 1) + " of " + list.length + "\n\n";
+    if (row.kind === "csv") {
+      msg += "CSV import review\n";
+      msg += "CSV name: " + (row.csvName || row.machineName || "") + "\n";
+      msg += "CSV reg: " + (row.csvRegNo || "") + "\n";
+      msg += "Issue: " + (row.note || "possible match already on master") + "\n\n";
+    } else {
+      msg += "Machine No.: " + (row.machineNo || "") + "\n";
+      msg += "Machine name: " + (row.machineName || "") + "\n";
+      msg += "Device: " + (row.deviceLabel || "") + "\n\n";
+    }
+    if (sug.length) {
+      msg += "Suggested master records:\n";
+      sug.slice(0, 5).forEach(function(s, idx) {
+        msg += "  " + (idx + 1) + ") " + (s.name || "") + " · " + (s.regNo || "—") +
+          (s.score != null ? (" · " + s.score + "%") : "") + "\n";
+      });
+      msg += "\nOK = link to suggestion #1\nCancel = skip for now";
+      var go = confirm(msg);
+      if (!go) { skipped++; continue; }
+      try {
+        if (row.kind === "csv") {
+          await applyCsvReviewLink(row, sug[0]);
+        } else {
+          await bioLinkStudentSerial(sug[0].studentId, row.machineNo, row.machineName, row.deviceLabel, (sug[0].score || 0) / 100, "batch");
+          await del("biometric_pending", row.id);
+        }
+        linked++;
+      } catch (err) {
+        alert(err.message || String(err));
+        skipped++;
+      }
+    } else {
+      msg += "No automatic suggestion.\n\nOK = move to unlinked pool / keep for later\nCancel = skip";
+      if (confirm(msg)) {
+        row.status = "unlinked";
+        row.updatedAt = new Date().toISOString();
+        await put("biometric_pending", row);
+        toPool++;
+      } else skipped++;
+    }
+  }
+  markDirty("match queue batch");
+  try { await renderBioQueues(); } catch (_) {}
+  try { await renderCsvReviewQueue(); } catch (_) {}
+  alert("Batch done.\nLinked: " + linked + "\nMoved to pool: " + toPool + "\nSkipped: " + skipped);
+}
+
+async function applyCsvReviewLink(row, suggestion) {
+  // Link means: keep master student, optionally update empty fields from CSV; do not create duplicate
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === suggestion.studentId; });
+  if (!s) throw new Error("Master student not found");
+  var before = { name: s.name, regNo: s.regNo, programme: s.programme, level: s.level };
+  // Only fill blanks from CSV unless officer already confirmed
+  if (row.csvRegNo && !s.regNo) s.regNo = row.csvRegNo;
+  if (row.csvProgramme && !s.programme) s.programme = row.csvProgramme;
+  if (row.csvLevel != null && row.csvLevel !== "" && (s.level == null || s.level === "")) s.level = row.csvLevel;
+  if (row.csvGender && !s.gender) s.gender = row.csvGender;
+  if (row.csvHostel && !s.hostel) s.hostel = row.csvHostel;
+  s.updatedAt = new Date().toISOString();
+  await put("students", s);
+  try {
+    await writeAudit({
+      action: "update",
+      entity: "students",
+      entityId: s.id,
+      reason: "CSV import review — confirmed existing student (no duplicate)",
+      details: { before: before, csvName: row.csvName, csvRegNo: row.csvRegNo }
+    });
+  } catch (_) {}
+  await del("biometric_pending", row.id);
+}
+
+async function renderCsvReviewQueue() {
+  var body = document.getElementById("csvReviewBody");
+  if (!body) return;
+  var list = [];
+  try { list = await getAll("biometric_pending"); } catch (_) {}
+  list = (list || []).filter(function(x) {
+    return x && (x.kind === "csv" || x.status === "csv_review");
+  });
+  if (!list.length) {
+    body.innerHTML = '<tr><td colspan="5" class="muted-note">No CSV discrepancies pending.</td></tr>';
+    return;
+  }
+  body.innerHTML = list.map(function(row) {
+    var sug = (row.suggestions || []).slice(0, 3).map(function(s) {
+      return escapeHtml(s.name || "") + " · " + escapeHtml(s.regNo || "—") +
+        (s.score != null ? (" (" + s.score + "%)") : "");
+    }).join("<br>") || "—";
+    return "<tr>" +
+      "<td>" + escapeHtml(row.csvName || row.machineName || "") + "</td>" +
+      "<td>" + escapeHtml(row.csvRegNo || "") + "</td>" +
+      "<td>" + escapeHtml(row.note || "") + "</td>" +
+      "<td>" + sug + "</td>" +
+      "<td class=\"qa-edit-only\">" +
+        (isQaOfficer() ? (
+          '<button type="button" class="btn btn--primary btn--sm" data-csv-confirm="' + escapeHtml(row.id) + '">Confirm link</button> ' +
+          '<button type="button" class="btn btn--ghost btn--sm" data-csv-add="' + escapeHtml(row.id) + '">Add as new</button> ' +
+          '<button type="button" class="btn btn--ghost btn--sm" data-csv-discard="' + escapeHtml(row.id) + '">Discard</button>'
+        ) : "—") +
+      "</td></tr>";
+  }).join("");
+
+  document.querySelectorAll("[data-csv-confirm]").forEach(function(btn) {
+    btn.onclick = async function() {
+      var id = btn.getAttribute("data-csv-confirm");
+      var row = (await getAll("biometric_pending")).find(function(x) { return x.id === id; });
+      if (!row || !(row.suggestions || []).length) { alert("No suggestion to link."); return; }
+      try {
+        await applyCsvReviewLink(row, row.suggestions[0]);
+        markDirty("csv review link");
+        await renderCsvReviewQueue();
+        try { await renderStudentsTable(); } catch (_) {}
+      } catch (e) { alert(e.message || String(e)); }
+    };
+  });
+  document.querySelectorAll("[data-csv-add]").forEach(function(btn) {
+    btn.onclick = async function() {
+      var id = btn.getAttribute("data-csv-add");
+      var row = (await getAll("biometric_pending")).find(function(x) { return x.id === id; });
+      if (!row) return;
+      if (!confirm("Add as a NEW student card from this CSV row?")) return;
+      var now = new Date().toISOString();
+      var regNo = row.csvRegNo || "";
+      if (regNo) {
+        var all = await getAll("students");
+        if (all.some(function(s) { return String(s.regNo || "").toLowerCase() === regNo.toLowerCase(); })) {
+          alert("That reg no already exists — use Confirm link instead.");
+          return;
+        }
+      }
+      if (!regNo) {
+        try { regNo = await generateTempRegNo(row.csvProgramme || "Nursing"); } catch (_) { regNo = "TMP-" + Date.now(); }
+      }
+      var rec = {
+        id: generateId("stu"),
+        name: row.csvName || row.machineName || "Unknown",
+        regNo: regNo,
+        programme: row.csvProgramme || "",
+        level: row.csvLevel != null ? row.csvLevel : "",
+        gender: row.csvGender || "",
+        hostel: row.csvHostel || "",
+        phone: row.csvPhone || "",
+        status: "Active",
+        createdAt: now,
+        updatedAt: now
+      };
+      await put("students", rec);
+      try {
+        await writeAudit({
+          action: "create",
+          entity: "students",
+          entityId: rec.id,
+          reason: "Created from CSV discrepancy queue as new student",
+          details: { csvName: row.csvName, csvRegNo: row.csvRegNo }
+        });
+      } catch (_) {}
+      await del("biometric_pending", id);
+      markDirty("csv review create");
+      await renderCsvReviewQueue();
+      try { await renderStudentsTable(); } catch (_) {}
+    };
+  });
+  document.querySelectorAll("[data-csv-discard]").forEach(function(btn) {
+    btn.onclick = async function() {
+      if (!confirm("Discard this CSV review item?")) return;
+      await del("biometric_pending", btn.getAttribute("data-csv-discard"));
+      markDirty("csv review discard");
+      await renderCsvReviewQueue();
+    };
+  });
 }
 
 // Report generators bind to window inside openDB boot (where they are defined).
