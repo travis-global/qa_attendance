@@ -18650,5 +18650,1002 @@
     "user": "QA Officer",
     "source": "official-letter",
     "id": 883
+  },
+  {
+    "ref": "REF/EOCNS/QA/1002",
+    "action": "create",
+    "entity": "students",
+    "entityId": "csv_import",
+    "reason": "Imported 14 students from CSV",
+    "details": {
+      "added": 14,
+      "skippedDup": 28,
+      "skippedEmpty": 0,
+      "photos": 0,
+      "fileName": "reg_numbers_2026-11-10 (2).csv"
+    },
+    "timestamp": "2026-11-10T13:10:45.158Z",
+    "at": "2026-11-10T13:10:45.158Z",
+    "createdAt": "2026-11-10T13:10:45.158Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:10:45",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 884
+  },
+  {
+    "ref": "REF/EOCNS/QA/1003",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvus7j7sm9fvd",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "EKUMMA UZOMA JENNIFER",
+        "regNo": "EOCNS/26/0061/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Uzoma Jennifer Ekuma",
+      "csvRegNo": "EOCNS/26/0061/GNS"
+    },
+    "timestamp": "2026-11-10T13:13:05.633Z",
+    "at": "2026-11-10T13:13:05.633Z",
+    "createdAt": "2026-11-10T13:13:05.633Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:13:05",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 885
+  },
+  {
+    "ref": "REF/EOCNS/QA/1004",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvutehxvqvlxr",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "UCHECHUKWU BETHEL C.",
+        "regNo": "EOCNS/26/0057/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Uchechukwu Bethel",
+      "csvRegNo": "EOCNS/26/0057/GNS"
+    },
+    "timestamp": "2026-11-10T13:13:15.212Z",
+    "at": "2026-11-10T13:13:15.212Z",
+    "createdAt": "2026-11-10T13:13:15.212Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:13:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 886
+  },
+  {
+    "ref": "REF/EOCNS/QA/1005",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvutaaa7rev1c",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "NWITE FAVOUR OLUOMACHI",
+        "regNo": "EOCNS/26/0056/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Favour Oluomachi",
+      "csvRegNo": "EOCNS/26/0056/GNS"
+    },
+    "timestamp": "2026-11-10T13:13:21.114Z",
+    "at": "2026-11-10T13:13:21.114Z",
+    "createdAt": "2026-11-10T13:13:21.114Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:13:21",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 887
+  },
+  {
+    "ref": "REF/EOCNS/QA/1006",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvus6j4xiyiyj",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "AKPOM AMARACHUKWU NGOZICHUKWU",
+        "regNo": "EOCNS/26/0040/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "AMARACHUKWU AKPOM",
+      "csvRegNo": "EOCNS/26/0040/GNS"
+    },
+    "timestamp": "2026-11-10T13:13:25.820Z",
+    "at": "2026-11-10T13:13:25.820Z",
+    "createdAt": "2026-11-10T13:13:25.820Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:13:25",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 888
+  },
+  {
+    "ref": "REF/EOCNS/QA/1007",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvusmd3df2hl5",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "ONWE UKA-AMAKA DIVINE",
+        "regNo": "EOCNS/26/0073/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "ONWE UKAMAKA DIVINE",
+      "csvRegNo": "EOCNS/26/0073/GNS"
+    },
+    "timestamp": "2026-11-10T13:13:44.319Z",
+    "at": "2026-11-10T13:13:44.319Z",
+    "createdAt": "2026-11-10T13:13:44.319Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:13:44",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 889
+  },
+  {
+    "ref": "REF/EOCNS/QA/1008",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvutdrx8ric9j",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "AHAMA VICTORIA EGBAI",
+        "regNo": "EOCNS/26/0062/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Victoria Ahama",
+      "csvRegNo": "EOCNS/26/0062/GNS"
+    },
+    "timestamp": "2026-11-10T13:13:48.689Z",
+    "at": "2026-11-10T13:13:48.689Z",
+    "createdAt": "2026-11-10T13:13:48.689Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:13:48",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 890
+  },
+  {
+    "ref": "REF/EOCNS/QA/1009",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvuscfxa4lhed",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "ONYEBUEKE KINGSLEY EMMA",
+        "regNo": "EOCNS/26/0045/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Onyebueke Kingsley",
+      "csvRegNo": "EOCNS/26/0045/GNS"
+    },
+    "timestamp": "2026-11-10T13:13:57.606Z",
+    "at": "2026-11-10T13:13:57.606Z",
+    "createdAt": "2026-11-10T13:13:57.606Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:13:57",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 891
+  },
+  {
+    "ref": "REF/EOCNS/QA/1010",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvsa27y634fx7",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "JOY CHINAZAEKPERE ASOJUA",
+        "regNo": "EOCNS/26/0049/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Asogwa Joy Chinazaekperem",
+      "csvRegNo": "EOCNS/26/0049/GNS"
+    },
+    "timestamp": "2026-11-10T13:14:06.376Z",
+    "at": "2026-11-10T13:14:06.376Z",
+    "createdAt": "2026-11-10T13:14:06.376Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:14:06",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 892
+  },
+  {
+    "ref": "REF/EOCNS/QA/1011",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvuvhs537c9h1",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "NWOKARA UKAMAKA ANTHONIA",
+        "regNo": "EOCNS/26/0038/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Ukamaka Nwokora",
+      "csvRegNo": "EOCNS/26/0038/GNS"
+    },
+    "timestamp": "2026-11-10T13:14:23.348Z",
+    "at": "2026-11-10T13:14:23.348Z",
+    "createdAt": "2026-11-10T13:14:23.348Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:14:23",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 893
+  },
+  {
+    "ref": "REF/EOCNS/QA/1012",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvutitt5cul62",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "MIRACLE OLUEBUBE IGWE",
+        "regNo": "EOCNS/26/0054/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "MIRACLE IGWE",
+      "csvRegNo": "EOCNS/26/0054/GNS"
+    },
+    "timestamp": "2026-11-10T13:14:26.042Z",
+    "at": "2026-11-10T13:14:26.042Z",
+    "createdAt": "2026-11-10T13:14:26.042Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:14:26",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 894
+  },
+  {
+    "ref": "REF/EOCNS/QA/1013",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvus5mbd6apei",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "CHUKWUEMEKA DAVID IKECHUKWU",
+        "regNo": "EOCNS/26/0039/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "David Chukwuemeka",
+      "csvRegNo": "EOCNS/26/0039/GNS"
+    },
+    "timestamp": "2026-11-10T13:14:27.331Z",
+    "at": "2026-11-10T13:14:27.331Z",
+    "createdAt": "2026-11-10T13:14:27.331Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:14:27",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 895
+  },
+  {
+    "ref": "REF/EOCNS/QA/1014",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvsa1ixajo7p5",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "AKABUOBI ESTHER ROTANA",
+        "regNo": "EOCNS/26/0030/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "ESTHER ROTANNA",
+      "csvRegNo": "EOCNS/26/0030/GNS"
+    },
+    "timestamp": "2026-11-10T13:14:28.864Z",
+    "at": "2026-11-10T13:14:28.864Z",
+    "createdAt": "2026-11-10T13:14:28.864Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:14:28",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 896
+  },
+  {
+    "ref": "REF/EOCNS/QA/1015",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvusjuz7ekrzs",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "ANUBIA PERPETUAL SOBECHI",
+        "regNo": "EOCNS/26/0023/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Nnubia Sobechi perpetual",
+      "csvRegNo": "EOCNS/26/0023/GNS"
+    },
+    "timestamp": "2026-11-10T13:15:00.693Z",
+    "at": "2026-11-10T13:15:00.693Z",
+    "createdAt": "2026-11-10T13:15:00.693Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:15:00",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 897
+  },
+  {
+    "ref": "REF/EOCNS/QA/1016",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvs9sf0ar5n1h",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "AGASHI PRECIOUS I.",
+        "regNo": "EOCNS/26/0021/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "PRECIOUS AGASHI",
+      "csvRegNo": "EOCNS/26/0021/GNS"
+    },
+    "timestamp": "2026-11-10T13:15:26.155Z",
+    "at": "2026-11-10T13:15:26.155Z",
+    "createdAt": "2026-11-10T13:15:26.155Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:15:26",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 898
+  },
+  {
+    "ref": "REF/EOCNS/QA/1017",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvus8jm0h2wzg",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "REJOICE B. OWATEKIYE",
+        "regNo": "EOCNS/26/0022/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "rejoice owatekiye",
+      "csvRegNo": "EOCNS/26/0022/GNS"
+    },
+    "timestamp": "2026-11-10T13:15:40.745Z",
+    "at": "2026-11-10T13:15:40.745Z",
+    "createdAt": "2026-11-10T13:15:40.745Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:15:40",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 899
+  },
+  {
+    "ref": "REF/EOCNS/QA/1018",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvusomywj99lo",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "UGODINMA JULIET MMESOMA",
+        "regNo": "EOCNS/26/0031/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Juliet Mmesoma Ugodinamba",
+      "csvRegNo": "EOCNS/26/0031/GNS"
+    },
+    "timestamp": "2026-11-10T13:15:42.619Z",
+    "at": "2026-11-10T13:15:42.619Z",
+    "createdAt": "2026-11-10T13:15:42.619Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:15:42",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 900
+  },
+  {
+    "ref": "REF/EOCNS/QA/1019",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvusr6d2j8kaa",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "OKONYE PRECIOUS NMESOMA",
+        "regNo": "EOCNS/26/0044/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Precious Okoye",
+      "csvRegNo": "EOCNS/26/0044/GNS"
+    },
+    "timestamp": "2026-11-10T13:15:44.139Z",
+    "at": "2026-11-10T13:15:44.139Z",
+    "createdAt": "2026-11-10T13:15:44.139Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:15:44",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 901
+  },
+  {
+    "ref": "REF/EOCNS/QA/1020",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mw67bbj36qvgm",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "OKORIE BLESSING CHUKWU",
+        "regNo": "TMP-EOCNS/26/0011/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Okorie Blessing Chukwu",
+      "csvRegNo": "EOCNS/26/0001/PGNS"
+    },
+    "timestamp": "2026-11-10T13:15:48.043Z",
+    "at": "2026-11-10T13:15:48.043Z",
+    "createdAt": "2026-11-10T13:15:48.043Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:15:48",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 902
+  },
+  {
+    "ref": "REF/EOCNS/QA/1021",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvs9x0s03o79p",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "CHIBUZOR CHIOMA PRAISE",
+        "regNo": "EOCNS/26/0050/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Chioma Praise",
+      "csvRegNo": "EOCNS/26/0050/GNS"
+    },
+    "timestamp": "2026-11-10T13:16:12.925Z",
+    "at": "2026-11-10T13:16:12.925Z",
+    "createdAt": "2026-11-10T13:16:12.925Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:16:12",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 903
+  },
+  {
+    "ref": "REF/EOCNS/QA/1022",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvusajpbujcny",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "OHANWACHI DIVINE OLUOMACHI",
+        "regNo": "EOCNS/26/0007/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "OHANWADI DIVINE OLUOMACHI",
+      "csvRegNo": "EOCNS/26/0007/GNS"
+    },
+    "timestamp": "2026-11-10T13:16:28.879Z",
+    "at": "2026-11-10T13:16:28.879Z",
+    "createdAt": "2026-11-10T13:16:28.879Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:16:28",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 904
+  },
+  {
+    "ref": "REF/EOCNS/QA/1023",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvs9t8ea938j5",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "CHUKWU CHIDERA UKA",
+        "regNo": "EOCNS/26/0024/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Chukwu Chidera Uka",
+      "csvRegNo": "EOCNS/26/0025/GNS"
+    },
+    "timestamp": "2026-11-10T13:17:11.853Z",
+    "at": "2026-11-10T13:17:11.853Z",
+    "createdAt": "2026-11-10T13:17:11.853Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:17:11",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 905
+  },
+  {
+    "ref": "REF/EOCNS/QA/1024",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvusfrg49oa12",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "UMUKORO MARY ANUOLUWAKPO",
+        "regNo": "EOCNS/26/0011/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Mary Anuoluwapo Umukoro",
+      "csvRegNo": "EOCNS/26/0011/GNS"
+    },
+    "timestamp": "2026-11-10T13:17:16.056Z",
+    "at": "2026-11-10T13:17:16.056Z",
+    "createdAt": "2026-11-10T13:17:16.056Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:17:16",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 906
+  },
+  {
+    "ref": "REF/EOCNS/QA/1025",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvus39fetji4l",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "FAVOUR CHIBUZOR OKO",
+        "regNo": "EOCNS/26/0003/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Favour Chibuzor",
+      "csvRegNo": "EOCNS/26/0003/GNS"
+    },
+    "timestamp": "2026-11-10T13:17:20.071Z",
+    "at": "2026-11-10T13:17:20.071Z",
+    "createdAt": "2026-11-10T13:17:20.071Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:17:20",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 907
+  },
+  {
+    "ref": "REF/EOCNS/QA/1026",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvushczvayk97",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "ADERSHINA DEBORAH KUFRE",
+        "regNo": "EOCNS/26/0048/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Deborah Kurfeh Adeshina",
+      "csvRegNo": "EOCNS/26/0048/GNS"
+    },
+    "timestamp": "2026-11-10T13:17:24.830Z",
+    "at": "2026-11-10T13:17:24.830Z",
+    "createdAt": "2026-11-10T13:17:24.830Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:17:24",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 908
+  },
+  {
+    "ref": "REF/EOCNS/QA/1027",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvusbc9awsly1",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "ASOGWU PASCHALINE OGOCHUKWU",
+        "regNo": "EOCNS/26/0018/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Asogwa paschaline Ogochukwu",
+      "csvRegNo": "EOCNS/26/0018/GNS"
+    },
+    "timestamp": "2026-11-10T13:17:35.630Z",
+    "at": "2026-11-10T13:17:35.630Z",
+    "createdAt": "2026-11-10T13:17:35.630Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:17:35",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 909
+  },
+  {
+    "ref": "REF/EOCNS/QA/1028",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvutd4x0xkesu",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "PRECIOUS NKEMUJIKA JOSEPH",
+        "regNo": "EOCNS/26/0019/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "PRECIOUS JOSEPH NKEJIMKA",
+      "csvRegNo": "EOCNS/26/0019/GNS"
+    },
+    "timestamp": "2026-11-10T13:17:40.003Z",
+    "at": "2026-11-10T13:17:40.003Z",
+    "createdAt": "2026-11-10T13:17:40.003Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:17:40",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 910
+  },
+  {
+    "ref": "REF/EOCNS/QA/1029",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvusxpyc8bz5r",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "OZULU VICTORY OZIOMA",
+        "regNo": "EOCNS/26/0008/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Ozulu Victory",
+      "csvRegNo": "EOCNS/26/0008/GNS"
+    },
+    "timestamp": "2026-11-10T13:17:43.854Z",
+    "at": "2026-11-10T13:17:43.854Z",
+    "createdAt": "2026-11-10T13:17:43.854Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:17:43",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 911
+  },
+  {
+    "ref": "REF/EOCNS/QA/1030",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mw67704txzjg8",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "IGWE CHINAZAEKPERE GIFT",
+        "regNo": "TMP-EOCNS/26/0006/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Igwe Chinazaekpere Gift",
+      "csvRegNo": "EOCNS/26/0004/GNS"
+    },
+    "timestamp": "2026-11-10T13:17:52.778Z",
+    "at": "2026-11-10T13:17:52.778Z",
+    "createdAt": "2026-11-10T13:17:52.778Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:17:52",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 912
+  },
+  {
+    "ref": "REF/EOCNS/QA/1031",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mw9mfbzhnze8w",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "OLAPO LATEEFAH AYOMIDE",
+        "regNo": "EOCNS/26/0070/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Lateefah Olapo",
+      "csvRegNo": "EOCNS/26/0070/GNS"
+    },
+    "timestamp": "2026-11-10T13:18:05.223Z",
+    "at": "2026-11-10T13:18:05.223Z",
+    "createdAt": "2026-11-10T13:18:05.223Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:18:05",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 913
+  },
+  {
+    "ref": "REF/EOCNS/QA/1032",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvusyisjz94s0",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "EZEOKE OGECHI FAITH",
+        "regNo": "EOCNS/26/0068/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Ezeoke Faith",
+      "csvRegNo": "EOCNS/26/0068/GNS"
+    },
+    "timestamp": "2026-11-10T13:18:11.435Z",
+    "at": "2026-11-10T13:18:11.435Z",
+    "createdAt": "2026-11-10T13:18:11.435Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:18:11",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 914
+  },
+  {
+    "ref": "REF/EOCNS/QA/1033",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mw9mdsbg02k7f",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "ODO CALLISTA KELECHI",
+        "regNo": "EOCNS/26/0076/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Odo Calista kelechi",
+      "csvRegNo": "EOCNS/26/0076/GNS"
+    },
+    "timestamp": "2026-11-10T13:18:30.674Z",
+    "at": "2026-11-10T13:18:30.674Z",
+    "createdAt": "2026-11-10T13:18:30.674Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:18:30",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 915
+  },
+  {
+    "ref": "REF/EOCNS/QA/1034",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mw9maskc29hkq",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "OGBA JANEFRANCES CHIAMAKA",
+        "regNo": "EOCNS/26/0072/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Chiamaka Jane France Ogba",
+      "csvRegNo": "EOCNS/26/0072/GNS"
+    },
+    "timestamp": "2026-11-10T13:18:37.716Z",
+    "at": "2026-11-10T13:18:37.716Z",
+    "createdAt": "2026-11-10T13:18:37.716Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:18:37",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 916
+  },
+  {
+    "ref": "REF/EOCNS/QA/1035",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvuszawbbvyhs",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "AZU LOVETH IFEANYI",
+        "regNo": "EOCNS/26/0059/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Loveth Ifeanyi",
+      "csvRegNo": "EOCNS/26/0059/GNS"
+    },
+    "timestamp": "2026-11-10T13:18:44.809Z",
+    "at": "2026-11-10T13:18:44.809Z",
+    "createdAt": "2026-11-10T13:18:44.809Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:18:44",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 917
+  },
+  {
+    "ref": "REF/EOCNS/QA/1036",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvusgi7ofd5f2",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "GEORGE JESSICA UGONNA",
+        "regNo": "EOCNS/26/0065/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "JESSICA GEORGE",
+      "csvRegNo": "EOCNS/26/0065/GNS"
+    },
+    "timestamp": "2026-11-10T13:19:17.197Z",
+    "at": "2026-11-10T13:19:17.197Z",
+    "createdAt": "2026-11-10T13:19:17.197Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:19:17",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 918
+  },
+  {
+    "ref": "REF/EOCNS/QA/1037",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvut6bmvqvkb2",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "NWACHI ARBITA NMESOMA",
+        "regNo": "EOCNS/26/0055/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Arbita Mmesoma Nwachi",
+      "csvRegNo": "EOCNS/26/0055/GNS"
+    },
+    "timestamp": "2026-11-10T13:19:20.687Z",
+    "at": "2026-11-10T13:19:20.687Z",
+    "createdAt": "2026-11-10T13:19:20.687Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:19:20",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 919
+  },
+  {
+    "ref": "REF/EOCNS/QA/1038",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvut0gx6e9ck9",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "ORAIDU IFEOMA SATION",
+        "regNo": "EOCNS/26/0032/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "ORAEDU IFEOMA SALVATION",
+      "csvRegNo": "EOCNS/26/0032/GNS"
+    },
+    "timestamp": "2026-11-10T13:19:26.366Z",
+    "at": "2026-11-10T13:19:26.366Z",
+    "createdAt": "2026-11-10T13:19:26.366Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:19:26",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 920
+  },
+  {
+    "ref": "REF/EOCNS/QA/1039",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvs98wh5p9wl4",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "JENNIFER AIKHIONBARE",
+        "regNo": "EOCNS/26/0005/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Aikhonbare Jennifer",
+      "csvRegNo": "EOCNS/26/0005/GNS"
+    },
+    "timestamp": "2026-11-10T13:19:29.522Z",
+    "at": "2026-11-10T13:19:29.522Z",
+    "createdAt": "2026-11-10T13:19:29.522Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:19:29",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 921
+  },
+  {
+    "ref": "REF/EOCNS/QA/1040",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvs9r9mcnoi4p",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "OKE DIAOKE",
+        "regNo": "EOCNS/26/0042/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Oke Diahoke",
+      "csvRegNo": "EOCNS/26/0042/GNS"
+    },
+    "timestamp": "2026-11-10T13:19:37.878Z",
+    "at": "2026-11-10T13:19:37.878Z",
+    "createdAt": "2026-11-10T13:19:37.878Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:19:37",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 922
+  },
+  {
+    "ref": "REF/EOCNS/QA/1041",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvussxva4yqga",
+    "reason": "CSV import review — confirmed existing student (no duplicate)",
+    "details": {
+      "before": {
+        "name": "EBOH PRINCESS NMESOMA",
+        "regNo": "EOCNS/26/0017/GNS",
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "csvName": "Eboh Princess mmesoma",
+      "csvRegNo": "EOCNS/26/0017/GNS"
+    },
+    "timestamp": "2026-11-10T13:20:14.108Z",
+    "at": "2026-11-10T13:20:14.108Z",
+    "createdAt": "2026-11-10T13:20:14.108Z",
+    "whenLocal": "Tue, 10 Nov 2026, 14:20:14",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 923
   }
 ]
