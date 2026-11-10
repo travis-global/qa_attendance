@@ -70,32 +70,33 @@ async function githubPutFile(env, path, contentText, message, sha) {
     "User-Agent": "eocns-publish-worker",
     "Content-Type": "application/json",
   };
-  if (!sha) {
-    const cur = await githubGetFile(env, path);
-    sha = cur.sha;
-  }
   const bytes = new TextEncoder().encode(contentText);
   let binary = "";
   bytes.forEach((b) => { binary += String.fromCharCode(b); });
-  const body = { message, content: btoa(binary), branch: BRANCH };
-  if (sha) body.sha = sha;
-  const putRes = await fetch(url, { method: "PUT", headers, body: JSON.stringify(body) });
-  if (!putRes.ok) {
+  const contentB64 = btoa(binary);
+
+  let attemptSha = sha;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    if (!attemptSha) {
+      const cur = await githubGetFile(env, path);
+      attemptSha = cur.sha;
+    }
+    const body = { message, content: contentB64, branch: BRANCH };
+    if (attemptSha) body.sha = attemptSha;
+    const putRes = await fetch(url, { method: "PUT", headers, body: JSON.stringify(body) });
+    if (putRes.ok) return putRes.json();
     const errText = await putRes.text();
-    throw new Error(`${path} → ${putRes.status} ${errText.slice(0, 240)}`);
+    // Concurrent update — refresh SHA and retry
+    if (putRes.status === 409 || /sha|conflict/i.test(errText)) {
+      const cur = await githubGetFile(env, path);
+      attemptSha = cur.sha;
+      continue;
+    }
+    throw new Error(`PUT ${path} → ${putRes.status} ${errText.slice(0, 240)}`);
   }
-  return putRes.json();
+  throw new Error(`PUT ${path} failed after retries (SHA conflict)`);
 }
 
-function checkPublishKey(env, request, payload) {
-  if (!env.PUBLISH_KEY) return true;
-  const key =
-    request.headers.get("X-EOCNS-Key") ||
-    request.headers.get("X-Publish-Key") ||
-    (payload && payload.publishKey) ||
-    "";
-  return key === env.PUBLISH_KEY;
-}
 
 async function handlePublish(env, request, payload, cors) {
   if (!checkPublishKey(env, request, payload)) {

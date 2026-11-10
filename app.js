@@ -6262,18 +6262,45 @@ async function fetchRemoteList(path) {
   }
 }
 
+async function fetchRemoteTextFresh(path) {
+  try {
+    return await fetchRepoText(path + (path.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now());
+  } catch (_) {
+    try { return await fetchRepoText(path); } catch (e2) { return null; }
+  }
+}
+
+/**
+ * Build publish payload for one JSON list store.
+ * - Merges local+remote (no data loss across devices)
+ * - Skips upload when content is unchanged (delta publish)
+ * - Never publishes empty over non-empty remote
+ */
 async function safePublishJson(path, localRows, label) {
   var local = Array.isArray(localRows) ? localRows : [];
+  var remoteText = null;
   var remote = [];
   try {
-    var rem = await fetchRepoJson(path + "?t=" + Date.now());
-    if (Array.isArray(rem)) remote = rem;
-  } catch (_) { remote = []; }
+    remoteText = await fetchRemoteTextFresh(path);
+    if (remoteText) {
+      var rem = JSON.parse(remoteText);
+      if (Array.isArray(rem)) remote = rem;
+    }
+  } catch (_) { remote = []; remoteText = null; }
   var remoteLen = remote.length;
+
   if (local.length === 0 && remoteLen > 0) {
     console.warn("publish guard: skipped empty", label, "remote has", remoteLen);
-    return { skipped: true, reason: "local empty, remote has " + remoteLen + " " + label, remoteLen: remoteLen, merged: remote };
+    return {
+      skipped: true,
+      unchanged: true,
+      reason: "local empty, remote has " + remoteLen + " " + label,
+      remoteLen: remoteLen,
+      merged: remote,
+      body: null
+    };
   }
+
   var MERGE = {
     students: 1, lecturers: 1, sessions: 1, qa_entries: 1, audit: 1,
     discipline: 1, pending_students: 1, programmes: 1, levels: 1, courses: 1,
@@ -6282,51 +6309,95 @@ async function safePublishJson(path, localRows, label) {
   };
   var merged = local;
   if (MERGE[label] && remoteLen) merged = mergeRecordsById(local, remote);
+  var body = JSON.stringify(merged, null, 2);
+  var fp = textFingerprint(body);
+  var remoteFp = remoteText != null ? textFingerprint(remoteText) : null;
+  if (remoteFp && fp === remoteFp) {
+    return {
+      skipped: true,
+      unchanged: true,
+      reason: "unchanged",
+      remoteLen: remoteLen,
+      publishedLen: merged.length,
+      merged: merged,
+      body: null,
+      fingerprint: fp
+    };
+  }
   return {
     skipped: false,
-    body: JSON.stringify(merged, null, 2),
+    unchanged: false,
+    body: body,
     merged: merged,
     localLen: local.length,
     remoteLen: remoteLen,
-    publishedLen: merged.length
+    publishedLen: merged.length,
+    fingerprint: fp
   };
+}
+
+/** Poll raw repo until file fingerprint matches expected (or attempts exhausted). */
+async function verifyRepoFile(path, expectedFp, attempts, delayMs) {
+  attempts = attempts || 8;
+  delayMs = delayMs || 2000;
+  for (var i = 0; i < attempts; i++) {
+    if (i) await new Promise(function(r) { setTimeout(r, delayMs); });
+    var text = await fetchRemoteTextFresh(path);
+    if (text != null && textFingerprint(text) === expectedFp) return true;
+  }
+  return false;
 }
 
 async function publishAllToRepo() {
   if (!isQaOfficer()) return;
   var pin = (document.getElementById("qaPublishPin") && document.getElementById("qaPublishPin").value || "").trim();
   var status = document.getElementById("qaPublishStatus");
+  function setSt(msg) { if (status) status.textContent = msg; }
   if (!pin || pin !== (APP_CONFIG.qaPin || "EOCNS-QA")) {
-    if (status) status.textContent = "Incorrect officer PIN.";
+    setSt("Incorrect officer PIN.");
     return;
   }
   try {
-    APP_CONFIG = await fetchRepoJson(DATA_FILES.config + "?t=" + Date.now());
-  } catch (_) {}
-  var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
-  if (!workerUrl) {
-    if (status) status.textContent = "Set publishWorkerUrl in data/config.json to your Cloudflare Worker URL, then reload.";
-    return;
-  }
-  if (status) status.textContent = "Sending data to publish worker…";
-  try {
-    var students = shapeStudentsForRepo(await getAll("students"));
+    try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config + "?t=" + Date.now()); } catch (_) {}
+    var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
+    if (!workerUrl) {
+      setSt("Set publishWorkerUrl in data/config.json to your Cloudflare Worker URL, then reload.");
+      return;
+    }
+    var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
+    if (!key) throw new Error("publishWorkerKey missing in data/config.json");
+
+    setSt("Preparing institutional publish (merge + delta)…");
     var files = {};
     var skipped = [];
-    var publishLens = {};
+    var unchanged = [];
+    var expectedFp = {};
+    var mergedLocal = {};
+
     async function putFile(path, rows, label) {
       var r = await safePublishJson(path, rows, label);
-      if (r.skipped) { skipped.push(label + " (" + r.reason + ")"); return; }
+      if (r.merged) mergedLocal[label] = r.merged;
+      if (r.skipped || r.unchanged) {
+        if (r.reason === "unchanged") unchanged.push(label);
+        else skipped.push(label + " (" + (r.reason || "skipped") + ")");
+        // Keep local union even when not uploading
+        if (r.merged && Array.isArray(r.merged) && (label === "qa_entries" || label === "students" || label === "audit" || label === "lecturers" || label === "sessions")) {
+          try {
+            await replaceStoreFromRepoRows(label, label === "students" ? r.merged.map(studentFromRepo) : r.merged);
+          } catch (_) {}
+        }
+        return;
+      }
       files[path] = r.body;
-      publishLens[label] = r.publishedLen != null ? r.publishedLen : (Array.isArray(rows) ? rows.length : 0);
-      // Persist merged union locally so a refresh cannot drop rows this browser just published
+      expectedFp[path] = r.fingerprint;
       if (r.merged && Array.isArray(r.merged) && (label === "qa_entries" || label === "students" || label === "audit" || label === "lecturers" || label === "sessions")) {
         try {
           await replaceStoreFromRepoRows(label, label === "students" ? r.merged.map(studentFromRepo) : r.merged);
         } catch (e) { console.warn("local merge write", label, e); }
       }
     }
-    await putFile(DATA_FILES.students, students, "students");
+
+    await putFile(DATA_FILES.students, shapeStudentsForRepo(await getAll("students")), "students");
     await putFile(DATA_FILES.lecturers, await getAll("lecturers"), "lecturers");
     await putFile(DATA_FILES.sessions, await getAll("sessions"), "sessions");
     await putFile(DATA_FILES.qa_entries, await getAll("qa_entries"), "qa_entries");
@@ -6336,9 +6407,16 @@ async function publishAllToRepo() {
     await putFile(DATA_FILES.programmes, await getAll("programmes"), "programmes");
     await putFile(DATA_FILES.levels, await getAll("levels"), "levels");
     await putFile(DATA_FILES.courses, await getAll("courses"), "courses");
-    if (TIMETABLES_CACHE && typeof TIMETABLES_CACHE === "object" && Object.keys(TIMETABLES_CACHE).length) {
-      files[DATA_FILES.timetables] = JSON.stringify(TIMETABLES_CACHE, null, 2);
-    }
+    try {
+      if (TIMETABLES_CACHE && typeof TIMETABLES_CACHE === "object" && Object.keys(TIMETABLES_CACHE).length) {
+        var ttBody = JSON.stringify(TIMETABLES_CACHE, null, 2);
+        var ttRemote = await fetchRemoteTextFresh(DATA_FILES.timetables);
+        if (!ttRemote || textFingerprint(ttBody) !== textFingerprint(ttRemote)) {
+          files[DATA_FILES.timetables] = ttBody;
+          expectedFp[DATA_FILES.timetables] = textFingerprint(ttBody);
+        } else unchanged.push("timetables");
+      }
+    } catch (_) {}
     try { await putFile(DATA_FILES.attendance, await getAll("attendance"), "attendance"); } catch (_) {}
     try { await putFile(DATA_FILES.hostel_runs, await getAll("hostel_runs"), "hostel_runs"); } catch (_) {}
     try { await putFile(DATA_FILES.biometric_pending, await getAll("biometric_pending"), "biometric_pending"); } catch (_) {}
@@ -6349,84 +6427,119 @@ async function publishAllToRepo() {
     try {
       var rmeta = await getAll("remedial_meta");
       var metaVal = (rmeta[0] && (rmeta[0].value !== undefined ? rmeta[0].value : rmeta[0])) || {};
-      if (metaVal && typeof metaVal === "object") files[DATA_FILES.remedial_meta] = JSON.stringify(metaVal, null, 2);
+      if (metaVal && typeof metaVal === "object") {
+        var mb = JSON.stringify(metaVal, null, 2);
+        var mr = await fetchRemoteTextFresh(DATA_FILES.remedial_meta);
+        if (!mr || textFingerprint(mb) !== textFingerprint(mr)) {
+          files[DATA_FILES.remedial_meta] = mb;
+          expectedFp[DATA_FILES.remedial_meta] = textFingerprint(mb);
+        } else unchanged.push("remedial_meta");
+      }
     } catch (_) {}
     try {
       var rt = await getAll("remedial_timetable");
       var ttVal = (rt[0] && rt[0].value) || (rt[0] || { slots: [] });
-      files[DATA_FILES.remedial_timetable] = JSON.stringify(ttVal, null, 2);
+      var rtb = JSON.stringify(ttVal, null, 2);
+      var rtr = await fetchRemoteTextFresh(DATA_FILES.remedial_timetable);
+      if (!rtr || textFingerprint(rtb) !== textFingerprint(rtr)) {
+        files[DATA_FILES.remedial_timetable] = rtb;
+        expectedFp[DATA_FILES.remedial_timetable] = textFingerprint(rtb);
+      } else unchanged.push("remedial_timetable");
     } catch (_) {}
-    if (skipped.length) {
-      console.warn("Publish guard skipped:", skipped.join("; "));
-      if (status) status.textContent = "Protecting repo: skipped empty local for " + skipped.join(", ") + ". Other files still publishing…";
-    }
+
     var fileKeys = Object.keys(files);
     if (!fileKeys.length) {
-      throw new Error("Nothing to publish — every store was empty or skipped by the safety guard. Your local data may not have loaded into IndexedDB. Import your snapshot first, then publish again.");
+      EOCNS_DIRTY = false;
+      clearDirty();
+      try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
+      setSt("Nothing new to publish — repository already has the same data (" +
+        (unchanged.length ? unchanged.join(", ") : "all stores") +
+        "). Local marked clean; refresh will load from repository.");
+      return;
     }
-    var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
-    if (!key) {
-      throw new Error("publishWorkerKey missing in data/config.json — cannot authorize the publish worker.");
-    }
+
+    setSt("Uploading " + fileKeys.length + " changed file(s) to GitHub (skipped " +
+      unchanged.length + " unchanged)…");
+
     var headers = { "Content-Type": "application/json", "X-EOCNS-Key": key };
     var res = await fetch(workerUrl.replace(/\/$/, ""), {
       method: "POST",
       headers: headers,
       body: JSON.stringify({
         action: "publish",
-        message: "Update master data via EOCNS QA System",
-        publishKey: key,
+        message: "EOCNS institutional publish (delta)",
         files: files
       })
     });
-    var body = {};
-    try { body = await res.json(); } catch (_) {}
+    var bodyText = await res.text();
+    var body;
+    try { body = JSON.parse(bodyText); } catch (_) { body = { raw: bodyText }; }
     if (!res.ok) {
-      var msg = body.error || ("Worker HTTP " + res.status);
+      var msg = (body && body.error) ? body.error : (bodyText || res.statusText || String(res.status));
       if (res.status === 401) {
-        msg += " — On your PC run: cd cloudflare-worker && npx wrangler secret put PUBLISH_KEY  (use exactly the publishWorkerKey from data/config.json), then npx wrangler deploy";
+        msg += " — Check publishWorkerKey vs Worker PUBLISH_KEY secret.";
       }
       throw new Error(msg);
     }
+
+    setSt("Worker accepted " + ((body.updated && body.updated.length) || fileKeys.length) +
+      " file(s). Verifying repository before locking…");
+
+    var verified = [];
+    var failedVerify = [];
+    for (var pi = 0; pi < fileKeys.length; pi++) {
+      var pth = fileKeys[pi];
+      var ok = await verifyRepoFile(pth, expectedFp[pth], 10, 2000);
+      if (ok) verified.push(pth);
+      else failedVerify.push(pth);
+    }
+
+    if (failedVerify.length) {
+      // Do NOT wipe — institutional lock requires full verification
+      EOCNS_DIRTY = true;
+      try { await put("meta", { key: "dirty", value: true }); } catch (_) {}
+      setSt("Publish sent but verification incomplete for: " + failedVerify.join(", ") +
+        ". Local data KEPT. Wait 30s and Publish again (or hard-refresh after confirm on GitHub). Nothing was wiped.");
+      return;
+    }
+
+    // LOCKED SUCCESS: repo matches what we published
     EOCNS_DIRTY = false;
     clearDirty();
     try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
     try { await put("meta", { key: "lastPublishAt", value: new Date().toISOString() }); } catch (_) {}
-    if (status) status.textContent = "Published via worker: " + ((body.updated && body.updated.join(", ")) || "ok") + ". Verifying (local data kept — no wipe)…";
-    // STRONG PUBLISH: never wipe IndexedDB after publish. Merged lists already saved locally.
+    try { await put("meta", { key: "lastPublishFiles", value: verified }); } catch (_) {}
+
+    setSt("Verified on GitHub (" + verified.length + " file(s)). Locking: clearing local cache and reloading from repository…");
+
     try {
-      EOCNS_DIRTY = false;
-      clearDirty();
-      try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
-      try { await put("meta", { key: "lastPublishAt", value: new Date().toISOString() }); } catch (_) {}
       for (var si = 0; si < SYNC_STORES.length; si++) {
-        var storeName = SYNC_STORES[si][0];
-        try {
-          var localRows = await getAll(storeName);
-          await put("meta", { key: "repoFp:" + storeName, value: textFingerprint(JSON.stringify(localRows)) });
-        } catch (_) {}
+        try { await clearStore(SYNC_STORES[si][0]); } catch (_) {}
       }
-      await new Promise(function(r) { setTimeout(r, 2500); });
-      var verifyNotes = [];
       try {
-        var remoteQa = await fetchRemoteList(DATA_FILES.qa_entries);
-        var localQa = await getAll("qa_entries");
-        if (remoteQa.length < localQa.length) {
-          verifyNotes.push("qa_entries: remote " + remoteQa.length + " < local " + localQa.length + " (propagation lag — local kept)");
-        } else {
-          verifyNotes.push("qa_entries verified (" + remoteQa.length + ")");
+        var metaAll = await getAll("meta");
+        for (var mi = 0; mi < metaAll.length; mi++) {
+          var mk = metaAll[mi] && metaAll[mi].key;
+          if (mk && (String(mk).indexOf("repoFp:") === 0 || mk === "dirty")) {
+            try { await del("meta", mk); } catch (_) {}
+          }
         }
-      } catch (_) { verifyNotes.push("qa verify deferred"); }
-      if (status) {
-        status.textContent = "Published successfully. Local lecture logs and master data were kept. " +
-          verifyNotes.join(" · ") +
-          ". Other devices: hard-refresh after ~30s. If a device is behind, Publish again from the browser that has the full data.";
-      }
+        await put("meta", { key: "dirty", value: false });
+      } catch (_) {}
+      TIMETABLES_CACHE = null;
+      try { PROGRAMMES_CACHE = null; LEVELS_CACHE = null; } catch (_) {}
+      await new Promise(function(r) { setTimeout(r, 1500); });
+      await syncFromRepoIfClean();
       try { await refreshCachesAfterSync(); } catch (_) {}
+      setSt("Publish locked. Repository is source of truth. Reloaded " + verified.length +
+        " updated file(s); " + unchanged.length + " unchanged skipped. Device B: hard-refresh to see the same data.");
     } catch (postErr) {
-      console.warn("post-publish verify", postErr);
-      if (status) status.textContent = "Published OK. Local data was kept (no wipe). " + (postErr.message || postErr);
+      console.warn("post-publish reload", postErr);
+      setSt("Published and verified on GitHub, but local reload failed: " +
+        (postErr.message || postErr) +
+        ". Hard-refresh this page — data is safe on the repository.");
     }
+
     var panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = true;
     if (document.getElementById("qaPublishPin")) document.getElementById("qaPublishPin").value = "";
@@ -6435,21 +6548,15 @@ async function publishAllToRepo() {
     var msg = (err && err.message) ? err.message : String(err || "unknown");
     var note = "";
     if (/Unauthorized|401|PUBLISH_KEY/i.test(msg)) {
-      note = " Cause: publishWorkerKey in data/config.json does not match the Worker secret PUBLISH_KEY (or secret is empty/wrong). Fix: wrangler secret put PUBLISH_KEY with the exact config value, then wrangler deploy.";
+      note = " Cause: publishWorkerKey does not match Worker secret PUBLISH_KEY.";
     } else if (/Failed to fetch|NetworkError|CORS|Load failed/i.test(msg)) {
-      note = " Cause: browser could not reach the Worker URL (wrong publishWorkerUrl, offline, or CORS). Check data/config.json publishWorkerUrl and that the worker is deployed.";
+      note = " Cause: cannot reach publish Worker URL.";
     } else if (/GITHUB_TOKEN|not configured/i.test(msg)) {
-      note = " Cause: Worker has no GITHUB_TOKEN secret. Run: npx wrangler secret put GITHUB_TOKEN";
-    } else if (/403|404|Contents/i.test(msg)) {
-      note = " Cause: GitHub rejected the commit (token scope, repo name, or branch). Token needs Contents Read and write on travis-global/qa_attendance.";
-    } else if (/Path not allowed/i.test(msg)) {
-      note = " Cause: Worker allow-list is outdated. Pull latest cloudflare-worker and run npx wrangler deploy.";
-    } else if (/Incorrect officer PIN/i.test(msg)) {
-      note = " Cause: PIN does not match data/config.json qaPin.";
+      note = " Cause: Worker missing GITHUB_TOKEN secret.";
     } else {
-      note = " See browser console (F12) for full detail.";
+      note = " See browser console (F12) for detail.";
     }
-    if (status) status.textContent = "Publish failed: " + msg + note;
+    setSt("Publish failed: " + msg + note);
   }
 }
 
