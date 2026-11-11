@@ -34280,5 +34280,219 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1505
+  },
+  {
+    "ref": "REF/EOCNS/QA/1010",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaqcm6y_141",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "regNo": "EOCNS/24/0068/MID",
+      "name": "CHINEMEREM PRECIOUS ONYEBUCHI"
+    },
+    "timestamp": "2026-11-11T16:20:51.646Z",
+    "at": "2026-11-11T16:20:51.646Z",
+    "createdAt": "2026-11-11T16:20:51.646Z",
+    "whenLocal": "Wed, 11 Nov 2026, 17:20:51",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1506
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mwaqcklm_11",
+    "reason": "Removed from master list",
+    "details": {
+      "name": "Glory Adaniyomwan",
+      "regNo": "EOCNS/24/0052/MID"
+    },
+    "timestamp": "2026-11-11T16:21:26.550Z",
+    "at": "2026-11-11T16:21:26.550Z",
+    "createdAt": "2026-11-11T16:21:26.550Z",
+    "whenLocal": "Wed, 11 Nov 2026, 17:21:26",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1507
+  },
+  {
+    "ref": "REF/EOCNS/QA/1011",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaqckrg_26",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "regNo": "EOCNS/24/0027/MID",
+      "name": "Godson Portia"
+    },
+    "timestamp": "2026-11-11T16:21:51.585Z",
+    "at": "2026-11-11T16:21:51.585Z",
+    "createdAt": "2026-11-11T16:21:51.585Z",
+    "whenLocal": "Wed, 11 Nov 2026, 17:21:51",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1508
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mwaqckk1_7",
+    "reason": "Removed from master list",
+    "details": {
+      "name": "Ifeanyi Martin Ekeh",
+      "regNo": "EOCNS/24/0055/MID"
+    },
+    "timestamp": "2026-11-11T16:22:13.318Z",
+    "at": "2026-11-11T16:22:13.318Z",
+    "createdAt": "2026-11-11T16:22:13.318Z",
+    "whenLocal": "Wed, 11 Nov 2026, 17:22:13",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1509
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mwaqcki7_4",
+    "reason": "Removed from master list",
+    "details": {
+      "name": "Ignatius Divine Chinecherem",
+      "regNo": "EOCNS/24/0053/MID"
+    },
+    "timestamp": "2026-11-11T16:22:31.569Z",
+    "at": "2026-11-11T16:22:31.569Z",
+    "createdAt": "2026-11-11T16:22:31.569Z",
+    "whenLocal": "Wed, 11 Nov 2026, 17:22:31",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1510
+  },
+  {
+    "ref": "REF/EOCNS/QA/1012",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaqckno_15",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "regNo": "EOCNS/24/0054/MID",
+      "name": "Precious Mmesoma Ezechukwu"
+    },
+    "timestamp": "2026-11-11T16:23:01.083Z",
+    "at": "2026-11-11T16:23:01.083Z",
+    "createdAt": "2026-11-11T16:23:01.083Z",
+    "whenLocal": "Wed, 11 Nov 2026, 17:23:01",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1511
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mw9ipo80ls2ja",
+    "reason": "Removed from master list",
+    "details": {
+      "name": "RAPHAEL OHALEHI C.",
+      "regNo": "TMP-EOCNS/26/0001/MID"
+    },
+    "timestamp": "2026-11-11T16:23:29.629Z",
+    "at": "2026-11-11T16:23:29.629Z",
+    "createdAt": "2026-11-11T16:23:29.629Z",
+    "whenLocal": "Wed, 11 Nov 2026, 17:23:29",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1512
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mwaqclfo_80",
+    "reason": "Removed from master list",
+    "details": {
+      "name": "Udeh Faith",
+      "regNo": "EOCNS/24/0006/MID"
+    },
+    "timestamp": "2026-11-11T16:23:49.317Z",
+    "at": "2026-11-11T16:23:49.317Z",
+    "createdAt": "2026-11-11T16:23:49.317Z",
+    "whenLocal": "Wed, 11 Nov 2026, 17:23:49",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1513
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mwaqcke6_1",
+    "reason": "Removed from master list",
+    "details": {
+      "name": "UGWU LOVINA IFUNANYA",
+      "regNo": "EOCNS/24/0078/MID"
+    },
+    "timestamp": "2026-11-11T16:24:05.206Z",
+    "at": "2026-11-11T16:24:05.206Z",
+    "createdAt": "2026-11-11T16:24:05.206Z",
+    "whenLocal": "Wed, 11 Nov 2026, 17:24:05",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1514
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mwaqcl7r_61",
+    "reason": "Removed from master list",
+    "details": {
+      "name": "Vasco Wonderful nmesoma",
+      "regNo": "EOCNS/24/0096/GNS"
+    },
+    "timestamp": "2026-11-11T16:24:24.008Z",
+    "at": "2026-11-11T16:24:24.008Z",
+    "createdAt": "2026-11-11T16:24:24.008Z",
+    "whenLocal": "Wed, 11 Nov 2026, 17:24:24",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1515
   }
 ]
