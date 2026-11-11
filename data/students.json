@@ -154,34 +154,6 @@
     "id": "stu_mvrzdach9mpa2"
   },
   {
-    "serial": "34",
-    "name": "Amarachi Precious Obioha",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0034/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacikidli"
-  },
-  {
-    "serial": "53",
-    "name": "Amarachukwu Judith Chijioke",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0053/MID",
-    "hostel": "Off-campus",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacn2nxla"
-  },
-  {
     "serial": "",
     "name": "ANGELA EZINNE IGWE",
     "programme": "Midwifery",
@@ -208,20 +180,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvuskvyq43dmp"
-  },
-  {
-    "serial": "12",
-    "name": "Annastecia Promise Otuonye",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0012/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacbd3ah0"
   },
   {
     "serial": "",
@@ -280,62 +238,6 @@
     "id": "stu_mvuszawbbvyhs"
   },
   {
-    "serial": "25",
-    "name": "Blessing Chidere Izukanma",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0025/MID",
-    "hostel": "Off-campus",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacfkn0tn"
-  },
-  {
-    "serial": "17",
-    "name": "Blessing Ngozi Ali",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0017/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdaccyvwcj"
-  },
-  {
-    "serial": "15",
-    "name": "Blessing Ngozi Nwigbo",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0015/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdaccp539e"
-  },
-  {
-    "serial": "71",
-    "name": "Blessing Nnenna Nwankwo",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0071/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdact60iwr"
-  },
-  {
     "serial": "",
     "name": "BONIFACE ELIJAH",
     "programme": "General Nursing",
@@ -364,34 +266,6 @@
     "id": "stu_mvrzdacg4sae8"
   },
   {
-    "serial": "55",
-    "name": "Chiamaka Grace Okoro",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0055/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdaco1opwx"
-  },
-  {
-    "serial": "3",
-    "name": "Chiamaka Precious Onwe",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0003/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdac8q3req"
-  },
-  {
     "serial": "",
     "name": "CHIBUZOR CHIOMA PRAISE",
     "programme": "General Nursing",
@@ -404,20 +278,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvs9x0s03o79p"
-  },
-  {
-    "serial": "13",
-    "name": "Chidimma Esther Okechukwu",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0013/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacb9ybem"
   },
   {
     "serial": "",
@@ -448,34 +308,6 @@
     "id": "stu_mvrzdacswa9nh"
   },
   {
-    "serial": "59",
-    "name": "Chinaza Misharck Ikenna",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0059/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Male",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacppx2hn"
-  },
-  {
-    "serial": "19",
-    "name": "Chinecherem Dominic Usuio",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0019/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacdgjitg"
-  },
-  {
     "serial": "35",
     "name": "Chinedu Francis Ekwe",
     "programme": "Midwifery",
@@ -490,20 +322,6 @@
     "id": "stu_mvrzdaci05e3p"
   },
   {
-    "serial": "6",
-    "name": "Chinelo Glory Orji",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0006/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdac9fx74v"
-  },
-  {
     "serial": "45",
     "name": "Chinemerem Deborah Okpuru",
     "programme": "Midwifery",
@@ -516,104 +334,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvrzdacldpf3b"
-  },
-  {
-    "serial": "63",
-    "name": "Chinemerem Precious Onyebuchi",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0063/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacqoeexw"
-  },
-  {
-    "serial": "22",
-    "name": "Chinenye Cynthia Omeh",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0022/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdace5eqsw"
-  },
-  {
-    "serial": "8",
-    "name": "Chioma Blessing Chinedu",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0008/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdac98xsdi"
-  },
-  {
-    "serial": "69",
-    "name": "Chioma Favour Onuoha",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0069/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdactoqmr1"
-  },
-  {
-    "serial": "7",
-    "name": "Chioma Gladys Okeoma",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0007/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdac9k90w1"
-  },
-  {
-    "serial": "65",
-    "name": "Chisimdi Joy Aruma",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0065/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacr05m2j"
-  },
-  {
-    "serial": "2",
-    "name": "Chisom Favour Udeh",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0002/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdac82qi9z"
   },
   {
     "serial": "",
@@ -642,20 +362,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvrzdacei0dw3"
-  },
-  {
-    "serial": "56",
-    "name": "Christabel Ginika Okwor",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0056/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacoj4i46"
   },
   {
     "serial": "",
@@ -742,20 +448,6 @@
     "id": "stu_mvs9upequhniy"
   },
   {
-    "serial": "54",
-    "name": "Cynthia Chizaram Eze",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0054/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacohrlsj"
-  },
-  {
     "serial": "62",
     "name": "Daniella Chiwendu Obiahu",
     "programme": "Midwifery",
@@ -840,20 +532,6 @@
     "id": "stu_mvusrwbjh5tdf"
   },
   {
-    "serial": "37",
-    "name": "Emmanuel Chiemeka Obinka",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0037/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdaciga39e"
-  },
-  {
     "serial": "29",
     "name": "Emmanuel Chinemerem Onyebuchi",
     "programme": "Midwifery",
@@ -866,20 +544,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvrzdacg31flp"
-  },
-  {
-    "serial": "49",
-    "name": "Esther Chidalu Michael",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0049/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacmzduyr"
   },
   {
     "serial": "44",
@@ -924,20 +588,6 @@
     "id": "stu_mvusyisjz94s0"
   },
   {
-    "serial": "18",
-    "name": "Fatima Adaeze Haruna",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0018/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacdnw9gh"
-  },
-  {
     "serial": "",
     "name": "FAVOUR CHIBUZOR OKO",
     "programme": "General Nursing",
@@ -964,20 +614,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvus2lij4nj1m"
-  },
-  {
-    "serial": "51",
-    "name": "Favour Chizaram Awuzie",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0051/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacni6oyy"
   },
   {
     "serial": "",
@@ -1022,20 +658,6 @@
     "id": "stu_mvrzdacroebrp"
   },
   {
-    "serial": "10",
-    "name": "Grace Mmesoma Okafor",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0010/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacanbgyn"
-  },
-  {
     "serial": "",
     "name": "IDOMOBAZI EKO OTTO",
     "programme": "General Nursing",
@@ -1062,20 +684,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvs9vfeplwhks"
-  },
-  {
-    "serial": "72",
-    "name": "Ifedirichukwu Christopher Ezeabia",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0072/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Male",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacurcvj0"
   },
   {
     "serial": "",
@@ -1120,20 +728,6 @@
     "id": "stu_mvs98wh5p9wl4"
   },
   {
-    "serial": "58",
-    "name": "Jennifer Chinecherem Emeka",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0058/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacpn8cj5"
-  },
-  {
     "serial": "60",
     "name": "John Chukwu Ube",
     "programme": "Midwifery",
@@ -1148,20 +742,6 @@
     "id": "stu_mvrzdacqxi6oa"
   },
   {
-    "serial": "33",
-    "name": "John Janet Otaka",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0033/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdachqxkye"
-  },
-  {
     "serial": "",
     "name": "JOSEPH ONYINYECHI SHALOM",
     "programme": "General Nursing",
@@ -1174,20 +754,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvutfa7oa0sxs"
-  },
-  {
-    "serial": "41",
-    "name": "Joy Adaobi Ifeanyi",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0041/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdackzk8m3"
   },
   {
     "serial": "",
@@ -1260,20 +826,6 @@
     "id": "stu_mvrzdacksgwcs"
   },
   {
-    "serial": "64",
-    "name": "Miracle Chioma Egbe",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0064/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacrqvw23"
-  },
-  {
     "serial": "",
     "name": "MIRACLE OLUEBUBE IGWE",
     "programme": "General Nursing",
@@ -1300,20 +852,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvrzdacpbsbsd"
-  },
-  {
-    "serial": "48",
-    "name": "Ngozi Virginia Aloh",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0048/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacm0vm38"
   },
   {
     "serial": "",
@@ -1512,20 +1050,6 @@
     "id": "stu_mvutfwoi47rfc"
   },
   {
-    "serial": "9",
-    "name": "Ogochukwu Judith Esiaka",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0009/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacamifn8"
-  },
-  {
     "serial": "",
     "name": "OGODO  JOY MARY",
     "programme": "General Nursing",
@@ -1680,20 +1204,6 @@
     "id": "stu_mvuscfxa4lhed"
   },
   {
-    "serial": "4",
-    "name": "Onyinyechi Miracle Nduka",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0004/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdac8leuhu"
-  },
-  {
     "serial": "",
     "name": "ORAIDU IFEOMA SATION",
     "programme": "General Nursing",
@@ -1706,20 +1216,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvut0gx6e9ck9"
-  },
-  {
-    "serial": "5",
-    "name": "Ozioma Faith Udeh",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0005/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdac9nlhud"
   },
   {
     "serial": "",
@@ -1736,34 +1232,6 @@
     "id": "stu_mvusxpyc8bz5r"
   },
   {
-    "serial": "52",
-    "name": "Peace Chidera Agu",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0052/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacnmw0qu"
-  },
-  {
-    "serial": "26",
-    "name": "Portia Miracle Godson",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0026/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacfq5dhv"
-  },
-  {
     "serial": "",
     "name": "PRECIOUS AMARACHI LUCKY",
     "programme": "General Nursing",
@@ -1778,48 +1246,6 @@
     "id": "stu_mvsa3h5h69t45"
   },
   {
-    "serial": "21",
-    "name": "Precious Chiamaka Nwogidi",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0021/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdace74bh7"
-  },
-  {
-    "serial": "40",
-    "name": "Precious Chinwendu Uzoma",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0040/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacjavm2e"
-  },
-  {
-    "serial": "50",
-    "name": "Precious Mmesoma Ezeehukwu",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0050/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacmwo1ln"
-  },
-  {
     "serial": "",
     "name": "PRECIOUS NKEMUJIKA JOSEPH",
     "programme": "General Nursing",
@@ -1832,20 +1258,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvutd4x0xkesu"
-  },
-  {
-    "serial": "31",
-    "name": "Precious Ogochukwu Chukwuma",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0031/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdachdxepl"
   },
   {
     "serial": "",
@@ -1876,20 +1288,6 @@
     "id": "stu_mvutbp8dike3c"
   },
   {
-    "serial": "23",
-    "name": "Promise Amaka Ikechukwu",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0023/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacehprqe"
-  },
-  {
     "serial": "27",
     "name": "Promise Chinasa Aneh",
     "programme": "Midwifery",
@@ -1902,20 +1300,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvrzdacg08aia"
-  },
-  {
-    "serial": "43",
-    "name": "Queen Ojonoda Dibiagwu",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0043/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacki4wjo"
   },
   {
     "serial": "",
@@ -1958,48 +1342,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvus8jm0h2wzg"
-  },
-  {
-    "serial": "70",
-    "name": "Rita Ebubechi Egbere",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0070/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdact8l3nk"
-  },
-  {
-    "serial": "14",
-    "name": "Sarah Ifunanya Chukwma",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0014/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacbg992e"
-  },
-  {
-    "serial": "16",
-    "name": "Stephanie Nneoma Ojimba",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0016/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdaccorrl8"
   },
   {
     "serial": "36",
@@ -2128,20 +1470,6 @@
     "id": "stu_mvuqpqlvpn2fl"
   },
   {
-    "serial": "68",
-    "name": "Ujunwa Victory Nwanonyelum",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0068/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdacsfieq1"
-  },
-  {
     "serial": "",
     "name": "UMAHI PRAISE CHIAMAKA",
     "programme": "General Nursing",
@@ -2168,20 +1496,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mvusfrg49oa12"
-  },
-  {
-    "serial": "1",
-    "name": "Winner Ifeoma Joseph",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/200/0001/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvrzdac7jzp9s"
   },
   {
     "serial": "",

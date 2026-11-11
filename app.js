@@ -5972,6 +5972,10 @@ async function studentsForActiveSession() {
   var progs = ACTIVE_SESSION.programmes || [];
   var levels = ACTIVE_SESSION.levels || [];
   return all.filter(function(st) {
+    if (st.status && String(st.status) !== "Active") return false;
+    var regU = String(st.regNo || "").toUpperCase().replace(/\s+/g, "");
+    // Retired cohort must never appear in session rosters / attendance
+    if (regU.indexOf("EOCNS/200") === 0) return false;
     return programmeMatches(st.programme, progs) && levelMatches(st.level, levels);
   });
 }
