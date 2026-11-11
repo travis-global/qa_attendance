@@ -174,5 +174,61 @@
     "classKeys": [
       "200_nursing"
     ]
+  },
+  {
+    "id": "MID 311",
+    "code": "MID 311",
+    "name": "Reproductive Health I",
+    "classKeys": [
+      "300_midwifery"
+    ]
+  },
+  {
+    "id": "MID 312",
+    "code": "MID 312",
+    "name": "Infant",
+    "classKeys": [
+      "300_midwifery"
+    ]
+  },
+  {
+    "id": "MID 313",
+    "code": "MID 313",
+    "name": "Family Planning",
+    "classKeys": [
+      "300_midwifery"
+    ]
+  },
+  {
+    "id": "MID 314",
+    "code": "MID 314",
+    "name": "Complicated Midwifery II",
+    "classKeys": [
+      "300_midwifery"
+    ]
+  },
+  {
+    "id": "MID 315",
+    "code": "MID 315",
+    "name": "Research and Statistics",
+    "classKeys": [
+      "300_midwifery"
+    ]
+  },
+  {
+    "id": "MID 316",
+    "code": "MID 316",
+    "name": "Seminar in Midwifery I",
+    "classKeys": [
+      "300_midwifery"
+    ]
+  },
+  {
+    "id": "MID 317",
+    "code": "MID 317",
+    "name": "Practicum",
+    "classKeys": [
+      "300_midwifery"
+    ]
   }
 ]

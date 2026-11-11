@@ -419,12 +419,19 @@
                 </label>
                 <label class="field"><span class="field__label">Programme</span><select id="hostelRosterProgramme"><option value="">All</option></select></label>
                 <label class="field"><span class="field__label">Level</span><select id="hostelRosterLevel"><option value="">All</option></select></label>
+                <label class="field"><span class="field__label">Machine link</span>
+                  <select id="hostelRosterLinkFilter">
+                    <option value="">All</option>
+                    <option value="linked">Linked (has machine ID)</option>
+                    <option value="unlinked">Not linked</option>
+                  </select>
+                </label>
                 <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--ghost" id="btnRefreshHostelRoster">Refresh roster</button></label>
               </div>
               <div class="table-scroll" style="margin-top:12px;max-height:280px;overflow:auto">
-                <table class="data-table"><thead><tr><th>Machine ID</th><th>Reg No</th><th>Name</th><th>Programme</th><th>Level</th><th>Hostel</th><th class="qa-edit-only">Link</th></tr></thead>
+                <table class="data-table"><thead><tr><th>Machine ID</th><th>Link status</th><th>Reg No</th><th>Name</th><th>Programme</th><th>Level</th><th>Hostel</th><th class="qa-edit-only">Action</th></tr></thead>
                 <tbody id="hostelRosterBody"></tbody></table>
-                <p class="muted-note" style="margin-top:8px">Machine ID is the primary key for gate uniqueness. Link/Unlink fixes wrong mappings without regenerating the whole train.</p>
+                <p class="muted-note" style="margin-top:8px"><span id="hostelRosterNote">Machine ID is the biometric User No. Linked students show their ID; Not linked means no machine ID on the master card yet.</span></p>
               </div>
             </div>
           </div>
@@ -1351,7 +1358,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=85"></script>
+  <script src="app.js?v=86"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

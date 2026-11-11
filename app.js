@@ -2356,11 +2356,15 @@ async function renderHostelRoster() {
   var prog = (pf && pf.value) || "";
   var level = (lf && lf.value) || "";
   var hostelF = (document.getElementById("hostelRosterFilter") && document.getElementById("hostelRosterFilter").value) || "";
+  var linkF = (document.getElementById("hostelRosterLinkFilter") && document.getElementById("hostelRosterLinkFilter").value) || "";
   var all = await getAll("students");
   var list = (all || []).filter(function(s) {
     if (s.status && String(s.status) !== "Active") return false;
     if (prog && String(s.programme || "") !== prog) return false;
     if (level && String(s.level || "") !== String(level)) return false;
+    var hasSerial = !!(s.serial && String(s.serial).trim());
+    if (linkF === "linked" && !hasSerial) return false;
+    if (linkF === "unlinked" && hasSerial) return false;
     if (hostelF) {
       var h = String(s.hostel || "").toLowerCase();
       if (hostelF === "unassigned") {
@@ -2389,14 +2393,22 @@ async function renderHostelRoster() {
     return String(a.name || "").localeCompare(String(b.name || ""));
   });
   if (!list.length) {
-    body.innerHTML = '<tr><td colspan="7" class="muted-note">No students match filters.</td></tr>';
+    body.innerHTML = '<tr><td colspan="8" class="muted-note">No students match filters.</td></tr>';
     return;
   }
+  var linkedN = 0, unlinkedN = 0;
   body.innerHTML = list.map(function(s) {
-    var mid = s.serial ? ("<strong>" + escapeHtml(String(s.serial)) + "</strong>") : '<span class="muted-note">—</span>';
+    var hasSerial = !!(s.serial && String(s.serial).trim());
+    if (hasSerial) linkedN++; else unlinkedN++;
+    var mid = hasSerial
+      ? ("<strong style=\"font-size:1.05em\">" + escapeHtml(String(s.serial).trim()) + "</strong>")
+      : '<span class="muted-note">—</span>';
+    var status = hasSerial
+      ? '<span style="color:#15803d;font-weight:600">Linked</span>'
+      : '<span style="color:#b45309;font-weight:600">Not linked</span>';
     var actions = "—";
     if (isQaOfficer()) {
-      if (s.serial) {
+      if (hasSerial) {
         actions = '<button type="button" class="btn btn--ghost btn--sm" data-hostel-unlink="' + escapeHtml(s.id) + '">Unlink</button>';
       } else {
         actions = '<button type="button" class="btn btn--primary btn--sm" data-hostel-link="' + escapeHtml(s.id) + '">Link ID…</button>';
@@ -2404,6 +2416,7 @@ async function renderHostelRoster() {
     }
     return "<tr>" +
       "<td>" + mid + "</td>" +
+      "<td>" + status + "</td>" +
       "<td>" + escapeHtml(s.regNo || "—") + "</td>" +
       "<td>" + escapeHtml(s.name || "") + "</td>" +
       "<td>" + escapeHtml(s.programme || "") + "</td>" +
@@ -2411,6 +2424,8 @@ async function renderHostelRoster() {
       "<td>" + escapeHtml(s.hostel || "—") + "</td>" +
       '<td class="qa-edit-only">' + actions + "</td></tr>";
   }).join("");
+  var note = document.getElementById("hostelRosterNote");
+  if (note) note.textContent = "Showing " + list.length + " · Linked " + linkedN + " · Not linked " + unlinkedN;
   document.querySelectorAll("[data-hostel-unlink]").forEach(function(btn) {
     btn.onclick = function() { bioUnlinkStudentSerial(btn.getAttribute("data-hostel-unlink")); };
   });

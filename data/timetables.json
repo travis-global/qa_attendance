@@ -247,5 +247,138 @@
         "hours": 1
       }
     ]
+  },
+  "300_midwifery": {
+    "class_name": "Basic Midwifery 300L",
+    "department": "EOCNS Midwifery Department",
+    "session_label": "2026/2027 First Semester",
+    "slots": [
+      {
+        "weekday": 0,
+        "code": "MID 315",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 0,
+        "code": "MID 313",
+        "start": "10:00",
+        "end": "11:00",
+        "hours": 1
+      },
+      {
+        "weekday": 0,
+        "code": "MID 311",
+        "start": "11:00",
+        "end": "12:00",
+        "hours": 1
+      },
+      {
+        "weekday": 0,
+        "code": "MID 311",
+        "start": "13:00",
+        "end": "14:00",
+        "hours": 1
+      },
+      {
+        "weekday": 1,
+        "code": "MID 311",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 1,
+        "code": "MID 314",
+        "start": "11:00",
+        "end": "12:00",
+        "hours": 1
+      },
+      {
+        "weekday": 2,
+        "code": "MID 316",
+        "start": "08:00",
+        "end": "09:00",
+        "hours": 1
+      },
+      {
+        "weekday": 2,
+        "code": "MID 311",
+        "start": "09:00",
+        "end": "10:00",
+        "hours": 1
+      },
+      {
+        "weekday": 2,
+        "code": "MID 314",
+        "start": "10:00",
+        "end": "11:00",
+        "hours": 1
+      },
+      {
+        "weekday": 2,
+        "code": "MID 316",
+        "start": "11:00",
+        "end": "12:00",
+        "hours": 1
+      },
+      {
+        "weekday": 2,
+        "code": "MID 314",
+        "start": "13:00",
+        "end": "14:00",
+        "hours": 1
+      },
+      {
+        "weekday": 3,
+        "code": "MID 313",
+        "start": "08:00",
+        "end": "09:00",
+        "hours": 1
+      },
+      {
+        "weekday": 3,
+        "code": "MID 314",
+        "start": "09:00",
+        "end": "11:00",
+        "hours": 2
+      },
+      {
+        "weekday": 3,
+        "code": "MID 317",
+        "start": "11:00",
+        "end": "12:00",
+        "hours": 1
+      },
+      {
+        "weekday": 3,
+        "code": "MID 313",
+        "start": "13:00",
+        "end": "14:00",
+        "hours": 1
+      },
+      {
+        "weekday": 4,
+        "code": "MID 315",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 4,
+        "code": "MID 312",
+        "start": "10:00",
+        "end": "12:00",
+        "hours": 2
+      },
+      {
+        "weekday": 4,
+        "code": "MID 317",
+        "start": "13:00",
+        "end": "15:00",
+        "hours": 2
+      }
+    ]
   }
 }
