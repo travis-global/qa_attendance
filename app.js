@@ -2099,6 +2099,7 @@ openDB().then(async () => {
       console.info("EOCNS repo updates pulled:", syncRes.pulled);
     }
   } catch (e) { console.warn("repo sync", e); }
+  try { startSmartRepoWatch(); } catch (e) { console.warn("smart watch", e); }
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
   try { refreshDashboardStats(); } catch (e) { console.warn("stats", e); }
   initQaOfficerUI();
@@ -6471,6 +6472,66 @@ async function forceSyncFromRepository() {
  * - If repo fingerprint unchanged → leave local alone (no wipe, no flicker)
  * - If repo changed for a store → pull only that store
  */
+
+/** True when local has officer edits not yet published. */
+function hasUnpublishedLocalChanges() {
+  if (EOCNS_DIRTY) return true;
+  try {
+    // meta dirty checked async by callers via getAll when needed
+  } catch (_) {}
+  return false;
+}
+
+/**
+ * Smart background sync: if local has no new unpublished work, pull any repo changes.
+ * Runs on tab focus and on a quiet interval so officers never need hard-refresh.
+ */
+var __eocnsSmartSyncTimer = null;
+var __eocnsSmartSyncBusy = false;
+var __eocnsLastSmartSync = 0;
+
+async function smartAutoSyncFromRepo(reason) {
+  if (__eocnsSmartSyncBusy) return;
+  if (EOCNS_DIRTY) return;
+  var now = Date.now();
+  // throttle: at most once per 20s unless publish just finished
+  if (reason !== "post-publish" && reason !== "boot" && (now - __eocnsLastSmartSync) < 20000) return;
+  __eocnsSmartSyncBusy = true;
+  try {
+    var metaRows = await getAll("meta"), dirtyMeta = false;
+    metaRows.forEach(function(r) { if (r.key === "dirty" && r.value === true) dirtyMeta = true; });
+    if (dirtyMeta) { EOCNS_DIRTY = true; return; }
+    var res = await syncFromRepoIfClean();
+    __eocnsLastSmartSync = Date.now();
+    if (res && res.pulled && res.pulled.length) {
+      console.info("EOCNS auto-sync (" + (reason || "timer") + "):", res.pulled);
+      try { await refreshCachesAfterSync(); } catch (_) {}
+      try {
+        var active = document.querySelector(".view.active");
+        var vid = active && active.id ? active.id.replace(/^view-/, "") : "";
+        if (vid && typeof showView === "function") showView(vid);
+      } catch (_) {}
+    }
+  } catch (e) {
+    console.warn("smart auto-sync", e);
+  } finally {
+    __eocnsSmartSyncBusy = false;
+  }
+}
+
+function startSmartRepoWatch() {
+  if (__eocnsSmartSyncTimer) return;
+  document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === "visible") smartAutoSyncFromRepo("focus");
+  });
+  window.addEventListener("focus", function() { smartAutoSyncFromRepo("focus"); });
+  // Quiet poll: only pulls when repo changed and local is clean
+  __eocnsSmartSyncTimer = setInterval(function() {
+    if (document.visibilityState === "visible") smartAutoSyncFromRepo("interval");
+  }, 45000);
+}
+
+
 async function syncFromRepoIfClean() {
   var metaRows = await getAll("meta"), m = {};
   metaRows.forEach(function(r) { m[r.key] = r.value; });
@@ -6924,34 +6985,42 @@ async function publishAllToRepo() {
     try { await put("meta", { key: "lastPublishAt", value: new Date().toISOString() }); } catch (_) {}
     try { await put("meta", { key: "lastPublishFiles", value: verified }); } catch (_) {}
 
-    setSt("Verified on GitHub (" + verified.length + " file(s)). Locking: clearing local cache and reloading from repository…");
+    setSt("Verified on GitHub (" + verified.length + " file(s)). Locking local as published — no refresh needed…");
 
     try {
+      // Mark local as identical to what we just published (smart: distinguish clean vs new local later)
+      var pathToStore = {};
       for (var si = 0; si < SYNC_STORES.length; si++) {
-        try { await clearStore(SYNC_STORES[si][0]); } catch (_) {}
+        pathToStore[DATA_FILES[SYNC_STORES[si][1]]] = SYNC_STORES[si][0];
       }
-      try {
-        var metaAll = await getAll("meta");
-        for (var mi = 0; mi < metaAll.length; mi++) {
-          var mk = metaAll[mi] && metaAll[mi].key;
-          if (mk && (String(mk).indexOf("repoFp:") === 0 || mk === "dirty")) {
-            try { await del("meta", mk); } catch (_) {}
-          }
+      for (var pi2 = 0; pi2 < verified.length; pi2++) {
+        var vp = verified[pi2];
+        var stName = pathToStore[vp];
+        if (stName && expectedFp[vp]) {
+          await put("meta", { key: "repoFp:" + stName, value: expectedFp[vp] });
         }
-        await put("meta", { key: "dirty", value: false });
-      } catch (_) {}
-      TIMETABLES_CACHE = null;
-      try { PROGRAMMES_CACHE = null; LEVELS_CACHE = null; } catch (_) {}
-      await new Promise(function(r) { setTimeout(r, 1500); });
-      await forceSyncFromRepository(); // explicit full reload only where requested
+      }
+      // Fingerprint remaining local stores so next auto-sync knows baseline
+      for (var si2 = 0; si2 < SYNC_STORES.length; si2++) {
+        var sn = SYNC_STORES[si2][0];
+        try {
+          var rowsNow = await getAll(sn);
+          var bodyNow = JSON.stringify(sn === "students" && typeof shapeStudentsForRepo === "function"
+            ? shapeStudentsForRepo(rowsNow) : rowsNow, null, 2);
+          await put("meta", { key: "repoFp:" + sn, value: textFingerprint(bodyNow) });
+        } catch (_) {}
+      }
+      EOCNS_DIRTY = false;
+      clearDirty();
+      try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
+      try { await put("meta", { key: "lastPublishAt", value: new Date().toISOString() }); } catch (_) {}
       try { await refreshCachesAfterSync(); } catch (_) {}
-      setSt("Publish locked. Repository is source of truth. Reloaded " + verified.length +
-        " updated file(s); " + unchanged.length + " unchanged skipped. Device B: hard-refresh to see the same data.");
+      try { __eocnsLastSmartSync = 0; } catch (_) {}
+      setSt("Published and locked. Local data matches the repository (" + verified.length +
+        " file(s) updated; " + unchanged.length + " unchanged). No hard refresh needed — the system stays ready. Other open devices update automatically when focused.");
     } catch (postErr) {
-      console.warn("post-publish reload", postErr);
-      setSt("Published and verified on GitHub, but local reload failed: " +
-        (postErr.message || postErr) +
-        ". Hard-refresh this page — data is safe on the repository.");
+      console.warn("post-publish lock", postErr);
+      setSt("Published and verified on GitHub. Local kept. " + (postErr.message || postErr));
     }
 
     var panel = document.getElementById("qaTokenPanel");
