@@ -154,57 +154,7 @@
               <button class="action-btn" data-goto="sessions"><span class="action-btn__icon">◫</span><span>New Session</span></button>
             </div></div>
             
-          <div class="card" style="margin-bottom:16px" id="biometricMapCard">
-            <div class="card__header">
-              <h3 style="margin:0">0. Biometric device users → master list</h3>
-            </div>
-            <div class="card__body">
-              <p class="muted-note" style="margin-top:0">
-                Upload the <strong>user list</strong> from each ZKTeco device (not the attendance log).
-                Strong unique name matches are linked automatically: the machine <em>User ID / No.</em> is stored as the student <strong>serial</strong>.
-                The <strong>name on this site always stays the official name</strong> — machine spelling is only used for matching.
-                Ambiguous rows need officer confirmation. <strong>Unlinked people are omitted from hostel reports</strong> until reviewed; regenerate the report after linking. Leftovers stay in the unlinked pool until you create a student card or discard them.
-              </p>
-              <div class="form-grid" style="margin-top:12px">
-                <label class="field"><span class="field__label">Device / hostel tag</span>
-                  <select id="bioDeviceLabel">
-                    <option value="Hostel 1">Hostel 1 machine</option>
-                    <option value="Hostel 2">Hostel 2 machine</option>
-                    <option value="Device other">Other device</option>
-                  </select>
-                </label>
-                <label class="field field--full"><span class="field__label">User export (.xls / .xlsx / .csv)</span>
-                  <input type="file" id="bioUserFile" accept=".xls,.xlsx,.csv,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
-                </label>
-              </div>
-              <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-                <button type="button" class="btn btn--primary qa-edit-only" id="btnBioImportMatch">Import &amp; match</button>
-                <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnBioBatchClarify">Batch review (clarify)</button>
-                <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnBioBatchUnlinked">Batch unlinked pool</button>
-                <button type="button" class="btn btn--ghost btn--sm" id="btnBioRefreshQueues">Refresh queues</button>
-              </div>
-              <div id="bioImportStatus" class="muted-note" style="margin-top:10px"></div>
-              <div id="bioImportSummary" class="bio-summary" hidden style="margin-top:12px"></div>
-
-              <h4 style="margin:18px 0 8px;font-size:0.95rem">Needs clarification</h4>
-              <p class="muted-note" style="margin:0 0 8px">Top suggestions shown — confirm the correct student. Site name is kept; machine ID is written to <code>serial</code>.</p>
-              <div style="overflow:auto;max-height:320px">
-                <table class="data-table" id="bioClarifyTable">
-                  <thead><tr><th>Machine No.</th><th>Machine name</th><th>Device</th><th>Best matches</th><th class="qa-edit-only">Action</th></tr></thead>
-                  <tbody id="bioClarifyBody"><tr><td colspan="5" class="muted-note">No rows waiting.</td></tr></tbody>
-                </table>
-              </div>
-
-              <h4 style="margin:18px 0 8px;font-size:0.95rem">Unlinked pool (create card or discard)</h4>
-              <p class="muted-note" style="margin:0 0 8px">Persists until you create a master student from the machine user, link manually, or discard. Publish keeps the pool on all devices.</p>
-              <div style="overflow:auto;max-height:320px">
-                <table class="data-table" id="bioUnlinkedTable">
-                  <thead><tr><th>Machine No.</th><th>Machine name</th><th>Device</th><th>Saved</th><th class="qa-edit-only">Action</th></tr></thead>
-                  <tbody id="bioUnlinkedBody"><tr><td colspan="5" class="muted-note">Pool empty.</td></tr></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+          
 <div class="card"><div class="card__header"><h3>System Status</h3></div><div class="card__body">
               <div class="status-list">
                 <div class="status-item"><span class="status-dot good"></span><span>Local database ready</span></div>
@@ -349,7 +299,7 @@
         </section>
         <section class="view" id="view-hostel">
           <div class="page-toolbar" style="margin-bottom:12px">
-            <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Hostel on reports: majority Location ID (1/2) from the gate file; master list only if Location ID is missing or tied.</p></div>
+            <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Biometrics &amp; train → link machine IDs. Fee report uses Location ID majority; conflicts held until clarified.</p></div>
             <div class="page-toolbar__right"><button type="button" class="btn btn--primary" id="btnGenerateHostelReport">Generate hostel distribution report</button></div>
           </div>
 
@@ -360,7 +310,59 @@
           </div>
 
           
-          <div class="card" style="margin-bottom:16px" id="hostelTrainCard">
+          
+<div class="card" style="margin-bottom:16px" id="biometricMapCard">
+            <div class="card__header">
+              <h3 style="margin:0">Biometric device users → master list</h3>
+            </div>
+            <div class="card__body">
+              <p class="muted-note" style="margin-top:0">
+                Train/link machine users to the master list. You can also use <strong>Train from gate export</strong> below for attendance files.
+                Strong unique name matches are linked automatically: the machine <em>User ID / No.</em> is stored as the student <strong>serial</strong>.
+                The <strong>name on this site always stays the official name</strong> — machine spelling is only used for matching.
+                Ambiguous rows need officer confirmation. <strong>Unlinked people are omitted from hostel reports</strong> until reviewed; regenerate the report after linking. Leftovers stay in the unlinked pool until you <strong>link to a master student</strong>, create a card, or discard them.
+              </p>
+              <div class="form-grid" style="margin-top:12px">
+                <label class="field"><span class="field__label">Device / hostel tag</span>
+                  <select id="bioDeviceLabel">
+                    <option value="Hostel 1">Hostel 1 machine</option>
+                    <option value="Hostel 2">Hostel 2 machine</option>
+                    <option value="Device other">Other device</option>
+                  </select>
+                </label>
+                <label class="field field--full"><span class="field__label">User export (.xls / .xlsx / .csv)</span>
+                  <input type="file" id="bioUserFile" accept=".xls,.xlsx,.csv,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+                </label>
+              </div>
+              <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+                <button type="button" class="btn btn--primary qa-edit-only" id="btnBioImportMatch">Import &amp; match</button>
+                <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnBioBatchClarify">Batch review (clarify)</button>
+                <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnBioBatchUnlinked">Batch unlinked pool</button>
+                <button type="button" class="btn btn--ghost btn--sm" id="btnBioRefreshQueues">Refresh queues</button>
+              </div>
+              <div id="bioImportStatus" class="muted-note" style="margin-top:10px"></div>
+              <div id="bioImportSummary" class="bio-summary" hidden style="margin-top:12px"></div>
+
+              <h4 style="margin:18px 0 8px;font-size:0.95rem">Needs clarification</h4>
+              <p class="muted-note" style="margin:0 0 8px">Top suggestions shown — confirm the correct student. Site name is kept; machine ID is written to <code>serial</code>.</p>
+              <div style="overflow:auto;max-height:320px">
+                <table class="data-table" id="bioClarifyTable">
+                  <thead><tr><th>Machine No.</th><th>Machine name</th><th>Device</th><th>Best matches</th><th class="qa-edit-only">Action</th></tr></thead>
+                  <tbody id="bioClarifyBody"><tr><td colspan="5" class="muted-note">No rows waiting.</td></tr></tbody>
+                </table>
+              </div>
+
+              <h4 style="margin:18px 0 8px;font-size:0.95rem">Unlinked pool (create card or discard)</h4>
+              <p class="muted-note" style="margin:0 0 8px">Persists until you create a master student from the machine user, link manually, or discard. Publish keeps the pool on all devices.</p>
+              <div style="overflow:auto;max-height:320px">
+                <table class="data-table" id="bioUnlinkedTable">
+                  <thead><tr><th>Machine No.</th><th>Machine name</th><th>Device</th><th>Saved</th><th class="qa-edit-only">Action</th></tr></thead>
+                  <tbody id="bioUnlinkedBody"><tr><td colspan="5" class="muted-note">Pool empty.</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+<div class="card" style="margin-bottom:16px" id="hostelTrainCard">
             <div class="card__header"><h3>Train from gate export</h3></div>
             <div class="card__body">
               <p class="muted-note" style="margin-top:0">
@@ -390,7 +392,7 @@
           </div>
 
 <div class="card" style="margin-bottom:16px">
-            <div class="card__header"><h3>1. Upload gate log</h3></div>
+            <div class="card__header"><h3>1. Upload gate log (fee report)</h3></div>
             <div class="card__body">
               <div id="hostelDropzone" class="dropzone" style="border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;cursor:pointer;background:var(--surface-2)">
                 <p style="margin:0 0 8px;font-weight:600">Drop the gate export here, or click to choose</p>
@@ -1349,7 +1351,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=84"></script>
+  <script src="app.js?v=85"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

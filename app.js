@@ -11035,7 +11035,7 @@ async function renderBioQueues() {
           '<td class="muted-note">' + escapeHtml(row.note || "Awaiting create / manual link") + '</td>' +
           '<td class="qa-edit-only">' +
             (isQaOfficer() ? (
-              '<button type="button" class="btn btn--primary btn--sm" data-bio-review="' + escapeHtml(row.id) + '">Link…</button> ' +
+              '<button type="button" class="btn btn--primary btn--sm" data-bio-review="' + escapeHtml(row.id) + '">Link to master…</button> ' +
               '<button type="button" class="btn btn--ghost btn--sm" data-bio-create="' + escapeHtml(row.id) + '">Create student</button> ' +
               '<button type="button" class="btn btn--ghost btn--sm" data-bio-discard="' + escapeHtml(row.id) + '">Discard</button>'
             ) : "—") +
