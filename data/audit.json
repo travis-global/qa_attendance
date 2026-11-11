@@ -34124,5 +34124,53 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1501
+  },
+  {
+    "ref": "REF/EOCNS/QA/16",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwapkb5d_17",
+    "reason": "HOTEL UPDATE",
+    "details": {
+      "before": {
+        "id": "stu_mwapkb5d_17",
+        "name": "Sopulu Cynthia Nzekwe",
+        "regNo": "EOCNS/26/0082/GNS",
+        "programme": "ND Nursing",
+        "level": "100",
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "email": "",
+        "serial": "EOCNS/26/0082/GNS",
+        "createdAt": "2026-11-11T15:31:11.902Z",
+        "updatedAt": "2026-11-11T15:31:11.902Z"
+      },
+      "after": {
+        "id": "stu_mwapkb5d_17",
+        "name": "Sopulu Cynthia Nzekwe",
+        "regNo": "EOCNS/26/0082/GNS",
+        "programme": "ND Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "Hostel 2",
+        "status": "Active",
+        "phone": "",
+        "email": "",
+        "serial": "EOCNS/26/0082/GNS",
+        "createdAt": "2026-11-11T15:31:11.902Z",
+        "updatedAt": "2026-11-11T15:50:50.313Z"
+      },
+      "photoChanged": false
+    },
+    "timestamp": "2026-11-11T15:50:50.314Z",
+    "at": "2026-11-11T15:50:50.314Z",
+    "createdAt": "2026-11-11T15:50:50.314Z",
+    "whenLocal": "Wed, 11 Nov 2026, 16:50:50",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1502
   }
 ]
