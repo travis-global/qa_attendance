@@ -34172,5 +34172,113 @@
     "officer": "Alolote Fortunatus",
     "source": "official-letter",
     "id": 1502
+  },
+  {
+    "ref": "REF/EOCNS/QA/1008",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwcbkdepac88x",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwcbkdepac88x",
+        "name": "MBANUZUO CHINWETITO",
+        "regNo": "EOCNS/25/0167/GNS",
+        "programme": "Nursing",
+        "level": 200,
+        "gender": "Female",
+        "hostel": "Hostel 1",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-11T16:14:25.248Z",
+        "updatedAt": "2026-11-11T16:14:25.248Z"
+      }
+    },
+    "timestamp": "2026-11-11T16:14:25.250Z",
+    "at": "2026-11-11T16:14:25.250Z",
+    "createdAt": "2026-11-11T16:14:25.250Z",
+    "whenLocal": "Wed, 11 Nov 2026, 17:14:25",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1503
+  },
+  {
+    "ref": "REF/EOCNS/QA/16",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaqclgi_82",
+    "reason": "LEVEL UPDATE",
+    "details": {
+      "before": {
+        "id": "stu_mwaqclgi_82",
+        "name": "Linda Nkechinyere Okonkwo",
+        "regNo": "EOCNS/24/0082/GNS",
+        "programme": "Nursing",
+        "level": "300",
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "email": "",
+        "serial": "EOCNS/24/0082/GNS",
+        "createdAt": "2026-11-11T15:52:18.610Z",
+        "updatedAt": "2026-11-11T15:52:18.610Z"
+      },
+      "after": {
+        "id": "stu_mwaqclgi_82",
+        "name": "Linda Nkechinyere Okonkwo",
+        "regNo": "EOCNS/24/0082/GNS",
+        "programme": "Nursing",
+        "level": 200,
+        "gender": "Female",
+        "hostel": "Off-campus",
+        "status": "Active",
+        "phone": "",
+        "email": "",
+        "serial": "EOCNS/24/0082/GNS",
+        "createdAt": "2026-11-11T15:52:18.610Z",
+        "updatedAt": "2026-11-11T16:16:18.534Z"
+      },
+      "photoChanged": false
+    },
+    "timestamp": "2026-11-11T16:16:18.536Z",
+    "at": "2026-11-11T16:16:18.536Z",
+    "createdAt": "2026-11-11T16:16:18.536Z",
+    "whenLocal": "Wed, 11 Nov 2026, 17:16:18",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1504
+  },
+  {
+    "ref": "REF/EOCNS/QA/1009",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwcbntngm9zg0",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwcbntngm9zg0",
+        "name": "OGBONNA UGOCHUKWU",
+        "regNo": "EOCNS/26/0116/GNS",
+        "programme": "Nursing",
+        "level": 200,
+        "gender": "Male",
+        "hostel": "Hostel 1",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-11T16:17:06.268Z",
+        "updatedAt": "2026-11-11T16:17:06.268Z"
+      }
+    },
+    "timestamp": "2026-11-11T16:17:06.269Z",
+    "at": "2026-11-11T16:17:06.269Z",
+    "createdAt": "2026-11-11T16:17:06.269Z",
+    "whenLocal": "Wed, 11 Nov 2026, 17:17:06",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1505
   }
 ]
