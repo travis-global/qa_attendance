@@ -2091,15 +2091,14 @@ async function generateHostelReport() {
 openDB().then(async () => {
   console.log("EOCNS Attendance System ready");
   try {
-  // Every load: discard local operational data and force-read from repository
+  // Independent local DB: hydrate only if empty; pull from repo only when remote changed
+  try { await hydrateAllFromRepoIfEmpty(); } catch (e) { console.warn("hydrate", e); }
   try {
-    console.info("EOCNS: force-sync from repository…");
-    var syncRes = await forceSyncFromRepository();
-    console.info("EOCNS repo sync", syncRes && syncRes.counts, "mismatch", syncRes && syncRes.mismatch, "failed", syncRes && syncRes.failed);
-  } catch (e) {
-    console.warn("force repo sync failed, trying hydrate empty only", e);
-    try { await hydrateAllFromRepoIfEmpty(); } catch (e2) { console.warn("hydrate", e2); }
-  }
+    var syncRes = await syncFromRepoIfClean();
+    if (syncRes && syncRes.pulled && syncRes.pulled.length) {
+      console.info("EOCNS repo updates pulled:", syncRes.pulled);
+    }
+  } catch (e) { console.warn("repo sync", e); }
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
   try { refreshDashboardStats(); } catch (e) { console.warn("stats", e); }
   initQaOfficerUI();
@@ -6426,13 +6425,11 @@ async function refreshCachesAfterSync() {
  * clear dirty flags, and verify local counts/fingerprints match the fetched repo payloads.
  * Called on every page load/reload so Device A and Device B always see the same data.
  */
+/**
+ * Explicit full replace from repository (Settings → Reload). Not used on ordinary refresh.
+ */
 async function forceSyncFromRepository() {
-  var changed = [];
-  var failed = [];
-  var counts = {};
-  var verified = [];
-  var mismatch = [];
-
+  var changed = [], failed = [], counts = {};
   for (var i = 0; i < SYNC_STORES.length; i++) {
     var store = SYNC_STORES[i][0];
     var path = DATA_FILES[SYNC_STORES[i][1]];
@@ -6442,38 +6439,108 @@ async function forceSyncFromRepository() {
       var rows = JSON.parse(text);
       if (!Array.isArray(rows)) throw new Error("not a list");
       await replaceStoreFromRepoRows(store, rows);
-      var fp = textFingerprint(text);
-      await put("meta", { key: "repoFp:" + store, value: fp });
-      // verify: re-read local and compare length + fingerprint of re-serialized list
-      var localRows = await getAll(store);
-      counts[store] = localRows.length;
-      if (localRows.length !== rows.length) {
-        mismatch.push(store + " (local " + localRows.length + " ≠ repo " + rows.length + ")");
-      } else {
-        // shape students for fair compare if needed
-        var localBody;
-        if (store === "students") {
-          localBody = JSON.stringify(typeof shapeStudentsForRepo === "function" ? shapeStudentsForRepo(localRows) : localRows, null, 2);
-        } else {
-          localBody = JSON.stringify(localRows, null, 2);
-        }
-        // length match is the institutional guarantee; fingerprint of repo text is stored
-        verified.push(store);
-      }
+      await put("meta", { key: "repoFp:" + store, value: textFingerprint(text) });
+      counts[store] = rows.length;
       changed.push(store);
     } catch (e) {
       console.warn("force repo sync", store, e);
-      failed.push(store + ": " + (e && e.message ? e.message : String(e)));
+      failed.push(store);
+    }
+  }
+  try { TIMETABLES_CACHE = await fetchRepoJson(DATA_FILES.timetables + "?t=" + Date.now()); } catch (_) {}
+  try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config + "?t=" + Date.now()); } catch (_) {}
+  try {
+    var meta = await fetchRepoJson(DATA_FILES.remedial_meta + "?t=" + Date.now());
+    if (meta) await put("remedial_meta", { key: "main", value: meta });
+  } catch (_) {}
+  try {
+    var rtt = await fetchRepoJson(DATA_FILES.remedial_timetable + "?t=" + Date.now());
+    if (rtt) await put("remedial_timetable", { key: "main", value: rtt });
+  } catch (_) {}
+  EOCNS_DIRTY = false;
+  try { clearDirty(); } catch (_) {}
+  try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
+  try { await refreshCachesAfterSync(); } catch (_) {}
+  return { forced: true, changed: changed, failed: failed, counts: counts };
+}
+
+/**
+ * Independent local DB:
+ * - If this browser has unpublished changes → keep local, do not overwrite from repo
+ * - If local store empty → fill from repo
+ * - If repo fingerprint unchanged → leave local alone (no wipe, no flicker)
+ * - If repo changed for a store → pull only that store
+ */
+async function syncFromRepoIfClean() {
+  var metaRows = await getAll("meta"), m = {};
+  metaRows.forEach(function(r) { m[r.key] = r.value; });
+  if (m.dirty === true || EOCNS_DIRTY) {
+    EOCNS_DIRTY = true;
+    var b = document.getElementById("dirtyBanner");
+    if (b) {
+      b.hidden = false;
+      b.style.background = "";
+      b.textContent = "This browser has unpublished changes — local data is kept. Publish when ready, or use Settings → Reload from repository to discard local edits.";
+    }
+    return { skipped: "unpublished changes", pulled: [] };
+  }
+
+  var pulled = [];
+  var failed = [];
+  var unchanged = [];
+
+  for (var i = 0; i < SYNC_STORES.length; i++) {
+    var store = SYNC_STORES[i][0], path = DATA_FILES[SYNC_STORES[i][1]];
+    if (!path) continue;
+    try {
+      var localNow = [];
+      try { localNow = await getAll(store); } catch (_) {}
+      var text = await fetchRepoText(path + (path.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now());
+      var rows = JSON.parse(text);
+      if (!Array.isArray(rows)) throw new Error("not a list");
+      var fp = textFingerprint(text);
+      var prevFp = m["repoFp:" + store];
+
+      // Empty local → hydrate
+      if (!localNow.length) {
+        if (rows.length) {
+          await replaceStoreFromRepoRows(store, rows);
+          await put("meta", { key: "repoFp:" + store, value: fp });
+          pulled.push(store + "(empty→repo)");
+        } else {
+          unchanged.push(store);
+        }
+        continue;
+      }
+
+      // Same fingerprint as last successful sync → leave local independent
+      if (prevFp && prevFp === fp) {
+        unchanged.push(store);
+        continue;
+      }
+
+      // Repo changed (or first fingerprint) → update this store only
+      await replaceStoreFromRepoRows(store, rows);
+      await put("meta", { key: "repoFp:" + store, value: fp });
+      pulled.push(store);
+    } catch (e) {
+      console.warn("repo sync", store, e);
+      failed.push(store);
     }
   }
 
-  // timetables / config / remedial meta
   try {
-    TIMETABLES_CACHE = await fetchRepoJson(DATA_FILES.timetables + "?t=" + Date.now());
+    var ttText = await fetchRepoText(DATA_FILES.timetables + "?t=" + Date.now());
+    var ttFp = textFingerprint(ttText);
+    if (m["repoFp:timetables"] !== ttFp) {
+      TIMETABLES_CACHE = JSON.parse(ttText);
+      await put("meta", { key: "repoFp:timetables", value: ttFp });
+      pulled.push("timetables");
+    } else if (!TIMETABLES_CACHE) {
+      try { TIMETABLES_CACHE = JSON.parse(ttText); } catch (_) {}
+    }
   } catch (_) {}
-  try {
-    APP_CONFIG = await fetchRepoJson(DATA_FILES.config + "?t=" + Date.now());
-  } catch (_) {}
+  try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config + "?t=" + Date.now()); } catch (_) {}
   try {
     var meta = await fetchRepoJson(DATA_FILES.remedial_meta + "?t=" + Date.now());
     if (meta) await put("remedial_meta", { key: "main", value: meta });
@@ -6483,54 +6550,31 @@ async function forceSyncFromRepository() {
     if (rtt) await put("remedial_timetable", { key: "main", value: rtt });
   } catch (_) {}
 
-  EOCNS_DIRTY = false;
-  try { clearDirty(); } catch (_) {}
-  try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
-  try { await put("meta", { key: "lastForceSyncAt", value: new Date().toISOString() }); } catch (_) {}
-  try { await put("meta", { key: "lastForceSyncCounts", value: counts }); } catch (_) {}
-
   var banner = document.getElementById("dirtyBanner");
   if (banner) {
-    if (mismatch.length) {
-      banner.hidden = false;
-      banner.textContent = "Repository sync warning: " + mismatch.join("; ") + ". Try hard-refresh. If it persists, Publish from the device that has full data.";
-      banner.style.background = "#fef3c7";
-    } else if (failed.length && !changed.length) {
-      banner.hidden = false;
-      banner.textContent = "Could not reach repository (" + failed.slice(0, 2).join("; ") + "). Showing last local data if any — check network.";
-      banner.style.background = "#fee2e2";
-    } else {
+    if (pulled.length) {
       banner.hidden = false;
       banner.style.background = "";
-      var stu = counts.students != null ? counts.students : "—";
-      banner.textContent = "Synced from repository · " + stu + " students · " +
-        verified.length + " stores verified · " +
-        (failed.length ? ("failed: " + failed.length) : "match OK");
-      // auto-hide success after a few seconds
+      banner.textContent = "Repository updates applied: " + pulled.join(", ") + ". Local data otherwise unchanged.";
       setTimeout(function() {
         try {
-          if (banner && /Synced from repository/.test(banner.textContent || "")) banner.hidden = true;
+          if (banner && /Repository updates applied/.test(banner.textContent || "")) banner.hidden = true;
         } catch (_) {}
-      }, 8000);
+      }, 6000);
+    } else {
+      // Stay quiet on ordinary refresh — independence
+      banner.hidden = true;
     }
   }
 
-  try { await refreshCachesAfterSync(); } catch (_) {}
+  if (pulled.length) {
+    try { await refreshCachesAfterSync(); } catch (_) {}
+  }
 
-  return {
-    forced: true,
-    changed: changed,
-    verified: verified,
-    mismatch: mismatch,
-    failed: failed,
-    counts: counts
-  };
+  return { skipped: false, pulled: pulled, unchanged: unchanged, failed: failed };
 }
 
-async function syncFromRepoIfClean() {
-  // Legacy entry: institutional policy is FORCE on every load.
-  return forceSyncFromRepository();
-}
+
 
 
 
@@ -6899,7 +6943,7 @@ async function publishAllToRepo() {
       TIMETABLES_CACHE = null;
       try { PROGRAMMES_CACHE = null; LEVELS_CACHE = null; } catch (_) {}
       await new Promise(function(r) { setTimeout(r, 1500); });
-      await forceSyncFromRepository();
+      await forceSyncFromRepository(); // explicit full reload only where requested
       try { await refreshCachesAfterSync(); } catch (_) {}
       setSt("Publish locked. Repository is source of truth. Reloaded " + verified.length +
         " updated file(s); " + unchanged.length + " unchanged skipped. Device B: hard-refresh to see the same data.");
