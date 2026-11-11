@@ -6764,6 +6764,15 @@ async function githubPutFile(token, path, contentText, message) {
 
 
 /** Prefer newer record by updatedAt/createdAt; keep all ids from both sides. */
+function recordMergeKey(r) {
+  if (!r || typeof r !== "object") return null;
+  if (r.id != null && String(r.id).trim() !== "") return String(r.id).trim();
+  if (r.code != null && String(r.code).trim() !== "") return "code:" + String(r.code).trim();
+  if (r.key != null && String(r.key).trim() !== "") return "key:" + String(r.key).trim();
+  if (r.regNo != null && String(r.regNo).trim() !== "") return "reg:" + String(r.regNo).trim().toUpperCase();
+  return null;
+}
+
 function mergeRecordsById(localRows, remoteRows) {
   var map = {};
   function ts(r) {
@@ -6771,9 +6780,14 @@ function mergeRecordsById(localRows, remoteRows) {
   }
   function ingest(rows) {
     (rows || []).forEach(function(r) {
-      if (!r || r.id == null) return;
-      var id = String(r.id);
-      if (!map[id] || ts(r) >= ts(map[id])) map[id] = r;
+      var id = recordMergeKey(r);
+      if (!id) return;
+      var row = r;
+      // courses/programmes stored by code — give them a stable id so merges never drop them
+      if ((row.id == null || row.id === "") && row.code != null) {
+        try { row = Object.assign({}, row, { id: String(row.code).trim() }); } catch (_) {}
+      }
+      if (!map[id] || ts(row) >= ts(map[id])) map[id] = row;
     });
   }
   ingest(remoteRows);
