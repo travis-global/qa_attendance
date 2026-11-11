@@ -1151,7 +1151,7 @@
     "serial": "466",
     "name": "CHINEMEREM PRECIOUS ONYEBUCHI",
     "programme": "Midwifery",
-    "level": 300,
+    "level": 200,
     "code": "MID",
     "regNo": "EOCNS/24/0068/MID",
     "hostel": "Hostel 2",
@@ -2464,24 +2464,10 @@
     "id": "stu_mwaqcmm3_174"
   },
   {
-    "serial": "EOCNS/24/0052/MID",
-    "name": "Glory Adaniyomwan",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/24/0052/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mwaqcklm_11"
-  },
-  {
     "serial": "EOCNS/24/0027/MID",
     "name": "Godson Portia",
     "programme": "Midwifery",
-    "level": 300,
+    "level": 200,
     "code": "MID",
     "regNo": "EOCNS/24/0027/MID",
     "hostel": "",
@@ -2632,20 +2618,6 @@
     "id": "stu_mwaqclwa_117"
   },
   {
-    "serial": "EOCNS/24/0055/MID",
-    "name": "Ifeanyi Martin Ekeh",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/24/0055/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Male",
-    "phone": "",
-    "email": "",
-    "id": "stu_mwaqckk1_7"
-  },
-  {
     "serial": "",
     "name": "IFEANYI NGOZI",
     "programme": "General Nursing",
@@ -2700,20 +2672,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mwaq08za_150"
-  },
-  {
-    "serial": "EOCNS/24/0053/MID",
-    "name": "Ignatius Divine Chinecherem",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/24/0053/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mwaqcki7_4"
   },
   {
     "serial": "",
@@ -4973,7 +4931,7 @@
     "serial": "EOCNS/24/0054/MID",
     "name": "Precious Mmesoma Ezechukwu",
     "programme": "Midwifery",
-    "level": 300,
+    "level": 200,
     "code": "MID",
     "regNo": "EOCNS/24/0054/MID",
     "hostel": "",
@@ -5164,20 +5122,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mwaudldpzif4j"
-  },
-  {
-    "serial": "",
-    "name": "RAPHAEL OHALEHI C.",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "TMP-EOCNS/26/0001/MID",
-    "hostel": "Off-campus",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mw9ipo80ls2ja"
   },
   {
     "serial": "94",
@@ -5628,20 +5572,6 @@
     "id": "stu_mvrzdacl50nzb"
   },
   {
-    "serial": "EOCNS/24/0006/MID",
-    "name": "Udeh Faith",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/24/0006/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mwaqclfo_80"
-  },
-  {
     "serial": "",
     "name": "UDEH NGOZI EMELIA",
     "programme": "General Nursing",
@@ -5754,20 +5684,6 @@
     "id": "stu_mvusomywj99lo"
   },
   {
-    "serial": "EOCNS/24/0078/MID",
-    "name": "UGWU LOVINA IFUNANYA",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/24/0078/MID",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mwaqcke6_1"
-  },
-  {
     "serial": "",
     "name": "UGWU LOVINA IFUNAYA",
     "programme": "General Nursing",
@@ -5878,20 +5794,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mwaqcl19_47"
-  },
-  {
-    "serial": "377",
-    "name": "Vasco Wonderful nmesoma",
-    "programme": "Midwifery",
-    "level": 300,
-    "code": "MID",
-    "regNo": "EOCNS/24/0096/GNS",
-    "hostel": "Hostel 2",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mwaqcl7r_61"
   },
   {
     "serial": "64",
