@@ -133,7 +133,7 @@ function showView(viewId) {
   if (viewId === "sessions") renderSessionsList();
   if (viewId === "dashboard") refreshDashboardStats();
   if (viewId === "audit") renderAuditLog();
-  if (viewId === "hostel") { initHostelView(); renderHostelRoster(); try { renderBioQueues(); } catch (_) {} }
+  if (viewId === "hostel") { initHostelView(); renderHostelRoster(); try { renderBioQueues(); } catch (_) {} try { renderHostelConflicts(); } catch (_) {} }
   if (viewId === "timetable-board") { if (typeof window.renderTimetableBoard === "function") window.renderTimetableBoard(); else if (typeof renderTimetableBoard === "function") renderTimetableBoard(); }
   if (viewId === "qa-daily") renderQaDaily();
   if (viewId === "qa-weekly") initQaWeeklyView();
@@ -1622,6 +1622,7 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
       st.hostelSource = "location_id";
       if (st.masterHostel && !hostelIsBlank(st.masterHostel) && st.masterHostel !== fromMachine) {
         st.hostelConflict = true;
+        st.gateHostel = fromMachine;
       }
       if (st.masterId && hostelIsBlank(st.masterHostel)) {
         try {
@@ -1666,6 +1667,46 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
   }
 
 
+
+  // Location mismatches: queue for officer clarity; hold off fee report until resolved
+  var locationConflictNos = {};
+  try {
+    var existingConf = await getAll("biometric_pending");
+    var confKeys = {};
+    (existingConf || []).forEach(function(q) {
+      if (q && q.status === "hostel_conflict" && q.machineNo) confKeys[String(q.machineNo).trim()] = true;
+    });
+    var confSids = Object.keys(students);
+    for (var ci = 0; ci < confSids.length; ci++) {
+      var csid = confSids[ci];
+      var cst = students[csid];
+      if (!cst || !cst.hostelConflict) continue;
+      locationConflictNos[String(csid).trim()] = true;
+      if (confKeys[String(csid).trim()]) continue;
+      await put("biometric_pending", {
+        id: "hconf_" + Date.now().toString(36) + "_" + ci,
+        kind: "hostel_conflict",
+        status: "hostel_conflict",
+        machineNo: String(csid).trim(),
+        machineName: cst.name || "",
+        studentName: cst.name || "",
+        studentId: cst.masterId || null,
+        regNo: cst.regNo || "",
+        masterHostel: cst.masterHostel || "",
+        gateHostel: cst.gateHostel || cst.hostel || "",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      confKeys[String(csid).trim()] = true;
+    }
+    // any open hostel_conflict still holds off report even if not re-detected
+    (existingConf || []).forEach(function(q) {
+      if (q && q.status === "hostel_conflict" && q.machineNo) {
+        locationConflictNos[String(q.machineNo).trim()] = true;
+      }
+    });
+  } catch (e) { console.warn("hostel conflict queue", e); }
+
   // INSTITUTIONAL RULE: only master-linked students appear on the hostel report.
   // Unmatched machine users are held in the review queue; after linking, regenerate.
   var pendingNos = {};
@@ -1689,11 +1730,16 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     if (st && st.regNo && byNo[String(st.regNo).trim().toUpperCase()]) linked = true;
     // Anyone still sitting in the open review queue stays off the report
     if (pendingNos[key]) linked = false;
+    // Location conflict: hold off fee report until officer clarifies
+    if (typeof locationConflictNos !== "undefined" && locationConflictNos[key]) linked = false;
+    if (st && st.hostelConflict) linked = false;
     if (!linked) {
       excludedPending.push({
         machineNo: key,
         name: (st && st.name) || "",
-        reason: pendingNos[key] ? "awaiting officer review" : "not linked to master list"
+        reason: (st && st.hostelConflict) || (locationConflictNos && locationConflictNos[key])
+          ? "hostel location conflict — clarify before fee report"
+          : (pendingNos[key] ? "awaiting officer review" : "not linked to master list")
       });
       delete students[sid];
       delete attendance[sid];
@@ -2300,38 +2346,153 @@ openDB().then(async () => {
   seedQaDatalists();
   const todayStr = (function() { var d = new Date(); return d.toISOString().slice(0, 10); })();
 async function renderHostelRoster() {
-  await loadStudents();
-  await fillProgrammeLevelSelects();
-  // map roster selects
-  var pf = document.getElementById("hostelRosterProgramme");
-  var lf = document.getElementById("hostelRosterLevel");
-  if (pf && pf.options.length <= 1) {
-    var ap = document.getElementById("attProgramme");
-    if (ap) pf.innerHTML = ap.innerHTML;
-  }
-  if (lf && lf.options.length <= 1) {
-    var al = document.getElementById("attLevel");
-    if (al) lf.innerHTML = al.innerHTML;
-  }
-  var hostelF = (document.getElementById("hostelRosterFilter") && document.getElementById("hostelRosterFilter").value) || "";
-  var prog = (pf && pf.value) || "";
-  var level = (lf && lf.value) || "";
-  var list = studentsCache.filter(function(s) {
-    if (s.status && s.status !== "Active") return false;
-    if (prog && String(s.programme || "") !== prog) return false;
-    if (level && String(s.level || "") !== String(level)) return false;
-    var h = (s.hostel || "").trim();
-    if (hostelF === "__unset") return !h;
-    if (hostelF) return h === hostelF;
-    return true;
-  }).sort(compareStudentsByRegNo);
   var body = document.getElementById("hostelRosterBody");
   if (!body) return;
-  body.innerHTML = list.length ? list.map(function(s) {
-    return "<tr><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") + "</td><td>" + escapeHtml(s.programme || "") +
-      "</td><td>" + escapeHtml(String(s.level || "")) + "</td><td><strong>" + escapeHtml(s.hostel || "—") + "</strong></td></tr>";
-  }).join("") : "<tr><td colspan=\"5\">No students match.</td></tr>";
+  var pf = document.getElementById("hostelRosterProgramme");
+  var lf = document.getElementById("hostelRosterLevel");
+  try {
+    if (typeof fillProgrammeLevelSelects === "function") await fillProgrammeLevelSelects();
+  } catch (_) {}
+  var prog = (pf && pf.value) || "";
+  var level = (lf && lf.value) || "";
+  var hostelF = (document.getElementById("hostelRosterFilter") && document.getElementById("hostelRosterFilter").value) || "";
+  var all = await getAll("students");
+  var list = (all || []).filter(function(s) {
+    if (s.status && String(s.status) !== "Active") return false;
+    if (prog && String(s.programme || "") !== prog) return false;
+    if (level && String(s.level || "") !== String(level)) return false;
+    if (hostelF) {
+      var h = String(s.hostel || "").toLowerCase();
+      if (hostelF === "unassigned") {
+        if (h && h.indexOf("unassigned") < 0) return false;
+        if (!h) { /* keep */ }
+        else if (h.indexOf("unassigned") < 0) return false;
+      } else if (h.indexOf(String(hostelF).toLowerCase()) < 0) return false;
+    }
+    return true;
+  });
+  // Machine ID first priority, then reg no, then name
+  list.sort(function(a, b) {
+    var sa = String(a.serial || "");
+    var sb = String(b.serial || "");
+    if (sa && !sb) return -1;
+    if (!sa && sb) return 1;
+    if (sa && sb) {
+      var c = sa.localeCompare(sb, undefined, { numeric: true });
+      if (c) return c;
+    }
+    var ra = String(a.regNo || ""), rb = String(b.regNo || "");
+    if (ra && rb) {
+      var c2 = ra.localeCompare(rb, undefined, { numeric: true });
+      if (c2) return c2;
+    }
+    return String(a.name || "").localeCompare(String(b.name || ""));
+  });
+  if (!list.length) {
+    body.innerHTML = '<tr><td colspan="7" class="muted-note">No students match filters.</td></tr>';
+    return;
+  }
+  body.innerHTML = list.map(function(s) {
+    var mid = s.serial ? ("<strong>" + escapeHtml(String(s.serial)) + "</strong>") : '<span class="muted-note">—</span>';
+    var actions = "—";
+    if (isQaOfficer()) {
+      if (s.serial) {
+        actions = '<button type="button" class="btn btn--ghost btn--sm" data-hostel-unlink="' + escapeHtml(s.id) + '">Unlink</button>';
+      } else {
+        actions = '<button type="button" class="btn btn--primary btn--sm" data-hostel-link="' + escapeHtml(s.id) + '">Link ID…</button>';
+      }
+    }
+    return "<tr>" +
+      "<td>" + mid + "</td>" +
+      "<td>" + escapeHtml(s.regNo || "—") + "</td>" +
+      "<td>" + escapeHtml(s.name || "") + "</td>" +
+      "<td>" + escapeHtml(s.programme || "") + "</td>" +
+      "<td>" + escapeHtml(String(s.level || "")) + "</td>" +
+      "<td>" + escapeHtml(s.hostel || "—") + "</td>" +
+      '<td class="qa-edit-only">' + actions + "</td></tr>";
+  }).join("");
+  document.querySelectorAll("[data-hostel-unlink]").forEach(function(btn) {
+    btn.onclick = function() { bioUnlinkStudentSerial(btn.getAttribute("data-hostel-unlink")); };
+  });
+  document.querySelectorAll("[data-hostel-link]").forEach(function(btn) {
+    btn.onclick = function() { bioManualLinkPrompt(btn.getAttribute("data-hostel-link")); };
+  });
 }
+
+async function renderHostelConflicts() {
+  var body = document.getElementById("hostelConflictBody");
+  var countEl = document.getElementById("hostelConflictCount");
+  if (!body) return;
+  var list = [];
+  try { list = await getAll("biometric_pending"); } catch (_) {}
+  list = (list || []).filter(function(x) { return x && x.status === "hostel_conflict"; });
+  if (countEl) countEl.textContent = "Conflicts: " + list.length + (list.length ? " (held off fee reports)" : " — none");
+  if (!list.length) {
+    body.innerHTML = '<tr><td colspan="5" class="muted-note">No location conflicts.</td></tr>';
+    return;
+  }
+  body.innerHTML = list.map(function(row) {
+    return "<tr>" +
+      "<td><strong>" + escapeHtml(row.machineNo || "") + "</strong></td>" +
+      "<td>" + escapeHtml(row.studentName || row.machineName || "") +
+        (row.regNo ? (" · " + escapeHtml(row.regNo)) : "") + "</td>" +
+      "<td>" + escapeHtml(row.masterHostel || "—") + "</td>" +
+      "<td>" + escapeHtml(row.gateHostel || "") + "</td>" +
+      '<td class="qa-edit-only">' +
+        (isQaOfficer() ? (
+          '<button type="button" class="btn btn--primary btn--sm" data-hc-keep="' + escapeHtml(row.id) + '">Keep master</button> ' +
+          '<button type="button" class="btn btn--ghost btn--sm" data-hc-accept="' + escapeHtml(row.id) + '">Accept gate</button> ' +
+          '<button type="button" class="btn btn--ghost btn--sm" data-hc-discard="' + escapeHtml(row.id) + '">Dismiss</button>'
+        ) : "—") +
+      "</td></tr>";
+  }).join("");
+  document.querySelectorAll("[data-hc-keep]").forEach(function(btn) {
+    btn.onclick = async function() {
+      var row = (await getAll("biometric_pending")).find(function(x) { return x.id === btn.getAttribute("data-hc-keep"); });
+      if (!row) return;
+      // keep master hostel; clear conflict flag only
+      await del("biometric_pending", row.id);
+      markDirty("hostel conflict keep");
+      await renderHostelConflicts();
+    };
+  });
+  document.querySelectorAll("[data-hc-accept]").forEach(function(btn) {
+    btn.onclick = async function() {
+      var row = (await getAll("biometric_pending")).find(function(x) { return x.id === btn.getAttribute("data-hc-accept"); });
+      if (!row || !row.studentId) return;
+      var all = await getAll("students");
+      var s = all.find(function(x) { return x.id === row.studentId; });
+      if (!s) return;
+      var before = s.hostel || "";
+      s.hostel = row.gateHostel || s.hostel;
+      s.hostelSource = "gate_conflict_accept";
+      s.updatedAt = new Date().toISOString();
+      await put("students", s);
+      try {
+        await writeAudit({
+          action: "update",
+          entity: "students",
+          entityId: s.id,
+          reason: "Accepted gate Location ID hostel over master",
+          details: { hostelBefore: before, hostelAfter: s.hostel, machineNo: row.machineNo }
+        });
+      } catch (_) {}
+      await del("biometric_pending", row.id);
+      markDirty("hostel conflict accept");
+      await renderHostelConflicts();
+      try { await renderHostelRoster(); } catch (_) {}
+    };
+  });
+  document.querySelectorAll("[data-hc-discard]").forEach(function(btn) {
+    btn.onclick = async function() {
+      await del("biometric_pending", btn.getAttribute("data-hc-discard"));
+      markDirty("hostel conflict dismiss");
+      await renderHostelConflicts();
+    };
+  });
+}
+
+
 
 function svgPie(slices, size) {
   size = size || 160;
@@ -8265,39 +8426,9 @@ async function saveAttendanceSheet() {
 }
 
 
-async function renderHostelRoster() {
-  await loadStudents();
-  await fillProgrammeLevelSelects();
-  // map roster selects
-  var pf = document.getElementById("hostelRosterProgramme");
-  var lf = document.getElementById("hostelRosterLevel");
-  if (pf && pf.options.length <= 1) {
-    var ap = document.getElementById("attProgramme");
-    if (ap) pf.innerHTML = ap.innerHTML;
-  }
-  if (lf && lf.options.length <= 1) {
-    var al = document.getElementById("attLevel");
-    if (al) lf.innerHTML = al.innerHTML;
-  }
-  var hostelF = (document.getElementById("hostelRosterFilter") && document.getElementById("hostelRosterFilter").value) || "";
-  var prog = (pf && pf.value) || "";
-  var level = (lf && lf.value) || "";
-  var list = studentsCache.filter(function(s) {
-    if (s.status && s.status !== "Active") return false;
-    if (prog && String(s.programme || "") !== prog) return false;
-    if (level && String(s.level || "") !== String(level)) return false;
-    var h = (s.hostel || "").trim();
-    if (hostelF === "__unset") return !h;
-    if (hostelF) return h === hostelF;
-    return true;
-  }).sort(function(a, b) { return String(a.name).localeCompare(String(b.name)); });
-  var body = document.getElementById("hostelRosterBody");
-  if (!body) return;
-  body.innerHTML = list.length ? list.map(function(s) {
-    return "<tr><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") + "</td><td>" + escapeHtml(s.programme || "") +
-      "</td><td>" + escapeHtml(String(s.level || "")) + "</td><td><strong>" + escapeHtml(s.hostel || "—") + "</strong></td></tr>";
-  }).join("") : "<tr><td colspan=\"5\">No students match.</td></tr>";
-}
+
+// renderHostelRoster defined once above
+
 
 function svgPie(slices, size) {
   size = size || 160;
@@ -10852,33 +10983,40 @@ async function bioImportAndMatch() {
 async function renderBioQueues() {
   var clarifyBody = document.getElementById("bioClarifyBody");
   var unlinkedBody = document.getElementById("bioUnlinkedBody");
+  var countEl = document.getElementById("bioClarifyCount");
   var list = [];
   try { list = await getAll("biometric_pending"); } catch (_) { list = []; }
   list = (list || []).filter(function(x) { return x && x.status !== "linked"; });
-  var clarify = list.filter(function(x) { return x.status === "clarify" || x.status === "conflict"; });
+  var clarify = list.filter(function(x) {
+    return x.status === "clarify" || x.status === "conflict" || x.kind === "train";
+  }).filter(function(x) {
+    return x.status === "clarify" || x.status === "conflict";
+  });
   var unlinked = list.filter(function(x) { return x.status === "unlinked"; });
+  if (countEl) {
+    countEl.textContent = clarify.length
+      ? ("Clarify queue: " + clarify.length + " waiting")
+      : "Clarify queue: 0 — all clear";
+  }
   if (clarifyBody) {
     if (!clarify.length) {
-      clarifyBody.innerHTML = '<tr><td colspan="5" class="muted-note">No rows waiting.</td></tr>';
+      clarifyBody.innerHTML = '<tr><td colspan="5" class="muted-note">No rows waiting. Queue is clear.</td></tr>';
     } else {
       clarifyBody.innerHTML = clarify.map(function(row) {
-        var sug = (row.suggestions || []).map(function(s) {
-          return '<div class="bio-match-list">' +
-            escapeHtml(s.name) + ' · ' + escapeHtml(s.regNo || "—") +
-            ' · ' + (s.score != null ? s.score + "%" : "") +
-            (isQaOfficer() ? (' <button type="button" class="btn btn--ghost btn--sm" data-bio-link="' +
-              escapeHtml(row.id) + '" data-stu="' + escapeHtml(s.studentId) + '">Link</button>') : "") +
-            '</div>';
-        }).join("") || '<span class="muted-note">No suggestions</span>';
-        if (row.note) sug += '<div class="muted-note">' + escapeHtml(row.note) + '</div>';
+        var best = (row.suggestions || [])[0];
+        var bestTxt = best
+          ? (escapeHtml(best.name || "") + " · " + escapeHtml(best.regNo || "—") +
+             (best.score != null ? (" · " + best.score + "%") : ""))
+          : '<span class="muted-note">No auto match</span>';
         return '<tr>' +
-          '<td>' + escapeHtml(row.machineNo) + '</td>' +
-          '<td>' + escapeHtml(row.machineName) + '</td>' +
+          '<td><strong>' + escapeHtml(row.machineNo || "") + '</strong></td>' +
+          '<td>' + escapeHtml(row.machineName || "") + '</td>' +
           '<td>' + escapeHtml(row.deviceLabel || "") + '</td>' +
-          '<td>' + sug + '</td>' +
+          '<td>' + bestTxt + '</td>' +
           '<td class="qa-edit-only">' +
             (isQaOfficer() ? (
-              '<button type="button" class="btn btn--ghost btn--sm" data-bio-to-unlinked="' + escapeHtml(row.id) + '">Move to pool</button> ' +
+              '<button type="button" class="btn btn--primary btn--sm" data-bio-review="' + escapeHtml(row.id) + '">Review &amp; link</button> ' +
+              '<button type="button" class="btn btn--ghost btn--sm" data-bio-to-unlinked="' + escapeHtml(row.id) + '">Pool</button> ' +
               '<button type="button" class="btn btn--ghost btn--sm" data-bio-discard="' + escapeHtml(row.id) + '">Discard</button>'
             ) : "—") +
           '</td></tr>';
@@ -10891,40 +11029,23 @@ async function renderBioQueues() {
     } else {
       unlinkedBody.innerHTML = unlinked.map(function(row) {
         return '<tr>' +
-          '<td>' + escapeHtml(row.machineNo) + '</td>' +
-          '<td>' + escapeHtml(row.machineName) + '</td>' +
+          '<td><strong>' + escapeHtml(row.machineNo || "") + '</strong></td>' +
+          '<td>' + escapeHtml(row.machineName || "") + '</td>' +
           '<td>' + escapeHtml(row.deviceLabel || "") + '</td>' +
-          '<td>' + escapeHtml((row.createdAt || "").slice(0, 16).replace("T", " ")) + '</td>' +
+          '<td class="muted-note">' + escapeHtml(row.note || "Awaiting create / manual link") + '</td>' +
           '<td class="qa-edit-only">' +
             (isQaOfficer() ? (
-              '<button type="button" class="btn btn--primary btn--sm" data-bio-create="' + escapeHtml(row.id) + '">Create student</button> ' +
+              '<button type="button" class="btn btn--primary btn--sm" data-bio-review="' + escapeHtml(row.id) + '">Link…</button> ' +
+              '<button type="button" class="btn btn--ghost btn--sm" data-bio-create="' + escapeHtml(row.id) + '">Create student</button> ' +
               '<button type="button" class="btn btn--ghost btn--sm" data-bio-discard="' + escapeHtml(row.id) + '">Discard</button>'
             ) : "—") +
           '</td></tr>';
       }).join("");
     }
   }
-  // wire buttons
-  document.querySelectorAll("[data-bio-link]").forEach(function(btn) {
-    btn.addEventListener("click", async function() {
-      if (!isQaOfficer()) return;
-      var pid = btn.getAttribute("data-bio-link");
-      var sid = btn.getAttribute("data-stu");
-      try {
-        var pending = (await getAll("biometric_pending")).find(function(x) { return x.id === pid; });
-        if (!pending) return;
-        var score = null;
-        (pending.suggestions || []).forEach(function(s) {
-          if (s.studentId === sid) score = (s.score != null ? s.score / 100 : null);
-        });
-        await bioLinkStudentSerial(sid, pending.machineNo, pending.machineName, pending.deviceLabel, score, "manual");
-        await del("biometric_pending", pid);
-        markDirty("biometric link");
-        await renderBioQueues();
-        try { await renderStudentsTable(); } catch (_) {}
-      } catch (err) {
-        alert(err.message || String(err));
-      }
+  document.querySelectorAll("[data-bio-review]").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      openBioClarifyModal(btn.getAttribute("data-bio-review"));
     });
   });
   document.querySelectorAll("[data-bio-to-unlinked]").forEach(function(btn) {
@@ -10941,7 +11062,7 @@ async function renderBioQueues() {
   });
   document.querySelectorAll("[data-bio-discard]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
-      if (!confirm("Discard this device user from the queue? You can re-import the file later.")) return;
+      if (!confirm("Discard this device user from the queue?")) return;
       await del("biometric_pending", btn.getAttribute("data-bio-discard"));
       markDirty("biometric discard");
       await renderBioQueues();
@@ -10952,6 +11073,164 @@ async function renderBioQueues() {
       openBioCreateStudentModal(btn.getAttribute("data-bio-create"));
     });
   });
+  try { await renderHostelConflicts(); } catch (_) {}
+}
+
+async function openBioClarifyModal(pendingId) {
+  if (!isQaOfficer()) { openOfficerLoginGate("hostel"); return; }
+  var pending = (await getAll("biometric_pending")).find(function(x) { return x.id === pendingId; });
+  if (!pending) { alert("Queue item not found."); return; }
+  document.getElementById("bioClarifyPendingId").value = pendingId;
+  document.getElementById("bioClarifySelectedStu").value = "";
+  var info = document.getElementById("bioClarifyMachineInfo");
+  if (info) {
+    info.innerHTML = "<strong>Machine ID:</strong> " + escapeHtml(pending.machineNo || "") +
+      " &nbsp;|&nbsp; <strong>Machine name:</strong> " + escapeHtml(pending.machineName || "") +
+      " &nbsp;|&nbsp; <strong>Device:</strong> " + escapeHtml(pending.deviceLabel || "—");
+  }
+  var box = document.getElementById("bioClarifySuggestions");
+  var sug = (pending.suggestions || []).slice(0, 8);
+  if (!box) return;
+  if (!sug.length) {
+    box.innerHTML = '<p class="muted-note" style="margin:0">No automatic suggestions — search the master list below.</p>';
+  } else {
+    box.innerHTML = sug.map(function(s, idx) {
+      var checked = idx === 0 ? " checked" : "";
+      if (idx === 0) {
+        document.getElementById("bioClarifySelectedStu").value = s.studentId;
+      }
+      return '<label style="display:flex;gap:8px;align-items:flex-start;padding:6px 4px;cursor:pointer;border-bottom:1px solid var(--border)">' +
+        '<input type="radio" name="bioClarifyPick" value="' + escapeHtml(s.studentId) + '"' + checked + ' />' +
+        '<span><strong>' + escapeHtml(s.name || "") + '</strong><br>' +
+        '<span class="muted-note">' + escapeHtml(s.regNo || "—") +
+        (s.serial ? (" · ID " + escapeHtml(s.serial)) : "") +
+        (s.score != null ? (" · " + s.score + "% match") : "") +
+        '</span></span></label>';
+    }).join("");
+    box.querySelectorAll('input[name="bioClarifyPick"]').forEach(function(inp) {
+      inp.addEventListener("change", function() {
+        document.getElementById("bioClarifySelectedStu").value = inp.value;
+      });
+    });
+  }
+  var searchInp = document.getElementById("bioClarifySearch");
+  if (searchInp) {
+    searchInp.value = "";
+    searchInp.oninput = function() { bioClarifyRunSearch(searchInp.value); };
+  }
+  var res = document.getElementById("bioClarifySearchResults");
+  if (res) res.innerHTML = "";
+  var modal = document.getElementById("bioClarifyModal");
+  if (modal) modal.hidden = false;
+}
+
+function closeBioClarifyModal() {
+  var modal = document.getElementById("bioClarifyModal");
+  if (modal) modal.hidden = true;
+}
+
+async function bioClarifyRunSearch(q) {
+  var res = document.getElementById("bioClarifySearchResults");
+  if (!res) return;
+  q = String(q || "").trim().toLowerCase();
+  if (q.length < 2) { res.innerHTML = ""; return; }
+  var all = await getAll("students");
+  var hits = (all || []).filter(function(s) {
+    if (s.status && String(s.status) !== "Active") return false;
+    var name = String(s.name || "").toLowerCase();
+    var reg = String(s.regNo || "").toLowerCase();
+    var serial = String(s.serial || "").toLowerCase();
+    return name.indexOf(q) >= 0 || reg.indexOf(q) >= 0 || serial.indexOf(q) >= 0;
+  }).slice(0, 20);
+  if (!hits.length) {
+    res.innerHTML = '<p class="muted-note">No master students match.</p>';
+    return;
+  }
+  res.innerHTML = hits.map(function(s) {
+    return '<label style="display:flex;gap:8px;align-items:flex-start;padding:6px 4px;cursor:pointer;border-bottom:1px solid var(--border)">' +
+      '<input type="radio" name="bioClarifyPick" value="' + escapeHtml(s.id) + '" />' +
+      '<span><strong>' + escapeHtml(s.name || "") + '</strong><br>' +
+      '<span class="muted-note">' + escapeHtml(s.regNo || "—") +
+      (s.serial ? (" · ID " + escapeHtml(s.serial)) : "") +
+      " · " + escapeHtml(s.programme || "") + " L" + escapeHtml(String(s.level || "")) +
+      '</span></span></label>';
+  }).join("");
+  res.querySelectorAll('input[name="bioClarifyPick"]').forEach(function(inp) {
+    inp.addEventListener("change", function() {
+      document.getElementById("bioClarifySelectedStu").value = inp.value;
+      // uncheck suggestion radios in other box
+      document.querySelectorAll('#bioClarifySuggestions input[name="bioClarifyPick"]').forEach(function(r) {
+        r.checked = false;
+      });
+    });
+  });
+}
+
+async function confirmBioClarifyLink() {
+  var pid = document.getElementById("bioClarifyPendingId") && document.getElementById("bioClarifyPendingId").value;
+  var sid = document.getElementById("bioClarifySelectedStu") && document.getElementById("bioClarifySelectedStu").value;
+  // also check checked radio
+  var checked = document.querySelector('#bioClarifyModal input[name="bioClarifyPick"]:checked');
+  if (checked) sid = checked.value;
+  if (!pid || !sid) { alert("Select a master student first (suggestion or search)."); return; }
+  var pending = (await getAll("biometric_pending")).find(function(x) { return x.id === pid; });
+  if (!pending) { alert("Queue item gone."); closeBioClarifyModal(); return; }
+  try {
+    await bioLinkStudentSerial(sid, pending.machineNo, pending.machineName, pending.deviceLabel, null, "manual");
+    await del("biometric_pending", pid);
+    markDirty("biometric link");
+    closeBioClarifyModal();
+    await renderBioQueues();
+    try { await renderHostelRoster(); } catch (_) {}
+    try { await renderStudentsTable(); } catch (_) {}
+  } catch (err) {
+    alert(err.message || String(err));
+  }
+}
+
+async function bioUnlinkStudentSerial(studentId) {
+  if (!isQaOfficer()) return;
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === studentId; });
+  if (!s) throw new Error("Student not found");
+  var before = s.serial || "";
+  if (!before) { alert("No machine ID linked on this student."); return; }
+  if (!confirm("Unlink machine ID " + before + " from " + (s.name || "") + "?\n\nGate matching will treat them as unmatched until linked again.")) return;
+  s.serial = "";
+  s.updatedAt = new Date().toISOString();
+  await put("students", s);
+  try {
+    await writeAudit({
+      action: "update",
+      entity: "students",
+      entityId: s.id,
+      reason: "Unlinked biometric machine ID",
+      details: { serialBefore: before, name: s.name, regNo: s.regNo }
+    });
+  } catch (_) {}
+  markDirty("biometric unlink");
+  try { await renderHostelRoster(); } catch (_) {}
+  try { await renderStudentsTable(); } catch (_) {}
+  alert("Unlinked machine ID " + before + ".");
+}
+
+async function bioManualLinkPrompt(studentId) {
+  if (!isQaOfficer()) return;
+  var machineNo = prompt("Enter machine User ID / No. to link to this student:");
+  if (machineNo == null) return;
+  machineNo = String(machineNo).trim();
+  if (!machineNo) return;
+  var all = await getAll("students");
+  var s = all.find(function(x) { return x.id === studentId; });
+  if (!s) return;
+  try {
+    await bioLinkStudentSerial(studentId, machineNo, s.name || "", s.hostel || "", null, "roster");
+    markDirty("biometric link");
+    try { await renderHostelRoster(); } catch (_) {}
+    alert("Linked machine ID " + machineNo + " → " + (s.name || ""));
+  } catch (err) {
+    alert(err.message || String(err));
+  }
 }
 
 async function openBioCreateStudentModal(pendingId) {
@@ -11371,6 +11650,25 @@ function initBiometricMapUI() {
   document.getElementById("btnBioImportMatch")?.addEventListener("click", function() { bioImportAndMatch(); });
   document.getElementById("btnBioRefreshQueues")?.addEventListener("click", function() { renderBioQueues(); try { renderCsvReviewQueue(); } catch (_) {} });
   document.getElementById("btnBioBatchClarify")?.addEventListener("click", function() { startMatchQueueBatch("clarify"); });
+
+  document.getElementById("btnCloseBioClarify")?.addEventListener("click", closeBioClarifyModal);
+  document.getElementById("bioClarifyBackdrop")?.addEventListener("click", closeBioClarifyModal);
+  document.getElementById("btnBioClarifyCancel")?.addEventListener("click", closeBioClarifyModal);
+  document.getElementById("btnBioClarifyLink")?.addEventListener("click", function() { confirmBioClarifyLink(); });
+  document.getElementById("btnBioClarifyPool")?.addEventListener("click", async function() {
+    var pid = document.getElementById("bioClarifyPendingId") && document.getElementById("bioClarifyPendingId").value;
+    if (!pid) return;
+    var pending = (await getAll("biometric_pending")).find(function(x) { return x.id === pid; });
+    if (!pending) return;
+    pending.status = "unlinked";
+    pending.updatedAt = new Date().toISOString();
+    await put("biometric_pending", pending);
+    markDirty("biometric pool");
+    closeBioClarifyModal();
+    await renderBioQueues();
+  });
+  document.getElementById("btnRefreshHostelConflicts")?.addEventListener("click", function() { renderHostelConflicts(); });
+
   document.getElementById("btnBioBatchUnlinked")?.addEventListener("click", function() { startMatchQueueBatch("unlinked"); });
   document.getElementById("btnCsvReviewBatch")?.addEventListener("click", function() { startMatchQueueBatch("csv"); });
   document.getElementById("btnCsvReviewRefresh")?.addEventListener("click", function() { renderCsvReviewQueue(); });
@@ -11534,7 +11832,23 @@ async function startMatchQueueBatch(mode) {
   markDirty("match queue batch");
   try { await renderBioQueues(); } catch (_) {}
   try { await renderCsvReviewQueue(); } catch (_) {}
-  alert("Batch done.\nLinked: " + linked + "\nMoved to pool: " + toPool + "\nSkipped: " + skipped);
+  var leftClarify = 0, leftUnlinked = 0;
+  try {
+    var left = await getAll("biometric_pending");
+    (left || []).forEach(function(x) {
+      if (!x || x.status === "linked") return;
+      if (x.status === "clarify" || x.status === "conflict") leftClarify++;
+      if (x.status === "unlinked") leftUnlinked++;
+    });
+  } catch (_) {}
+  alert(
+    "Batch done.\nLinked: " + linked +
+    "\nMoved to pool: " + toPool +
+    "\nSkipped: " + skipped +
+    "\n\nStill waiting — Clarify: " + leftClarify +
+    " · Unlinked pool: " + leftUnlinked +
+    (leftClarify + leftUnlinked === 0 ? "\n\nAll clear — no names left to review." : "")
+  );
 }
 
 async function applyCsvReviewLink(row, suggestion) {

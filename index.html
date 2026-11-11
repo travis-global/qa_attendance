@@ -420,13 +420,35 @@
                 <label class="field"><span class="field__label">&nbsp;</span><button type="button" class="btn btn--ghost" id="btnRefreshHostelRoster">Refresh roster</button></label>
               </div>
               <div class="table-scroll" style="margin-top:12px;max-height:280px;overflow:auto">
-                <table class="data-table"><thead><tr><th>Name</th><th>Reg No</th><th>Programme</th><th>Level</th><th>Hostel</th></tr></thead>
+                <table class="data-table"><thead><tr><th>Machine ID</th><th>Reg No</th><th>Name</th><th>Programme</th><th>Level</th><th>Hostel</th><th class="qa-edit-only">Link</th></tr></thead>
                 <tbody id="hostelRosterBody"></tbody></table>
+                <p class="muted-note" style="margin-top:8px">Machine ID is the primary key for gate uniqueness. Link/Unlink fixes wrong mappings without regenerating the whole train.</p>
               </div>
             </div>
           </div>
 
-          <div class="card" style="margin-bottom:16px">
+          
+          <div class="card" style="margin-bottom:16px" id="hostelConflictCard">
+            <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+              <h3 style="margin:0">Hostel location conflicts</h3>
+              <button type="button" class="btn btn--ghost btn--sm" id="btnRefreshHostelConflicts">Refresh</button>
+            </div>
+            <div class="card__body">
+              <p class="muted-note" style="margin-top:0">
+                Master hostel differs from gate <strong>Location ID</strong> majority.
+                These students stay <strong>off the fee report</strong> until you confirm master, accept machine location, or clear the flag.
+              </p>
+              <div class="table-scroll" style="max-height:260px;overflow:auto">
+                <table class="data-table">
+                  <thead><tr><th>Machine ID</th><th>Name / Reg</th><th>Master hostel</th><th>Gate location</th><th class="qa-edit-only">Resolve</th></tr></thead>
+                  <tbody id="hostelConflictBody"><tr><td colspan="5" class="muted-note">No location conflicts.</td></tr></tbody>
+                </table>
+              </div>
+              <p class="muted-note" id="hostelConflictCount" style="margin:8px 0 0">Conflicts: 0</p>
+            </div>
+          </div>
+
+<div class="card" style="margin-bottom:16px">
             <div class="card__header"><h3>2. Report settings</h3></div>
             <div class="card__body">
               <div class="form-grid">
@@ -1327,7 +1349,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=83"></script>
+  <script src="app.js?v=84"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>
@@ -1496,6 +1518,34 @@
       <div class="modal__footer">
         <button type="button" class="btn btn--ghost" id="btnCancelStudentCsvImport">Cancel</button>
         <button type="button" class="btn btn--primary" id="btnConfirmStudentCsvImport">Import</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal" id="bioClarifyModal" hidden>
+    <div class="modal__backdrop" id="bioClarifyBackdrop"></div>
+    <div class="modal__dialog" style="max-width:560px">
+      <div class="modal__header">
+        <h3>Link machine user to master student</h3>
+        <button type="button" class="icon-btn" id="btnCloseBioClarify" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal__body">
+        <p class="muted-note" style="margin-top:0" id="bioClarifyMachineInfo"></p>
+        <p style="margin:0 0 8px;font-weight:600">Suggested matches <span class="muted-note">(top match pre-selected)</span></p>
+        <div id="bioClarifySuggestions" style="max-height:180px;overflow:auto;border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:12px"></div>
+        <label class="field field--full">
+          <span class="field__label">Or search master list (name / reg no)</span>
+          <input type="search" id="bioClarifySearch" placeholder="Type name or registration number…" autocomplete="off" />
+        </label>
+        <div id="bioClarifySearchResults" style="max-height:160px;overflow:auto;margin-top:8px"></div>
+        <input type="hidden" id="bioClarifyPendingId" />
+        <input type="hidden" id="bioClarifySelectedStu" />
+      </div>
+      <div class="modal__footer">
+        <button type="button" class="btn btn--ghost" id="btnBioClarifyCancel">Cancel</button>
+        <button type="button" class="btn btn--ghost" id="btnBioClarifyPool">Move to unlinked pool</button>
+        <button type="button" class="btn btn--primary" id="btnBioClarifyLink">Link selected</button>
       </div>
     </div>
   </div>
