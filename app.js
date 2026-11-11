@@ -2156,6 +2156,7 @@ openDB().then(async () => {
   try { refreshDashboardStats(); } catch (e) { console.warn("stats", e); }
   initQaOfficerUI();
   try { initBiometricMapUI(); } catch (e) { console.warn("biometric ui", e); }
+  try { initHostelTrainUI(); } catch (e) { console.warn("hostel train ui", e); }
 
   document.getElementById("btnRefreshPending")?.addEventListener("click", function() { renderPendingRegistrations({ fromRepo: true }); });
   document.getElementById("btnClosePendingReview")?.addEventListener("click", closePendingReview);
@@ -10961,6 +10962,325 @@ async function confirmBioCreateStudent() {
   await renderBioQueues();
   try { await renderStudentsTable(); } catch (_) {}
   alert("Student created on the master list with serial " + serial + ". Site name: " + name);
+}
+
+
+// =========================================================
+// HOSTEL TRAIN — learn machine No./name/location only (no report)
+// =========================================================
+
+function hostelFieldIsBlank(h) {
+  var t = String(h || "").trim().toLowerCase();
+  if (!t) return true;
+  if (t === "—" || t === "-" || t === "n/a" || t === "na" || t === "none") return true;
+  if (t.indexOf("unassigned") >= 0) return true;
+  return false;
+}
+
+function hostelFromLocationId(lid, h1, h2) {
+  var n = String(lid == null ? "" : lid).trim();
+  if (n === "1") return h1 || "Hostel 1";
+  if (n === "2") return h2 || "Hostel 2";
+  return "";
+}
+
+/**
+ * Train master list from a gate/hostel export:
+ * - unique machine users (No. + Name)
+ * - majority Location ID → hostel if student hostel blank
+ * - strong unique name match → write serial (site name kept)
+ * - ambiguous → biometric_pending clarify queue
+ */
+async function trainHostelFromExport(file, options) {
+  if (!isQaOfficer()) { openOfficerLoginGate("hostel"); return; }
+  options = options || {};
+  var statusEl = document.getElementById("hostelTrainStatus");
+  var sumEl = document.getElementById("hostelTrainSummary");
+  function setSt(t) { if (statusEl) statusEl.textContent = t; }
+  if (!file) { setSt("Choose a gate/hostel export file."); return; }
+
+  setSt("Reading export…");
+  var rows;
+  try {
+    if (typeof bioLoadSheetFile === "function") rows = await bioLoadSheetFile(file);
+    else {
+      // fallback XLSX
+      rows = await new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onerror = function() { reject(new Error("Could not read file")); };
+        reader.onload = function(e) {
+          try {
+            var data = new Uint8Array(e.target.result);
+            var wb = XLSX.read(data, { type: "array" });
+            var sheet = wb.Sheets[wb.SheetNames[0]];
+            resolve(XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" }));
+          } catch (err) { reject(err); }
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
+  } catch (e) {
+    setSt("Could not read file: " + (e.message || e));
+    return;
+  }
+  if (!rows || rows.length < 2) { setSt("File has no data rows."); return; }
+
+  var headerIndex = {};
+  (rows[0] || []).forEach(function(v, i) {
+    var k = String(v == null ? "" : v).trim();
+    if (k) headerIndex[k] = i;
+  });
+  // flexible header lookup
+  function col() {
+    var names = Array.prototype.slice.call(arguments);
+    for (var i = 0; i < names.length; i++) {
+      if (headerIndex[names[i]] != null) return headerIndex[names[i]];
+    }
+    var keys = Object.keys(headerIndex);
+    for (var j = 0; j < names.length; j++) {
+      var want = String(names[j]).toLowerCase();
+      for (var k = 0; k < keys.length; k++) {
+        if (String(keys[k]).toLowerCase().indexOf(want) >= 0) return headerIndex[keys[k]];
+      }
+    }
+    return null;
+  }
+  var nameCol = col("Name", "name", "User Name");
+  var noCol = col("No.", "No", "User ID", "ID", "Enroll ID");
+  var locCol = col("Location ID", "LocationID", "Location");
+  if (nameCol == null || noCol == null) {
+    setSt("Need Name and No. (User ID) columns. Found: " + Object.keys(headerIndex).join(", "));
+    return;
+  }
+
+  var h1 = (document.getElementById("hostel1Name") && document.getElementById("hostel1Name").value) || "Hostel 1";
+  var h2 = (document.getElementById("hostel2Name") && document.getElementById("hostel2Name").value) || "Hostel 2";
+  var devicePref = options.deviceLabel || (document.getElementById("hostelTrainDevice") && document.getElementById("hostelTrainDevice").value) || "";
+
+  // Aggregate unique machine users
+  var users = {}; // no -> { name, votes: {1:n,2:n}, punches }
+  for (var r = 1; r < rows.length; r++) {
+    var row = rows[r] || [];
+    var name = String(row[nameCol] == null ? "" : row[nameCol]).trim();
+    var noRaw = row[noCol];
+    if (!name || noRaw == null || noRaw === "") continue;
+    var no = String(typeof normalizeStudentIdHostel === "function" ? normalizeStudentIdHostel(noRaw) : noRaw).trim();
+    if (!no) continue;
+    if (!users[no]) users[no] = { machineNo: no, machineName: name, votes: { "1": 0, "2": 0 }, punches: 0 };
+    // prefer longer name if machine varies
+    if (name.length > users[no].machineName.length) users[no].machineName = name;
+    users[no].punches++;
+    if (locCol != null) {
+      var lid = String(row[locCol] == null ? "" : row[locCol]).trim();
+      if (lid === "1" || lid === "2") users[no].votes[lid] = (users[no].votes[lid] || 0) + 1;
+    }
+  }
+  var list = Object.keys(users).map(function(k) { return users[k]; });
+  if (!list.length) { setSt("No machine users found in file."); return; }
+
+  setSt("Training on " + list.length + " unique machine user(s)…");
+
+  var master = await getAll("students");
+  master = (master || []).filter(function(s) {
+    return !s.status || String(s.status).toLowerCase() === "active";
+  });
+  var bySerial = {};
+  master.forEach(function(s) {
+    if (s.serial) bySerial[String(s.serial).trim()] = s;
+  });
+
+  var AUTO_MIN = 0.85, AUTO_GAP = 0.12, CLARIFY_MIN = 0.55;
+  var autoLink = 0, hostelSet = 0, already = 0, clarify = 0, unlinked = 0, conflicts = 0;
+
+  var existingQ = await getAll("biometric_pending");
+  var openKeys = {};
+  (existingQ || []).forEach(function(q) {
+    if (q && q.status !== "linked" && q.machineNo) openKeys[String(q.machineNo).trim()] = true;
+  });
+
+  for (var i = 0; i < list.length; i++) {
+    var u = list[i];
+    var maj = null;
+    if (u.votes["1"] > u.votes["2"]) maj = "1";
+    else if (u.votes["2"] > u.votes["1"]) maj = "2";
+    var hostelGuess = maj ? hostelFromLocationId(maj, h1, h2) : (devicePref || "");
+
+    var linkedStu = bySerial[u.machineNo];
+    if (linkedStu) {
+      already++;
+      // fill blank hostel only
+      if (hostelGuess && hostelFieldIsBlank(linkedStu.hostel)) {
+        var before = linkedStu.hostel || "";
+        linkedStu.hostel = hostelGuess;
+        linkedStu.hostelSource = "train_location_id";
+        linkedStu.updatedAt = new Date().toISOString();
+        await put("students", linkedStu);
+        hostelSet++;
+        try {
+          await writeAudit({
+            action: "update",
+            entity: "students",
+            entityId: linkedStu.id,
+            reason: "Train: assigned blank hostel from gate Location ID",
+            details: { hostelBefore: before, hostelAfter: hostelGuess, machineNo: u.machineNo }
+          });
+        } catch (_) {}
+      }
+      continue;
+    }
+
+    // rank by name
+    var ranked = [];
+    for (var m = 0; m < master.length; m++) {
+      var s = master[m];
+      var sc = typeof bioNameScore === "function" ? bioNameScore(u.machineName, s.name || "") : 0;
+      if (sc <= 0) continue;
+      ranked.push({
+        studentId: s.id,
+        name: s.name,
+        regNo: s.regNo || "",
+        serial: s.serial || "",
+        score: sc
+      });
+    }
+    ranked.sort(function(a, b) { return b.score - a.score; });
+    var best = ranked[0], second = ranked[1];
+    var bestScore = best ? best.score : 0;
+    var secondScore = second ? second.score : 0;
+    var uniqueStrong = best && bestScore >= AUTO_MIN && (bestScore - secondScore) >= AUTO_GAP;
+    if (uniqueStrong && best.serial && String(best.serial).trim() && String(best.serial).trim() !== u.machineNo) {
+      uniqueStrong = false; // already has different machine id
+    }
+
+    if (uniqueStrong) {
+      try {
+        await bioLinkStudentSerial(best.studentId, u.machineNo, u.machineName, hostelGuess || devicePref || "Gate train", bestScore, "train");
+        // bioLink may set hostel from deviceLabel; ensure Location ID hostel if still blank
+        var all2 = await getAll("students");
+        var st2 = all2.find(function(x) { return x.id === best.studentId; });
+        if (st2 && hostelGuess && hostelFieldIsBlank(st2.hostel)) {
+          st2.hostel = hostelGuess;
+          st2.hostelSource = "train_location_id";
+          st2.updatedAt = new Date().toISOString();
+          await put("students", st2);
+          hostelSet++;
+        }
+        bySerial[u.machineNo] = st2 || { id: best.studentId };
+        // refresh master serial map entry
+        for (var mx = 0; mx < master.length; mx++) {
+          if (master[mx].id === best.studentId) {
+            master[mx].serial = u.machineNo;
+            if (hostelGuess && hostelFieldIsBlank(master[mx].hostel)) master[mx].hostel = hostelGuess;
+            break;
+          }
+        }
+        autoLink++;
+      } catch (err) {
+        conflicts++;
+        if (!openKeys[u.machineNo]) {
+          await put("biometric_pending", {
+            id: "train_" + Date.now().toString(36) + "_" + i,
+            kind: "train",
+            machineNo: u.machineNo,
+            machineName: u.machineName,
+            deviceLabel: hostelGuess || devicePref || "Gate train",
+            status: "conflict",
+            note: err.message || String(err),
+            suggestions: ranked.slice(0, 5).map(function(r) {
+              return { studentId: r.studentId, name: r.name, regNo: r.regNo, score: Math.round(r.score * 1000) / 10, serial: r.serial };
+            }),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          });
+          openKeys[u.machineNo] = true;
+        }
+      }
+      continue;
+    }
+
+    if (best && bestScore >= CLARIFY_MIN) {
+      clarify++;
+      if (!openKeys[u.machineNo]) {
+        await put("biometric_pending", {
+          id: "train_" + Date.now().toString(36) + "_" + i,
+          kind: "train",
+          machineNo: u.machineNo,
+          machineName: u.machineName,
+          deviceLabel: hostelGuess || devicePref || "Gate train",
+          status: "clarify",
+          suggestions: ranked.slice(0, 5).map(function(r) {
+            return { studentId: r.studentId, name: r.name, regNo: r.regNo, score: Math.round(r.score * 1000) / 10, serial: r.serial };
+          }),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+        openKeys[u.machineNo] = true;
+      }
+    } else {
+      unlinked++;
+      if (!openKeys[u.machineNo]) {
+        await put("biometric_pending", {
+          id: "train_" + Date.now().toString(36) + "_" + i,
+          kind: "train",
+          machineNo: u.machineNo,
+          machineName: u.machineName,
+          deviceLabel: hostelGuess || devicePref || "Gate train",
+          status: "unlinked",
+          suggestions: ranked.slice(0, 3).map(function(r) {
+            return { studentId: r.studentId, name: r.name, regNo: r.regNo, score: Math.round(r.score * 1000) / 10 };
+          }),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+        openKeys[u.machineNo] = true;
+      }
+    }
+  }
+
+  markDirty("hostel train");
+  try { await renderBioQueues(); } catch (_) {}
+  try { if (typeof renderHostelRoster === "function") await renderHostelRoster(); } catch (_) {}
+  try { if (typeof renderStudentsTable === "function") await renderStudentsTable(); } catch (_) {}
+
+  setSt("Train complete · machine users " + list.length +
+    " · already linked " + already +
+    " · auto-linked " + autoLink +
+    " · hostel filled " + hostelSet +
+    " · clarify " + clarify +
+    " · unlinked pool " + unlinked +
+    (conflicts ? (" · conflicts " + conflicts) : "") +
+    ". Publish when ready. Use Batch review for remaining names.");
+
+  if (sumEl) {
+    sumEl.hidden = false;
+    sumEl.innerHTML =
+      '<div class="bio-kpi"><div class="lab">Machine users</div><div class="val">' + list.length + '</div></div>' +
+      '<div class="bio-kpi"><div class="lab">Auto-linked</div><div class="val">' + autoLink + '</div></div>' +
+      '<div class="bio-kpi"><div class="lab">Hostel filled</div><div class="val">' + hostelSet + '</div></div>' +
+      '<div class="bio-kpi"><div class="lab">Clarify</div><div class="val">' + clarify + '</div></div>' +
+      '<div class="bio-kpi"><div class="lab">Unlinked</div><div class="val">' + unlinked + '</div></div>' +
+      '<div class="bio-kpi"><div class="lab">Already OK</div><div class="val">' + already + '</div></div>';
+  }
+}
+
+function initHostelTrainUI() {
+  document.getElementById("btnHostelTrain")?.addEventListener("click", async function() {
+    var inp = document.getElementById("hostelTrainFile");
+    var file = inp && inp.files && inp.files[0];
+    try {
+      await trainHostelFromExport(file, {
+        deviceLabel: (document.getElementById("hostelTrainDevice") && document.getElementById("hostelTrainDevice").value) || ""
+      });
+    } catch (e) {
+      console.error(e);
+      var st = document.getElementById("hostelTrainStatus");
+      if (st) st.textContent = "Train failed: " + (e.message || e);
+    }
+  });
+  document.getElementById("btnHostelTrainBatch")?.addEventListener("click", function() {
+    if (typeof startMatchQueueBatch === "function") startMatchQueueBatch("clarify");
+    else alert("Batch review not ready — hard-refresh once.");
+  });
 }
 
 function initBiometricMapUI() {
