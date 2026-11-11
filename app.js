@@ -1990,6 +1990,11 @@ async function generateHostelReport() {
   try {
     const result = await computeHostelAttendance(hostelParsedRows, startDate, endDate, hostel1Name, hostel2Name);
     try { await queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name); } catch (e) { console.warn("hostel unmatched queue", e); }
+    if (result.autoHostelAssigned) {
+      try { markDirty("auto hostel assign"); } catch (_) {}
+      try { if (typeof renderHostelRoster === "function") renderHostelRoster(); } catch (_) {}
+      try { if (typeof renderStudentsTable === "function") renderStudentsTable(); } catch (_) {}
+    }
     var excludedN = (result.excludedPending && result.excludedPending.length) || 0;
     if (excludedN && statusEl) {
       /* status finalized later; stash for message */
@@ -10555,6 +10560,21 @@ async function bioLinkStudentSerial(studentId, machineNo, machineName, deviceLab
   var mn = String(machineName || "").trim();
   if (mn && s.bioAliases.indexOf(mn) < 0) s.bioAliases.push(mn);
   if (deviceLabel) s.bioDeviceLabel = deviceLabel;
+  // If site has no hostel yet, use device/hostel tag from the machine link
+  var hostelBlank = function(h) {
+    var t = String(h || "").trim().toLowerCase();
+    return !t || t.indexOf("unassigned") >= 0 || t === "—" || t === "-" || t === "n/a" || t === "none";
+  };
+  var beforeHostel = s.hostel || "";
+  if (hostelBlank(s.hostel) && deviceLabel) {
+    var dl = String(deviceLabel);
+    if (/hostel\s*1/i.test(dl) || dl === "1") s.hostel = "Hostel 1";
+    else if (/hostel\s*2/i.test(dl) || dl === "2") s.hostel = "Hostel 2";
+    else if (/hostel/i.test(dl)) s.hostel = dl.trim();
+    if (!hostelBlank(s.hostel) && s.hostel !== beforeHostel) {
+      s.hostelSource = "machine_link";
+    }
+  }
   await put("students", s);
   try {
     await writeAudit({
