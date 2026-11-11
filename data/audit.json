@@ -33914,5 +33914,215 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1494
+  },
+  {
+    "ref": "REF/EOCNS/QA/1001",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwc9lwhju0byc",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwc9lwhju0byc",
+        "name": "NWOGIDI PRECIOUS CHIAMAKA",
+        "regNo": "EOCNS/24/0022/MID",
+        "programme": "Midwifery",
+        "level": 300,
+        "gender": "Female",
+        "hostel": "Hostel 2",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-11T15:19:37.399Z",
+        "updatedAt": "2026-11-11T15:19:37.399Z"
+      }
+    },
+    "timestamp": "2026-11-11T15:19:37.401Z",
+    "at": "2026-11-11T15:19:37.401Z",
+    "createdAt": "2026-11-11T15:19:37.401Z",
+    "whenLocal": "Wed, 11 Nov 2026, 16:19:37",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1495
+  },
+  {
+    "ref": "REF/EOCNS/QA/1002",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwc9n5vgw9hkw",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwc9n5vgw9hkw",
+        "name": "FATIMA ADAEZE HARUNA",
+        "regNo": "EOCNS/24/0019/MID",
+        "programme": "Midwifery",
+        "level": 300,
+        "gender": "Female",
+        "hostel": "Hostel 1",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-11T15:20:36.220Z",
+        "updatedAt": "2026-11-11T15:20:36.220Z"
+      }
+    },
+    "timestamp": "2026-11-11T15:20:36.225Z",
+    "at": "2026-11-11T15:20:36.225Z",
+    "createdAt": "2026-11-11T15:20:36.225Z",
+    "whenLocal": "Wed, 11 Nov 2026, 16:20:36",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1496
+  },
+  {
+    "ref": "REF/EOCNS/QA/1003",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwc9o4wmyqzpo",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwc9o4wmyqzpo",
+        "name": "ONWE PRECIOUS CHIAMAKA",
+        "regNo": "EOCNS/24/0003/MID",
+        "programme": "Midwifery",
+        "level": 300,
+        "gender": "Female",
+        "hostel": "Hostel 1",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-11T15:21:21.622Z",
+        "updatedAt": "2026-11-11T15:21:21.622Z"
+      }
+    },
+    "timestamp": "2026-11-11T15:21:21.623Z",
+    "at": "2026-11-11T15:21:21.623Z",
+    "createdAt": "2026-11-11T15:21:21.623Z",
+    "whenLocal": "Wed, 11 Nov 2026, 16:21:21",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1497
+  },
+  {
+    "ref": "REF/EOCNS/QA/1004",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwc9qzjaofdj7",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwc9qzjaofdj7",
+        "name": "CHIDIMMA ESTHER OKECHUKWU",
+        "regNo": "EOCNS/24/0014/MID",
+        "programme": "Midwifery",
+        "level": 300,
+        "gender": "Female",
+        "hostel": "Hostel 2",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-11T15:23:34.630Z",
+        "updatedAt": "2026-11-11T15:23:34.630Z"
+      }
+    },
+    "timestamp": "2026-11-11T15:23:34.636Z",
+    "at": "2026-11-11T15:23:34.636Z",
+    "createdAt": "2026-11-11T15:23:34.636Z",
+    "whenLocal": "Wed, 11 Nov 2026, 16:23:34",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1498
+  },
+  {
+    "ref": "REF/EOCNS/QA/1005",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwc9s0c3k45ww",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwc9s0c3k45ww",
+        "name": "JOHN JANET OTAKA",
+        "regNo": "EOCNS/24/0034/MID",
+        "programme": "Midwifery",
+        "level": 300,
+        "gender": "Female",
+        "hostel": "Off-campus",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-11T15:24:22.323Z",
+        "updatedAt": "2026-11-11T15:24:22.323Z"
+      }
+    },
+    "timestamp": "2026-11-11T15:24:22.328Z",
+    "at": "2026-11-11T15:24:22.328Z",
+    "createdAt": "2026-11-11T15:24:22.328Z",
+    "whenLocal": "Wed, 11 Nov 2026, 16:24:22",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1499
+  },
+  {
+    "ref": "REF/EOCNS/QA/1006",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwc9teji1tbll",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwc9teji1tbll",
+        "name": "ALOH NGOZI OTAKA",
+        "regNo": "EOCNS/24/0049/MID",
+        "programme": "Midwifery",
+        "level": 300,
+        "gender": "Female",
+        "hostel": "Off-campus",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-11T15:25:27.390Z",
+        "updatedAt": "2026-11-11T15:25:27.390Z"
+      }
+    },
+    "timestamp": "2026-11-11T15:25:27.391Z",
+    "at": "2026-11-11T15:25:27.391Z",
+    "createdAt": "2026-11-11T15:25:27.391Z",
+    "whenLocal": "Wed, 11 Nov 2026, 16:25:27",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1500
+  },
+  {
+    "ref": "REF/EOCNS/QA/1007",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwc9ui7ill1kl",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwc9ui7ill1kl",
+        "name": "PRECIOUS CHUKWUMA O.",
+        "regNo": "EOCNS/24/0032/MID",
+        "programme": "Midwifery",
+        "level": 300,
+        "gender": "Female",
+        "hostel": "Off-campus",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-11T15:26:18.798Z",
+        "updatedAt": "2026-11-11T15:26:18.798Z"
+      }
+    },
+    "timestamp": "2026-11-11T15:26:18.799Z",
+    "at": "2026-11-11T15:26:18.799Z",
+    "createdAt": "2026-11-11T15:26:18.799Z",
+    "whenLocal": "Wed, 11 Nov 2026, 16:26:18",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1501
   }
 ]
