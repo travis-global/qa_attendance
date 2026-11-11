@@ -33873,5 +33873,24 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1492
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mwapkbkp_84",
+    "reason": "Removed from master list",
+    "details": {
+      "name": "Demo Student 2026",
+      "regNo": "Demo/Reg001"
+    },
+    "timestamp": "2026-11-11T11:05:10.695Z",
+    "at": "2026-11-11T11:05:10.695Z",
+    "createdAt": "2026-11-11T11:05:10.695Z",
+    "whenLocal": "Wed, 11 Nov 2026, 12:05:10",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1493
   }
 ]
