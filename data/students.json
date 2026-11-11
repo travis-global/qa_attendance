@@ -3125,10 +3125,10 @@
     "serial": "EOCNS/24/0082/GNS",
     "name": "Linda Nkechinyere Okonkwo",
     "programme": "General Nursing",
-    "level": 300,
+    "level": 200,
     "code": "GNS",
     "regNo": "EOCNS/24/0082/GNS",
-    "hostel": "",
+    "hostel": "Off-campus",
     "status": "Active",
     "gender": "Female",
     "phone": "",
@@ -3246,6 +3246,20 @@
     "phone": "",
     "email": "",
     "id": "stu_mwaqcltp_111"
+  },
+  {
+    "serial": "",
+    "name": "MBANUZUO CHINWETITO",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/25/0167/GNS",
+    "hostel": "Hostel 1",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mwcbkdepac88x"
   },
   {
     "serial": "EOCNS/25/0155/GNS",
@@ -3974,6 +3988,20 @@
     "phone": "",
     "email": "",
     "id": "stu_mvutfwoi47rfc"
+  },
+  {
+    "serial": "",
+    "name": "OGBONNA UGOCHUKWU",
+    "programme": "General Nursing",
+    "level": 200,
+    "code": "GNS",
+    "regNo": "EOCNS/26/0116/GNS",
+    "hostel": "Hostel 1",
+    "status": "Active",
+    "gender": "Male",
+    "phone": "",
+    "email": "",
+    "id": "stu_mwcbntngm9zg0"
   },
   {
     "serial": "EOCNS/26/0013/GNS",
