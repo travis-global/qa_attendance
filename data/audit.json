@@ -28857,5 +28857,936 @@
     "officer": "Alolote Fortunatus",
     "source": "official-letter",
     "id": 1267
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdac7jzp9s",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Winner Ifeoma Joseph",
+      "regNo": "EOCNS/200/0001/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.933Z",
+    "at": "2026-11-11T09:05:15.933Z",
+    "createdAt": "2026-11-11T09:05:15.933Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1268
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdac82qi9z",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Chisom Favour Udeh",
+      "regNo": "EOCNS/200/0002/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.936Z",
+    "at": "2026-11-11T09:05:15.936Z",
+    "createdAt": "2026-11-11T09:05:15.936Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1269
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdac8leuhu",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Onyinyechi Miracle Nduka",
+      "regNo": "EOCNS/200/0004/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.936Z",
+    "at": "2026-11-11T09:05:15.936Z",
+    "createdAt": "2026-11-11T09:05:15.936Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1270
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdac8q3req",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Chiamaka Precious Onwe",
+      "regNo": "EOCNS/200/0003/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.937Z",
+    "at": "2026-11-11T09:05:15.937Z",
+    "createdAt": "2026-11-11T09:05:15.937Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1271
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdac98xsdi",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Chioma Blessing Chinedu",
+      "regNo": "EOCNS/200/0008/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.938Z",
+    "at": "2026-11-11T09:05:15.938Z",
+    "createdAt": "2026-11-11T09:05:15.938Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1272
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdac9fx74v",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Chinelo Glory Orji",
+      "regNo": "EOCNS/200/0006/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.939Z",
+    "at": "2026-11-11T09:05:15.939Z",
+    "createdAt": "2026-11-11T09:05:15.939Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1273
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdac9k90w1",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Chioma Gladys Okeoma",
+      "regNo": "EOCNS/200/0007/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.939Z",
+    "at": "2026-11-11T09:05:15.939Z",
+    "createdAt": "2026-11-11T09:05:15.939Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1274
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdac9nlhud",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Ozioma Faith Udeh",
+      "regNo": "EOCNS/200/0005/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.941Z",
+    "at": "2026-11-11T09:05:15.941Z",
+    "createdAt": "2026-11-11T09:05:15.941Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1275
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacamifn8",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Ogochukwu Judith Esiaka",
+      "regNo": "EOCNS/200/0009/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.942Z",
+    "at": "2026-11-11T09:05:15.942Z",
+    "createdAt": "2026-11-11T09:05:15.942Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1276
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacanbgyn",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Grace Mmesoma Okafor",
+      "regNo": "EOCNS/200/0010/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.942Z",
+    "at": "2026-11-11T09:05:15.942Z",
+    "createdAt": "2026-11-11T09:05:15.942Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1277
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacb9ybem",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Chidimma Esther Okechukwu",
+      "regNo": "EOCNS/200/0013/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.943Z",
+    "at": "2026-11-11T09:05:15.943Z",
+    "createdAt": "2026-11-11T09:05:15.943Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1278
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacbd3ah0",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Annastecia Promise Otuonye",
+      "regNo": "EOCNS/200/0012/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.944Z",
+    "at": "2026-11-11T09:05:15.944Z",
+    "createdAt": "2026-11-11T09:05:15.944Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1279
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacbg992e",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Sarah Ifunanya Chukwma",
+      "regNo": "EOCNS/200/0014/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.945Z",
+    "at": "2026-11-11T09:05:15.945Z",
+    "createdAt": "2026-11-11T09:05:15.945Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1280
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdaccorrl8",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Stephanie Nneoma Ojimba",
+      "regNo": "EOCNS/200/0016/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.946Z",
+    "at": "2026-11-11T09:05:15.946Z",
+    "createdAt": "2026-11-11T09:05:15.946Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1281
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdaccp539e",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Blessing Ngozi Nwigbo",
+      "regNo": "EOCNS/200/0015/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.947Z",
+    "at": "2026-11-11T09:05:15.947Z",
+    "createdAt": "2026-11-11T09:05:15.947Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1282
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdaccyvwcj",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Blessing Ngozi Ali",
+      "regNo": "EOCNS/200/0017/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.947Z",
+    "at": "2026-11-11T09:05:15.947Z",
+    "createdAt": "2026-11-11T09:05:15.947Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1283
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacdgjitg",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Chinecherem Dominic Usuio",
+      "regNo": "EOCNS/200/0019/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.948Z",
+    "at": "2026-11-11T09:05:15.948Z",
+    "createdAt": "2026-11-11T09:05:15.948Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1284
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacdnw9gh",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Fatima Adaeze Haruna",
+      "regNo": "EOCNS/200/0018/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.949Z",
+    "at": "2026-11-11T09:05:15.949Z",
+    "createdAt": "2026-11-11T09:05:15.949Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1285
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdace5eqsw",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Chinenye Cynthia Omeh",
+      "regNo": "EOCNS/200/0022/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.950Z",
+    "at": "2026-11-11T09:05:15.950Z",
+    "createdAt": "2026-11-11T09:05:15.950Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1286
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdace74bh7",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Precious Chiamaka Nwogidi",
+      "regNo": "EOCNS/200/0021/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.950Z",
+    "at": "2026-11-11T09:05:15.950Z",
+    "createdAt": "2026-11-11T09:05:15.950Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1287
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacehprqe",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Promise Amaka Ikechukwu",
+      "regNo": "EOCNS/200/0023/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.951Z",
+    "at": "2026-11-11T09:05:15.951Z",
+    "createdAt": "2026-11-11T09:05:15.951Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1288
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacfkn0tn",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Blessing Chidere Izukanma",
+      "regNo": "EOCNS/200/0025/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.951Z",
+    "at": "2026-11-11T09:05:15.951Z",
+    "createdAt": "2026-11-11T09:05:15.951Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1289
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacfq5dhv",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Portia Miracle Godson",
+      "regNo": "EOCNS/200/0026/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.952Z",
+    "at": "2026-11-11T09:05:15.952Z",
+    "createdAt": "2026-11-11T09:05:15.952Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1290
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdachdxepl",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Precious Ogochukwu Chukwuma",
+      "regNo": "EOCNS/200/0031/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.953Z",
+    "at": "2026-11-11T09:05:15.953Z",
+    "createdAt": "2026-11-11T09:05:15.953Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1291
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdachqxkye",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "John Janet Otaka",
+      "regNo": "EOCNS/200/0033/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.953Z",
+    "at": "2026-11-11T09:05:15.953Z",
+    "createdAt": "2026-11-11T09:05:15.953Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1292
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdaciga39e",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Emmanuel Chiemeka Obinka",
+      "regNo": "EOCNS/200/0037/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.954Z",
+    "at": "2026-11-11T09:05:15.954Z",
+    "createdAt": "2026-11-11T09:05:15.954Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1293
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacikidli",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Amarachi Precious Obioha",
+      "regNo": "EOCNS/200/0034/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.954Z",
+    "at": "2026-11-11T09:05:15.954Z",
+    "createdAt": "2026-11-11T09:05:15.954Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1294
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacjavm2e",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Precious Chinwendu Uzoma",
+      "regNo": "EOCNS/200/0040/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.955Z",
+    "at": "2026-11-11T09:05:15.955Z",
+    "createdAt": "2026-11-11T09:05:15.955Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1295
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacki4wjo",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Queen Ojonoda Dibiagwu",
+      "regNo": "EOCNS/200/0043/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.956Z",
+    "at": "2026-11-11T09:05:15.956Z",
+    "createdAt": "2026-11-11T09:05:15.956Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1296
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdackzk8m3",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Joy Adaobi Ifeanyi",
+      "regNo": "EOCNS/200/0041/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.956Z",
+    "at": "2026-11-11T09:05:15.956Z",
+    "createdAt": "2026-11-11T09:05:15.956Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1297
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacm0vm38",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Ngozi Virginia Aloh",
+      "regNo": "EOCNS/200/0048/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.958Z",
+    "at": "2026-11-11T09:05:15.958Z",
+    "createdAt": "2026-11-11T09:05:15.958Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1298
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacmwo1ln",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Precious Mmesoma Ezeehukwu",
+      "regNo": "EOCNS/200/0050/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.958Z",
+    "at": "2026-11-11T09:05:15.958Z",
+    "createdAt": "2026-11-11T09:05:15.958Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1299
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacmzduyr",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Esther Chidalu Michael",
+      "regNo": "EOCNS/200/0049/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.959Z",
+    "at": "2026-11-11T09:05:15.959Z",
+    "createdAt": "2026-11-11T09:05:15.959Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1300
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacn2nxla",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Amarachukwu Judith Chijioke",
+      "regNo": "EOCNS/200/0053/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.960Z",
+    "at": "2026-11-11T09:05:15.960Z",
+    "createdAt": "2026-11-11T09:05:15.960Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1301
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacni6oyy",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Favour Chizaram Awuzie",
+      "regNo": "EOCNS/200/0051/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.960Z",
+    "at": "2026-11-11T09:05:15.960Z",
+    "createdAt": "2026-11-11T09:05:15.960Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1302
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacnmw0qu",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Peace Chidera Agu",
+      "regNo": "EOCNS/200/0052/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.961Z",
+    "at": "2026-11-11T09:05:15.961Z",
+    "createdAt": "2026-11-11T09:05:15.961Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1303
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdaco1opwx",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Chiamaka Grace Okoro",
+      "regNo": "EOCNS/200/0055/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.962Z",
+    "at": "2026-11-11T09:05:15.962Z",
+    "createdAt": "2026-11-11T09:05:15.962Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1304
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacohrlsj",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Cynthia Chizaram Eze",
+      "regNo": "EOCNS/200/0054/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.962Z",
+    "at": "2026-11-11T09:05:15.962Z",
+    "createdAt": "2026-11-11T09:05:15.962Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1305
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacoj4i46",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Christabel Ginika Okwor",
+      "regNo": "EOCNS/200/0056/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.963Z",
+    "at": "2026-11-11T09:05:15.963Z",
+    "createdAt": "2026-11-11T09:05:15.963Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1306
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacpn8cj5",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Jennifer Chinecherem Emeka",
+      "regNo": "EOCNS/200/0058/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.964Z",
+    "at": "2026-11-11T09:05:15.964Z",
+    "createdAt": "2026-11-11T09:05:15.964Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1307
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacppx2hn",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Chinaza Misharck Ikenna",
+      "regNo": "EOCNS/200/0059/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.964Z",
+    "at": "2026-11-11T09:05:15.964Z",
+    "createdAt": "2026-11-11T09:05:15.964Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1308
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacqoeexw",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Chinemerem Precious Onyebuchi",
+      "regNo": "EOCNS/200/0063/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.965Z",
+    "at": "2026-11-11T09:05:15.965Z",
+    "createdAt": "2026-11-11T09:05:15.965Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1309
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacr05m2j",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Chisimdi Joy Aruma",
+      "regNo": "EOCNS/200/0065/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.965Z",
+    "at": "2026-11-11T09:05:15.965Z",
+    "createdAt": "2026-11-11T09:05:15.965Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1310
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacrqvw23",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Miracle Chioma Egbe",
+      "regNo": "EOCNS/200/0064/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.966Z",
+    "at": "2026-11-11T09:05:15.966Z",
+    "createdAt": "2026-11-11T09:05:15.966Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1311
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacsfieq1",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Ujunwa Victory Nwanonyelum",
+      "regNo": "EOCNS/200/0068/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.966Z",
+    "at": "2026-11-11T09:05:15.966Z",
+    "createdAt": "2026-11-11T09:05:15.966Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1312
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdact60iwr",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Blessing Nnenna Nwankwo",
+      "regNo": "EOCNS/200/0071/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.967Z",
+    "at": "2026-11-11T09:05:15.967Z",
+    "createdAt": "2026-11-11T09:05:15.967Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1313
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdact8l3nk",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Rita Ebubechi Egbere",
+      "regNo": "EOCNS/200/0070/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.968Z",
+    "at": "2026-11-11T09:05:15.968Z",
+    "createdAt": "2026-11-11T09:05:15.968Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1314
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdactoqmr1",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Chioma Favour Onuoha",
+      "regNo": "EOCNS/200/0069/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.968Z",
+    "at": "2026-11-11T09:05:15.968Z",
+    "createdAt": "2026-11-11T09:05:15.968Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1315
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvrzdacurcvj0",
+    "reason": "Bulk removal from master list (bulk)",
+    "details": {
+      "name": "Ifedirichukwu Christopher Ezeabia",
+      "regNo": "EOCNS/200/0072/MID"
+    },
+    "timestamp": "2026-11-11T09:05:15.970Z",
+    "at": "2026-11-11T09:05:15.970Z",
+    "createdAt": "2026-11-11T09:05:15.970Z",
+    "whenLocal": "Wed, 11 Nov 2026, 10:05:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1316
   }
 ]
