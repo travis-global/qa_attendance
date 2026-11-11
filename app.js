@@ -1592,8 +1592,21 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
       }
     }
   }
-  // Resolve hostel from majority Location ID, then master list
-  Object.keys(students).forEach(function(sid) {
+  function hostelIsBlank(h) {
+    var t = String(h || "").trim().toLowerCase();
+    if (!t) return true;
+    if (t === "—" || t === "-" || t === "n/a" || t === "na") return true;
+    if (t.indexOf("unassigned") >= 0) return true;
+    if (t === "none" || t === "null" || t === "undefined") return true;
+    return false;
+  }
+
+  // Resolve hostel from majority Location ID, then master list.
+  // If matched student has NO hostel on site, auto-write machine location onto master card.
+  var autoHostelAssigned = 0;
+  var sidsResolve = Object.keys(students);
+  for (var ri = 0; ri < sidsResolve.length; ri++) {
+    var sid = sidsResolve[ri];
     var st = students[sid];
     var v = locVotes[sid] || { "1": 0, "2": 0 };
     st.locationVotes = { "1": v["1"], "2": v["2"] };
@@ -1607,18 +1620,50 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     if (fromMachine) {
       st.hostel = fromMachine;
       st.hostelSource = "location_id";
-      if (st.masterHostel && st.masterHostel !== fromMachine &&
-          st.masterHostel.toLowerCase().indexOf("unassigned") < 0) {
+      if (st.masterHostel && !hostelIsBlank(st.masterHostel) && st.masterHostel !== fromMachine) {
         st.hostelConflict = true;
       }
-    } else if (st.masterHostel) {
+      if (st.masterId && hostelIsBlank(st.masterHostel)) {
+        try {
+          var masterRec = null;
+          for (var mi = 0; mi < master.length; mi++) {
+            if (master[mi].id === st.masterId) { masterRec = master[mi]; break; }
+          }
+          if (masterRec && hostelIsBlank(masterRec.hostel)) {
+            var beforeH = masterRec.hostel || "";
+            masterRec.hostel = fromMachine;
+            masterRec.updatedAt = new Date().toISOString();
+            masterRec.hostelSource = "machine_location_id";
+            await put("students", masterRec);
+            st.masterHostel = fromMachine;
+            st.hostelAssignedFromMachine = true;
+            autoHostelAssigned++;
+            try {
+              await writeAudit({
+                action: "update",
+                entity: "students",
+                entityId: masterRec.id,
+                reason: "Auto-assigned hostel from biometric Location ID (was blank on master)",
+                details: {
+                  hostelBefore: beforeH,
+                  hostelAfter: fromMachine,
+                  machineNo: sid,
+                  locationIdMajority: maj,
+                  votes: v
+                }
+              });
+            } catch (_) {}
+          }
+        } catch (e) { console.warn("auto hostel assign", e); }
+      }
+    } else if (st.masterHostel && !hostelIsBlank(st.masterHostel)) {
       st.hostel = st.masterHostel;
       st.hostelSource = "master_list";
     } else {
       st.hostel = "Unassigned (no Location ID majority / master hostel)";
       st.hostelSource = "unassigned";
     }
-  });
+  }
 
 
   // INSTITUTIONAL RULE: only master-linked students appear on the hostel report.
@@ -1667,7 +1712,8 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     dates: dates,
     hostel1Name: h1,
     hostel2Name: h2,
-    excludedPending: excludedPending
+    excludedPending: excludedPending,
+    autoHostelAssigned: autoHostelAssigned || 0
   };
 }
 
@@ -2081,6 +2127,7 @@ async function generateHostelReport() {
       " · master fallback " + mastN + " · unassigned " + unN +
       (confN ? (" · " + confN + " machine≠master conflicts") : "") +
       (exN ? (" · " + exN + " unreviewed machine user(s) held out until linked") : "") +
+      ((result.autoHostelAssigned) ? (" · auto-assigned hostel on " + result.autoHostelAssigned + " student(s) with blank hostel") : "") +
       " · saved to master sheet (Publish to keep on all devices).",
       "ok"
     );
