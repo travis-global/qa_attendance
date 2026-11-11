@@ -6835,8 +6835,78 @@ async function safePublishJson(path, localRows, label) {
     attendance: 1, hostel_runs: 1, biometric_pending: 1, remedial: 1,
     remedial_enrolment: 1, remedial_assignments: 1, remedial_logs: 1
   };
+  // Master catalogues (courses/programmes/levels): never replace with a thinner list
+  // without an explicit typed approval. Merge by code/id so nothing is dropped silently.
+  var CATALOGUE = { courses: 1, programmes: 1, levels: 1 };
+  var ROSTER = { students: 1, lecturers: 1, sessions: 1 };
+
   var merged = local;
-  if (MERGE[label] && remoteLen) merged = mergeRecordsById(local, remote);
+  if (ROSTER[label] && local.length > 0) {
+    merged = local; // officer roster on this device is intentional source after edits
+  } else if (MERGE[label] && remoteLen) {
+    merged = mergeRecordsById(local, remote);
+  }
+
+  // HARD GUARDS — bulk erase protection
+  if (merged.length === 0 && remoteLen > 0) {
+    console.warn("publish guard: refused empty publish for", label, "remote has", remoteLen);
+    return {
+      skipped: true,
+      unchanged: true,
+      reason: "refused empty publish over " + remoteLen + " remote " + label,
+      remoteLen: remoteLen,
+      merged: remote,
+      body: null
+    };
+  }
+  // Catalogue shrink (courses etc.): keep remote if local/merge is drastically smaller
+  if (CATALOGUE[label] && remoteLen > 0 && merged.length < remoteLen) {
+    // Prefer union (already merged) — if still smaller, something wrong; refuse shrink
+    if (merged.length < Math.max(1, Math.floor(remoteLen * 0.85))) {
+      var ok = false;
+      try {
+        ok = window.confirm(
+          "BULK ERASE WARNING\n\n" +
+          label + ": local/merged has " + merged.length + " rows but repository has " + remoteLen + ".\n\n" +
+          "Publishing would REMOVE data.\n\n" +
+          "OK = still publish this smaller list (type approval).\nCancel = keep repository data (recommended)."
+        );
+      } catch (_) { ok = false; }
+      if (!ok) {
+        return {
+          skipped: true,
+          unchanged: true,
+          reason: "refused bulk shrink of " + label + " (" + merged.length + " < " + remoteLen + ")",
+          remoteLen: remoteLen,
+          publishedLen: remoteLen,
+          merged: remote,
+          body: null
+        };
+      }
+    }
+  }
+  // Any store: refuse wiping more than half without confirm
+  if (remoteLen >= 5 && merged.length * 2 < remoteLen) {
+    var ok2 = false;
+    try {
+      ok2 = window.confirm(
+        "BULK ERASE WARNING\n\n" +
+        label + " would drop from " + remoteLen + " to " + merged.length + " records.\n\n" +
+        "OK = approve this bulk removal.\nCancel = skip this file and keep repository data."
+      );
+    } catch (_) { ok2 = false; }
+    if (!ok2) {
+      return {
+        skipped: true,
+        unchanged: true,
+        reason: "refused bulk erase of " + label,
+        remoteLen: remoteLen,
+        merged: remote,
+        body: null
+      };
+    }
+  }
+
   var body = JSON.stringify(merged, null, 2);
   var fp = textFingerprint(body);
   var remoteFp = remoteText != null ? textFingerprint(remoteText) : null;

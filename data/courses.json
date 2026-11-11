@@ -1,1 +1,524 @@
-[]
+[
+  {
+    "code": "ANP 201",
+    "name": "Anatomy and Physiology",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "ANP 201"
+  },
+  {
+    "code": "BIO 101",
+    "name": "Biology",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "BIO 101"
+  },
+  {
+    "code": "CH 201",
+    "name": "Community Health I",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "CH 201"
+  },
+  {
+    "code": "CM 201",
+    "name": "Community Midwifery",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "CM 201"
+  },
+  {
+    "code": "CMWP 201",
+    "name": "Complicated Midwifery",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "CMWP 201"
+  },
+  {
+    "code": "EED 126",
+    "name": "Intro. to Entrepreneurship",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "EED 126"
+  },
+  {
+    "code": "FNS 201",
+    "name": "Fundamentals of Nursing IV",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "FNS 201"
+  },
+  {
+    "code": "GNS 102",
+    "name": "Communication in English I",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "GNS 102"
+  },
+  {
+    "code": "GNS 111",
+    "name": "Citizenship Education",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "GNS 111"
+  },
+  {
+    "code": "GNS 211",
+    "name": "Communication in English II",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "GNS 211"
+  },
+  {
+    "code": "GNS 311",
+    "name": "Medical-Surgical Nursing IV",
+    "classKeys": [
+      "300_nursing"
+    ],
+    "id": "GNS 311"
+  },
+  {
+    "code": "GNS 312",
+    "name": "Reproductive Health III",
+    "classKeys": [
+      "300_nursing"
+    ],
+    "id": "GNS 312"
+  },
+  {
+    "code": "GNS 313",
+    "name": "Community Health Nursing II",
+    "classKeys": [
+      "300_nursing"
+    ],
+    "id": "GNS 313"
+  },
+  {
+    "code": "GNS 314",
+    "name": "Mental Health - Psychiatric Nursing",
+    "classKeys": [
+      "300_nursing"
+    ],
+    "id": "GNS 314"
+  },
+  {
+    "code": "GNS 315",
+    "name": "Emergency & Disaster Nursing",
+    "classKeys": [
+      "300_nursing"
+    ],
+    "id": "GNS 315"
+  },
+  {
+    "code": "GNS 316",
+    "name": "Quality Improvement in Health Care and Patient Safety",
+    "classKeys": [
+      "300_nursing"
+    ],
+    "id": "GNS 316"
+  },
+  {
+    "code": "INF 201",
+    "name": "Infant I",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "INF 201"
+  },
+  {
+    "code": "MID 221",
+    "name": "Fundamentals of Midwifery",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "MID 221"
+  },
+  {
+    "code": "MID 311",
+    "name": "Reproductive Health I",
+    "classKeys": [
+      "300_midwifery"
+    ],
+    "id": "MID 311"
+  },
+  {
+    "code": "MID 312",
+    "name": "Infant II",
+    "classKeys": [
+      "300_midwifery"
+    ],
+    "id": "MID 312"
+  },
+  {
+    "code": "MID 313",
+    "name": "Family Planning",
+    "classKeys": [
+      "300_midwifery"
+    ],
+    "id": "MID 313"
+  },
+  {
+    "code": "MID 314",
+    "name": "Complicated Midwifery II",
+    "classKeys": [
+      "300_midwifery"
+    ],
+    "id": "MID 314"
+  },
+  {
+    "code": "MID 315",
+    "name": "Research & Statistics",
+    "classKeys": [
+      "300_midwifery"
+    ],
+    "id": "MID 315"
+  },
+  {
+    "code": "MID 316",
+    "name": "Seminar in Midwifery",
+    "classKeys": [
+      "300_nursing"
+    ],
+    "id": "MID 316"
+  },
+  {
+    "code": "MID 317",
+    "name": "Practicum",
+    "classKeys": [
+      "300_midwifery"
+    ],
+    "id": "MID 317"
+  },
+  {
+    "code": "MSN 201",
+    "name": "Medical Surgical Nursing III",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "MSN 201"
+  },
+  {
+    "code": "NMW 201",
+    "name": "Normal Midwifery",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "NMW 201"
+  },
+  {
+    "code": "NUR 111",
+    "name": "Foundations of Nursing/Emergency Care",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUR 111"
+  },
+  {
+    "code": "NUR 121",
+    "name": "Foundations of Nursing II",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUR 121"
+  },
+  {
+    "code": "NUR 122",
+    "name": "Primary Health Care I",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUR 122"
+  },
+  {
+    "code": "NUR 125",
+    "name": "Pharmacology I",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUR 125"
+  },
+  {
+    "code": "NUR 211",
+    "name": "Foundations of Nursing III",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "NUR 211"
+  },
+  {
+    "code": "NUR 212",
+    "name": "Primary Health Care II",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "NUR 212"
+  },
+  {
+    "code": "NUR 213",
+    "name": "Medical-Surgical Nursing",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "NUR 213"
+  },
+  {
+    "code": "NUR 214",
+    "name": "Research Methodology I",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "NUR 214"
+  },
+  {
+    "code": "NUS 111",
+    "name": "Applied Chemistry",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUS 111"
+  },
+  {
+    "code": "NUS 112",
+    "name": "Applied Physics",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUS 112"
+  },
+  {
+    "code": "NUS 113",
+    "name": "Human Anatomy",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUS 113"
+  },
+  {
+    "code": "NUS 114",
+    "name": "Human Physiology I",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUS 114"
+  },
+  {
+    "code": "NUS 115",
+    "name": "Introduction to Sociology",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUS 115"
+  },
+  {
+    "code": "NUS 116",
+    "name": "Use of Computer",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUS 116"
+  },
+  {
+    "code": "NUS 117",
+    "name": "Medical Microbiology",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUS 117"
+  },
+  {
+    "code": "NUS 121",
+    "name": "Human Anatomy II",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUS 121"
+  },
+  {
+    "code": "NUS 122",
+    "name": "Human Physiology II",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUS 122"
+  },
+  {
+    "code": "NUS 124",
+    "name": "Human Nutrition",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "NUS 124"
+  },
+  {
+    "code": "NUS 211",
+    "name": "Human Anatomy III",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "NUS 211"
+  },
+  {
+    "code": "NUS 212",
+    "name": "Human Physiology III",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "NUS 212"
+  },
+  {
+    "code": "NUS 213",
+    "name": "Pharmacology II",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "NUS 213"
+  },
+  {
+    "code": "NUS 214",
+    "name": "Dietetics",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "NUS 214"
+  },
+  {
+    "code": "NUS 215",
+    "name": "Biostatistics",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "NUS 215"
+  },
+  {
+    "code": "NUT 201",
+    "name": "Nutrition",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "NUT 201"
+  },
+  {
+    "code": "PHARM 201",
+    "name": "Pharmacology III",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "PHARM 201"
+  },
+  {
+    "code": "PHARM 202",
+    "name": "Pharmacology II",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "PHARM 202"
+  },
+  {
+    "code": "POL 201",
+    "name": "Politics and Government",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "POL 201"
+  },
+  {
+    "code": "PRAC",
+    "name": "Practicum",
+    "classKeys": [
+      "100_nursing",
+      "200_nursing",
+      "200_midwifery"
+    ],
+    "id": "PRAC"
+  },
+  {
+    "code": "PRAC 101",
+    "name": "Practicum/Study Skills",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "PRAC 101"
+  },
+  {
+    "code": "PRAC 201",
+    "name": "Practicum",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "PRAC 201"
+  },
+  {
+    "code": "PRAC 301",
+    "name": "Practicum",
+    "classKeys": [
+      "300_nursing"
+    ],
+    "id": "PRAC 301"
+  },
+  {
+    "code": "PSY",
+    "name": "Psychology",
+    "classKeys": [
+      "100_nursing"
+    ],
+    "id": "PSY"
+  },
+  {
+    "code": "PWS 201",
+    "name": "Professional Writing & Seminar",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "PWS 201"
+  },
+  {
+    "code": "RAD 342",
+    "name": "Radiography",
+    "classKeys": [],
+    "id": "RAD 342"
+  },
+  {
+    "code": "RES 201",
+    "name": "Research and Statistics",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "RES 201"
+  },
+  {
+    "code": "RH 201",
+    "name": "Reproductive Health II",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "RH 201"
+  },
+  {
+    "code": "STAT 201",
+    "name": "Statistics I and II",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "STAT 201"
+  },
+  {
+    "code": "TUT",
+    "name": "Tutorial",
+    "classKeys": [
+      "100_nursing",
+      "200_nursing",
+      "200_midwifery"
+    ],
+    "id": "TUT"
+  }
+]
