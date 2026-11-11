@@ -448,5 +448,335 @@
     ],
     "createdAt": "2026-11-11T10:44:37.939Z",
     "updatedAt": "2026-11-11T10:44:37.939Z"
+  },
+  {
+    "id": "train_mwc0b6sp_10",
+    "kind": "train",
+    "machineNo": "328",
+    "machineName": "Daberechi  Okoroafor",
+    "deviceLabel": "Hostel 2",
+    "status": "unlinked",
+    "suggestions": [
+      {
+        "studentId": "stu_mwaqcmiz_167",
+        "name": "DABERECHI REBECCA",
+        "regNo": "EOCNS/24/0030/GNS",
+        "score": 50
+      },
+      {
+        "studentId": "stu_mw679ph9b040e",
+        "name": "OKORO GIFT",
+        "regNo": "TMP-EOCNS/26/0009/GNS",
+        "score": 40
+      },
+      {
+        "studentId": "stu_mwaq08jb_106",
+        "name": "Okoro Mmesoma",
+        "regNo": "EOCNS/25/0029/GNS",
+        "score": 40
+      }
+    ],
+    "createdAt": "2026-11-11T10:59:21.001Z",
+    "updatedAt": "2026-11-11T10:59:21.001Z"
+  },
+  {
+    "id": "train_mwc0b6t1_16",
+    "kind": "train",
+    "machineNo": "339",
+    "machineName": "Onyinyechi Igwilo",
+    "deviceLabel": "Hostel 2",
+    "status": "unlinked",
+    "suggestions": [
+      {
+        "studentId": "stu_mwaq08t9_134",
+        "name": "Onyinyechi Benjamin",
+        "regNo": "EOCNS/25/0130/GNS",
+        "score": 50
+      },
+      {
+        "studentId": "stu_mwaqcl26_49",
+        "name": "Onyinyechukwu Igwilo",
+        "regNo": "EOCNS/24/0114/GNS",
+        "score": 50
+      },
+      {
+        "studentId": "stu_mwaqclzn_125",
+        "name": "Paschaline Onyinyechi",
+        "regNo": "EOCNS/24/0064/GNS",
+        "score": 50
+      }
+    ],
+    "createdAt": "2026-11-11T10:59:21.013Z",
+    "updatedAt": "2026-11-11T10:59:21.013Z"
+  },
+  {
+    "id": "train_mwc0b6tl_29",
+    "kind": "train",
+    "machineNo": "371",
+    "machineName": "Marvellous Ikpor",
+    "deviceLabel": "Hostel 2",
+    "status": "unlinked",
+    "suggestions": [
+      {
+        "studentId": "stu_mwaqclmr_96",
+        "name": "Ikpor Marvelous Chimdumeje",
+        "regNo": "EOCNS/24/0087/GNS",
+        "score": 29.3
+      },
+      {
+        "studentId": "stu_mvs9sf0ar5n1h",
+        "name": "AGASHI PRECIOUS I.",
+        "regNo": "EOCNS/26/0021/GNS",
+        "score": 20
+      },
+      {
+        "studentId": "stu_mw678r1u6tqw3",
+        "name": "NWONUMARA NNEKA I.",
+        "regNo": "TMP-EOCNS/26/0008/GNS",
+        "score": 20
+      }
+    ],
+    "createdAt": "2026-11-11T10:59:21.033Z",
+    "updatedAt": "2026-11-11T10:59:21.033Z"
+  },
+  {
+    "id": "train_mwc0b6ty_37",
+    "kind": "train",
+    "machineNo": "403",
+    "machineName": "Chiamaka Precious Onwe",
+    "deviceLabel": "Hostel 2",
+    "status": "unlinked",
+    "suggestions": [
+      {
+        "studentId": "stu_mvs9sf0ar5n1h",
+        "name": "AGASHI PRECIOUS I.",
+        "regNo": "EOCNS/26/0021/GNS",
+        "score": 33.3
+      },
+      {
+        "studentId": "stu_mvsa3h5h69t45",
+        "name": "PRECIOUS AMARACHI LUCKY",
+        "regNo": "EOCNS/26/0036/GNS",
+        "score": 33.3
+      },
+      {
+        "studentId": "stu_mvusn8llu2sh6",
+        "name": "CHRISTOPHER NMESOMA PRECIOUS",
+        "regNo": "EOCNS/26/0069/GNS",
+        "score": 33.3
+      }
+    ],
+    "createdAt": "2026-11-11T10:59:21.046Z",
+    "updatedAt": "2026-11-11T10:59:21.046Z"
+  },
+  {
+    "id": "train_mwc0b6u3_40",
+    "kind": "train",
+    "machineNo": "413",
+    "machineName": "Chidimma Esther Okechukw",
+    "deviceLabel": "Hostel 2",
+    "status": "unlinked",
+    "suggestions": [
+      {
+        "studentId": "stu_mvs9zw3zonn45",
+        "name": "ARUA ESTHER KALU",
+        "regNo": "EOCNS/26/0001/GNS",
+        "score": 33.3
+      },
+      {
+        "studentId": "stu_mvsa1ixajo7p5",
+        "name": "AKABUOBI ESTHER ROTANA",
+        "regNo": "EOCNS/26/0030/GNS",
+        "score": 33.3
+      },
+      {
+        "studentId": "stu_mwaq07ne_12",
+        "name": "Ejimbe Gloria chidimma",
+        "regNo": "EOCNS/25/0139/GNS",
+        "score": 33.3
+      }
+    ],
+    "createdAt": "2026-11-11T10:59:21.051Z",
+    "updatedAt": "2026-11-11T10:59:21.051Z"
+  },
+  {
+    "id": "train_mwc0b6u7_43",
+    "kind": "train",
+    "machineNo": "418",
+    "machineName": "Fatima Adaeze Haruna",
+    "deviceLabel": "Hostel 2",
+    "status": "unlinked",
+    "suggestions": [
+      {
+        "studentId": "stu_mwaq08jn_107",
+        "name": "Benjamin Adaeze Esther",
+        "regNo": "EOCNS/25/0043/GNS",
+        "score": 33.3
+      },
+      {
+        "studentId": "stu_mvuqnhqvy2qjq",
+        "name": "NWUZOR ONYINYECHI A.",
+        "regNo": "TMP-EOCNS/26/0002/GNS",
+        "score": 24
+      },
+      {
+        "studentId": "stu_mvut1kwa5st7x",
+        "name": "NNAJI ONYINYECHI A.",
+        "regNo": "EOCNS/26/0015/GNS",
+        "score": 24
+      }
+    ],
+    "createdAt": "2026-11-11T10:59:21.055Z",
+    "updatedAt": "2026-11-11T10:59:21.055Z"
+  },
+  {
+    "id": "train_mwc0b6uc_46",
+    "kind": "train",
+    "machineNo": "423",
+    "machineName": "Promise Amaka Ikechukwu",
+    "deviceLabel": "Hostel 2",
+    "status": "unlinked",
+    "suggestions": [
+      {
+        "studentId": "stu_mvrzdacg08aia",
+        "name": "Promise Chinasa Aneh",
+        "regNo": "EOCNS/24/0028/MID",
+        "score": 33.3
+      },
+      {
+        "studentId": "stu_mvuqo9eva0kwf",
+        "name": "OKONYE PROMISE CHINELO",
+        "regNo": "TMP-EOCNS/26/0003/GNS",
+        "score": 33.3
+      },
+      {
+        "studentId": "stu_mvus5mbd6apei",
+        "name": "CHUKWUEMEKA DAVID IKECHUKWU",
+        "regNo": "EOCNS/26/0039/GNS",
+        "score": 33.3
+      }
+    ],
+    "createdAt": "2026-11-11T10:59:21.060Z",
+    "updatedAt": "2026-11-11T10:59:21.060Z"
+  },
+  {
+    "id": "train_mwc0b6un_53",
+    "kind": "train",
+    "machineNo": "449",
+    "machineName": "Esther Chidalu Michael",
+    "deviceLabel": "Hostel 2",
+    "status": "unlinked",
+    "suggestions": [
+      {
+        "studentId": "stu_mvs9zw3zonn45",
+        "name": "ARUA ESTHER KALU",
+        "regNo": "EOCNS/26/0001/GNS",
+        "score": 33.3
+      },
+      {
+        "studentId": "stu_mvsa1ixajo7p5",
+        "name": "AKABUOBI ESTHER ROTANA",
+        "regNo": "EOCNS/26/0030/GNS",
+        "score": 33.3
+      },
+      {
+        "studentId": "stu_mwaq08jn_107",
+        "name": "Benjamin Adaeze Esther",
+        "regNo": "EOCNS/25/0043/GNS",
+        "score": 33.3
+      }
+    ],
+    "createdAt": "2026-11-11T10:59:21.071Z",
+    "updatedAt": "2026-11-11T10:59:21.071Z"
+  },
+  {
+    "id": "train_mwc0b6uu_57",
+    "kind": "train",
+    "machineNo": "459",
+    "machineName": "Christabel Ginika Okwor",
+    "deviceLabel": "Hostel 2",
+    "status": "unlinked",
+    "suggestions": [
+      {
+        "studentId": "stu_mwaq08ha_100",
+        "name": "Ebube Nice Okwor",
+        "regNo": "EOCNS/25/0028/GNS",
+        "score": 33.3
+      },
+      {
+        "studentId": "stu_mwaq0838_58",
+        "name": "Christabel Louis",
+        "regNo": "EOCNS/25/0071/GNS",
+        "score": 29.3
+      },
+      {
+        "studentId": "stu_mwaq07qd_17",
+        "name": "HARMONY GINIKANWA NWANERI",
+        "regNo": "EOCNS/25/0156/GNS",
+        "score": 26.7
+      }
+    ],
+    "createdAt": "2026-11-11T10:59:21.078Z",
+    "updatedAt": "2026-11-11T10:59:21.078Z"
+  },
+  {
+    "id": "train_mwc0b6v0_61",
+    "kind": "train",
+    "machineNo": "473",
+    "machineName": "Rita Ebubechi Egbere",
+    "deviceLabel": "Hostel 2",
+    "status": "unlinked",
+    "suggestions": [
+      {
+        "studentId": "stu_mwaq07mk_10",
+        "name": "Sunday Emmanuella Ebubechi",
+        "regNo": "EOCNS/25/0153/GNS",
+        "score": 33.3
+      },
+      {
+        "studentId": "stu_mwaqcmjr_169",
+        "name": "RITA OGBUATU",
+        "regNo": "EOCNS/24/0052/GNS",
+        "score": 29.3
+      },
+      {
+        "studentId": "stu_mwaq08ha_100",
+        "name": "Ebube Nice Okwor",
+        "regNo": "EOCNS/25/0028/GNS",
+        "score": 26.7
+      }
+    ],
+    "createdAt": "2026-11-11T10:59:21.084Z",
+    "updatedAt": "2026-11-11T10:59:21.084Z"
+  },
+  {
+    "id": "train_mwc0b6v6_65",
+    "kind": "train",
+    "machineNo": "481",
+    "machineName": "Rachael C. Chidiogo",
+    "deviceLabel": "Hostel 2",
+    "status": "unlinked",
+    "suggestions": [
+      {
+        "studentId": "stu_mw9mcwpoc5abz",
+        "name": "CHIDINMA IBE R.",
+        "regNo": "EOCNS/26/0046/GNS",
+        "score": 48
+      },
+      {
+        "studentId": "stu_mvusi1cjdbl4v",
+        "name": "CHRISTIANA C. NJOKU",
+        "regNo": "EOCNS/26/0033/GNS",
+        "score": 33.3
+      },
+      {
+        "studentId": "stu_mvutehxvqvlxr",
+        "name": "UCHECHUKWU BETHEL C.",
+        "regNo": "EOCNS/26/0057/GNS",
+        "score": 33.3
+      }
+    ],
+    "createdAt": "2026-11-11T10:59:21.090Z",
+    "updatedAt": "2026-11-11T10:59:21.090Z"
   }
 ]
