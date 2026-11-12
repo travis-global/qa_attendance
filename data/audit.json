@@ -34655,5 +34655,82 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1522
+  },
+  {
+    "ref": "REF/EOCNS/QA/1008",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwdpzmvp4wy2",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-11",
+      "course": "NUS 113 — Human Anatomy",
+      "status": "Held",
+      "classKey": "100_nursing",
+      "amended": false
+    },
+    "timestamp": "2026-11-12T15:45:58.175Z",
+    "at": "2026-11-12T15:45:58.175Z",
+    "createdAt": "2026-11-12T15:45:58.175Z",
+    "whenLocal": "Thu, 12 Nov 2026, 16:45:58",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1523
+  },
+  {
+    "ref": "REF/EOCNS/QA/1009",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mwdq3p2q1w40",
+    "reason": "Lecturer created",
+    "details": {
+      "name": "Aderintoye Esther",
+      "contractHoursPerSemester": 30,
+      "courses": [
+        "NUR 111"
+      ],
+      "assignments": [
+        {
+          "code": "NUR 111",
+          "programme": "Nursing",
+          "level": "100",
+          "hours": 30
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-12T15:49:07.636Z",
+    "at": "2026-11-12T15:49:07.636Z",
+    "createdAt": "2026-11-12T15:49:07.636Z",
+    "whenLocal": "Thu, 12 Nov 2026, 16:49:07",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1524
+  },
+  {
+    "ref": "REF/EOCNS/QA/1010",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwdq8gnn8pfx",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-11",
+      "course": "NUR 111 — Foundation of Nursing/Emergency Care",
+      "status": "Held",
+      "classKey": "100_nursing",
+      "amended": false
+    },
+    "timestamp": "2026-11-12T15:52:50.015Z",
+    "at": "2026-11-12T15:52:50.015Z",
+    "createdAt": "2026-11-12T15:52:50.015Z",
+    "whenLocal": "Thu, 12 Nov 2026, 16:52:50",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1525
   }
 ]
