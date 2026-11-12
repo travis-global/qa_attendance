@@ -645,5 +645,29 @@
     "status": "Active",
     "updatedAt": "2026-11-04T15:31:37.682Z",
     "createdAt": "2026-11-04T15:31:37.682Z"
+  },
+  {
+    "id": "lec_mwdq3p2q1w40",
+    "name": "Aderintoye Esther",
+    "staffId": "EOCNS/STF/2026/0023",
+    "phone": "",
+    "courses": [
+      "NUR 111"
+    ],
+    "assignments": [
+      {
+        "code": "NUR 111",
+        "programme": "Nursing",
+        "level": "100",
+        "hours": 30
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 30,
+    "status": "Active",
+    "updatedAt": "2026-11-12T15:49:07.633Z",
+    "createdAt": "2026-11-12T15:49:07.633Z"
   }
 ]
