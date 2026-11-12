@@ -532,13 +532,13 @@
     "id": "stu_mvusbc9awsly1"
   },
   {
-    "serial": "EOCNS/25/0091/GNS",
+    "serial": "111",
     "name": "AUGUSATINA ILOCHI",
     "programme": "General Nursing",
     "level": 200,
     "code": "GNS",
     "regNo": "EOCNS/25/0091/GNS",
-    "hostel": "",
+    "hostel": "Hostel 1",
     "status": "Active",
     "gender": "Female",
     "phone": "",
@@ -1064,13 +1064,13 @@
     "id": "stu_mwaqcm1v_130"
   },
   {
-    "serial": "EOCNS/25/0084/GNS",
+    "serial": "104",
     "name": "Chima Nnedimma",
     "programme": "General Nursing",
     "level": 200,
     "code": "GNS",
     "regNo": "EOCNS/25/0084/GNS",
-    "hostel": "",
+    "hostel": "Hostel 1",
     "status": "Active",
     "gender": "Female",
     "phone": "",
@@ -1540,13 +1540,13 @@
     "id": "stu_mvus5mbd6apei"
   },
   {
-    "serial": "EOCNS/25/0154/GNS",
+    "serial": "160",
     "name": "Chukwuma Aghaegbuna",
     "programme": "General Nursing",
     "level": 200,
     "code": "GNS",
     "regNo": "EOCNS/25/0154/GNS",
-    "hostel": "",
+    "hostel": "Hostel 1",
     "status": "Active",
     "gender": "Male",
     "phone": "",
@@ -1652,13 +1652,13 @@
     "id": "stu_mwaq08zl_151"
   },
   {
-    "serial": "EOCNS/24/0030/GNS",
+    "serial": "328",
     "name": "DABERECHI REBECCA",
     "programme": "General Nursing",
     "level": 300,
     "code": "GNS",
     "regNo": "EOCNS/24/0030/GNS",
-    "hostel": "",
+    "hostel": "Hostel 2",
     "status": "Active",
     "gender": "Female",
     "phone": "",
@@ -3038,13 +3038,13 @@
     "id": "stu_mwaq08i7_103"
   },
   {
-    "serial": "EOCNS/25/0129/GNS",
+    "serial": "177",
     "name": "Kasarachi Vincent",
     "programme": "General Nursing",
     "level": 200,
     "code": "GNS",
     "regNo": "EOCNS/25/0129/GNS",
-    "hostel": "",
+    "hostel": "Hostel 1",
     "status": "Active",
     "gender": "Female",
     "phone": "",
@@ -5138,7 +5138,7 @@
     "id": "stu_mwaq082z_57"
   },
   {
-    "serial": "24",
+    "serial": "481",
     "name": "Rechael Chidiogo Chibuzor",
     "programme": "Midwifery",
     "level": 200,
@@ -5754,13 +5754,13 @@
     "id": "stu_mwaqcl7b_60"
   },
   {
-    "serial": "EOCNS/24/0068/GNS",
+    "serial": "355",
     "name": "Umenwaka Marycynthia",
     "programme": "General Nursing",
     "level": 300,
     "code": "GNS",
     "regNo": "EOCNS/24/0068/GNS",
-    "hostel": "",
+    "hostel": "Hostel 1",
     "status": "Active",
     "gender": "Female",
     "phone": "",
