@@ -1,6 +1,19 @@
-/* EOCNS build v87 — outer bare report refs removed */
+/* EOCNS build v91 — outer bare report refs removed */
 (() => {
 "use strict";
+// Safe stubs so early event wiring never throws ReferenceError (real impls overwrite later)
+if (typeof window.closeStudentFullRecord !== "function") {
+  window.closeStudentFullRecord = function() {
+    var m = document.getElementById("studentFullRecordModal");
+    if (!m) return;
+    m.hidden = true; m.setAttribute("hidden", ""); m.style.display = "none";
+  };
+}
+if (typeof window.openStudentFullRecord !== "function") {
+  window.openStudentFullRecord = function(id) {
+    console.warn("openStudentFullRecord not ready yet", id);
+  };
+}
 const THEME_KEY = "eocns-theme";
 function getPreferredTheme() {
   const stored = localStorage.getItem(THEME_KEY);
@@ -2241,12 +2254,20 @@ openDB().then(async () => {
     e.target.value = "";
   });
   document.getElementById("btnProfileFullRecord") && document.getElementById("btnProfileFullRecord").addEventListener("click", function() {
-    openStudentFullRecord(window.__profileStudentId);
+    var fn = window.openStudentFullRecord || (typeof openStudentFullRecord === "function" ? openStudentFullRecord : null);
+    if (fn) fn(window.__profileStudentId);
   });
-  document.getElementById("btnCloseFullRecord") && document.getElementById("btnCloseFullRecord").addEventListener("click", closeStudentFullRecord);
-  document.getElementById("btnCloseFullRecord2") && document.getElementById("btnCloseFullRecord2").addEventListener("click", closeStudentFullRecord);
-  document.getElementById("studentFullRecordBackdrop") && document.getElementById("studentFullRecordBackdrop").addEventListener("click", closeStudentFullRecord);
-  document.getElementById("btnPrintStudentSummary") && document.getElementById("btnPrintStudentSummary").addEventListener("click", printStudentSummary);
+  function _bindCloseFullRecord() {
+    if (typeof window.closeStudentFullRecord === "function") window.closeStudentFullRecord();
+    else if (typeof closeStudentFullRecord === "function") closeStudentFullRecord();
+  }
+  document.getElementById("btnCloseFullRecord") && document.getElementById("btnCloseFullRecord").addEventListener("click", _bindCloseFullRecord);
+  document.getElementById("btnCloseFullRecord2") && document.getElementById("btnCloseFullRecord2").addEventListener("click", _bindCloseFullRecord);
+  document.getElementById("studentFullRecordBackdrop") && document.getElementById("studentFullRecordBackdrop").addEventListener("click", _bindCloseFullRecord);
+  document.getElementById("btnPrintStudentSummary") && document.getElementById("btnPrintStudentSummary").addEventListener("click", function() {
+    if (typeof window.printStudentSummary === "function") window.printStudentSummary();
+    else if (typeof printStudentSummary === "function") printStudentSummary();
+  });
 
   document.getElementById("btnPrintStudentDiscipline") && document.getElementById("btnPrintStudentDiscipline").addEventListener("click", function() {
     printStudentSectionReport(window.__fullRecordStudentId, "discipline");
@@ -4796,6 +4817,10 @@ function closeStudentFullRecord() {
   if (!m) return;
   m.hidden = true; m.setAttribute("hidden", ""); m.style.display = "none";
 }
+window.closeStudentFullRecord = closeStudentFullRecord;
+if (typeof openStudentFullRecord === "function") window.openStudentFullRecord = openStudentFullRecord;
+if (typeof printStudentSummary === "function") window.printStudentSummary = printStudentSummary;
+if (typeof printStudentSectionReport === "function") window.printStudentSectionReport = printStudentSectionReport;
 
 function studentDossierStyles() {
   return "body{font-family:Segoe UI,system-ui,sans-serif;color:#0f172a;padding:24px;max-width:900px;margin:0 auto}" +
