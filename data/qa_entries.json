@@ -980,5 +980,60 @@
     "sessionName": "2026/2027 SESSION",
     "semesterId": "sess_mvt9hjbtg2q3o_s1",
     "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mwdqh6iggdkt",
+    "date": "2026-11-10",
+    "classKey": "100_nursing",
+    "course": "NUS 117 — Medical Microbiology",
+    "lecturer": "Dr. Ogbuinya Eda",
+    "status": "Held",
+    "duration": 43,
+    "start": "13:47",
+    "end": "14:30",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "",
+    "remark": "",
+    "absent": [
+      "REJOICE B. OWATEKIYE",
+      "402. FAVOUR CHISOM AGBO",
+      "OGODO  JOY MARY",
+      "NNUBIA PERPETUAL S."
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvus8jm0h2wzg",
+        "name": "REJOICE B. OWATEKIYE",
+        "regNo": "EOCNS/26/0022/GNS",
+        "serial": ""
+      },
+      {
+        "id": "stu_mvus2lij4nj1m",
+        "name": "FAVOUR CHISOM AGBO",
+        "regNo": "EOCNS/26/0051/GNS",
+        "serial": "402"
+      },
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      },
+      {
+        "id": "stu_mw67adicgi2fl",
+        "name": "NNUBIA PERPETUAL S.",
+        "regNo": "TMP-EOCNS/26/0010/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-12T15:59:36.760Z",
+    "createdAt": "2026-11-12T15:59:36.760Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
   }
 ]
