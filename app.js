@@ -5480,46 +5480,9 @@ async function handleProfilePhotoUpload(file) {
   }
 }
 
-async function buildStudentFullRecord(id) {
-  var all = await getAll("students");
-  var s = all.find(function(x) { return x.id === id; });
-  if (!s) return null;
-  var qa = await getAll("qa_entries");
-  var absents = [];
-  qa.forEach(function(e) {
-    var hit = false;
-    if (Array.isArray(e.absentDetails)) {
-      hit = e.absentDetails.some(function(d) { return d.id === s.id || d.regNo === s.regNo || (d.name && d.name === s.name); });
-    }
-    if (!hit && Array.isArray(e.absent)) {
-      hit = e.absent.some(function(a) {
-        var t = String(a).toLowerCase();
-        return (s.name && t.indexOf(s.name.toLowerCase()) >= 0) || (s.regNo && t.indexOf(String(s.regNo).toLowerCase()) >= 0);
-      });
-    }
-    if (hit) absents.push(e);
-  });
-  var rem = [];
-  try {
-    rem = (await getAll("remedial_enrolment")).filter(function(r) {
-      return r.matric === s.regNo || (r.name && s.name && r.name.toLowerCase() === s.name.toLowerCase());
-    });
-  } catch (_) {}
-  var disc = [];
-  try {
-    disc = (await getAll("discipline")).filter(function(d) {
-      return d.subjectId === s.id || (d.subjectRef && s.regNo && d.subjectRef === s.regNo) ||
-        (d.name && s.name && d.name.toLowerCase() === s.name.toLowerCase());
-    });
-  } catch (_) {}
-  var audit = [];
-  try {
-    audit = (await getAll("audit")).filter(function(a) {
-      return a.entityId === s.id || (a.details && (a.details.regNo === s.regNo || a.details.name === s.name));
-    }).slice(0, 40);
-  } catch (_) {}
-  return { student: s, absents: absents, remedial: rem, discipline: disc, audit: audit };
-}
+
+// [single buildStudentFullRecord — DSA dossier version kept above]
+
 
 
 // [kept single DSA openStudentFullRecord above]
