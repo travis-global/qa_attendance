@@ -940,13 +940,24 @@
                   <button type="button" class="btn btn--primary" id="btnPublishAll">Publish all data to repository</button>
                   <button type="button" class="btn btn--ghost" id="btnQaLogout">Sign out</button>
                 </div>
-                <div id="qaPublishStatus" class="muted-note" style="margin-top:12px"></div>
+                <div id="qaPublishStatus" style="margin-top:12px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:#fffbeb;color:#78350f;font-size:0.95rem;line-height:1.4;font-weight:600;min-height:1.2em"></div>
                 <div id="qaTokenPanel" style="margin-top:16px" hidden>
-                  <p class="muted-note">Confirm with your officer PIN. The page sends data to the publish worker (GitHub token stays on the worker). If publish fails, the status line explains the likely cause (PIN, worker URL, PUBLISH_KEY mismatch, GitHub token, or network).</p>
+                  <div id="qaPublishExplain" style="margin:0 0 14px;padding:14px 16px;border-radius:12px;border:1px solid #99f6e4;background:#f0fdfa;color:#134e4a;font-size:0.95rem;line-height:1.45">
+                    <p style="margin:0 0 8px;font-weight:700;font-size:1rem;color:#0f766e">How publish works</p>
+                    <ol style="margin:0;padding-left:1.25rem">
+                      <li style="margin-bottom:6px">Enter your <strong>officer PIN</strong> below, then click <strong>Confirm publish all</strong>.</li>
+                      <li style="margin-bottom:6px">The button <strong>disables immediately</strong> so the same push cannot be started twice.</li>
+                      <li style="margin-bottom:6px">This browser prepares a <strong>delta</strong> of changed master data (students, lectures, audit, hostel, etc.).</li>
+                      <li style="margin-bottom:6px">Data is sent to the <strong>publish worker</strong> only — the GitHub token never leaves the worker.</li>
+                      <li style="margin-bottom:6px">Each file is <strong>verified on GitHub</strong> before this device is marked clean.</li>
+                      <li>If anything fails, the status line below explains the cause (PIN, worker URL, key mismatch, or network). You can try again after it finishes.</li>
+                    </ol>
+                  </div>
                   <label class="field field--full"><span class="field__label">Confirm officer PIN</span>
                     <input type="password" id="qaPublishPin" placeholder="Officer PIN" autocomplete="off" />
                   </label>
                   <button type="button" class="btn btn--primary" id="btnConfirmPublish" style="margin-top:8px">Confirm publish all</button>
+                  <div id="qaPublishStatusDetail" class="muted-note" style="margin-top:12px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);font-size:0.92rem;line-height:1.4;min-height:1.2em" hidden></div>
                 </div>
               </div>
             </div>
@@ -1358,7 +1369,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=89"></script>
+  <script src="app.js?v=90"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

@@ -6686,6 +6686,19 @@ function initQaOfficerUI() {
     if (!isQaOfficer()) return;
     const panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = false;
+    var btn = document.getElementById("btnConfirmPublish");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Confirm publish all";
+      btn.style.opacity = "";
+      btn.style.cursor = "";
+    }
+    var pinEl = document.getElementById("qaPublishPin");
+    if (pinEl) { pinEl.disabled = false; pinEl.focus(); }
+    var detail = document.getElementById("qaPublishStatusDetail");
+    if (detail) { detail.hidden = false; detail.textContent = "Enter PIN, then Confirm. The button will lock until this publish finishes."; }
+    var st = document.getElementById("qaPublishStatus");
+    if (st) st.textContent = "Ready to publish — enter PIN and confirm.";
   });
   document.getElementById("btnConfirmPublish")?.addEventListener("click", publishAllToRepo);
   document.getElementById("btnReloadFromRepo")?.addEventListener("click", async () => {
@@ -7355,22 +7368,49 @@ async function publishAllToRepo() {
   if (!isQaOfficer()) return;
   var pin = (document.getElementById("qaPublishPin") && document.getElementById("qaPublishPin").value || "").trim();
   var status = document.getElementById("qaPublishStatus");
-  function setSt(msg) { if (status) status.textContent = msg; }
+  var detail = document.getElementById("qaPublishStatusDetail");
+  var btnConfirm = document.getElementById("btnConfirmPublish");
+  var btnPublish = document.getElementById("btnPublishAll");
+  function setSt(msg) {
+    if (status) status.textContent = msg;
+    if (detail) {
+      detail.hidden = false;
+      detail.textContent = msg;
+    }
+  }
+  function setPublishBusy(busy) {
+    if (btnConfirm) {
+      btnConfirm.disabled = !!busy;
+      btnConfirm.textContent = busy ? "Publishing… please wait" : "Confirm publish all";
+      btnConfirm.style.opacity = busy ? "0.65" : "";
+      btnConfirm.style.cursor = busy ? "not-allowed" : "";
+    }
+    if (btnPublish) btnPublish.disabled = !!busy;
+    var pinEl = document.getElementById("qaPublishPin");
+    if (pinEl) pinEl.disabled = !!busy;
+  }
   if (!pin || pin !== (APP_CONFIG.qaPin || "EOCNS-QA")) {
-    setSt("Incorrect officer PIN.");
+    setSt("Incorrect officer PIN. Confirm was not started.");
     return;
   }
+  // Disable confirm immediately so the officer cannot double-submit
+  setPublishBusy(true);
+  setSt("PIN accepted. Publish started — do not close this tab. Preparing merge + delta…");
   try {
     try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config + "?t=" + Date.now()); } catch (_) {}
     var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
     if (!workerUrl) {
       setSt("Set publishWorkerUrl in data/config.json to your Cloudflare Worker URL, then reload.");
+      setPublishBusy(false);
       return;
     }
     var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
-    if (!key) throw new Error("publishWorkerKey missing in data/config.json");
+    if (!key) {
+      setPublishBusy(false);
+      throw new Error("publishWorkerKey missing in data/config.json");
+    }
 
-    setSt("Preparing institutional publish (merge + delta)…");
+    setSt("Step 1/4 — Preparing institutional publish (merge + delta)…");
     var files = {};
     var skipped = [];
     var unchanged = [];
@@ -7502,7 +7542,8 @@ async function publishAllToRepo() {
       EOCNS_DIRTY = true;
       try { await put("meta", { key: "dirty", value: true }); } catch (_) {}
       setSt("Publish sent but verification incomplete for: " + failedVerify.join(", ") +
-        ". Local data KEPT. Wait 30s and Publish again (or hard-refresh after confirm on GitHub). Nothing was wiped.");
+        ". Local data KEPT. Wait 30s and Publish again. Nothing was wiped.");
+      setPublishBusy(false);
       return;
     }
 
@@ -7551,9 +7592,13 @@ async function publishAllToRepo() {
       setSt("Published and verified on GitHub. Local kept. " + (postErr.message || postErr));
     }
 
+    setPublishBusy(false);
     var panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = true;
-    if (document.getElementById("qaPublishPin")) document.getElementById("qaPublishPin").value = "";
+    if (document.getElementById("qaPublishPin")) {
+      document.getElementById("qaPublishPin").value = "";
+      document.getElementById("qaPublishPin").disabled = false;
+    }
   } catch (err) {
     console.error("publish error", err);
     var msg = (err && err.message) ? err.message : String(err || "unknown");
@@ -7567,7 +7612,8 @@ async function publishAllToRepo() {
     } else {
       note = " See browser console (F12) for detail.";
     }
-    setSt("Publish failed: " + msg + note);
+    setSt("Publish failed: " + msg + note + " Confirm is enabled again — fix the issue and retry.");
+    setPublishBusy(false);
   }
 }
 
