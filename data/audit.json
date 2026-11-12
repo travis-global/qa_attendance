@@ -34754,5 +34754,271 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1526
+  },
+  {
+    "ref": "REF/EOCNS/QA/16",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvs97qu2t30of",
+    "reason": "Hostel Update",
+    "details": {
+      "before": {
+        "id": "stu_mvs97qu2t30of",
+        "name": "ODEMELEM GODSTIME",
+        "regNo": "EOCNS/26/0010/GNS",
+        "programme": "Nursing",
+        "level": "100",
+        "gender": "Male",
+        "hostel": "1",
+        "status": "Active",
+        "phone": "",
+        "email": "",
+        "serial": "",
+        "createdAt": "2026-11-12T17:37:44.607Z",
+        "updatedAt": "2026-11-12T17:37:44.607Z"
+      },
+      "after": {
+        "id": "stu_mvs97qu2t30of",
+        "name": "ODEMELEM GODSTIME",
+        "regNo": "EOCNS/26/0010/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Male",
+        "hostel": "Hostel 1",
+        "status": "Active",
+        "phone": "",
+        "email": "",
+        "serial": "",
+        "createdAt": "2026-11-12T17:37:44.607Z",
+        "updatedAt": "2026-11-12T17:39:54.643Z"
+      },
+      "photoChanged": false
+    },
+    "timestamp": "2026-11-12T17:39:54.677Z",
+    "at": "2026-11-12T17:39:54.677Z",
+    "createdAt": "2026-11-12T17:39:54.677Z",
+    "whenLocal": "Thu, 12 Nov 2026, 18:39:54",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1527
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mw67adicgi2fl",
+    "reason": "Removed from master list",
+    "details": {
+      "name": "NNUBIA PERPETUAL S.",
+      "regNo": "TMP-EOCNS/26/0010/GNS"
+    },
+    "timestamp": "2026-11-12T17:40:49.450Z",
+    "at": "2026-11-12T17:40:49.450Z",
+    "createdAt": "2026-11-12T17:40:49.450Z",
+    "whenLocal": "Thu, 12 Nov 2026, 18:40:49",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1528
+  },
+  {
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mvuqnhqvy2qjq",
+    "reason": "Removed from master list",
+    "details": {
+      "name": "NWUZOR ONYINYECHI A.",
+      "regNo": "TMP-EOCNS/26/0002/GNS"
+    },
+    "timestamp": "2026-11-12T17:41:29.885Z",
+    "at": "2026-11-12T17:41:29.885Z",
+    "createdAt": "2026-11-12T17:41:29.885Z",
+    "whenLocal": "Thu, 12 Nov 2026, 18:41:29",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1529
+  },
+  {
+    "ref": "REF/EOCNS/QA/1257",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwdu72mtmnz4b",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwdu72mtmnz4b",
+        "name": "Olumachi Ogbonnaya E.",
+        "regNo": "TMP-EOCNS/26/0015/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-12T17:43:43.632Z",
+        "updatedAt": "2026-11-12T17:43:43.632Z"
+      }
+    },
+    "timestamp": "2026-11-12T17:43:43.701Z",
+    "at": "2026-11-12T17:43:43.701Z",
+    "createdAt": "2026-11-12T17:43:43.701Z",
+    "whenLocal": "Thu, 12 Nov 2026, 18:43:43",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1530
+  },
+  {
+    "ref": "REF/EOCNS/QA/1258",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwdu9td7ytkkf",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwdu9td7ytkkf",
+        "name": "ONWE INKECHINYERE O.",
+        "regNo": "TMP-EOCNS/26/0016/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-12T17:45:51.584Z",
+        "updatedAt": "2026-11-12T17:45:51.584Z"
+      }
+    },
+    "timestamp": "2026-11-12T17:45:51.714Z",
+    "at": "2026-11-12T17:45:51.714Z",
+    "createdAt": "2026-11-12T17:45:51.714Z",
+    "whenLocal": "Thu, 12 Nov 2026, 18:45:51",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1531
+  },
+  {
+    "ref": "REF/EOCNS/QA/1259",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwduegh8g5p5a",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwduegh8g5p5a",
+        "name": "UNACHI NWANNEKA A.",
+        "regNo": "TMP-EOCNS/26/0017/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-12T17:49:28.167Z",
+        "updatedAt": "2026-11-12T17:49:28.167Z"
+      }
+    },
+    "timestamp": "2026-11-12T17:49:28.245Z",
+    "at": "2026-11-12T17:49:28.245Z",
+    "createdAt": "2026-11-12T17:49:28.245Z",
+    "whenLocal": "Thu, 12 Nov 2026, 18:49:28",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1532
+  },
+  {
+    "ref": "REF/EOCNS/QA/1260",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwdufu4984vzq",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwdufu4984vzq",
+        "name": "NZEKWE SOPULU CYNTHIA",
+        "regNo": "TMP-EOCNS/26/0018/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-12T17:50:32.497Z",
+        "updatedAt": "2026-11-12T17:50:32.497Z"
+      }
+    },
+    "timestamp": "2026-11-12T17:50:32.606Z",
+    "at": "2026-11-12T17:50:32.606Z",
+    "createdAt": "2026-11-12T17:50:32.606Z",
+    "whenLocal": "Thu, 12 Nov 2026, 18:50:32",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1533
+  },
+  {
+    "ref": "REF/EOCNS/QA/1261",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwduheremp0q6",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwduheremp0q6",
+        "name": "ANI AMADOCHUKWU JULIET",
+        "regNo": "TMP-EOCNS/26/0019/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-12T17:51:45.909Z",
+        "updatedAt": "2026-11-12T17:51:45.909Z"
+      }
+    },
+    "timestamp": "2026-11-12T17:51:46.004Z",
+    "at": "2026-11-12T17:51:46.004Z",
+    "createdAt": "2026-11-12T17:51:46.004Z",
+    "whenLocal": "Thu, 12 Nov 2026, 18:51:46",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1534
+  },
+  {
+    "ref": "REF/EOCNS/QA/1262",
+    "action": "create",
+    "entity": "students",
+    "entityId": "stu_mwduissckjvxi",
+    "reason": "New student registration",
+    "details": {
+      "student": {
+        "id": "stu_mwduissckjvxi",
+        "name": "FLORENCE CHOICE",
+        "regNo": "TMP-EOCNS/26/0020/GNS",
+        "programme": "Nursing",
+        "level": 100,
+        "gender": "Female",
+        "hostel": "",
+        "status": "Active",
+        "phone": "",
+        "createdAt": "2026-11-12T17:52:50.737Z",
+        "updatedAt": "2026-11-12T17:52:50.737Z"
+      }
+    },
+    "timestamp": "2026-11-12T17:52:50.845Z",
+    "at": "2026-11-12T17:52:50.845Z",
+    "createdAt": "2026-11-12T17:52:50.845Z",
+    "whenLocal": "Thu, 12 Nov 2026, 18:52:50",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1535
   }
 ]
