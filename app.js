@@ -1,4 +1,4 @@
-/* EOCNS build v91 — outer bare report refs removed */
+/* EOCNS build v92 — outer bare report refs removed */
 (() => {
 "use strict";
 // Safe stubs so early event wiring never throws ReferenceError (real impls overwrite later)
@@ -12,6 +12,11 @@ if (typeof window.closeStudentFullRecord !== "function") {
 if (typeof window.openStudentFullRecord !== "function") {
   window.openStudentFullRecord = function(id) {
     console.warn("openStudentFullRecord not ready yet", id);
+  };
+}
+if (typeof window.generateStudentRegisterReport !== "function") {
+  window.generateStudentRegisterReport = async function() {
+    alert("Student register report is still loading. Wait 2 seconds and try again, or hard-refresh.");
   };
 }
 const THEME_KEY = "eocns-theme";
@@ -5857,7 +5862,18 @@ async function publishPendingListToRepo(message) {
     alert("Build the monthly report first. If this persists, hard-refresh (Ctrl+Shift+R).");
   });
 
-  document.getElementById("btnGenerateStudentRegister")?.addEventListener("click", function() { if (typeof window.generateStudentRegisterReport === "function") window.generateStudentRegisterReport(); else alert("Register report not ready — hard-refresh."); });
+  document.getElementById("btnGenerateStudentRegister")?.addEventListener("click", function() {
+    var fn = null;
+    try { if (typeof generateStudentRegisterReport === "function") fn = generateStudentRegisterReport; } catch (_) {}
+    if (!fn && typeof window.generateStudentRegisterReport === "function") fn = window.generateStudentRegisterReport;
+    if (!fn) { alert("Register report not ready — hard-refresh (Ctrl+Shift+R)."); return; }
+    try { window.generateStudentRegisterReport = fn; } catch (_) {}
+    Promise.resolve(fn()).catch(function(err) {
+      console.error(err);
+      alert("Register report failed: " + (err && err.message ? err.message : String(err)));
+    });
+  });
+  try { if (typeof generateStudentRegisterReport === "function") window.generateStudentRegisterReport = generateStudentRegisterReport; } catch (_) {}
   document.getElementById("btnGenerateHostelReportDash")?.addEventListener("click", function() { if (typeof window.generateHostelDistributionReport === "function") window.generateHostelDistributionReport(); else alert("Hostel report not ready — hard-refresh."); });
   document.getElementById("btnGenerateHostelReport")?.addEventListener("click", function() { if (typeof window.generateHostelDistributionReport === "function") window.generateHostelDistributionReport(); else alert("Hostel report not ready — hard-refresh."); });
 
@@ -10050,7 +10066,18 @@ async function generateStudentRegisterReport() {
   }
 }
 window.generateStudentRegisterReport = generateStudentRegisterReport;
-
+try {
+  var _btnReg = document.getElementById("btnGenerateStudentRegister");
+  if (_btnReg && !_btnReg.__regReportBound) {
+    _btnReg.__regReportBound = true;
+    _btnReg.addEventListener("click", function() {
+      Promise.resolve(window.generateStudentRegisterReport()).catch(function(err) {
+        console.error(err);
+        alert("Register report failed: " + (err && err.message ? err.message : String(err)));
+      });
+    });
+  }
+} catch (_) {}
 
 /** Hostel occupancy & distribution report */
 async function generateHostelDistributionReport() {
