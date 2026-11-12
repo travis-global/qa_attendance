@@ -392,6 +392,20 @@
     "id": "stu_mw9i4mzmzsbq0"
   },
   {
+    "serial": "",
+    "name": "ANI AMADOCHUKWU JULIET",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0019/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mwduheremp0q6"
+  },
+  {
     "serial": "EOCNS/26/0012/GNS",
     "name": "Ani amaelochukwu Juliet",
     "programme": "ND Nursing",
@@ -2366,6 +2380,20 @@
     "id": "stu_mwaqclqm_105"
   },
   {
+    "serial": "",
+    "name": "FLORENCE CHOICE",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0020/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mwduissckjvxi"
+  },
+  {
     "serial": "EOCNS/24/0065/GNS",
     "name": "Fortunate Ogba",
     "programme": "General Nursing",
@@ -3514,20 +3542,6 @@
     "id": "stu_mwapkb69_21"
   },
   {
-    "serial": "",
-    "name": "NNUBIA PERPETUAL S.",
-    "programme": "General Nursing",
-    "level": 100,
-    "code": "GNS",
-    "regNo": "TMP-EOCNS/26/0010/GNS",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mw67adicgi2fl"
-  },
-  {
     "serial": "136",
     "name": "Ntoka Chidimma Precious",
     "programme": "General Nursing",
@@ -3753,20 +3767,6 @@
   },
   {
     "serial": "",
-    "name": "NWUZOR ONYINYECHI A.",
-    "programme": "General Nursing",
-    "level": 100,
-    "code": "GNS",
-    "regNo": "TMP-EOCNS/26/0002/GNS",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mvuqnhqvy2qjq"
-  },
-  {
-    "serial": "",
     "name": "NWUZOR ONYINYECHI SUCCESS",
     "programme": "General Nursing",
     "level": 100,
@@ -3778,6 +3778,20 @@
     "phone": "",
     "email": "",
     "id": "stu_mvutjlzdukcm7"
+  },
+  {
+    "serial": "",
+    "name": "NZEKWE SOPULU CYNTHIA",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0018/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mwdufu4984vzq"
   },
   {
     "serial": "207",
@@ -3856,7 +3870,7 @@
     "level": 100,
     "code": "GNS",
     "regNo": "EOCNS/26/0010/GNS",
-    "hostel": "1",
+    "hostel": "Hostel 1",
     "status": "Active",
     "gender": "Male",
     "phone": "",
@@ -4466,6 +4480,20 @@
     "id": "stu_mwaq07uk_30"
   },
   {
+    "serial": "",
+    "name": "Olumachi Ogbonnaya E.",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0015/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mwdu72mtmnz4b"
+  },
+  {
     "serial": "EOCNS/25/0144/GNS",
     "name": "Ome Chidera",
     "programme": "General Nursing",
@@ -4506,6 +4534,20 @@
     "phone": "",
     "email": "",
     "id": "stu_mwaqcmg3_161"
+  },
+  {
+    "serial": "",
+    "name": "ONWE INKECHINYERE O.",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0016/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mwdu9td7ytkkf"
   },
   {
     "serial": "EOCNS/26/0079/GNS",
@@ -5780,6 +5822,20 @@
     "phone": "",
     "email": "",
     "id": "stu_mvusfrg49oa12"
+  },
+  {
+    "serial": "",
+    "name": "UNACHI NWANNEKA A.",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "TMP-EOCNS/26/0017/GNS",
+    "hostel": "",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mwduegh8g5p5a"
   },
   {
     "serial": "EOCNS/24/0020/MID",
