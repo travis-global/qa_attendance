@@ -479,13 +479,13 @@ async function renderStudentsTable() {
       ? ('<td class="qa-edit-only"><input type="checkbox" class="stu-select" value="' + id + '" /></td>')
       : '<td class="qa-edit-only"></td>';
     // View is always available (not qa-edit-only)
-    var actions = '<button type="button" class="icon-btn-sm" data-profile-stu="' + id + '">View</button>';
+    var actions = '<button type="button" class="icon-btn-sm" data-profile-stu="' + id + '" title="Open DSA full record">View</button>';
     if (isQaOfficer()) {
       actions += ' <button type="button" class="icon-btn-sm qa-edit-only" data-edit-stu="' + id + '">Edit</button>' +
         ' <button type="button" class="icon-btn-sm qa-edit-only" data-del-stu="' + id + '">Del</button>';
     }
     return "<tr data-stu-id=\"" + id + "\">" + cb +
-      "<td><div class=\"cell-main\" data-profile-stu=\"" + id + "\" style=\"cursor:pointer\" title=\"Open profile\">" + escapeHtml(s.name) + "</div></td>" +
+      "<td><div class=\"cell-main\" data-profile-stu=\"" + id + "\" style=\"cursor:pointer\" title=\"Open DSA full record\">" + escapeHtml(String(s.name || "").toUpperCase()) + "</div></td>" +
       "<td>" + escapeHtml(s.regNo || "—") + "</td>" +
       "<td>" + escapeHtml(s.programme || "—") + "</td>" +
       "<td>" + escapeHtml(String(s.level || "—")) + "</td>" +
@@ -499,7 +499,9 @@ async function renderStudentsTable() {
     btn.addEventListener("click", function(e) {
       e.preventDefault();
       e.stopPropagation();
-      openStudentProfile(btn.getAttribute("data-profile-stu"));
+      var sid = btn.getAttribute("data-profile-stu");
+      if (typeof openStudentFullRecord === "function") openStudentFullRecord(sid);
+      else if (typeof openStudentProfile === "function") openStudentProfile(sid);
     });
   });
   tbody.querySelectorAll("[data-edit-stu]").forEach(function(btn) {
@@ -5519,76 +5521,9 @@ async function buildStudentFullRecord(id) {
   return { student: s, absents: absents, remedial: rem, discipline: disc, audit: audit };
 }
 
-async function openStudentFullRecord(id) {
-  id = id || window.__profileStudentId;
-  if (!id) return;
-  var data = await buildStudentFullRecord(id);
-  if (!data) return;
-  var s = data.student;
-  document.getElementById("studentFullRecordTitle").textContent = "Full record — " + (s.name || "");
-  var photo = s.photoDataUrl
-    ? '<div class="passport-frame" style="margin-bottom:12px"><img src="' + s.photoDataUrl + '" alt="" /></div>'
-    : "";
-  function listBlock(title, items, rowFn) {
-    if (!items.length) return '<div class="record-section"><h4>' + title + '</h4><p class="muted-note">None on file</p></div>';
-    return '<div class="record-section"><h4>' + title + " (" + items.length + ")</h4><ul style=\"padding-left:18px;margin:0\">" +
-      items.map(rowFn).join("") + "</ul></div>";
-  }
-  var body = document.getElementById("studentFullRecordBody");
-  body.innerHTML = photo +
-    "<p><strong>" + escapeHtml(s.name) + "</strong> · " + escapeHtml(s.regNo || "—") + " · " +
-    escapeHtml(s.programme || "") + " " + escapeHtml(String(s.level || "")) + " · Hostel: " + escapeHtml(s.hostel || "—") + "</p>" +
-    listBlock("Lecture absences (from QA logs)", data.absents, function(e) {
-      return "<li>" + escapeHtml(e.date || "") + " · " + escapeHtml(e.course || "") + " · " + escapeHtml(e.status || "") + "</li>";
-    }) +
-    listBlock("Remedial enrolment", data.remedial, function(r) {
-      return "<li>" + escapeHtml((r.courses || r.courseCodes || []).join(", ") || "enrolled") +
-        (r.sessionName ? " · " + escapeHtml(r.sessionName) : "") + "</li>";
-    }) +
-    listBlock("Disciplinary cases", data.discipline, function(d) {
-      return "<li>" + escapeHtml(d.date || "") + " · " + escapeHtml(d.type || "") + " · " +
-        escapeHtml(d.status || "") + " · " + escapeHtml(d.ref || "") + "</li>";
-    }) +
-    listBlock("Recent audit touches", data.audit, function(a) {
-      return "<li>" + escapeHtml(a.at || a.createdAt || "") + " · " + escapeHtml(a.action || "") + " · " +
-        escapeHtml(a.reason || "") + "</li>";
-    });
-  window.__fullRecordStudentId = id;
-  var m = document.getElementById("studentFullRecordModal");
-  if (m) { m.hidden = false; m.removeAttribute("hidden"); m.style.display = ""; }
-}
 
-function closeStudentFullRecord() {
-  var m = document.getElementById("studentFullRecordModal");
-  if (!m) return;
-  m.hidden = true; m.setAttribute("hidden", ""); m.style.display = "none";
-}
+// [kept single DSA openStudentFullRecord above]
 
-async function printStudentSummary() {
-  var id = window.__fullRecordStudentId || window.__profileStudentId;
-  if (!id) return;
-  var data = await buildStudentFullRecord(id);
-  if (!data) return;
-  var s = data.student;
-  var w = window.open("", "_blank");
-  if (!w) return;
-  var photo = s.photoDataUrl ? '<img src="' + s.photoDataUrl + '" style="width:90px;height:110px;object-fit:cover;border:1px solid #ccc"/>' : "";
-  w.document.write("<!DOCTYPE html><html><head><title>Student summary</title><style>body{font-family:Georgia,serif;padding:24px;color:#0f172a}h1{color:#0d9488;font-size:1.3rem}table{border-collapse:collapse;width:100%;font-size:0.9rem}td,th{border:1px solid #cbd5e1;padding:6px;text-align:left}.muted{color:#64748b;font-size:0.85rem}</style></head><body>" +
-    "<h1>EOCNS — Student Affairs summary</h1>" +
-    (ACTIVE_SESSION ? "<p class=\"muted\">Session: " + escapeHtml(ACTIVE_SESSION.name) + semesterSuffixHtml() + "</p>" : "") +
-    "<div style=\"display:flex;gap:16px\">" + photo + "<div><p><strong>" + escapeHtml(s.name) + "</strong></p>" +
-    "<p>Reg: " + escapeHtml(s.regNo || "—") + "<br/>" + escapeHtml(s.programme || "") + " · Level " + escapeHtml(String(s.level || "")) +
-    "<br/>Hostel: " + escapeHtml(s.hostel || "—") + "</p></div></div>" +
-    "<h3>Disciplinary cases</h3><table><thead><tr><th>Date</th><th>Type</th><th>Status</th><th>REF</th></tr></thead><tbody>" +
-    (data.discipline.length ? data.discipline.map(function(d) {
-      return "<tr><td>" + escapeHtml(d.date||"") + "</td><td>" + escapeHtml(d.type||"") + "</td><td>" + escapeHtml(d.status||"") + "</td><td>" + escapeHtml(d.ref||"") + "</td></tr>";
-    }).join("") : "<tr><td colspan=4>None on file</td></tr>") +
-    "</tbody></table>" +
-    "<h3>Lecture absences logged</h3><p class=\"muted\">" + data.absents.length + " linked QA absence mark(s)</p>" +
-    "<p class=\"muted\">Generated " + new Date().toLocaleString() + " · Officer system summary</p></body></html>");
-  w.document.close();
-  setTimeout(function() { w.print(); }, 300);
-}
 
 async function renderDisciplineTable() {
   var tbody = document.getElementById("disciplineTableBody");
@@ -9931,12 +9866,89 @@ window.saveTimetableLocal = saveTimetableLocal;
 
 /** Full student register — institutional snapshot */
 async function generateStudentRegisterReport() {
-  var meta = await promptOfficerAndFormat("Student Master Register");
-  if (!meta) return;
+  // Apply the same filters as the Students table (search / programme / level)
+  var search = (document.getElementById("studentSearch") && document.getElementById("studentSearch").value || "").toLowerCase().trim();
+  var fProg = (document.getElementById("filterProgramme") && document.getElementById("filterProgramme").value) || "";
+  var fLevel = (document.getElementById("filterLevel") && document.getElementById("filterLevel").value) || "";
+
+  var officer = prompt("Enter the full name of the officer generating this student register report:", "");
+  if (officer == null) return;
+  officer = String(officer).trim();
+  if (!officer) { alert("Officer name is required."); return; }
+  var fmt = prompt("Output format — type PDF, WORD or CSV (default PDF):", "PDF");
+  if (fmt == null) return;
+  fmt = String(fmt).trim().toLowerCase();
+  if (fmt.indexOf("c") === 0) fmt = "csv";
+  else if (fmt.indexOf("w") === 0) fmt = "word";
+  else fmt = "pdf";
+
   var students = await getAll("students");
-  students = students.slice().sort(function(a, b) {
-    return String(a.name || "").localeCompare(String(b.name || ""));
+  students = (students || []).slice();
+  if (search) {
+    students = students.filter(function(s) {
+      return String(s.name || "").toLowerCase().indexOf(search) >= 0 ||
+        String(s.regNo || "").toLowerCase().indexOf(search) >= 0;
+    });
+  }
+  if (fProg) students = students.filter(function(s) { return String(s.programme || "") === fProg; });
+  if (fLevel) students = students.filter(function(s) { return String(s.level || "") === String(fLevel); });
+
+  students.sort(function(a, b) {
+    return String(a.name || "").toUpperCase().localeCompare(String(b.name || "").toUpperCase());
   });
+
+  function aaName(n) { return String(n || "").trim().toUpperCase(); }
+  function genderLabel(g) {
+    var t = String(g || "").trim();
+    if (!t) return "—";
+    var l = t.toLowerCase();
+    if (l.indexOf("f") === 0) return "Female";
+    if (l.indexOf("m") === 0) return "Male";
+    return t;
+  }
+
+  var filterNote = [];
+  if (fProg) filterNote.push("Programme: " + fProg);
+  if (fLevel) filterNote.push("Level: " + fLevel);
+  if (search) filterNote.push("Search: " + search);
+  var filterLine = filterNote.length ? filterNote.join(" · ") : "All students (no filter)";
+
+  if (fmt === "csv") {
+    var lines = ["S/N,Name,Reg No,Gender,Programme,Level,Hostel,Status"];
+    students.forEach(function(s, i) {
+      function q(v) {
+        var t = String(v == null ? "" : v).replace(/"/g, '""');
+        return '"' + t + '"';
+      }
+      lines.push([
+        i + 1,
+        q(aaName(s.name)),
+        q(s.regNo || ""),
+        q(genderLabel(s.gender)),
+        q(s.programme || ""),
+        q(s.level || ""),
+        q(s.hostel || ""),
+        q(s.status || "Active")
+      ].join(","));
+    });
+    var blob = new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "EOCNS_Student_Register_" + new Date().toISOString().slice(0, 10) + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    try {
+      writeAudit({
+        action: "create", entity: "report", entityId: "report_" + Date.now().toString(36),
+        reason: "Generated student register CSV",
+        details: { officer: officer, format: "csv", count: students.length, filter: filterLine }
+      });
+    } catch (_) {}
+    alert("CSV downloaded for " + students.length + " student(s).\n" + filterLine);
+    return;
+  }
+
   var byProg = {};
   students.forEach(function(s) {
     var k = (s.programme || "Unspecified") + " · L" + (s.level || "?");
@@ -9946,38 +9958,62 @@ async function generateStudentRegisterReport() {
   var active = students.filter(function(s) { return !s.status || String(s.status).toLowerCase() === "active"; }).length;
   var female = students.filter(function(s) { return String(s.gender || "").toLowerCase().indexOf("f") === 0; }).length;
   var male = students.filter(function(s) { return String(s.gender || "").toLowerCase().indexOf("m") === 0; }).length;
-  var amendments = await collectReportAmendments({ entities: ["students"] });
-  var body = reportLetterheadHtml(
-    "Student Master Register",
-    "Full institutional roll — programmes, levels & status",
-    "Snapshot as at " + new Date().toLocaleString()
-  );
+  var amendments = [];
+  try {
+    if (typeof collectReportAmendments === "function") {
+      amendments = await collectReportAmendments({ entities: ["students"] });
+    }
+  } catch (_) {}
+
+  var letterhead = (typeof reportLetterheadHtml === "function")
+    ? reportLetterheadHtml("Student Master Register", "Filtered institutional roll — name, registration number & gender", "Snapshot as at " + new Date().toLocaleString())
+    : "<h1>Student Master Register</h1>";
+  var body = letterhead;
+  body += "<p style='font-size:12px;color:#475569'><strong>Filter applied:</strong> " + escapeHtml(filterLine) +
+    " · <strong>Officer:</strong> " + escapeHtml(officer) + "</p>";
   body += "<h2 class='sec'>Register snapshot</h2>";
   body += "<div class='kpi'>" +
-    "<div><div class='lab'>Total on roll</div><div class='val' style='color:#1B3A6B'>" + students.length + "</div></div>" +
+    "<div><div class='lab'>Students in report</div><div class='val' style='color:#1B3A6B'>" + students.length + "</div></div>" +
     "<div class='present'><div class='lab'>Active</div><div class='val'>" + active + "</div></div>" +
     "<div><div class='lab'>Female</div><div class='val' style='color:#1B3A6B'>" + female + "</div></div>" +
     "<div><div class='lab'>Male</div><div class='val' style='color:#1B3A6B'>" + male + "</div></div>" +
     "</div>";
-  // gender donut approx
-  var genPct = students.length ? Math.round((female / students.length) * 1000) / 10 : 0;
-  body += "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center'>" + svgDonut(genPct, 130, "% female") +
-    "<p style='font-size:12px;max-width:360px'>This register is the master list used for attendance sheets, QA logs and remedial enrolment. Inactive records remain listed for audit but are excluded from operational counts where filters apply.</p></div>";
+  if (typeof svgDonut === "function" && students.length) {
+    var genPct = Math.round((female / students.length) * 1000) / 10;
+    body += "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center'>" + svgDonut(genPct, 130, "% female") +
+      "<p style='font-size:12px;max-width:360px'>Names shown in uppercase (AA). Core columns: Name, Reg. No, Gender.</p></div>";
+  }
   Object.keys(byProg).sort().forEach(function(k) {
     var rows = byProg[k].map(function(s, i) {
-      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
-        "</td><td>" + escapeHtml(s.serial || "") + "</td><td>" + escapeHtml(s.gender || "") +
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(aaName(s.name)) + "</td><td>" + escapeHtml(s.regNo || "") +
+        "</td><td>" + escapeHtml(genderLabel(s.gender)) +
         "</td><td>" + escapeHtml(s.hostel || "") + "</td><td>" + escapeHtml(s.status || "Active") + "</td></tr>";
     }).join("");
     body += "<h2 class='sec'>" + escapeHtml(k) + " <span style='font-weight:500;color:#64748b'>(" + byProg[k].length + ")</span></h2>";
-    body += "<table class='data'><thead><tr><th>#</th><th>Name</th><th>Reg. No</th><th>Serial</th><th>Gender</th><th>Hostel</th><th>Status</th></tr></thead><tbody>" + rows + "</tbody></table>";
+    body += "<table class='data'><thead><tr><th>#</th><th>Name</th><th>Reg. No</th><th>Gender</th><th>Hostel</th><th>Status</th></tr></thead><tbody>" + rows + "</tbody></table>";
   });
-  body += reportGlossaryHtml([
-    ["Serial", "Class list number used on attendance sheets."],
-    ["Active / Inactive", "Inactive students are retained for history but should not appear on new attendance sheets."]
-  ]);
-  body += reportAmendmentsHtml(amendments);
-  openReportWindow("EOCNS Student Master Register", body, meta.officer, meta.format);
+  if (!students.length) {
+    body += "<p class='muted'>No students match the current filters.</p>";
+  }
+  if (typeof reportGlossaryHtml === "function") {
+    body += reportGlossaryHtml([
+      ["Name", "Shown in uppercase (AA) for uniformity on official registers."],
+      ["Reg. No", "Official registration / matriculation number."],
+      ["Gender", "As recorded on the master list."]
+    ]);
+  }
+  if (typeof reportAmendmentsHtml === "function") body += reportAmendmentsHtml(amendments);
+
+  var openWin = window.openReportWindow || (typeof openReportWindow === "function" ? openReportWindow : null);
+  if (openWin) openWin("EOCNS Student Master Register", body, officer, fmt);
+  else {
+    var w = window.open("", "_blank");
+    if (w) {
+      w.document.write("<!DOCTYPE html><html><head><title>Student Register</title></head><body>" + body + "</body></html>");
+      w.document.close();
+      if (fmt === "pdf") setTimeout(function() { try { w.print(); } catch (_) {} }, 400);
+    }
+  }
 }
 window.generateStudentRegisterReport = generateStudentRegisterReport;
 
