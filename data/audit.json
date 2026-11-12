@@ -34732,5 +34732,27 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1525
+  },
+  {
+    "ref": "REF/EOCNS/QA/1011",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwdqh6iggdkt",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-10",
+      "course": "NUS 117 — Medical Microbiology",
+      "status": "Held",
+      "classKey": "100_nursing",
+      "amended": false
+    },
+    "timestamp": "2026-11-12T15:59:36.771Z",
+    "at": "2026-11-12T15:59:36.771Z",
+    "createdAt": "2026-11-12T15:59:36.771Z",
+    "whenLocal": "Thu, 12 Nov 2026, 16:59:36",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1526
   }
 ]
