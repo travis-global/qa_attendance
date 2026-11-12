@@ -912,5 +912,73 @@
     "sessionName": "2026/2027 SESSION",
     "semesterId": "sess_mvt9hjbtg2q3o_s1",
     "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mwdpzmvp4wy2",
+    "date": "2026-11-11",
+    "classKey": "100_nursing",
+    "course": "NUS 113 — Human Anatomy",
+    "lecturer": "Mr. Simon Udu",
+    "status": "Held",
+    "duration": 99,
+    "start": "08:41",
+    "end": "10:20",
+    "topic": "Connective Tissues",
+    "objectives": "Classification of connective tissues. Examples of Connective Tissues",
+    "lectureSummary": "The lecture covered Connective Tissues",
+    "assignment": "None was given",
+    "remark": "Class participation was above average",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-12T15:45:58.165Z",
+    "createdAt": "2026-11-12T15:45:58.165Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mwdq8gnn8pfx",
+    "date": "2026-11-11",
+    "classKey": "100_nursing",
+    "course": "NUR 111 — Foundation of Nursing/Emergency Care",
+    "lecturer": "Aderintoye Esther",
+    "status": "Held",
+    "duration": 166,
+    "start": "10:35",
+    "end": "13:21",
+    "topic": "Organization of Nursing Work",
+    "objectives": "Roles and Functions of a Nurse",
+    "lectureSummary": "The lecture covered the organization of Nursing work",
+    "assignment": "None was given",
+    "remark": "",
+    "absent": [
+      "OGODO  JOY MARY"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "OGODO  JOY MARY",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-12T15:52:50.003Z",
+    "createdAt": "2026-11-12T15:52:50.003Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
   }
 ]
