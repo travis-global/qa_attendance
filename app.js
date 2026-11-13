@@ -2335,8 +2335,9 @@ async function generateHostelReport() {
       if (st.hostelSource === "location_id") locN++;
       else if (st.hostelSource === "master_list") mastN++;
       else unN++;
-      if (st.hostelConflict) confN++;
     });
+    confN = (result.conflicts && result.conflicts.length) || 0;
+    try { await renderHostelConflicts(); } catch (_) {}
     var exN = (result._excludedN || (result.excludedPending && result.excludedPending.length) || 0);
     setHostelStatus(
       "Report ready · " + absentees.length + " absentees · master-list hostel assignments " + mastN +
