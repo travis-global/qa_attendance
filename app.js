@@ -2373,6 +2373,7 @@ async function finalizeHostelReportFromPreview() {
   }
   var rate=Number(window.__hostelPreviewRate)||Number((document.getElementById("hostelRate")&&document.getElementById("hostelRate").value)||0)||0;
   var dayHeaders=window.__hostelPreviewDayHeaders||[],last=window.__lastHostelReport||{},result=last.result||null;
+  var priorRun = last.runId ? (await getAll("hostel_runs")).find(function(x){return x.id===last.runId;}) : null;
   var dateKeys=(result&&result.dates?result.dates:[]).map(function(d){return toDateKeyHostel(d);});
   if(!dateKeys.length){
     var sd=parseInputDateHostel(document.getElementById("hostelStartDate")&&document.getElementById("hostelStartDate").value);
@@ -2384,7 +2385,7 @@ async function finalizeHostelReportFromPreview() {
   if(result&&result.students)Object.keys(result.students).forEach(function(sid){
     var meta=result.students[sid]||{},present=result.attendance&&result.attendance[sid]?result.attendance[sid]:new Set();
     var marks=dateKeys.map(function(k){return present&&present.has&&present.has(k)?"P":"A";}),abs=marks.filter(function(m){return m==="A";}).length;
-    matrix.push({studentId:sid,name:meta.name||"",regNo:meta.regNo||"",hostel:meta.hostel||"",programme:meta.programme||"",level:meta.level||"",dayMarks:marks,absentDays:abs,fine:abs*rate});
+    matrix.push({studentId:sid,rosterId:(last.runId||"")+"::"+String(sid),machineNo:meta.machineNo||"",name:meta.name||"",regNo:meta.regNo||"",hostel:meta.hostel||"",programme:meta.programme||"",level:meta.level||"",dayMarks:marks,absentDays:abs,fine:abs*rate});
   });
   // A row removed from the absentee preview is intentionally removed from
   // this run's liability schedule, while the other present-only matrix rows stay.
@@ -2403,20 +2404,42 @@ async function finalizeHostelReportFromPreview() {
     if(target){target.name=edit.name||target.name;target.hostel=edit.hostel||target.hostel;target.dayMarks=edit.dayMarks.slice();target.absentDays=edit.absentDays;target.fine=edit.fine;}
     else matrix.push({studentId:edit.id||"",name:edit.name,regNo:edit.regNo||"",hostel:edit.hostel||"",programme:edit.programme||"",level:edit.level||"",dayMarks:edit.dayMarks.slice(),absentDays:edit.absentDays,fine:edit.fine});
   });
+  // Bring in students linked after the preview was created. Their saved gate events
+  // are retained on the draft run, so their marks belong to this exact date range.
+  if(priorRun&&priorRun.matrix){
+    priorRun.matrix.forEach(function(saved){
+      var sid=String(saved.studentId||"");
+      if(!sid||matrix.some(function(row){return String(row.studentId)===sid;}))return;
+      // Do not re-add a row the officer intentionally removed from the preview.
+      if(originallyPreviewedIds[sid])return;
+      matrix.push(Object.assign({},saved));
+    });
+  }
+  matrix.forEach(function(row){row.rosterId=(last.runId||"")+"::"+String(row.studentId||"");});
   matrix.sort(function(a,b){var h=String(a.hostel||"").localeCompare(String(b.hostel||""));return h||String(a.name||"").localeCompare(String(b.name||""));});
   var absentees=matrix.filter(function(r){return(Number(r.absentDays)||0)>0;}).map(function(r){return{id:r.studentId||"",name:r.name,hostel:r.hostel,regNo:r.regNo||"",programme:r.programme||"",level:r.level||"",dayMarks:r.dayMarks,absentDays:r.absentDays,fine:r.absentDays*rate};});
   var start=dateKeys[0],end=dateKeys[dateKeys.length-1],total=absentees.reduce(function(sum,r){return sum+r.fine;},0);
-  var run={id:"hr_"+Date.now().toString(36),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
+  var run={id:(priorRun&&priorRun.id)||last.runId||("hr_"+Date.now().toString(36)),status:"final",
+    hostel:(result&&result.sourceHostel)||(priorRun&&priorRun.hostel)||"",
+    sourceLocationId:(result&&result.sourceLocationId)||(priorRun&&priorRun.sourceLocationId)||null,
+    coverageDateKeys:(result&&result.coverageDateKeys)||(priorRun&&priorRun.coverageDateKeys)||dateKeys.slice(),
+    gateEvents:(result&&result.gateEvents)||(priorRun&&priorRun.gateEvents)||[],
+    createdAt:(priorRun&&priorRun.createdAt)||new Date().toISOString(),updatedAt:new Date().toISOString(),
     start:start,end:end,rate:rate,dateKeys:dateKeys,dayHeaders:dayHeaders,absenteeCount:absentees.length,totalFine:total,
-    studentCount:matrix.length,rows:absentees.map(function(r){return{studentId:r.id,name:r.name,hostel:r.hostel,regNo:r.regNo||"",absentDays:r.absentDays,fine:r.fine,programme:r.programme||"",level:r.level||"",dayMarks:r.dayMarks||[]};}),
-    matrix:matrix,amendments:[],edited:true,note:"Officer-edited preview. P=present; A=absent. Hostel assignment follows the master student record.",source:"gate_export_edited"};
+    studentCount:matrix.length,rows:absentees.map(function(r){return{studentId:r.id,rosterId:"",name:r.name,hostel:r.hostel,regNo:r.regNo||"",absentDays:r.absentDays,fine:r.fine,programme:r.programme||"",level:r.level||"",dayMarks:r.dayMarks||[]};}),
+    matrix:matrix,amendments:(priorRun&&priorRun.amendments)||[],resolutions:(priorRun&&priorRun.resolutions)||[],edited:true,
+    note:"Officer-edited preview. P=present; A=absent. Hostel assignment follows the master student record.",source:"gate_export_edited"};
+  matrix.forEach(function(row){row.rosterId=run.id+"::"+String(row.studentId||"");});
+  run.rows.forEach(function(row){var full=matrix.find(function(m){return String(m.studentId)===String(row.studentId);});if(full)row.rosterId=full.rosterId;});
   try{
     stampSessionFields(run);await put("hostel_runs",run);
+    try{await attachHostelRunToPending(run,result||{});}catch(attachErr){console.warn("pending run association",attachErr);}
     await writeAudit({action:"create",entity:"hostel_runs",entityId:run.id,reason:"Hostel report finalized from editable preview",
       details:{start:start,end:end,rate:rate,absenteeCount:absentees.length,totalFine:total,studentCount:matrix.length,edited:true}});
     markDirty("hostel_runs");await renderHostelRunsMaster();
-    downloadHostelWorkbook(absentees,dayHeaders,"EOCNS_Hostel_Absentees_"+start+"_to_"+end+".xlsx");
-    setHostelStatus("Final report downloaded and saved ("+absentees.length+" absentees; "+matrix.length+" students in the full attendance matrix). Publish when ready so other devices receive this run.","ok");
+    downloadHostelWorkbook(matrix,dateKeys,"EOCNS_Absence_Report_"+start+"_to_"+end+".xlsx");
+    if(window.__lastHostelReport)window.__lastHostelReport.runId=run.id;
+    setHostelStatus("Final report downloaded and saved ("+absentees.length+" students with absences; "+matrix.length+" students in the full roster). Resolved records are included. Publish when ready so other devices receive this run.","ok");
   }catch(err){console.error(err);setHostelStatus("Finalization failed: "+(err.message||String(err)),"error");}
 }
 
