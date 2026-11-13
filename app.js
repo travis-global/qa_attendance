@@ -1951,7 +1951,7 @@ async function previewHostelFromGate() {
       dates: result.dates,
       result: result
     };
-    try { await queueUnmatchedFromHostelResult(result, result.hostel1Name, result.hostel2Name); } catch (queueErr) { console.warn("hostel pending queue", queueErr); }
+    await queueUnmatchedFromHostelResult(result, result.hostel1Name, result.hostel2Name);
     try { await persistHostelDraftRun(window.__lastHostelReport); } catch (draftErr) { console.error("hostel draft save", draftErr); throw new Error("The report preview could not be saved safely: " + (draftErr.message || String(draftErr))); }
     setHostelStatus("Preview ready — edit names, days (P/A), then Confirm & download. The draft is saved so resolved issues can be added to this report.", "ok");
     return result;
