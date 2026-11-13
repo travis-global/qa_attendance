@@ -2712,7 +2712,7 @@ function renderProfessionalHostelPreview(absentees, dayHeaders, rate, startDate,
     '<h3 style="margin:0 0 8px">Executive summary — Hostel boarding fee</h3>' +
     '<p style="margin:0 0 12px;line-height:1.5">Period <strong>' + period + '</strong>. Rate <strong>' + formatNairaHostel(rate) + '</strong> per absent night. ' +
     '<strong>' + absentees.length + '</strong> students incurred charges totalling <strong>' + formatNairaHostel(totalFine) + '</strong>. ' +
-    'Hostel labels follow the student's master record; gate Location ID is diagnostic only and never overrides the master list.</p>' +
+    'Hostel labels follow the master student record; gate Location ID is diagnostic only and never overrides the master list.</p>' +
     '<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin-bottom:16px">' +
     '<div><div class="muted-note">Absentees by hostel</div>' + svgPie(pieSlices, 150) + '</div>' +
     '<div><div class="muted-note">Fines by hostel (₦)</div>' + svgBars(barItems, 280, 130) + '</div></div>' +
