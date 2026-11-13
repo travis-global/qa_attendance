@@ -1,4 +1,4 @@
-/* EOCNS build v93 — outer bare report refs removed */
+/* EOCNS build v94 — outer bare report refs removed */
 (() => {
 "use strict";
 // Safe stubs so early event wiring never throws ReferenceError (real impls overwrite later)
@@ -1223,17 +1223,50 @@ async function renderAuditLog() {
   if (denied) denied.hidden = true;
   if (officer) officer.hidden = false;
   var list = await getAll("audit");
+  list = (list || []).slice();
   list.sort(function(a, b) {
     return String(b.timestamp || b.at || b.createdAt || "").localeCompare(String(a.timestamp || a.at || a.createdAt || ""));
   });
+  var fromD = (document.getElementById("auditFilterFrom") && document.getElementById("auditFilterFrom").value) || "";
+  var toD = (document.getElementById("auditFilterTo") && document.getElementById("auditFilterTo").value) || "";
+  var ent = (document.getElementById("auditFilterEntity") && document.getElementById("auditFilterEntity").value) || "";
+  var act = (document.getElementById("auditFilterAction") && document.getElementById("auditFilterAction").value) || "";
+  var whoQ = (document.getElementById("auditFilterOfficer") && document.getElementById("auditFilterOfficer").value || "").toLowerCase().trim();
+  var q = (document.getElementById("auditFilterSearch") && document.getElementById("auditFilterSearch").value || "").toLowerCase().trim();
+  var filtered = list.filter(function(a) {
+    if (!a) return false;
+    var iso = String(a.timestamp || a.at || a.createdAt || "");
+    var day = iso.slice(0, 10);
+    if (fromD && day && day < fromD) return false;
+    if (toD && day && day > toD) return false;
+    if (fromD && !day) return false;
+    if (ent && String(a.entity || "") !== ent && String(a.entity || "").indexOf(ent) !== 0) return false;
+    if (act && String(a.action || "").toLowerCase() !== act.toLowerCase()) return false;
+    if (whoQ) {
+      var who = String(a.officer || a.user || "").toLowerCase();
+      if (who.indexOf(whoQ) < 0) return false;
+    }
+    if (q) {
+      var blob = (String(a.reason || "") + " " + String(a.ref || "") + " " + String(a.entityId || "") + " " + String(a.entity || "") + " " + JSON.stringify(a.details || {})).toLowerCase();
+      if (blob.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+  var summary = document.getElementById("auditFilterSummary");
+  if (summary) {
+    summary.textContent = "Showing " + filtered.length + " of " + list.length + " audit entries" +
+      (fromD || toD ? (" · dates " + (fromD || "…") + " → " + (toD || "…")) : "") +
+      (ent ? (" · entity " + ent) : "") +
+      (act ? (" · action " + act) : "") + ".";
+  }
   var el = document.getElementById("auditList");
   if (!el) return;
-  if (!list.length) {
-    el.innerHTML = "<p class=\"muted-note\">No audit entries yet.</p>";
+  if (!filtered.length) {
+    el.innerHTML = "<p class=\"muted-note\">No audit entries match these filters.</p>";
     return;
   }
-  el.innerHTML = "<table class=\"data-table\"><thead><tr><th>When (exact)</th><th>Action</th><th>Entity</th><th>Reason / REF</th><th>Who (officer)</th></tr></thead><tbody>" +
-    list.slice(0, 300).map(function(a) {
+  el.innerHTML = "<div style=\"overflow-x:auto\"><table class=\"data-table\"><thead><tr><th>When (exact)</th><th>Action</th><th>Entity</th><th>Reason / REF</th><th>Who (officer)</th></tr></thead><tbody>" +
+    filtered.slice(0, 500).map(function(a) {
       var when = a.whenLocal || "";
       if (!when) {
         var iso = a.timestamp || a.at || a.createdAt || "";
@@ -1253,8 +1286,9 @@ async function renderAuditLog() {
         "</td><td>" + escapeHtml((a.entity || "") + (a.entityId ? (" · " + a.entityId) : "")) +
         "</td><td>" + escapeHtml(reason) +
         "</td><td>" + escapeHtml(who) + "</td></tr>";
-    }).join("") + "</tbody></table>";
+    }).join("") + "</tbody></table></div>";
 }
+
 async function refreshDashboardStats() {
   try {
     var students = await getAll("students");
@@ -3602,25 +3636,41 @@ async function collectReportAmendments(opts) {
   return rows.slice(0, 40);
 }
 
-function reportAmendmentsHtml(rows) {
+function reportAmendmentsHtml(rows, officerName) {
+  var officer = String(officerName || "").trim() || "the QA officer who released this report";
   if (!rows || !rows.length) {
-    return "<h2 class='sec'>Master-list &amp; log amendments in this window</h2>" +
-      "<p class='muted'>No audited edits to master data or lecture logs were recorded for this reporting window.</p>";
+    return "<div class='amend-footer' style='margin-top:22px;padding:12px 14px;border-top:1px solid #cbd5e1;font-size:11px;line-height:1.45;color:#334155'>" +
+      "<strong>Data-change notice:</strong> No audited master-data or log changes were recorded for the window used in this report. " +
+      "For clarifications, meet <strong>" + escapeHtml(officer) + "</strong> (Quality Assurance).</div>";
   }
-  var body = rows.map(function(a, i) {
-    var when = a.at || a.createdAt || a.date || "—";
-    var ref = a.externalRef || a.ref || "—";
-    var who = a.officer || a.by || "—";
-    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(String(when).slice(0, 19).replace("T", " ")) +
-      "</td><td>" + escapeHtml(String(a.action || "")) + "</td><td>" + escapeHtml(String(a.entity || "")) +
-      "</td><td>" + escapeHtml(String(ref)) + "</td><td>" + escapeHtml(String(a.reason || a.details && a.details.reason || "—")) +
-      "</td><td>" + escapeHtml(String(who)) + "</td></tr>";
-  }).join("");
-  return "<h2 class='sec'>Master-list &amp; log amendments in this window</h2>" +
-    "<p style='font-size:11px;color:#64748b'>Any create / update / delete on master lists or lecture logs that falls inside the report period is listed automatically from the audit trail. Official REF numbers appear when officers supplied them.</p>" +
-    "<table class='data'><thead><tr><th>#</th><th>When</th><th>Action</th><th>Entity</th><th>REF</th><th>Reason</th><th>Officer</th></tr></thead><tbody>" +
-    body + "</tbody></table>";
+  var n = rows.length;
+  var times = rows.map(function(a) {
+    return String(a.at || a.timestamp || a.createdAt || a.date || "").slice(0, 10);
+  }).filter(function(d) { return d && d.length >= 8; }).sort();
+  var fromD = times.length ? times[0] : "";
+  var toD = times.length ? times[times.length - 1] : "";
+  var entitySet = {};
+  rows.forEach(function(a) {
+    var e = String(a.entity || "records").replace(/_/g, " ");
+    if (e) entitySet[e] = true;
+  });
+  var entities = Object.keys(entitySet);
+  var entityPhrase = entities.length ? entities.join(", ") : "institutional records";
+  var rangePhrase = "";
+  if (fromD && toD && fromD === toD) rangePhrase = " on <strong>" + escapeHtml(fromD) + "</strong>";
+  else if (fromD && toD) rangePhrase = " between <strong>" + escapeHtml(fromD) + "</strong> and <strong>" + escapeHtml(toD) + "</strong>";
+  else if (fromD || toD) rangePhrase = " in the period around <strong>" + escapeHtml(fromD || toD) + "</strong>";
+  else rangePhrase = " in the reporting window";
+  var changeWord = n === 1 ? "change has" : "changes have";
+  return "<div class='amend-footer' style='margin-top:22px;padding:12px 14px;border-top:1px solid #cbd5e1;font-size:11px;line-height:1.5;color:#334155'>" +
+    "<strong>Data-change notice:</strong> <strong>" + n + "</strong> audited " + changeWord + " been recorded affecting " +
+    escapeHtml(entityPhrase) + rangePhrase + ". " +
+    "Detailed line-by-line history is held in the system Audit Log. " +
+    "For clarifications, meet <strong>" + escapeHtml(officer) + "</strong> (Quality Assurance Department).</div>";
 }
+
+
+
 
 function reportGlossaryHtml(extraItems) {
   var items = [
@@ -4000,7 +4050,7 @@ async function printWeeklyProfessionalPack(payload) {
     ["Status: Over-Delivered", "More held sessions than the timetable scheduled for the window."],
     ["Status: Not in Timetable", "A held log exists for a course/slot not on the official timetable."]
   ]);
-  body += reportAmendmentsHtml(amendments);
+  body += reportAmendmentsHtml(amendments, (typeof meta !== "undefined" && meta && meta.officer) || (typeof officer !== "undefined" && officer) || "");
   openReportWindow("EOCNS Weekly QA — " + period, body, meta.officer, meta.format);
 }
 window.printWeeklyProfessionalPack = printWeeklyProfessionalPack;
@@ -4043,7 +4093,7 @@ async function printMonthlyProfessionalPack(payload) {
   body += "<table class='data'><thead><tr><th>Course</th><th>Scheduled</th><th>Held</th><th>Missed</th><th>Rate</th></tr></thead><tbody>" +
     (courseRows || "<tr><td colspan='5'>No data</td></tr>") + "</tbody></table>";
   body += reportGlossaryHtml();
-  body += reportAmendmentsHtml(amendments);
+  body += reportAmendmentsHtml(amendments, (typeof meta !== "undefined" && meta && meta.officer) || (typeof officer !== "undefined" && officer) || "");
   openReportWindow("EOCNS Monthly QA — " + period, body, meta.officer, meta.format);
 }
 window.printMonthlyProfessionalPack = printMonthlyProfessionalPack;
@@ -4544,7 +4594,7 @@ async function printRemWeeklyPack() {
     ["Course-specific %", "Only remedial courses on the student's enrolment list count toward possible sessions."],
     ["Hrs missed", "Contracted or timetable hours not covered by a remedial lecture log."]
   ]);
-  body += reportAmendmentsHtml(amendments);
+  body += reportAmendmentsHtml(amendments, (typeof meta !== "undefined" && meta && meta.officer) || (typeof officer !== "undefined" && officer) || "");
   openReportWindow("EOCNS Remedial Weekly — " + period, body, meta.officer, meta.format);
 }
 window.printRemWeeklyPack = printRemWeeklyPack;
@@ -4615,7 +4665,7 @@ async function printRemSummaryPack() {
   body += reportGlossaryHtml([
     ["Excellent / Good / At risk / Critical", "Bands at ≥80%, ≥65%, ≥40%, and below 40% average course-specific attendance."]
   ]);
-  body += reportAmendmentsHtml(amendments);
+  body += reportAmendmentsHtml(amendments, (typeof meta !== "undefined" && meta && meta.officer) || (typeof officer !== "undefined" && officer) || "");
   openReportWindow("EOCNS Remedial Summary — " + period, body, meta.officer, meta.format);
 }
 window.printRemSummaryPack = printRemSummaryPack;
@@ -6192,6 +6242,28 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
   document.getElementById("btnSaveTimetable") && document.getElementById("btnSaveTimetable").addEventListener("click", saveTimetableLocal);
   document.getElementById("ttClassKey") && document.getElementById("ttClassKey").addEventListener("change", renderTimetableEditor);
   document.getElementById("btnDownloadAudit") && document.getElementById("btnDownloadAudit").addEventListener("click", downloadAuditJson);
+  document.getElementById("btnAuditApplyFilters") && document.getElementById("btnAuditApplyFilters").addEventListener("click", function() { renderAuditLog(); });
+  document.getElementById("btnAuditClearFilters") && document.getElementById("btnAuditClearFilters").addEventListener("click", function() {
+    ["auditFilterFrom","auditFilterTo","auditFilterEntity","auditFilterAction","auditFilterOfficer","auditFilterSearch"].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+    renderAuditLog();
+  });
+  ["auditFilterFrom","auditFilterTo","auditFilterEntity","auditFilterAction"].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && !el.__auditWired) {
+      el.__auditWired = true;
+      el.addEventListener("change", function() { renderAuditLog(); });
+    }
+  });
+  ["auditFilterOfficer","auditFilterSearch"].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && !el.__auditWired) {
+      el.__auditWired = true;
+      el.addEventListener("keydown", function(ev) { if (ev.key === "Enter") renderAuditLog(); });
+    }
+  });
   document.getElementById("btnPrintFullQaPack") && document.getElementById("btnPrintFullQaPack").addEventListener("click", printFullQaPack);
   document.getElementById("btnExportSnapshot") && document.getElementById("btnExportSnapshot").addEventListener("click", function() {
     if (typeof window.exportFullSnapshot === "function") window.exportFullSnapshot();
@@ -10281,7 +10353,7 @@ async function generateStudentRegisterReport() {
       ["Gender", "As recorded on the master list."]
     ]);
   }
-  if (typeof reportAmendmentsHtml === "function") body += reportAmendmentsHtml(amendments);
+  if (typeof reportAmendmentsHtml === "function") body += reportAmendmentsHtml(amendments, (typeof meta !== "undefined" && meta && meta.officer) || (typeof officer !== "undefined" && officer) || "");
 
   var openWin = window.openReportWindow || (typeof openReportWindow === "function" ? openReportWindow : null);
   if (openWin) openWin("EOCNS Student Master Register", body, officer, fmt);

@@ -905,9 +905,49 @@
           <div class="card" id="auditOfficerCard" hidden>
             <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
               <h3 style="margin:0">Audit Trail</h3>
-              <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadAudit">⬇ Download</button>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button type="button" class="btn btn--ghost btn--sm" id="btnAuditApplyFilters">Apply filters</button>
+                <button type="button" class="btn btn--ghost btn--sm" id="btnAuditClearFilters">Clear</button>
+                <button type="button" class="btn btn--ghost btn--sm qa-edit-only" id="btnDownloadAudit">⬇ Download</button>
+              </div>
             </div>
-            <div class="card__body" id="auditList"><p>No audit entries yet.</p></div>
+            <div class="card__body">
+              <div class="form-grid" style="margin-bottom:12px">
+                <label class="field"><span class="field__label">From date</span><input type="date" id="auditFilterFrom" /></label>
+                <label class="field"><span class="field__label">To date</span><input type="date" id="auditFilterTo" /></label>
+                <label class="field"><span class="field__label">Entity</span>
+                  <select id="auditFilterEntity">
+                    <option value="">All entities</option>
+                    <option value="students">students</option>
+                    <option value="qa_entries">qa_entries</option>
+                    <option value="lecturers">lecturers</option>
+                    <option value="hostel_runs">hostel_runs</option>
+                    <option value="discipline">discipline</option>
+                    <option value="attendance">attendance</option>
+                    <option value="remedial">remedial</option>
+                    <option value="pending_students">pending_students</option>
+                    <option value="sessions">sessions</option>
+                    <option value="courses">courses</option>
+                    <option value="timetables">timetables</option>
+                    <option value="report">report</option>
+                    <option value="audit">audit</option>
+                  </select>
+                </label>
+                <label class="field"><span class="field__label">Action</span>
+                  <select id="auditFilterAction">
+                    <option value="">All actions</option>
+                    <option value="create">create</option>
+                    <option value="update">update</option>
+                    <option value="delete">delete</option>
+                    <option value="publish">publish</option>
+                  </select>
+                </label>
+                <label class="field"><span class="field__label">Officer contains</span><input type="text" id="auditFilterOfficer" placeholder="Name" /></label>
+                <label class="field field--full"><span class="field__label">Search reason / REF / id</span><input type="search" id="auditFilterSearch" placeholder="Type to search…" /></label>
+              </div>
+              <p class="muted-note" id="auditFilterSummary" style="margin:0 0 10px">Showing recent entries.</p>
+              <div id="auditList"><p class="muted-note">No audit entries yet.</p></div>
+            </div>
           </div>
         </section>
                 <section class="view" id="view-settings">
@@ -1382,7 +1422,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=93"></script>
+  <script src="app.js?v=94"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>
