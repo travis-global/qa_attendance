@@ -2370,7 +2370,7 @@ async function openHostelRunViewer(id, editable) {
       }
       return "<td>" + escapeHtml(m) + "</td>";
     }).join("");
-    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(r.name || "") + "</td><td>" + escapeHtml(r.regNo || "") +
+    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(formatReportPersonName(r.name)) + "</td><td>" + escapeHtml(r.regNo || "") +
       "</td><td>" + escapeHtml(r.hostel || "") + "</td>" + markCells +
       "<td data-hr-days='" + i + "'>" + (r.absentDays != null ? r.absentDays : "—") + "</td>" +
       "<td data-hr-fine='" + i + "'>" + Number(r.fine || 0).toLocaleString("en-NG") + "</td></tr>";
@@ -4836,7 +4836,7 @@ async function printRemWeeklyPack() {
   var d = window.__remWeekly;
   if (!d) { alert("Build the remedial weekly analysis first."); return; }
   var lecRows = (d.lecturerRows || []).map(function(r) {
-    return "<tr><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
+    return "<tr><td>" + escapeHtml(formatReportPersonName(r.lecturer)) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
       "</td><td>" + escapeHtml(String(r.presentDays || r.present || "—")) +
       "</td><td style='color:#B91C1C'>" + escapeHtml(String(r.absentDays || r.absent || "—")) +
       "</td><td>" + escapeHtml(String(r.taught != null ? r.taught + "h" : r.hrsTaught || "—")) +
@@ -4847,7 +4847,7 @@ async function printRemWeeklyPack() {
     var rows = (pg.students || []).map(function(s, i) {
       var pct = s.pct != null ? s.pct : s.rate;
       var col = pct >= 80 ? "#1B7A3D" : pct >= 50 ? "#B8860B" : "#B91C1C";
-      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || s.matric || "") +
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(formatReportPersonName(s.name)) + "</td><td>" + escapeHtml(s.regNo || s.matric || "") +
         "</td><td>" + escapeHtml((s.courses || s.enrolled || []).join ? (s.courses || s.enrolled).join(", ") : (s.courses || "")) +
         "</td><td style='text-align:center'>" + escapeHtml(String(s.sess || s.sessions || "")) +
         "</td><td style='text-align:center;font-weight:700;color:" + col + "'>" + (pct != null ? pct + "%" : "—") + "</td></tr>";
@@ -4862,13 +4862,13 @@ async function printRemWeeklyPack() {
     var rows = d.studentRows.map(function(s, i) {
       var pct = s.pct != null ? s.pct : 0;
       var col = pct >= 80 ? "#1B7A3D" : pct >= 50 ? "#B8860B" : "#B91C1C";
-      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(formatReportPersonName(s.name)) + "</td><td>" + escapeHtml(s.regNo || "") +
         "</td><td style='text-align:center;color:" + col + ";font-weight:700'>" + pct + "%</td></tr>";
     }).join("");
     stuBlocks = "<h2 class='sec'>Student attendance (course-specific)</h2><table class='data'><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>%</th></tr></thead><tbody>" + rows + "</tbody></table>";
   }
   var tentRows = (d.tentative || []).map(function(t, i) {
-    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(t.name) + "</td><td>" + escapeHtml(t.regNo || "") +
+    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(formatReportPersonName(t.name)) + "</td><td>" + escapeHtml(t.regNo || "") +
       "</td><td>" + escapeHtml(String(t.days || "")) + "</td><td style='color:#7c3aed;font-weight:600'>TENTATIVE – UNDEFINED</td></tr>";
   }).join("");
   var amendments = await collectReportAmendments({ from: d.start, to: d.end, entities: ["remedial", "remedial_enrolment", "remedial_logs", "remedial_assignments", "students"] });
@@ -4931,7 +4931,7 @@ async function printRemSummaryPack() {
   var d = window.__remSummary;
   if (!d) { alert("Build remedial summary first."); return; }
   var lecRows = (d.lecturerRows || []).map(function(r) {
-    return "<tr><td>" + escapeHtml(r.lecturer) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
+    return "<tr><td>" + escapeHtml(formatReportPersonName(r.lecturer)) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
       "</td><td>" + (r.taught != null ? r.taught + "h" : "—") + "</td><td>" + (r.missed != null ? r.missed + "h" : "—") + "</td></tr>";
   }).join("");
   var tables = "";
@@ -4947,7 +4947,7 @@ async function printRemSummaryPack() {
       var pct = s.pct != null ? s.pct : 0;
       var col = pct >= 80 ? "#1B7A3D" : pct >= 50 ? "#B8860B" : "#B91C1C";
       var status = pct >= 80 ? "Excellent" : pct >= 65 ? "Good" : pct >= 40 ? "At risk" : "Critical";
-      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name) + "</td><td>" + escapeHtml(s.regNo || "") +
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(formatReportPersonName(s.name)) + "</td><td>" + escapeHtml(s.regNo || "") +
         "</td><td style='text-align:center;color:" + col + ";font-weight:700'>" + pct + "%</td><td>" + status + "</td></tr>";
     }).join("");
     tables += "<h2 class='sec'>" + escapeHtml(p) + "</h2><table class='data'><thead><tr><th>#</th><th>Name</th><th>Matric</th><th>Avg %</th><th>Band</th></tr></thead><tbody>" + rows + "</tbody></table>";
@@ -5440,7 +5440,7 @@ async function printStudentSectionReport(id, section) {
   var body = "";
   body += "<h1>EOCNS — " + title + "</h1>";
   body += "<p class=\"muted\">Quality Assurance / Student Affairs · Generated " + new Date().toLocaleString() + "</p>";
-  body += "<p><strong>" + escapeHtml(s.name || "") + "</strong><br/>Reg: " + escapeHtml(s.regNo || "—") +
+  body += "<p><strong>" + escapeHtml(formatReportPersonName(s.name)) + "</strong><br/>Reg: " + escapeHtml(s.regNo || "—") +
     " · Machine ID: " + escapeHtml(s.serial || "—") + "<br/>" +
     escapeHtml(s.programme || "") + " · Level " + escapeHtml(String(s.level || "")) +
     " · Hostel: " + escapeHtml(s.hostel || "—") + "</p>";
@@ -9284,7 +9284,7 @@ async function buildAttendanceSheet() {
     var cells = "";
     for (var c = 0; c < colCount; c++) cells += "<td class=\"att-mark-cell\"></td>";
     var regNote = s.regNo ? (" <span class=\"att-reg\">" + escapeHtml(s.regNo) + (isTempRegNo(s.regNo) ? " · temp" : "") + "</span>") : "";
-    return "<tr><td class=\"att-sn\">" + (i + 1) + "</td><td class=\"att-name\">" + escapeHtml(s.name) + regNote + "</td>" + cells + "</tr>";
+    return "<tr><td class=\"att-sn\">" + (i + 1) + "</td><td class=\"att-name\">" + escapeHtml(formatReportPersonName(s.name)) + regNote + "</td>" + cells + "</tr>";
   }).join("");
 
   var sigLines = "";
@@ -10815,7 +10815,7 @@ async function generateHostelDistributionReport() {
     var rows = list.map(function(s, i) {
       var reg = s.regNo || "";
       var temp = (typeof isTempRegNo === "function" && isTempRegNo(reg)) ? " <span class='cell-sub'>temp</span>" : "";
-      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(s.name || "") + "</td><td>" + escapeHtml(reg) + temp +
+      return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(formatReportPersonName(s.name)) + "</td><td>" + escapeHtml(reg) + temp +
         "</td><td>" + escapeHtml(s.programme || "") + "</td><td>" + escapeHtml(String(s.level || "")) +
         "</td><td>" + escapeHtml(s.gender || "") + "</td></tr>";
     }).join("");
