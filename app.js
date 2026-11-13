@@ -1585,173 +1585,166 @@ function parseHostelLocationId(raw) {
  * Master list is still used for name/reg matching. Conflicts (machine vs master) are flagged.
  */
 async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, hostel2Name) {
-  // Accept both Date objects and date-input strings; normalize to local midnight.
+  // The master student registry is the roster. Gate data only supplies presence,
+  // machine-ID resolution, source Location ID and diagnostic inconsistencies.
   startDate = startDate instanceof Date ? dateOnlyHostel(startDate) : parseInputDateHostel(String(startDate || ""));
   endDate = endDate instanceof Date ? dateOnlyHostel(endDate) : parseInputDateHostel(String(endDate || ""));
   if (!startDate || !endDate || endDate < startDate) throw new Error("Choose a valid reporting date range.");
-  const headerIndex = {};
-  rows[0].forEach((v, i) => {
-    const k = String(v).trim();
-    if (k) headerIndex[k] = i;
-  });
-  const nameCol = headerIndex["Name"];
-  const noCol = headerIndex["No."];
-  const dateCol = headerIndex["Date/Time"];
-  const statusCol = headerIndex["Status"];
-  const locCol = headerIndex["Location ID"];
-  const h1 = hostel1Name || "Hostel 1";
-  const h2 = hostel2Name || "Hostel 2";
-  const master = await getAll("students");
-  function normName(n) {
-    return String(n || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (!Array.isArray(rows) || rows.length < 2) throw new Error("The gate export has no attendance rows.");
+
+  var headers = {};
+  rows[0].forEach(function(v, i) { var k = String(v == null ? "" : v).trim(); if (k) headers[k] = i; });
+  var nameCol = headers["Name"], noCol = headers["No."], dateCol = headers["Date/Time"];
+  var statusCol = headers["Status"], locCol = headers["Location ID"];
+  if (noCol == null || dateCol == null || locCol == null) {
+    throw new Error("The gate export must contain No., Date/Time and Location ID columns.");
   }
-  const byNo = {};
-  const byName = {};
-  var byAlias = {};
-  master.forEach(function(s) {
-    if (s.serial) byNo[String(s.serial).trim()] = s;
-    if (s.regNo) byNo[String(s.regNo).trim().toUpperCase()] = s;
-    const nn = normName(s.name);
-    if (nn) byName[nn] = s;
-    (s.bioAliases || []).forEach(function(a) {
-      var an = normName(a);
-      if (an) byAlias[an] = s;
-    });
-  });
-  function resolveMaster(name, studentId) {
-    if (studentId && byNo[String(studentId).trim()]) return byNo[String(studentId).trim()];
-    if (studentId && byNo[String(studentId).trim().toUpperCase()]) return byNo[String(studentId).trim().toUpperCase()];
-    const nn = normName(name);
-    if (nn && byName[nn]) return byName[nn];
-    // alias from biometric import (machine spelling → site student)
-    if (nn && byAlias && byAlias[nn]) return byAlias[nn];
-    return null;
-  }
-  const students = {};
-  const attendance = {};
-  const locVotes = {}; // studentId -> { "1": n, "2": n }
-  for (let r = 1; r < rows.length; r++) {
-    const row = rows[r];
-    const rawName = row[nameCol];
-    const studentIdRaw = row[noCol];
-    if (!rawName || studentIdRaw === "" || studentIdRaw == null) continue;
-    const name = String(rawName).trim();
-    const studentId = normalizeStudentIdHostel(studentIdRaw);
-    const masterStu = resolveMaster(name, studentId);
-    if (!(studentId in students)) {
-      students[studentId] = {
-        name: masterStu ? masterStu.name : name,
-        hostel: "Unassigned",
-        hostelSource: "pending",
-        regNo: masterStu ? (masterStu.regNo || "") : "",
-        programme: masterStu ? (masterStu.programme || "") : "",
-        level: masterStu ? (masterStu.level || "") : "",
-        masterId: masterStu ? masterStu.id : null,
-        masterHostel: masterStu && masterStu.hostel ? String(masterStu.hostel).trim() : "",
-        matched: !!masterStu,
-        locationIdMajority: null,
-        locationVotes: { "1": 0, "2": 0 },
-        hostelConflict: false
-      };
-      attendance[studentId] = new Set();
-      locVotes[studentId] = { "1": 0, "2": 0 };
-    }
-    const rawDate = row[dateCol];
-    if (rawDate === "" || rawDate == null) continue;
-    const attendanceDate = parseAttendanceDateHostel(rawDate);
-    if (!attendanceDate) continue;
-    if (attendanceDate < startDate || attendanceDate > endDate) continue;
-    const status = String(row[statusCol] || "").trim().toUpperCase();
-    if (status === "C/IN") {
-      attendance[studentId].add(toDateKeyHostel(attendanceDate));
-      if (locCol != null) {
-        var lid = parseHostelLocationId(row[locCol]);
-        if (lid === 1 || lid === 2) locVotes[studentId][String(lid)]++;
-      }
-    }
-  }
-  function hostelIsBlank(h) {
+  var h1 = hostel1Name || "Hostel 1", h2 = hostel2Name || "Hostel 2";
+  var startKey = toDateKeyHostel(startDate), endKey = toDateKeyHostel(endDate);
+  var locationVotes = { "1": 0, "2": 0 };
+  var gateUsers = {}, pendingByMachine = {};
+
+  function cleanId(v) { return String(v == null ? "" : v).trim().replace(/\.0$/, ""); }
+  function isBlankHostel(h) {
     var t = String(h || "").trim().toLowerCase();
-    if (!t) return true;
-    if (t === "—" || t === "-" || t === "n/a" || t === "na") return true;
-    if (t.indexOf("unassigned") >= 0) return true;
-    if (t === "none" || t === "null" || t === "undefined") return true;
-    return false;
+    return !t || t === "—" || t === "-" || t === "n/a" || t === "na" ||
+      t === "none" || t === "null" || t === "undefined" || t.indexOf("unassigned") >= 0;
   }
+  function hostelKey(h) { return String(h || "").toLowerCase().replace(/[^a-z0-9]/g, ""); }
 
-  // Master registry is authoritative. Location ID is diagnostic only.
-  var autoHostelAssigned = 0;
-  var sidsResolve = Object.keys(students);
-  for (var ri = 0; ri < sidsResolve.length; ri++) {
-    var sid = sidsResolve[ri], st = students[sid], v = locVotes[sid] || { "1": 0, "2": 0 };
-    st.locationVotes = { "1": v["1"], "2": v["2"] };
-    var maj = v["1"] > v["2"] ? 1 : (v["2"] > v["1"] ? 2 : null);
-    st.locationIdMajority = maj;
-    st.gateHostel = maj === 1 ? h1 : (maj === 2 ? h2 : "");
-    st.hostel = st.masterHostel && !hostelIsBlank(st.masterHostel) ? st.masterHostel : "Unassigned";
-    st.hostelSource = st.masterHostel && !hostelIsBlank(st.masterHostel) ? "master_list" : "unassigned";
-    st.hostelConflict = !!(st.gateHostel && st.masterHostel && !hostelIsBlank(st.masterHostel) && st.gateHostel !== st.masterHostel);
-  }
-
-  // Record mismatches for investigation, but do not suppress linked students.
-  try {
-    var existingConf = await getAll("biometric_pending"), confKeys = {};
-    (existingConf || []).forEach(function(q) {
-      if (q && q.status === "hostel_conflict" && q.machineNo) confKeys[String(q.machineNo).trim()] = true;
-    });
-    for (var ci = 0; ci < sidsResolve.length; ci++) {
-      var csid = sidsResolve[ci], cst = students[csid];
-      if (!cst || !cst.hostelConflict || confKeys[String(csid).trim()]) continue;
-      await put("biometric_pending", {
-        id: "hconf_" + Date.now().toString(36) + "_" + ci, kind: "hostel_conflict", status: "hostel_conflict",
-        machineNo: String(csid).trim(), machineName: cst.name || "", studentName: cst.name || "",
-        studentId: cst.masterId || null, regNo: cst.regNo || "", masterHostel: cst.masterHostel || "",
-        gateHostel: cst.gateHostel || "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
-      });
+  // First pass: determine the uploaded file's dominant Location ID and collect
+  // unique machine/date presence. Repeated punches on one date count once.
+  for (var r = 1; r < rows.length; r++) {
+    var row = rows[r] || [];
+    var rawDate = row[dateCol];
+    var dt = parseAttendanceDateHostel(rawDate);
+    if (!dt || dt < startDate || dt > endDate) continue;
+    var machineNo = cleanId(row[noCol]);
+    if (!machineNo) continue;
+    var lid = parseHostelLocationId(row[locCol]);
+    if (lid === 1 || lid === 2) locationVotes[String(lid)]++;
+    if (!gateUsers[machineNo]) {
+      gateUsers[machineNo] = { machineNo: machineNo, machineName: nameCol == null ? "" : String(row[nameCol] || "").trim(), dates: {}, locations: { "1": 0, "2": 0 } };
     }
-  } catch (e) { console.warn("hostel conflict queue", e); }
+    var status = String(statusCol == null ? "" : (row[statusCol] || "")).trim().toUpperCase();
+    if (status === "C/IN") gateUsers[machineNo].dates[toDateKeyHostel(dt)] = true;
+    if (lid === 1 || lid === 2) gateUsers[machineNo].locations[String(lid)]++;
+  }
 
-  // Only unmatched identities are excluded; conflict queue entries never exclude master-linked students.
-  var pendingNos = {};
-  try {
-    var qlist = await getAll("biometric_pending");
-    (qlist || []).forEach(function(q) {
-      if (!q || q.status === "linked" || q.status === "hostel_conflict") return;
-      if (q.machineNo != null && String(q.machineNo).trim()) pendingNos[String(q.machineNo).trim()] = true;
-    });
-  } catch (_) {}
-  var excludedPending = [];
-  Object.keys(students).forEach(function(sid) {
-    var st = students[sid], key = String(sid).trim();
-    var linked = !!(st && st.matched && st.masterId);
-    if (byNo[key]) linked = true;
-    if (st && st.regNo && byNo[String(st.regNo).trim().toUpperCase()]) linked = true;
-    if (pendingNos[key] && !(st && st.matched && st.masterId)) linked = false;
-    if (!linked) {
-      excludedPending.push({ machineNo:key, name:(st && st.name)||"", reason:pendingNos[key]?"awaiting officer identity review":"not linked to master list" });
-      delete students[sid]; delete attendance[sid];
+  var sourceId = locationVotes["1"] > locationVotes["2"] ? 1 :
+    (locationVotes["2"] > locationVotes["1"] ? 2 : null);
+  if (!sourceId) throw new Error("The uploaded data does not have a clear dominant Location ID for this date range. Check the file or split mixed-hostel exports before generating a report.");
+  var sourceHostel = sourceId === 1 ? h1 : h2;
+  var sourceKey = hostelKey(sourceHostel);
+  var master = await getAll("students");
+  var bySerial = {};
+  master.forEach(function(st) {
+    var serial = cleanId(st.serial);
+    if (serial) {
+      if (!bySerial[serial]) bySerial[serial] = [];
+      bySerial[serial].push(st);
     }
   });
 
+  var attendance = {}, students = {}, excludedPending = [], conflicts = [];
+  var inferredUpdates = [];
+  var activeMaster = (master || []).filter(function(st) {
+    return !st.status || String(st.status).toLowerCase() === "active";
+  });
 
+  // Resolve every gate machine user against the linked machine ID. Unknown IDs
+  // remain in a persistent review queue; names are suggestions, never identity.
+  Object.keys(gateUsers).forEach(function(machineNo) {
+    var user = gateUsers[machineNo], matches = bySerial[machineNo] || [];
+    if (matches.length !== 1) {
+      excludedPending.push({ machineNo: machineNo, name: user.machineName, reason: matches.length ? "machine ID is linked to multiple master students" : "machine ID is not linked to a master student" });
+      pendingByMachine[machineNo] = user;
+      return;
+    }
+    var st = matches[0], masterHostel = String(st.hostel || "").trim();
+    if (isBlankHostel(masterHostel)) {
+      // A linked master student with no hostel inherits the hostel of this
+      // gate export. Persist this as an inferred assignment with an audit trail.
+      st.hostel = sourceHostel;
+      st.hostelSource = "gate_location_inferred";
+      st.hostelInferredAt = new Date().toISOString();
+      st.hostelInferredFromLocationId = sourceId;
+      st.updatedAt = new Date().toISOString();
+      inferredUpdates.push(st);
+      masterHostel = sourceHostel;
+    } else if (hostelKey(masterHostel) !== sourceKey) {
+      conflicts.push({ machineNo: machineNo, studentId: st.id, studentName: st.name || user.machineName, regNo: st.regNo || "", masterHostel: masterHostel, gateHostel: sourceHostel });
+      return; // do not charge a student against a different master hostel
+    }
+  });
 
-  const dates = [];
-  const cursor = new Date(startDate);
-  while (cursor <= endDate) {
-    dates.push(new Date(cursor));
-    cursor.setDate(cursor.getDate() + 1);
+  // Persist inferred assignments before building the report.
+  for (var iu = 0; iu < inferredUpdates.length; iu++) {
+    await put("students", inferredUpdates[iu]);
+    try {
+      await writeAudit({ action: "update", entity: "students", entityId: inferredUpdates[iu].id,
+        reason: "Hostel inferred from linked gate machine ID because master hostel was blank",
+        details: { hostelAfter: sourceHostel, machineNo: cleanId(inferredUpdates[iu].serial), locationId: sourceId, source: "gate_export" } });
+    } catch (_) {}
   }
+  if (inferredUpdates.length) {
+    try { markDirty("hostel inferred assignments"); } catch (_) {}
+    try { if (typeof renderHostelRoster === "function") await renderHostelRoster(); } catch (_) {}
+  }
+
+  // Persist conflict warnings. A conflict never overwrites the master hostel.
+  var existingPending = [];
+  try { existingPending = await getAll("biometric_pending"); } catch (_) {}
+  for (var ci = 0; ci < conflicts.length; ci++) {
+    var c = conflicts[ci];
+    var already = (existingPending || []).some(function(q) {
+      return q && q.status === "hostel_conflict" && String(q.machineNo || "") === c.machineNo &&
+        String(q.studentId || "") === String(c.studentId) && hostelKey(q.gateHostel) === sourceKey;
+    });
+    if (!already) {
+      var conflictRow = { id: "hconf_" + Date.now().toString(36) + "_" + ci, kind: "hostel_conflict",
+        status: "hostel_conflict", machineNo: c.machineNo, machineName: c.studentName,
+        studentName: c.studentName, studentId: c.studentId, regNo: c.regNo,
+        masterHostel: c.masterHostel, gateHostel: c.gateHostel,
+        locationId: sourceId, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+      await put("biometric_pending", conflictRow);
+      existingPending.push(conflictRow);
+    }
+  }
+  if (conflicts.length) { try { markDirty("hostel conflicts"); } catch (_) {} }
+
+  // Build the report from ALL active master students assigned to the detected
+  // hostel, including students with zero gate punches in the selected period.
+  activeMaster.forEach(function(st) {
+    var assigned = String(st.hostel || "").trim();
+    if (isBlankHostel(assigned) || hostelKey(assigned) !== sourceKey) return;
+    var serial = cleanId(st.serial);
+    var gateUser = serial ? gateUsers[serial] : null;
+    var sid = String(st.id);
+    students[sid] = {
+      name: st.name || "", hostel: assigned, hostelSource: st.hostelSource || "master_list",
+      regNo: st.regNo || "", programme: st.programme || "", level: st.level || "",
+      masterId: st.id, masterHostel: assigned, matched: !!serial,
+      machineNo: serial, gateHostel: gateUser ? sourceHostel : "",
+      locationIdMajority: sourceId, hostelConflict: false
+    };
+    var present = new Set();
+    if (gateUser) Object.keys(gateUser.dates).forEach(function(k) { present.add(k); });
+    attendance[sid] = present;
+  });
+
+  // Pending items are stored separately from the report roster, and can be
+  // resolved later from the existing biometric matching queue.
+  var dates = [];
+  for (var cursor = new Date(startDate); cursor <= endDate; cursor.setDate(cursor.getDate() + 1)) dates.push(new Date(cursor));
   return {
-    students: students,
-    attendance: attendance,
-    dates: dates,
-    hostel1Name: h1,
-    hostel2Name: h2,
-    excludedPending: excludedPending,
-    autoHostelAssigned: autoHostelAssigned || 0
+    students: students, attendance: attendance, dates: dates,
+    hostel1Name: h1, hostel2Name: h2, sourceHostel: sourceHostel,
+    sourceLocationId: sourceId, locationVotes: locationVotes,
+    excludedPending: excludedPending, pendingUsers: pendingByMachine,
+    conflicts: conflicts, autoHostelAssigned: inferredUpdates.length
   };
 }
-
 function ordinalSuffixHostel(n) {
   const v = n % 100;
   if (v >= 11 && v <= 13) return "th";
