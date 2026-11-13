@@ -1993,14 +1993,15 @@ async function openHostelRunViewer(id, editable) {
   var body = show.map(function(r, i) {
     var marks = r.dayMarks || [];
     var markCells = headers.map(function(_, di) {
-      var m = marks[di] || "";
+      var rawMark = marks[di];
+      var m = (String(rawMark == null ? "" : rawMark).trim().toUpperCase() === "A" || String(rawMark == null ? "" : rawMark).trim().toUpperCase() === "X") ? "A" : "P";
       if (editable) {
         return '<td><select data-hr-mark="' + i + ':' + di + '" class="hr-mark-sel">' +
           '<option value="P"' + (m === "P" ? " selected" : "") + '>P</option>' +
           '<option value="A"' + (m === "A" ? " selected" : "") + '>A</option>' +
           '</select></td>';
       }
-      return "<td>" + escapeHtml(m || "—") + "</td>";
+      return "<td>" + escapeHtml(m) + "</td>";
     }).join("");
     return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(r.name || "") + "</td><td>" + escapeHtml(r.regNo || "") +
       "</td><td>" + escapeHtml(r.hostel || "") + "</td>" + markCells +
@@ -2048,7 +2049,8 @@ function recalcHostelRunEditPreview() {
     var absent = 0;
     for (var di = 0; di < nDays; di++) {
       var sel = table.querySelector('select[data-hr-mark="' + i + ':' + di + '"]');
-      var m = sel ? sel.value : ((r.dayMarks || [])[di] || "A");
+      var oldMark = (r.dayMarks || [])[di];
+      var m = sel ? sel.value : ((String(oldMark == null ? "" : oldMark).trim().toUpperCase() === "A" || String(oldMark == null ? "" : oldMark).trim().toUpperCase() === "X") ? "A" : "P");
       if (m === "A") absent++;
     }
     var daysEl = table.querySelector('[data-hr-days="' + i + '"]');
@@ -2076,7 +2078,8 @@ async function saveHostelRunEdit() {
     var absent = 0;
     for (var di = 0; di < nDays; di++) {
       var sel = table && table.querySelector('select[data-hr-mark="' + i + ':' + di + '"]');
-      var prev = (r.dayMarks || [])[di] || "";
+      var oldPrev = (r.dayMarks || [])[di];
+      var prev = (String(oldPrev == null ? "" : oldPrev).trim().toUpperCase() === "A" || String(oldPrev == null ? "" : oldPrev).trim().toUpperCase() === "X") ? "A" : "P";
       var m = sel ? sel.value : prev;
       marks.push(m);
       if (m === "A") absent++;
@@ -2282,11 +2285,11 @@ async function generateHostelReport() {
     });
     var exN = (result._excludedN || (result.excludedPending && result.excludedPending.length) || 0);
     setHostelStatus(
-      "Report ready · " + absentees.length + " absentees · hostel via Location ID " + locN +
-      " · master fallback " + mastN + " · unassigned " + unN +
+      "Report ready · " + absentees.length + " absentees · master-list hostel assignments " + mastN +
+      " · unassigned " + unN +
       (confN ? (" · " + confN + " machine≠master conflicts") : "") +
       (exN ? (" · " + exN + " unreviewed machine user(s) held out until linked") : "") +
-      ((result.autoHostelAssigned) ? (" · auto-assigned hostel on " + result.autoHostelAssigned + " student(s) with blank hostel") : "") +
+      "" +
       " · saved to master sheet (Publish to keep on all devices).",
       "ok"
     );
@@ -2753,7 +2756,7 @@ function printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, end
     "<h2>1. Executive summary</h2>" +
     "<p class=\"narrative\">This report covers <strong>" + period + "</strong> at a charge of <strong>" + formatNairaHostel(rate) +
     "</strong> per absent night. <strong>" + absentees.length + "</strong> students were absent on one or more nights, generating a combined liability of <strong>" +
-    formatNairaHostel(totalFine) + "</strong>. Hostel placement follows the master student record. Biometric Location ID is diagnostic only and does not override master hostel assignment. Occasional software mix-ups can still appear — use REF edit on the master run if a row is wrong. Historical published runs remain unchanged if a student is later moved between hostels.</p>" +
+    formatNairaHostel(totalFine) + "</strong>. Hostel placement follows the master student record. Biometric Location ID is diagnostic only and does not override master hostel assignment. Gate/master discrepancies are recorded for review; they do not override the master assignment. Historical published runs remain unchanged if a student is later moved between hostels.</p>" +
     "<div class=\"kpi\"><div><strong>" + absentees.length + "</strong>Absentees</div>" +
     "<div><strong>" + formatNairaHostel(totalFine) + "</strong>Total due</div>" +
     "<div><strong>" + formatNairaHostel(rate) + "</strong>Daily rate</div></div>" +
