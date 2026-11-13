@@ -1937,7 +1937,9 @@ async function previewHostelFromGate() {
       dates: result.dates,
       result: result
     };
-    setHostelStatus("Preview ready — edit names, days (P/A), then Confirm & download.", "ok");
+    try { await queueUnmatchedFromHostelResult(result, result.hostel1Name, result.hostel2Name); } catch (queueErr) { console.warn("hostel pending queue", queueErr); }
+    try { await persistHostelDraftRun(window.__lastHostelReport); } catch (draftErr) { console.error("hostel draft save", draftErr); throw new Error("The report preview could not be saved safely: " + (draftErr.message || String(draftErr))); }
+    setHostelStatus("Preview ready — edit names, days (P/A), then Confirm & download. The draft is saved so resolved issues can be added to this report.", "ok");
     return result;
   } catch (err) {
     console.error(err);
@@ -2058,6 +2060,38 @@ async function attachHostelRunToPending(run, result) {
     changed = true;
   }
   if (changed) markDirty("hostel pending report association");
+}
+
+
+async function persistHostelDraftRun(report) {
+  if (!report || !report.result || !report.result.students) return null;
+  var result=report.result, dateKeys=(result.dates||[]).map(function(d){return toDateKeyHostel(d);});
+  var rate=Number(report.rate||0), matrix=[];
+  Object.keys(result.students).forEach(function(sid){
+    var meta=result.students[sid]||{},present=result.attendance&&result.attendance[sid]?result.attendance[sid]:new Set();
+    var marks=dateKeys.map(function(k){return present&&present.has&&present.has(k)?"P":"A";});
+    var absent=marks.filter(function(m){return m==="A";}).length;
+    matrix.push({studentId:String(sid),machineNo:meta.machineNo||"",name:meta.name||"",regNo:meta.regNo||"",hostel:meta.hostel||"",programme:meta.programme||"",level:meta.level||"",dayMarks:marks,absentDays:absent,fine:absent*rate});
+  });
+  var existing=report.runId?(await getAll("hostel_runs")).find(function(x){return x.id===report.runId;}):null;
+  var id=(existing&&existing.id)||report.runId||("hr_"+Date.now().toString(36));
+  matrix.forEach(function(row){row.rosterId=id+"::"+String(row.studentId);});
+  var abs=matrix.filter(function(row){return row.absentDays>0;});
+  var run={id:id,status:"draft",hostel:result.sourceHostel||"",sourceLocationId:result.sourceLocationId||null,
+    coverageDateKeys:result.coverageDateKeys||dateKeys.slice(),gateEvents:result.gateEvents||[],
+    createdAt:(existing&&existing.createdAt)||new Date().toISOString(),updatedAt:new Date().toISOString(),
+    start:dateKeys[0],end:dateKeys[dateKeys.length-1],rate:rate,dateKeys:dateKeys,dayHeaders:report.dayHeaders||[],
+    absenteeCount:abs.length,totalFine:abs.reduce(function(sum,row){return sum+row.fine;},0),studentCount:matrix.length,
+    rows:abs.map(function(row){return Object.assign({},row);}),matrix:matrix,
+    amendments:(existing&&existing.amendments)||[],resolutions:(existing&&existing.resolutions)||[],
+    note:"Draft attendance report. P=present; A=absent. Hostel assignment follows the master student record.",source:"gate_export_draft"};
+  stampSessionFields(run);
+  await put("hostel_runs",run);
+  report.runId=id;
+  await attachHostelRunToPending(run,result);
+  markDirty("hostel report draft");
+  try{await renderHostelRunsMaster();}catch(_){}
+  return run;
 }
 
 async function reconcileHostelRunsForMachine(machineNo, student) {
