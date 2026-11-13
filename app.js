@@ -1459,6 +1459,7 @@ function handleHostelFile(file) {
         return;
       }
       hostelParsedRows = rows;
+      setHostelDateRangeFromRows(rows, validation.headerIndex);
       const count = countHostelStudents(rows, validation.headerIndex);
       showHostelFileCheck('Ready — "' + file.name + '". About ' + count + " students found. Building editable preview…", "ok");
       try { previewHostelFromGate(); } catch (pe) { console.warn("auto preview", pe); }
@@ -1499,6 +1500,24 @@ function countHostelStudents(rows, headerIndex) {
     if (name && no !== "") seen.add(String(no).trim());
   }
   return seen.size;
+}
+
+function setHostelDateRangeFromRows(rows, headerIndex) {
+  var dateCol = headerIndex && headerIndex["Date/Time"];
+  if (dateCol == null) return;
+  var minDate = null, maxDate = null;
+  for (var r = 1; r < rows.length; r++) {
+    var parsed = parseAttendanceDateHostel(rows[r][dateCol]);
+    if (!parsed) continue;
+    if (!minDate || parsed < minDate) minDate = parsed;
+    if (!maxDate || parsed > maxDate) maxDate = parsed;
+  }
+  if (minDate && maxDate) {
+    var startEl = document.getElementById("hostelStartDate");
+    var endEl = document.getElementById("hostelEndDate");
+    if (startEl) startEl.value = toInputDateHostel(minDate);
+    if (endEl) endEl.value = toInputDateHostel(maxDate);
+  }
 }
 
 function parseInputDateHostel(value) {
