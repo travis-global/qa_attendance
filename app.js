@@ -2484,7 +2484,7 @@ async function finalizeHostelReportFromPreview() {
   try{
     stampSessionFields(run);await put("hostel_runs",run);
     try{await attachHostelRunToPending(run,result||{});}catch(attachErr){console.warn("pending run association",attachErr);}
-    await writeAudit({action:"create",entity:"hostel_runs",entityId:run.id,reason:"Hostel report finalized from editable preview",
+    await writeAudit({action:priorRun?"update":"create",entity:"hostel_runs",entityId:run.id,reason:"Hostel report finalized from editable preview",
       details:{start:start,end:end,rate:rate,absenteeCount:absentees.length,totalFine:total,studentCount:matrix.length,edited:true}});
     markDirty("hostel_runs");await renderHostelRunsMaster();
     downloadHostelWorkbook(matrix,dateKeys,"EOCNS_Absence_Report_"+start+"_to_"+end+".xlsx");
