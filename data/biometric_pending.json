@@ -778,5 +778,140 @@
     ],
     "createdAt": "2026-11-11T10:59:21.090Z",
     "updatedAt": "2026-11-11T10:59:21.090Z"
+  },
+  {
+    "id": "bio_h_mwezn1na_801_0",
+    "kind": "hostel",
+    "machineNo": "801",
+    "machineName": "Favour Uwa",
+    "deviceLabel": "Hostel 2",
+    "status": "unlinked",
+    "reason": "machine ID is not linked to a master student",
+    "suggestions": [
+      {
+        "studentId": "stu_mwaq08d1_87",
+        "name": "FAVOUR NZEWI",
+        "regNo": "EOCNS/25/0162/GNS",
+        "serial": "EOCNS/25/0162/GNS",
+        "score": 50
+      },
+      {
+        "studentId": "stu_mwaq08l2_111",
+        "name": "Favour Arua",
+        "regNo": "EOCNS/25/0052/GNS",
+        "serial": "72",
+        "score": 50
+      },
+      {
+        "studentId": "stu_mwaq092o_160",
+        "name": "FAVOUR NWAKPA",
+        "regNo": "EOCNS/25/0081/GNS",
+        "serial": "101",
+        "score": 50
+      },
+      {
+        "studentId": "stu_mwaqclbv_71",
+        "name": "Favour Nwaorgu",
+        "regNo": "EOCNS/24/0090/GNS",
+        "serial": "372",
+        "score": 50
+      },
+      {
+        "studentId": "stu_mwaqclnn_98",
+        "name": "Favour Eni",
+        "regNo": "EOCNS/24/0092/GNS",
+        "serial": "EOCNS/24/0092/GNS",
+        "score": 50
+      }
+    ],
+    "reportRunIds": [
+      "hr_mwezn1o2"
+    ],
+    "createdAt": "2026-11-13T13:03:53.110Z",
+    "updatedAt": "2026-11-13T13:03:53.154Z",
+    "reportContexts": [
+      {
+        "runId": "hr_mwezn1o2",
+        "hostel": "Hostel 2",
+        "start": "2026-11-09",
+        "end": "2026-11-12",
+        "locationId": 2
+      }
+    ]
+  },
+  {
+    "id": "hconf_resolved_mwez273t_0",
+    "kind": "hostel_conflict",
+    "status": "hostel_conflict",
+    "machineNo": "1535",
+    "machineName": "AGU CHIOMA AKUABATA",
+    "studentName": "AGU CHIOMA AKUABATA",
+    "studentId": "stu_mvs9weg9bwro3",
+    "regNo": "EOCNS/26/0058/GNS",
+    "masterHostel": "Off-campus",
+    "gateHostel": "Hostel 2",
+    "locationId": 2,
+    "reportRunIds": [
+      "hr_mweyzc8l",
+      "hr_mwez3wc6",
+      "hr_mwez4uuh",
+      "hr_mwezfqh5",
+      "hr_mwezgegz",
+      "hr_mwezhs62",
+      "hr_mwezn1o2"
+    ],
+    "reportContexts": [
+      {
+        "runId": "hr_mweyzc8l",
+        "hostel": "Hostel 2",
+        "start": "2026-11-09",
+        "end": "2026-11-12",
+        "locationId": 2
+      },
+      {
+        "runId": "hr_mwez3wc6",
+        "hostel": "Hostel 2",
+        "start": "2026-11-09",
+        "end": "2026-11-12",
+        "locationId": 2
+      },
+      {
+        "runId": "hr_mwez4uuh",
+        "hostel": "Hostel 2",
+        "start": "2026-11-09",
+        "end": "2026-11-12",
+        "locationId": 2
+      },
+      {
+        "runId": "hr_mwezfqh5",
+        "hostel": "Hostel 2",
+        "start": "2026-11-09",
+        "end": "2026-11-12",
+        "locationId": 2
+      },
+      {
+        "runId": "hr_mwezgegz",
+        "hostel": "Hostel 2",
+        "start": "2026-11-09",
+        "end": "2026-11-12",
+        "locationId": 2
+      },
+      {
+        "runId": "hr_mwezhs62",
+        "hostel": "Hostel 2",
+        "start": "2026-11-09",
+        "end": "2026-11-12",
+        "locationId": 2
+      },
+      {
+        "runId": "hr_mwezn1o2",
+        "hostel": "Hostel 2",
+        "start": "2026-11-09",
+        "end": "2026-11-12",
+        "locationId": 2
+      }
+    ],
+    "createdAt": "2026-11-13T12:47:40.409Z",
+    "updatedAt": "2026-11-13T13:03:53.172Z"
   }
 ]
