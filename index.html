@@ -299,8 +299,7 @@
         </section>
         <section class="view" id="view-hostel">
           <div class="page-toolbar" style="margin-bottom:12px">
-            <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Biometrics &amp; train → link machine IDs. Fee report uses Location ID majority; conflicts held until clarified.</p></div>
-            <div class="page-toolbar__right"><button type="button" class="btn btn--primary" id="btnGenerateHostelReport">Generate hostel distribution report</button></div>
+            <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Upload a gate attendance file, choose the reporting dates, review absentees and confirm the final report. Hostel assignment comes from the student master list; gate Location ID is only a cross-check.</p></div>
           </div>
 
           <div class="page-toolbar">
@@ -311,6 +310,9 @@
 
           
           
+<details class="card" style="margin-bottom:16px">
+            <summary style="padding:16px;font-weight:650;cursor:pointer">Advanced setup: biometric linking, roster and location checks</summary>
+            <div style="padding:0 16px 16px">
 <div class="card" style="margin-bottom:16px" id="biometricMapCard">
             <div class="card__header">
               <h3 style="margin:0">Biometric device users → master list</h3>
@@ -392,7 +394,7 @@
           </div>
 
 <div class="card" style="margin-bottom:16px">
-            <div class="card__header"><h3>1. Upload gate log (fee report)</h3></div>
+            <div class="card__header"><h3>1. Upload gate attendance file</h3></div>
             <div class="card__body">
               <div id="hostelDropzone" class="dropzone" style="border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;cursor:pointer;background:var(--surface-2)">
                 <p style="margin:0 0 8px;font-weight:600">Drop the gate export here, or click to choose</p>
@@ -406,7 +408,7 @@
           <div class="card" style="margin-bottom:16px">
             <div class="card__header"><h3>Master hostel roster</h3></div>
             <div class="card__body">
-              <p class="muted-note">Hostel on each run uses <strong>majority Location ID</strong> from punches (1 = Hostel 1, 2 = Hostel 2). If Location ID is missing or tied 1–2, the <strong>student master list</strong> is used. Occasional ZK mix-ups: edit the saved run with REF. Upload both machines for the period when possible.</p>
+              <p class="muted-note">The student master list is the source of truth for each student’s hostel. Gate Location ID is shown only as a diagnostic cross-check; a mismatch does not change the student’s hostel or remove them from the report.</p>
               <div class="form-grid">
                 <label class="field"><span class="field__label">Filter by hostel</span>
                   <select id="hostelRosterFilter">
@@ -456,9 +458,12 @@
               <p class="muted-note" id="hostelConflictCount" style="margin:8px 0 0">Conflicts: 0</p>
             </div>
           </div>
+            </div>
+          </details>
+
 
 <div class="card" style="margin-bottom:16px">
-            <div class="card__header"><h3>2. Report settings</h3></div>
+            <div class="card__header"><h3>2. Choose report period and fine rate</h3></div>
             <div class="card__body">
               <div class="form-grid">
                 <label class="field"><span class="field__label">Start date</span><input type="date" id="hostelStartDate" /></label>
@@ -468,15 +473,39 @@
                 <label class="field"><span class="field__label">Hostel 2 name (Location ID = 2)</span><input type="text" id="hostel2Name" value="Hostel 2" /></label>
               </div>
               <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-                <button type="button" class="btn btn--primary" id="btnGenerateHostel">Generate &amp; download report</button>
+                <button type="button" class="btn btn--primary" id="btnGenerateHostel">Build attendance preview</button>
                 <button type="button" class="btn btn--ghost" id="btnClearHostel">Clear</button>
               </div>
               <div id="hostelStatus" class="muted-note" style="margin-top:12px"></div>
             </div>
           </div>
+<div class="card" id="hostelResults" hidden>
+            <div class="card__header"><h3>3. Review absentees and confirm</h3></div>
+            <div class="card__body">
+              <div style="padding:12px 14px;margin-bottom:12px;border-radius:10px;border:1px solid #99f6e4;background:#f0fdfa;color:#134e4a;font-size:0.92rem;line-height:1.45">
+                <strong>Before you download:</strong> edit any <em>name</em>, <em>hostel</em>, or day mark (<strong>P</strong> = present, <strong>A</strong> = absent).
+                Days absent and fines recalculate when you click <strong>Recalculate from edits</strong>.
+                Unmatched / unclear rows can be corrected here so the final fee report is accurate.
+              </div>
+              <div id="hostelSummary" class="muted-note" style="margin-bottom:10px"></div>
+              <div style="overflow-x:auto;max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:8px">
+                <table class="data-table" id="hostelPreviewTable"><thead></thead><tbody></tbody></table>
+              </div>
+              <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+                <button type="button" class="btn btn--ghost" id="btnHostelRecalcPreview">Recalculate from edits</button>
+                <button type="button" class="btn btn--primary" id="btnHostelFinalizeReport">Confirm edits &amp; download report</button>
+                <button type="button" class="btn btn--ghost" id="btnHostelAddPreviewRow">+ Add row</button>
+              </div>
+              <p class="muted-note" style="margin-top:8px">Make any corrections, then select <strong>Confirm edits &amp; download report</strong>. The report is saved to the master sheet as well.</p>
+            </div>
+          </div>
 
 
-          <div class="card" style="margin-bottom:16px">
+
+          <details class="card" style="margin-bottom:16px">
+            <summary style="padding:16px;font-weight:650;cursor:pointer">Past reports and saved attendance sheets</summary>
+            <div style="padding:0 16px 16px">
+<div class="card" style="margin-bottom:16px">
             <div class="card__header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
               <h3 style="margin:0">3. Master hostel attendance sheet</h3>
               <div style="display:flex;gap:8px;align-items:center">
@@ -494,27 +523,10 @@
               </div>
             </div>
           </div>
-
-          <div class="card" id="hostelResults" hidden>
-            <div class="card__header"><h3>Editable preview — review before final report</h3></div>
-            <div class="card__body">
-              <div style="padding:12px 14px;margin-bottom:12px;border-radius:10px;border:1px solid #99f6e4;background:#f0fdfa;color:#134e4a;font-size:0.92rem;line-height:1.45">
-                <strong>Before you download:</strong> edit any <em>name</em>, <em>hostel</em>, or day mark (<strong>P</strong> = present, <strong>A</strong> = absent).
-                Days absent and fines recalculate when you click <strong>Recalculate from edits</strong>.
-                Unmatched / unclear rows can be corrected here so the final fee report is accurate.
-              </div>
-              <div id="hostelSummary" class="muted-note" style="margin-bottom:10px"></div>
-              <div style="overflow-x:auto;max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:8px">
-                <table class="data-table" id="hostelPreviewTable"><thead></thead><tbody></tbody></table>
-              </div>
-              <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-                <button type="button" class="btn btn--ghost" id="btnHostelRecalcPreview">Recalculate from edits</button>
-                <button type="button" class="btn btn--primary" id="btnHostelFinalizeReport">Confirm edits &amp; download report</button>
-                <button type="button" class="btn btn--ghost" id="btnHostelAddPreviewRow">+ Add row</button>
-              </div>
-              <p class="muted-note" style="margin-top:8px">You can also use <strong>Generate &amp; download report</strong> above — it builds this preview first, then downloads after you confirm.</p>
             </div>
-          </div>
+          </details>
+
+          
         </section>
         <section class="view" id="view-sessions">
           <div class="page-toolbar">
