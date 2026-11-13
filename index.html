@@ -304,12 +304,24 @@
 
           <div class="page-toolbar">
             <div class="page-toolbar__left">
-              <p class="muted-note" style="margin:0">Upload the gate / biometric export (.xls / .xlsx) and generate the standard Hostel Absentees boarding-fee report.</p>
+              <p class="muted-note" style="margin:0">The gate export supplies check-in records. Select the dates below; the preview will show students with at least one absent day.</p>
             </div>
           </div>
 
           
           
+<div class="card" style="margin-bottom:16px">
+            <div class="card__header"><h3>1. Upload gate attendance file</h3></div>
+            <div class="card__body">
+              <div id="hostelDropzone" class="dropzone" style="border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;cursor:pointer;background:var(--surface-2)">
+                <p style="margin:0 0 8px;font-weight:600">Drop the gate export here, or click to choose</p>
+                <p class="muted-note" style="margin:0">Required columns: Department, Name, No., Date/Time, Status, Location ID</p>
+                <input type="file" id="hostelFileInput" accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden />
+              </div>
+              <div id="hostelFileCheck" class="muted-note" style="margin-top:10px" hidden></div>
+            </div>
+          </div>
+
 <details class="card" style="margin-bottom:16px">
             <summary style="padding:16px;font-weight:650;cursor:pointer">Advanced setup: biometric linking, roster and location checks</summary>
             <div style="padding:0 16px 16px">
@@ -393,17 +405,7 @@
             </div>
           </div>
 
-<div class="card" style="margin-bottom:16px">
-            <div class="card__header"><h3>1. Upload gate attendance file</h3></div>
-            <div class="card__body">
-              <div id="hostelDropzone" class="dropzone" style="border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;cursor:pointer;background:var(--surface-2)">
-                <p style="margin:0 0 8px;font-weight:600">Drop the gate export here, or click to choose</p>
-                <p class="muted-note" style="margin:0">Required columns: Department, Name, No., Date/Time, Status, Location ID</p>
-                <input type="file" id="hostelFileInput" accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden />
-              </div>
-              <div id="hostelFileCheck" class="muted-note" style="margin-top:10px" hidden></div>
-            </div>
-          </div>
+
 
           <div class="card" style="margin-bottom:16px">
             <div class="card__header"><h3>Master hostel roster</h3></div>
@@ -446,8 +448,7 @@
             </div>
             <div class="card__body">
               <p class="muted-note" style="margin-top:0">
-                Master hostel differs from gate <strong>Location ID</strong> majority.
-                These students stay <strong>off the fee report</strong> until you confirm master, accept machine location, or clear the flag.
+                Master hostel differs from the gate Location ID. The master hostel remains in use; resolve the mismatch here only if the student’s official hostel record needs correction.
               </p>
               <div class="table-scroll" style="max-height:260px;overflow:auto">
                 <table class="data-table">
@@ -469,8 +470,8 @@
                 <label class="field"><span class="field__label">Start date</span><input type="date" id="hostelStartDate" /></label>
                 <label class="field"><span class="field__label">End date</span><input type="date" id="hostelEndDate" /></label>
                 <label class="field"><span class="field__label">Rate per absent day (₦)</span><input type="number" id="hostelRate" value="15000" min="0" step="500" /></label>
-                <label class="field"><span class="field__label">Hostel 1 name (Location ID = 1)</span><input type="text" id="hostel1Name" value="Hostel 1" /></label>
-                <label class="field"><span class="field__label">Hostel 2 name (Location ID = 2)</span><input type="text" id="hostel2Name" value="Hostel 2" /></label>
+                <label class="field"><span class="field__label">Gate label for Location ID 1 (cross-check)</span><input type="text" id="hostel1Name" value="Hostel 1" /></label>
+                <label class="field"><span class="field__label">Gate label for Location ID 2 (cross-check)</span><input type="text" id="hostel2Name" value="Hostel 2" /></label>
               </div>
               <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
                 <button type="button" class="btn btn--primary" id="btnGenerateHostel">Build attendance preview</button>
@@ -484,7 +485,7 @@
             <div class="card__body">
               <div style="padding:12px 14px;margin-bottom:12px;border-radius:10px;border:1px solid #99f6e4;background:#f0fdfa;color:#134e4a;font-size:0.92rem;line-height:1.45">
                 <strong>Before you download:</strong> edit any <em>name</em>, <em>hostel</em>, or day mark (<strong>P</strong> = present, <strong>A</strong> = absent).
-                Days absent and fines recalculate when you click <strong>Recalculate from edits</strong>.
+                Days absent and fines update automatically when you change a day mark.
                 Unmatched / unclear rows can be corrected here so the final fee report is accurate.
               </div>
               <div id="hostelSummary" class="muted-note" style="margin-bottom:10px"></div>
