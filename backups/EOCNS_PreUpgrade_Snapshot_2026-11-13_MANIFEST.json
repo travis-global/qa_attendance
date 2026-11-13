@@ -1,0 +1,209 @@
+{
+  "createdAt": "2026-11-13T08:47:27.086506+00:00",
+  "git": {
+    "commit": "b3075bc0de98ceaa733ac14b75e92811513403e9",
+    "log": "b3075bc0de98ceaa733ac14b75e92811513403e9 | 2026-11-13 08:03:28 +0000 | Wire remaining buttons: weekly/monthly download, handover sheet, remedial modal close",
+    "repo": "travis-global/qa_attendance"
+  },
+  "counts": {
+    "attendance": 0,
+    "audit": 1436,
+    "biometric_pending": 26,
+    "config": 1,
+    "courses": 29,
+    "discipline": 0,
+    "hostel_runs": 0,
+    "lecturers": 23,
+    "levels": 3,
+    "pending_students": 1,
+    "programmes": 3,
+    "qa_entries": 31,
+    "remedial": 0,
+    "remedial_assignments": 0,
+    "remedial_enrolment": 0,
+    "remedial_logs": 0,
+    "remedial_meta": 1,
+    "remedial_timetable": 1,
+    "sessions": 1,
+    "students": 423,
+    "timetables": 1
+  },
+  "files": [
+    {
+      "name": "attendance.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0,
+      "type": "list"
+    },
+    {
+      "name": "audit.json",
+      "bytes": 960768,
+      "sha256": "0dfa48b621bd9134fd65b12f111b84204638089aa05074346a4388481561c765",
+      "count": 1436,
+      "type": "list"
+    },
+    {
+      "name": "biometric_pending.json",
+      "bytes": 20217,
+      "sha256": "7199a6e4288042fec292a2a79c50e5af03f2fd3b78ce89947d25c0e499e2eaa4",
+      "count": 26,
+      "type": "list"
+    },
+    {
+      "name": "config.json",
+      "bytes": 442,
+      "sha256": "4a35cea47ad79f0bdfc5244a82d44301662b986299905f165ea3f82b943d126b",
+      "count": 1,
+      "type": "dict"
+    },
+    {
+      "name": "courses.json",
+      "bytes": 3750,
+      "sha256": "021853ef5e5342936ba3415b5427b1e97111e09fe721ca0b4f9dad24937da57d",
+      "count": 29,
+      "type": "list"
+    },
+    {
+      "name": "discipline.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0,
+      "type": "list"
+    },
+    {
+      "name": "hostel_runs.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0,
+      "type": "list"
+    },
+    {
+      "name": "lecturers.json",
+      "bytes": 14514,
+      "sha256": "613d673b70de2b2b480aafc67ea6c521a86ac60110e18b1b5b0699a50574fe48",
+      "count": 23,
+      "type": "list"
+    },
+    {
+      "name": "levels.json",
+      "bytes": 290,
+      "sha256": "4491b72397eb82feaacbda132b0934b02653c3e0410bb9e2396173cb6d1818d9",
+      "count": 3,
+      "type": "list"
+    },
+    {
+      "name": "pending_students.json",
+      "bytes": 38928,
+      "sha256": "0c6ce25986cf61faaddf6699e8d3b593fdd5be0659132bb8f4962d819df98e7e",
+      "count": 1,
+      "type": "list"
+    },
+    {
+      "name": "programmes.json",
+      "bytes": 313,
+      "sha256": "58148459905003fd75cfdeed9ef9223c66e163811f7b23e1cf903e1c66d69bb4",
+      "count": 3,
+      "type": "list"
+    },
+    {
+      "name": "qa_entries.json",
+      "bytes": 28738,
+      "sha256": "fc6ac9227640cf31105912bc8c40d3651b49bdcde3d136bacfc3becf3863208d",
+      "count": 31,
+      "type": "list"
+    },
+    {
+      "name": "remedial.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0,
+      "type": "list"
+    },
+    {
+      "name": "remedial_assignments.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0,
+      "type": "list"
+    },
+    {
+      "name": "remedial_enrolment.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0,
+      "type": "list"
+    },
+    {
+      "name": "remedial_logs.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0,
+      "type": "list"
+    },
+    {
+      "name": "remedial_meta.json",
+      "bytes": 183,
+      "sha256": "8f9bc458978c00734822af391bbea3d5e0fb17f25d6163cc3cede79818f5fd9c",
+      "count": 1,
+      "type": "dict"
+    },
+    {
+      "name": "remedial_timetable.json",
+      "bytes": 17,
+      "sha256": "176d5f35ccf0d4c5c4ba469f88b339dbde100b71d87b6afcad106553b81391fa",
+      "count": 1,
+      "type": "dict"
+    },
+    {
+      "name": "sessions.json",
+      "bytes": 343,
+      "sha256": "371a321661743eca38a7ac324ad516c107350545468699ae1186cc82e6be2156",
+      "count": 1,
+      "type": "list"
+    },
+    {
+      "name": "students.json",
+      "bytes": 130473,
+      "sha256": "7093c679f3736a5c07d681220dc9d68714e9b5a4bc4eaba4e34e21e0580d3019",
+      "count": 423,
+      "type": "list"
+    },
+    {
+      "name": "timetables.json",
+      "bytes": 7429,
+      "sha256": "8092757130c973d50e2431ab384585c5dfe48f6d231bc3f08bcfc4d75aa578b0",
+      "count": 1,
+      "type": "dict"
+    }
+  ],
+  "livePagesParity": {
+    "attendance": "match",
+    "audit": "match",
+    "biometric_pending": "match",
+    "config": "match",
+    "courses": "match",
+    "discipline": "match",
+    "hostel_runs": "match",
+    "lecturers": "match",
+    "levels": "match",
+    "pending_students": "match",
+    "programmes": "match",
+    "qa_entries": "match",
+    "remedial": "match",
+    "remedial_assignments": "match",
+    "remedial_enrolment": "match",
+    "remedial_logs": "match",
+    "remedial_meta": "match",
+    "remedial_timetable": "match",
+    "sessions": "match",
+    "students": "match",
+    "timetables": "match"
+  },
+  "fullSnapshotFile": "EOCNS_Full_Snapshot.json",
+  "notes": [
+    "This backup was taken before architectural upgrade (Worker-only PIN, encryption-at-rest, lazy loading).",
+    "Restore by importing stores into the app or copying data/*.json back to the repository.",
+    "Keep this archive offline and confidential \u2014 it contains plain institutional data."
+  ]
+}
