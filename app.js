@@ -2091,7 +2091,7 @@ function downloadHostelWorkbook(rosterRows, dateKeys, filename, gateExportRows) 
   XLSX.writeFile(wb, filename);
 }
 
-function downloadHostelRunWorkbook(run) {
+async function downloadHostelRunWorkbook(run) {
   if (!run) throw new Error("Saved hostel report not found.");
   var matrix = (run.matrix && run.matrix.length) ? run.matrix : (run.rows || []);
   var gateRows = run.gateExportRows || [];
@@ -2349,7 +2349,7 @@ async function renderHostelRunsMaster() {
       if(!saved){alert("Saved hostel report not found.");return;}
       var linkedIssues=(await getAll("biometric_pending")).filter(function(item){return item&&item.status!=="linked"&&(item.reportRunIds||[]).indexOf(saved.id)>=0;});
       if(linkedIssues.length){alert("This report still has "+linkedIssues.length+" unresolved issue(s). Resolve or explicitly dismiss them before downloading the report.");return;}
-      try{downloadHostelRunWorkbook(saved);}catch(e){alert(e.message||String(e));}
+      try{await downloadHostelRunWorkbook(saved);}catch(e){alert(e.message||String(e));}
     });
   });
   body.querySelectorAll("[data-hr-edit]").forEach(function(btn) {
@@ -2629,7 +2629,7 @@ async function finalizeHostelReportFromPreview() {
     await writeAudit({action:priorRun?"update":"create",entity:"hostel_runs",entityId:run.id,reason:"Hostel report finalized from editable preview",
       details:{start:start,end:end,rate:rate,absenteeCount:absentees.length,totalFine:total,studentCount:matrix.length,edited:true}});
     markDirty("hostel_runs");await renderHostelRunsMaster();
-    downloadHostelRunWorkbook(run);
+    await downloadHostelRunWorkbook(run);
     if(window.__lastHostelReport)window.__lastHostelReport.runId=run.id;
     setHostelStatus("Final report downloaded and saved ("+absentees.length+" students with absences; "+matrix.length+" students in the full roster). Resolved records are included. Publish when ready so other devices receive this run.","ok");
   }catch(err){console.error(err);setHostelStatus("Finalization failed: "+(err.message||String(err)),"error");}
