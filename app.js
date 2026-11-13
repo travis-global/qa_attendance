@@ -1841,8 +1841,6 @@ function recalculateHostelPreviewFromDom() {
   return collectHostelPreviewFromDom();
 }
 
-/** 
-
 async function previewHostelFromGate() {
   if (!hostelParsedRows || !hostelParsedRows.length) {
     setHostelStatus("Upload a gate export first.", "error");
