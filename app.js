@@ -2130,7 +2130,7 @@ function closeHostelRunModal() {
 
 
 
-async async function finalizeHostelReportFromPreview() {
+async function finalizeHostelReportFromPreview() {
   if(!isQaOfficer()){setHostelStatus("Sign in as QA Officer.","error");return;}
   var rows=recalculateHostelPreviewFromDom();
   if(!rows.length){setHostelStatus("Preview is empty. Upload gate data or add rows first.","error");return;}
