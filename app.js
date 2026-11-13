@@ -151,7 +151,7 @@ function showView(viewId) {
   if (viewId === "sessions") renderSessionsList();
   if (viewId === "dashboard") refreshDashboardStats();
   if (viewId === "audit") renderAuditLog();
-  if (viewId === "hostel") { initHostelView(); renderHostelRoster(); try { renderBioQueues(); } catch (_) {} try { renderHostelConflicts(); } catch (_) {} }
+  if (viewId === "hostel") { initHostelView(); if (typeof window.renderHostelRoster === "function") window.renderHostelRoster(); else console.error("Hostel roster renderer was not initialized."); try { renderBioQueues(); } catch (_) {} try { renderHostelConflicts(); } catch (_) {} }
   if (viewId === "timetable-board") { if (typeof window.renderTimetableBoard === "function") window.renderTimetableBoard(); else if (typeof renderTimetableBoard === "function") renderTimetableBoard(); }
   if (viewId === "qa-daily") renderQaDaily();
   if (viewId === "qa-weekly") initQaWeeklyView();
