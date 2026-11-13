@@ -5381,7 +5381,7 @@ async function openStudentFullRecord(id) {
 
   var body = document.getElementById("studentFullRecordBody");
   body.innerHTML = photo +
-    "<p style=\"margin:0 0 8px\"><strong>" + escapeHtml(s.name) + "</strong><br/>" +
+    "<p style=\"margin:0 0 8px\"><strong>" + escapeHtml(formatReportPersonName(s.name)) + "</strong><br/>" +
     "Reg: " + escapeHtml(s.regNo || "—") + " · Machine ID: " + escapeHtml(s.serial || "—") + "<br/>" +
     escapeHtml(s.programme || "") + " · Level " + escapeHtml(String(s.level || "")) +
     " · Hostel: " + escapeHtml(s.hostel || "—") + " · Status: " + escapeHtml(s.status || "Active") + "</p>" +
@@ -6998,7 +6998,7 @@ function lecturerHoursTableHtml(p, forScreen) {
   } else {
     head = "<th>Lecturer</th><th>Staff ID</th><th>Contract / semester (h)</th><th>Scheduled in semester (h)</th><th>Delivered to date (h)</th><th>Variance</th><th>% of contract</th><th>Status</th>";
     rows = p.rows.map(function(r) {
-      return "<tr><td>" + escapeHtml(r.name) + "</td><td>" + escapeHtml(r.staffId) + "</td><td>" + r.contract + "</td><td>" + dash(r.scheduled) + "</td><td>" + r.delivered +
+      return "<tr><td>" + escapeHtml(formatReportPersonName(r.name)) + "</td><td>" + escapeHtml(r.staffId) + "</td><td>" + r.contract + "</td><td>" + dash(r.scheduled) + "</td><td>" + r.delivered +
         "</td><td>" + dash(r.variance) + "</td><td>" + (r.pct == null ? "—" : r.pct + "%") + "</td><td>" + escapeHtml(r.status) + "</td></tr>";
     }).join("");
   }
