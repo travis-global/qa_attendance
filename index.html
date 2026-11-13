@@ -496,10 +496,23 @@
           </div>
 
           <div class="card" id="hostelResults" hidden>
-            <div class="card__header"><h3>Preview — Absentees only</h3></div>
-            <div class="card__body" style="overflow-x:auto">
+            <div class="card__header"><h3>Editable preview — review before final report</h3></div>
+            <div class="card__body">
+              <div style="padding:12px 14px;margin-bottom:12px;border-radius:10px;border:1px solid #99f6e4;background:#f0fdfa;color:#134e4a;font-size:0.92rem;line-height:1.45">
+                <strong>Before you download:</strong> edit any <em>name</em>, <em>hostel</em>, or day mark (<strong>P</strong> = present, <strong>A</strong> = absent).
+                Days absent and fines recalculate when you click <strong>Recalculate from edits</strong>.
+                Unmatched / unclear rows can be corrected here so the final fee report is accurate.
+              </div>
               <div id="hostelSummary" class="muted-note" style="margin-bottom:10px"></div>
-              <table class="data-table" id="hostelPreviewTable"><thead></thead><tbody></tbody></table>
+              <div style="overflow-x:auto;max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:8px">
+                <table class="data-table" id="hostelPreviewTable"><thead></thead><tbody></tbody></table>
+              </div>
+              <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+                <button type="button" class="btn btn--ghost" id="btnHostelRecalcPreview">Recalculate from edits</button>
+                <button type="button" class="btn btn--primary" id="btnHostelFinalizeReport">Confirm edits &amp; download report</button>
+                <button type="button" class="btn btn--ghost" id="btnHostelAddPreviewRow">+ Add row</button>
+              </div>
+              <p class="muted-note" style="margin-top:8px">You can also use <strong>Generate &amp; download report</strong> above — it builds this preview first, then downloads after you confirm.</p>
             </div>
           </div>
         </section>
@@ -1369,7 +1382,7 @@
   </div>
 
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="app.js?v=92"></script>
+  <script src="app.js?v=93"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>

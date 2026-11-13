@@ -1,4 +1,4 @@
-/* EOCNS build v92 — outer bare report refs removed */
+/* EOCNS build v93 — outer bare report refs removed */
 (() => {
 "use strict";
 // Safe stubs so early event wiring never throws ReferenceError (real impls overwrite later)
@@ -1426,7 +1426,8 @@ function handleHostelFile(file) {
       }
       hostelParsedRows = rows;
       const count = countHostelStudents(rows, validation.headerIndex);
-      showHostelFileCheck('Ready — "' + file.name + '". About ' + count + " students found.", "ok");
+      showHostelFileCheck('Ready — "' + file.name + '". About ' + count + " students found. Building editable preview…", "ok");
+      try { previewHostelFromGate(); } catch (pe) { console.warn("auto preview", pe); }
     } catch (err) {
       console.error(err);
       hostelParsedRows = null;
@@ -1849,18 +1850,172 @@ function buildOutputBaseNameHostel(startDate, endDate) {
 function renderHostelPreview(absentees, dayHeaders, rate) {
   const table = document.getElementById("hostelPreviewTable");
   if (!table) return;
+  window.__hostelPreviewRate = rate;
+  window.__hostelPreviewDayHeaders = dayHeaders || [];
   const thead = table.querySelector("thead");
   const tbody = table.querySelector("tbody");
-  thead.innerHTML = "<tr><th>Name</th><th>Hostel</th>" + dayHeaders.map(h => "<th>" + escapeHtml(h) + "</th>").join("") + "<th>Days</th><th>Fine</th></tr>";
-  tbody.innerHTML = absentees.map(r => {
-    return "<tr><td>" + escapeHtml(r.name) + "</td><td>" + escapeHtml(r.hostel) + "</td>" +
-      r.dayMarks.map(m => '<td style="text-align:center">' + (m || "·") + "</td>").join("") +
-      "<td>" + r.absentDays + "</td><td>" + formatNairaHostel(r.fine) + "</td></tr>";
+  thead.innerHTML = "<tr><th>Name</th><th>Hostel</th>" +
+    (dayHeaders || []).map(function(h) { return "<th>" + escapeHtml(h) + "</th>"; }).join("") +
+    "<th>Days</th><th>Fine (₦)</th><th></th></tr>";
+  tbody.innerHTML = (absentees || []).map(function(r, idx) {
+    var days = (r.dayMarks || []).map(function(m, di) {
+      var v = (m === "P" || m === "A") ? m : (m ? String(m) : "A");
+      return '<td style="text-align:center;padding:2px"><input data-hp-day="' + di + '" value="' + escapeHtml(v) +
+        '" maxlength="1" title="P=present A=absent" style="width:2rem;text-align:center;text-transform:uppercase;padding:4px" /></td>';
+    }).join("");
+    return '<tr data-hp-idx="' + idx + '">' +
+      '<td><input data-hp-name type="text" value="' + escapeHtml(r.name || "") + '" style="min-width:140px;width:100%" /></td>' +
+      '<td><input data-hp-hostel type="text" value="' + escapeHtml(r.hostel || "") + '" style="min-width:90px;width:100%" /></td>' +
+      days +
+      '<td data-hp-days style="text-align:center">' + (r.absentDays != null ? r.absentDays : "") + '</td>' +
+      '<td><input data-hp-fine type="number" min="0" step="500" value="' + (Number(r.fine) || 0) + '" style="width:6rem" /></td>' +
+      '<td><button type="button" class="btn btn--ghost btn--sm" data-hp-remove="' + idx + '">Remove</button></td></tr>';
   }).join("");
-  const totalFine = absentees.reduce((s, r) => s + r.fine, 0);
-  document.getElementById("hostelSummary").textContent =
-    absentees.length + " absentees · Rate ₦" + rate.toLocaleString("en-NG") + "/day · Total fine " + formatNairaHostel(totalFine);
+  tbody.querySelectorAll("[data-hp-remove]").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      var tr = btn.closest("tr");
+      if (tr) tr.remove();
+      recalculateHostelPreviewFromDom();
+    });
+  });
+  tbody.querySelectorAll("[data-hp-day]").forEach(function(inp) {
+    inp.addEventListener("change", function() {
+      var v = String(inp.value || "").trim().toUpperCase();
+      if (v !== "P" && v !== "A") v = "A";
+      inp.value = v;
+    });
+  });
+  const totalFine = (absentees || []).reduce(function(s, r) { return s + (Number(r.fine) || 0); }, 0);
+  var sum = document.getElementById("hostelSummary");
+  if (sum) sum.textContent = (absentees || []).length + " row(s) in preview · Rate ₦" +
+    Number(rate || 0).toLocaleString("en-NG") + "/day · Total fine " + formatNairaHostel(totalFine) +
+    " — edit cells, then Recalculate or Confirm & download.";
   document.getElementById("hostelResults").hidden = false;
+}
+
+/** Read editable preview table → absentee row objects */
+function collectHostelPreviewFromDom() {
+  var table = document.getElementById("hostelPreviewTable");
+  if (!table) return [];
+  var rate = Number(window.__hostelPreviewRate) || Number((document.getElementById("hostelRate") && document.getElementById("hostelRate").value) || 0) || 0;
+  var rows = [];
+  table.querySelectorAll("tbody tr").forEach(function(tr) {
+    var nameEl = tr.querySelector("[data-hp-name]");
+    var hostEl = tr.querySelector("[data-hp-hostel]");
+    var fineEl = tr.querySelector("[data-hp-fine]");
+    var dayInputs = tr.querySelectorAll("[data-hp-day]");
+    var dayMarks = [];
+    dayInputs.forEach(function(inp) {
+      var v = String(inp.value || "").trim().toUpperCase();
+      dayMarks.push(v === "P" ? "P" : "A");
+    });
+    var absentDays = dayMarks.filter(function(m) { return m === "A"; }).length;
+    var fine = fineEl && fineEl.value !== "" ? Number(fineEl.value) : (absentDays * rate);
+    if (isNaN(fine)) fine = absentDays * rate;
+    rows.push({
+      name: nameEl ? nameEl.value.trim() : "",
+      hostel: hostEl ? hostEl.value.trim() : "",
+      dayMarks: dayMarks,
+      absentDays: absentDays,
+      fine: fine
+    });
+  });
+  return rows;
+}
+
+function recalculateHostelPreviewFromDom() {
+  var rate = Number((document.getElementById("hostelRate") && document.getElementById("hostelRate").value) || window.__hostelPreviewRate || 0) || 0;
+  window.__hostelPreviewRate = rate;
+  var table = document.getElementById("hostelPreviewTable");
+  if (!table) return [];
+  var total = 0;
+  var n = 0;
+  table.querySelectorAll("tbody tr").forEach(function(tr) {
+    n++;
+    var dayInputs = tr.querySelectorAll("[data-hp-day]");
+    var absent = 0;
+    dayInputs.forEach(function(inp) {
+      var v = String(inp.value || "").trim().toUpperCase();
+      if (v !== "P") { v = "A"; inp.value = "A"; absent++; }
+      else inp.value = "P";
+    });
+    var daysCell = tr.querySelector("[data-hp-days]");
+    if (daysCell) daysCell.textContent = String(absent);
+    var fineEl = tr.querySelector("[data-hp-fine]");
+    var fine = absent * rate;
+    if (fineEl) fineEl.value = String(fine);
+    total += fine;
+  });
+  var sum = document.getElementById("hostelSummary");
+  if (sum) sum.textContent = n + " row(s) · Rate ₦" + rate.toLocaleString("en-NG") + "/day · Total fine " + formatNairaHostel(total) + " (from your edits)";
+  return collectHostelPreviewFromDom();
+}
+
+async function previewHostelFromGate() {
+  if (!hostelParsedRows || !hostelParsedRows.length) {
+    setHostelStatus("Upload a gate export first.", "error");
+    return null;
+  }
+  if (!isQaOfficer()) {
+    setHostelStatus("Sign in as QA Officer to preview and edit hostel data.", "error");
+    return null;
+  }
+  var startDate = document.getElementById("hostelStartDate") && document.getElementById("hostelStartDate").value;
+  var endDate = document.getElementById("hostelEndDate") && document.getElementById("hostelEndDate").value;
+  var rate = Number(document.getElementById("hostelRate") && document.getElementById("hostelRate").value) || 0;
+  var hostel1Name = (document.getElementById("hostel1Name") && document.getElementById("hostel1Name").value) || "Hostel 1";
+  var hostel2Name = (document.getElementById("hostel2Name") && document.getElementById("hostel2Name").value) || "Hostel 2";
+  if (!startDate || !endDate) {
+    setHostelStatus("Set start and end dates for the period.", "error");
+    return null;
+  }
+  setHostelStatus("Computing attendance from gate data…", "");
+  try {
+    var result = await computeHostelAttendance(hostelParsedRows, startDate, endDate, hostel1Name, hostel2Name);
+    var dayHeaders = buildDayHeadersHostel(result.dates);
+    var absentees = buildAbsenteeRowsHostel(result.students, result.attendance, result.dates, rate);
+    // Include present-only students optionally? User asked edit absentees/names — keep absentees + allow add row
+    renderHostelPreview(absentees, dayHeaders, rate);
+    window.__lastHostelReport = {
+      absentees: absentees,
+      dayHeaders: dayHeaders,
+      rate: rate,
+      startDate: startDate,
+      endDate: endDate,
+      students: result.students,
+      dates: result.dates,
+      result: result
+    };
+    setHostelStatus("Preview ready — edit names, days (P/A), then Confirm & download.", "ok");
+    return result;
+  } catch (err) {
+    console.error(err);
+    setHostelStatus("Preview failed: " + (err.message || String(err)), "error");
+    return null;
+  }
+}
+
+function addHostelPreviewRow() {
+  var table = document.getElementById("hostelPreviewTable");
+  if (!table) return;
+  var headers = window.__hostelPreviewDayHeaders || [];
+  var tbody = table.querySelector("tbody");
+  if (!tbody) return;
+  var days = headers.map(function(_, di) {
+    return '<td style="text-align:center;padding:2px"><input data-hp-day="' + di + '" value="A" maxlength="1" style="width:2rem;text-align:center;text-transform:uppercase;padding:4px" /></td>';
+  }).join("");
+  var tr = document.createElement("tr");
+  tr.innerHTML = '<td><input data-hp-name type="text" value="" placeholder="FULL NAME" style="min-width:140px;width:100%" /></td>' +
+    '<td><input data-hp-hostel type="text" value="" placeholder="Hostel" style="min-width:90px;width:100%" /></td>' +
+    days +
+    '<td data-hp-days style="text-align:center">0</td>' +
+    '<td><input data-hp-fine type="number" min="0" step="500" value="0" style="width:6rem" /></td>' +
+    '<td><button type="button" class="btn btn--ghost btn--sm" data-hp-remove="x">Remove</button></td>';
+  tbody.appendChild(tr);
+  tr.querySelector("[data-hp-remove]").addEventListener("click", function() {
+    tr.remove();
+    recalculateHostelPreviewFromDom();
+  });
 }
 
 function downloadHostelWorkbook(absentees, dayHeaders, filename) {
@@ -2081,6 +2236,67 @@ function closeHostelRunModal() {
   window.__hostelEditMode = false;
 }
 
+
+
+async function finalizeHostelReportFromPreview() {
+  if (!isQaOfficer()) { setHostelStatus("Sign in as QA Officer.", "error"); return; }
+  var rows = recalculateHostelPreviewFromDom();
+  if (!rows.length) {
+    setHostelStatus("Preview is empty. Upload gate data or add rows first.", "error");
+    return;
+  }
+  var rate = Number(window.__hostelPreviewRate) || Number((document.getElementById("hostelRate") && document.getElementById("hostelRate").value) || 0) || 0;
+  var dayHeaders = window.__hostelPreviewDayHeaders || [];
+  var startDate = document.getElementById("hostelStartDate") && document.getElementById("hostelStartDate").value;
+  var endDate = document.getElementById("hostelEndDate") && document.getElementById("hostelEndDate").value;
+  // Prefer edited absentees for download
+  var absentees = rows.filter(function(r) { return (Number(r.absentDays) || 0) > 0 || (Number(r.fine) || 0) > 0; });
+  if (!absentees.length) absentees = rows.slice();
+  try {
+    var fname = "EOCNS_Hostel_Absentees_" + (startDate || "start") + "_to_" + (endDate || "end") + ".xlsx";
+    downloadHostelWorkbook(absentees, dayHeaders, fname);
+    // Persist run using last compute + edited absentees when possible
+    var last = window.__lastHostelReport || {};
+    var result = last.result;
+    if (result) {
+      var runId = "hr_" + Date.now().toString(36);
+      var totalFine = absentees.reduce(function(s, r) { return s + (Number(r.fine) || 0); }, 0);
+      var run = {
+        id: runId,
+        start: startDate,
+        end: endDate,
+        rate: rate,
+        absenteeCount: absentees.length,
+        totalFine: totalFine,
+        studentCount: Object.keys(result.students || {}).length,
+        dayHeaders: dayHeaders,
+        absentees: absentees,
+        edited: true,
+        note: "Officer-edited preview before download",
+        source: "gate_export_edited",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      try { stampSessionFields(run); } catch (_) {}
+      await put("hostel_runs", run);
+      try {
+        await writeAudit({
+          action: "create",
+          entity: "hostel_runs",
+          entityId: run.id,
+          reason: "Hostel report finalized from editable preview",
+          details: { start: startDate, end: endDate, rate: rate, absenteeCount: absentees.length, totalFine: totalFine, edited: true }
+        });
+      } catch (_) {}
+      try { markDirty("hostel_runs"); } catch (_) {}
+      try { if (typeof renderHostelRunsMaster === "function") renderHostelRunsMaster(); } catch (_) {}
+    }
+    setHostelStatus("Report downloaded (" + absentees.length + " rows). Publish when ready so other devices see this run.", "ok");
+  } catch (err) {
+    console.error(err);
+    setHostelStatus("Download failed: " + (err.message || String(err)), "error");
+  }
+}
 
 async function generateHostelReport() {
   if (!isQaOfficer()) { openOfficerLoginGate("hostel"); return; }
@@ -2364,7 +2580,20 @@ openDB().then(async () => {
   hostelFileInput?.addEventListener("change", () => {
     if (hostelFileInput.files && hostelFileInput.files[0]) handleHostelFile(hostelFileInput.files[0]);
   });
-  document.getElementById("btnGenerateHostel")?.addEventListener("click", generateHostelReport);
+  document.getElementById("btnGenerateHostel")?.addEventListener("click", function() {
+    previewHostelFromGate().then(function(r) {
+      if (!r) return;
+      setHostelStatus("Preview updated. Review/edit the table, then click Confirm edits & download report.", "ok");
+    });
+  });
+  document.getElementById("btnHostelRecalcPreview")?.addEventListener("click", function() {
+    recalculateHostelPreviewFromDom();
+    setHostelStatus("Fines recalculated from day marks.", "ok");
+  });
+  document.getElementById("btnHostelFinalizeReport")?.addEventListener("click", function() {
+    finalizeHostelReportFromPreview();
+  });
+  document.getElementById("btnHostelAddPreviewRow")?.addEventListener("click", addHostelPreviewRow);
   document.getElementById("btnClearHostel")?.addEventListener("click", () => {
     hostelParsedRows = null;
     if (hostelFileInput) hostelFileInput.value = "";
