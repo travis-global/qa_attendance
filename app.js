@@ -2440,6 +2440,17 @@ function closeHostelRunModal() {
 
 async function finalizeHostelReportFromPreview() {
   if(!isQaOfficer()){setHostelStatus("Sign in as QA Officer.","error");return;}
+  var lastCheck=window.__lastHostelReport||{};
+  if(lastCheck.runId){
+    var pendingChecks=await getAll("biometric_pending");
+    var unresolved=(pendingChecks||[]).filter(function(item){
+      return item && item.status!=="linked" && (item.reportRunIds||[]).indexOf(lastCheck.runId)>=0;
+    });
+    if(unresolved.length){
+      setHostelStatus("Finalization paused: "+unresolved.length+" linked issue(s) still need review. Resolve or explicitly dismiss every pending machine ID / hostel conflict for this report, then confirm again.","error");
+      return;
+    }
+  }
   var rows=recalculateHostelPreviewFromDom();
   if(!rows.length){setHostelStatus("Preview is empty. Upload gate data or add rows first.","error");return;}
   if(rows.some(function(r){return !String(r.name||"").trim();})){
