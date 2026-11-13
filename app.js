@@ -2450,10 +2450,8 @@ async function finalizeHostelReportFromPreview() {
       matrix.push(Object.assign({},saved));
     });
   }
-  matrix.forEach(function(row,index){
-    if(!row.studentId) row.studentId="manual_"+String(last.runId||"report")+"_"+String(index+1);
-    row.rosterId=(last.runId||"")+"::"+String(row.studentId);
-  });
+  matrix.forEach(function(row){row.rosterId=run.id+"::"+String(row.studentId);});
+  matrix.forEach(function(row,index){if(!row.studentId)row.studentId="manual_"+String(last.runId||"report")+"_"+String(index+1);});
   matrix.sort(function(a,b){var h=String(a.hostel||"").localeCompare(String(b.hostel||""));return h||String(a.name||"").localeCompare(String(b.name||""));});
   var absentees=matrix.filter(function(r){return(Number(r.absentDays)||0)>0;}).map(function(r){return{id:r.studentId||"",name:r.name,hostel:r.hostel,regNo:r.regNo||"",programme:r.programme||"",level:r.level||"",dayMarks:r.dayMarks,absentDays:r.absentDays,fine:r.absentDays*rate};});
   var start=dateKeys[0],end=dateKeys[dateKeys.length-1],total=absentees.reduce(function(sum,r){return sum+r.fine;},0);
