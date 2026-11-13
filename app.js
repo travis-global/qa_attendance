@@ -1596,8 +1596,8 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
   rows[0].forEach(function(v, i) { var k = String(v == null ? "" : v).trim(); if (k) headers[k] = i; });
   var nameCol = headers["Name"], noCol = headers["No."], dateCol = headers["Date/Time"];
   var statusCol = headers["Status"], locCol = headers["Location ID"];
-  if (noCol == null || dateCol == null || locCol == null) {
-    throw new Error("The gate export must contain No., Date/Time and Location ID columns.");
+  if (noCol == null || dateCol == null || locCol == null || statusCol == null) {
+    throw new Error("The gate export must contain No., Date/Time, Status and Location ID columns.");
   }
   var h1 = hostel1Name || "Hostel 1", h2 = hostel2Name || "Hostel 2";
   var startKey = toDateKeyHostel(startDate), endKey = toDateKeyHostel(endDate);
@@ -1651,7 +1651,7 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
   Object.keys(gateUsers).forEach(function(machineNo) {
     gateUsers[machineNo].dates = gateUsers[machineNo].datesByLocation[String(sourceId)] || {};
   });
-  var gateEvents = [], gateEventSeen = {};
+  var gateEvents = [], gateEventSeen = {}, sourcePresenceCoverage = {};
   for (var ge = 1; ge < rows.length; ge++) {
     var gateRow = rows[ge] || [], gateDate = parseAttendanceDateHostel(gateRow[dateCol]);
     if (!gateDate || gateDate < startDate || gateDate > endDate) continue;
@@ -1660,8 +1660,17 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     var gateMachine = cleanId(gateRow[noCol]);
     if (!gateMachine) continue;
     var gateDateKey = toDateKeyHostel(gateDate), eventKey = gateMachine + "|" + gateDateKey;
-    if (!gateEventSeen[eventKey]) { gateEventSeen[eventKey] = true; gateEvents.push({ machineNo: gateMachine, dateKey: gateDateKey, locationId: sourceId, status: "C/IN" }); }
+    if (!gateEventSeen[eventKey]) {
+      gateEventSeen[eventKey] = true;
+      sourcePresenceCoverage[gateDateKey] = true;
+      gateEvents.push({ machineNo: gateMachine, dateKey: gateDateKey, locationId: sourceId, status: "C/IN" });
+    }
   }
+  coverageDateKeys.forEach(function(key) {
+    if (!sourcePresenceCoverage[key]) {
+      throw new Error("No valid C/In gate event was found for " + key + " at " + sourceHostel + ". The system will not calculate fines from a date with no confirmed presence records.");
+    }
+  });
   var master = await getAll("students");
   var bySerial = {};
   master.forEach(function(st) {
