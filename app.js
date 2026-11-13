@@ -2095,6 +2095,22 @@ async function persistHostelDraftRun(report) {
   return run;
 }
 
+
+async function recordHostelIssueResolution(issue, action, details) {
+  if (!issue) return;
+  var runIds=issue.reportRunIds||[];
+  for(var i=0;i<runIds.length;i++){
+    var runs=await getAll("hostel_runs"),run=(runs||[]).find(function(x){return x.id===runIds[i];});
+    if(!run)continue;
+    run.resolutions=run.resolutions||[];
+    run.resolutions.push({issueId:issue.id||"",machineNo:issue.machineNo||"",studentId:issue.studentId||"",action:action,details:details||{},at:new Date().toISOString(),by:typeof getQaOfficerName==="function"?getQaOfficerName():"QA Officer"});
+    run.updatedAt=new Date().toISOString();
+    await put("hostel_runs",run);
+  }
+  try{await writeAudit({action:"update",entity:"hostel_runs",entityId:runIds.join(","),reason:"Hostel attendance issue resolved: "+action,details:{issueId:issue.id||"",machineNo:issue.machineNo||"",studentId:issue.studentId||"",resolution:action,extra:details||{}}});}catch(_){}
+  if(runIds.length){markDirty("hostel issue resolution");try{await renderHostelRunsMaster();}catch(_){}}
+}
+
 async function reconcileHostelRunsForMachine(machineNo, student) {
   var serial = String(machineNo || "").trim().replace(/\.0$/, "");
   if (!serial || !student) return [];
@@ -2934,7 +2950,8 @@ async function renderHostelConflicts() {
     btn.onclick = async function() {
       var row = (await getAll("biometric_pending")).find(function(x) { return x.id === btn.getAttribute("data-hc-keep"); });
       if (!row) return;
-      // keep master hostel; clear conflict flag only
+      // Keep the official master hostel and retain the decision in the report history.
+      await recordHostelIssueResolution(row,"kept_master_hostel",{masterHostel:row.masterHostel,gateHostel:row.gateHostel});
       await del("biometric_pending", row.id);
       markDirty("hostel conflict keep");
       await renderHostelConflicts();
@@ -2970,6 +2987,8 @@ async function renderHostelConflicts() {
   });
   document.querySelectorAll("[data-hc-discard]").forEach(function(btn) {
     btn.onclick = async function() {
+      var issue=(await getAll("biometric_pending")).find(function(x){return x.id===btn.getAttribute("data-hc-discard");});
+      if(issue)await recordHostelIssueResolution(issue,"dismissed_conflict",{masterHostel:issue.masterHostel,gateHostel:issue.gateHostel});
       await del("biometric_pending", btn.getAttribute("data-hc-discard"));
       markDirty("hostel conflict dismiss");
       await renderHostelConflicts();
@@ -11134,6 +11153,8 @@ async function renderBioQueues() {
   document.querySelectorAll("[data-bio-discard]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
       if (!confirm("Discard this device user from the queue?")) return;
+      var issue=(await getAll("biometric_pending")).find(function(x){return x.id===btn.getAttribute("data-bio-discard");});
+      if(issue)await recordHostelIssueResolution(issue,"discarded_pending_machine",{reason:issue.reason||issue.note||""});
       await del("biometric_pending", btn.getAttribute("data-bio-discard"));
       markDirty("biometric discard");
       await renderBioQueues();
