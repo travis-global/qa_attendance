@@ -1,4 +1,4 @@
-/* EOCNS build v94 — outer bare report refs removed */
+/* EOCNS build v95 — outer bare report refs removed */
 (() => {
 "use strict";
 // Safe stubs so early event wiring never throws ReferenceError (real impls overwrite later)
@@ -6139,6 +6139,33 @@ async function publishPendingListToRepo(message) {
   document.getElementById("btnPrintMonthlyQa") && document.getElementById("btnPrintMonthlyQa").addEventListener("click", function() {
     if (typeof window.printMonthlyProfessionalPack === "function") return window.printMonthlyProfessionalPack();
     alert("Build the monthly report first. If this persists, hard-refresh (Ctrl+Shift+R).");
+  });
+
+  document.getElementById("btnDownloadWeeklyQa") && document.getElementById("btnDownloadWeeklyQa").addEventListener("click", function() {
+    if (typeof window.printWeeklyProfessionalPack === "function") return window.printWeeklyProfessionalPack();
+    alert("Build the weekly report first, then download/print.");
+  });
+  document.getElementById("btnDownloadMonthlyQa") && document.getElementById("btnDownloadMonthlyQa").addEventListener("click", function() {
+    if (typeof window.printMonthlyProfessionalPack === "function") return window.printMonthlyProfessionalPack();
+    alert("Build the monthly report first, then download/print.");
+  });
+  document.getElementById("btnPrintHandoverPack") && document.getElementById("btnPrintHandoverPack").addEventListener("click", function() {
+    if (typeof printOfficerHandoverSheet === "function") printOfficerHandoverSheet();
+    else if (typeof window.printOfficerHandoverSheet === "function") window.printOfficerHandoverSheet();
+    else alert("Handover sheet not ready — hard-refresh.");
+  });
+  function closeRemedialModal() {
+    var m = document.getElementById("remedialModal");
+    if (!m) return;
+    m.hidden = true; m.setAttribute("hidden", ""); m.style.display = "none";
+  }
+  document.getElementById("btnCloseRemedial") && document.getElementById("btnCloseRemedial").addEventListener("click", closeRemedialModal);
+  document.getElementById("btnCancelRemedial") && document.getElementById("btnCancelRemedial").addEventListener("click", closeRemedialModal);
+  document.getElementById("remedialForm") && document.getElementById("remedialForm").addEventListener("submit", function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (typeof saveRemLog === "function") return saveRemLog(e);
+    if (typeof saveRemedial === "function") return saveRemedial(e);
+    alert("Use the Remedial Logging tab sheet to save attendance.");
   });
 
   document.getElementById("btnGenerateStudentRegister")?.addEventListener("click", function() {
