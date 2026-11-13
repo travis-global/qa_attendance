@@ -1655,6 +1655,13 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     }
     gateUsers[machineNo].dates = gateUsers[machineNo].datesByLocation[String(sourceId)] || {};
   });
+  var gateExportRows = [rows[0].slice()];
+  for (var gx = 1; gx < rows.length; gx++) {
+    var exportRow = rows[gx] || [], exportDate = parseAttendanceDateHostel(exportRow[dateCol]);
+    if (!exportDate || exportDate < startDate || exportDate > endDate) continue;
+    if (parseHostelLocationId(exportRow[locCol]) !== sourceId) continue;
+    gateExportRows.push(exportRow.slice());
+  }
   var gateEvents = [], gateEventSeen = {}, sourcePresenceCoverage = {};
   for (var ge = 1; ge < rows.length; ge++) {
     var gateRow = rows[ge] || [], gateDate = parseAttendanceDateHostel(gateRow[dateCol]);
@@ -1783,7 +1790,7 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     sourceLocationId: sourceId, locationVotes: locationVotes,
     excludedPending: excludedPending, pendingUsers: pendingByMachine,
     conflicts: conflicts, autoHostelAssigned: inferredUpdates.length,
-    coverageDateKeys: coverageDateKeys, gateEvents: gateEvents
+    coverageDateKeys: coverageDateKeys, gateEvents: gateEvents, gateExportRows: gateExportRows
   };
 }
 function ordinalSuffixHostel(n) {
@@ -1993,7 +2000,7 @@ function addHostelPreviewRow() {
   });
 }
 
-function downloadHostelWorkbook(rosterRows, dateKeys, filename) {
+function downloadHostelWorkbook(rosterRows, dateKeys, filename, gateExportRows) {
   var headers = (dateKeys || []).map(function(k) {
     var p = String(k || "").split("-");
     return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : String(k || "");
@@ -2045,6 +2052,41 @@ function downloadHostelWorkbook(rosterRows, dateKeys, filename) {
   ws["!autofilter"] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: Math.max(0, data.length - 1), c: endCol } }) };
   ws["!pageSetup"] = { orientation: "landscape", fitToWidth: 1, fitToHeight: 0 };
   ws["!margins"] = { left: 0.25, right: 0.25, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 };
+  if (Array.isArray(gateExportRows) && gateExportRows.length > 1) {
+    var gateWs = XLSX.utils.aoa_to_sheet(gateExportRows);
+    var gateHeaders = gateExportRows[0] || [];
+    var gateHeaderStyle = {
+      font: { bold: true, color: { rgb: white }, name: "Arial", sz: 10 },
+      fill: { fgColor: { rgb: burgundy } },
+      alignment: { horizontal: "center", vertical: "center", wrapText: true },
+      border: { top: { style: "thin", color: { rgb: burgundy } }, bottom: { style: "thin", color: { rgb: burgundy } }, left: { style: "thin", color: { rgb: burgundy } }, right: { style: "thin", color: { rgb: burgundy } } }
+    };
+    var gateBaseStyle = {
+      font: { name: "Arial", sz: 9, color: { rgb: "FF222222" } },
+      alignment: { horizontal: "center", vertical: "center" },
+      border: { top: { style: "hair", color: { rgb: line } }, bottom: { style: "hair", color: { rgb: line } }, left: { style: "hair", color: { rgb: line } }, right: { style: "hair", color: { rgb: line } } }
+    };
+    for (var gr = 0; gr < gateExportRows.length; gr++) {
+      for (var gc = 0; gc < gateHeaders.length; gc++) {
+        var ga = XLSX.utils.encode_cell({ r: gr, c: gc });
+        var gcell = gateWs[ga];
+        if (!gcell) gcell = gateWs[ga] = { t: "s", v: "" };
+        gcell.s = gr === 0 ? gateHeaderStyle : Object.assign({}, gateBaseStyle, { fill: { fgColor: { rgb: gr % 2 === 1 ? beige : white } } });
+        if (gr > 0 && gc === 1) gcell.s.alignment = { horizontal: "left", vertical: "center" };
+      }
+    }
+    gateWs["!cols"] = gateHeaders.map(function(h) {
+      var key = String(h || "").toLowerCase();
+      return { wch: key === "name" ? 28 : (key === "date/time" ? 21 : (key === "department" ? 18 : 15)) };
+    });
+    gateWs["!rows"] = [{ hpt: 30 }];
+    for (var grh = 1; grh < gateExportRows.length; grh++) gateWs["!rows"].push({ hpt: 20 });
+    gateWs["!freeze"] = { xSplit: 1, ySplit: 1, topLeftCell: "B2", activePane: "bottomRight", state: "frozen" };
+    gateWs["!autofilter"] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: Math.max(0, gateExportRows.length - 1), c: Math.max(0, gateHeaders.length - 1) } }) };
+    gateWs["!pageSetup"] = { orientation: "landscape", fitToWidth: 1, fitToHeight: 0 };
+    gateWs["!margins"] = { left: 0.25, right: 0.25, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 };
+    XLSX.utils.book_append_sheet(wb, gateWs, "Gate Attendance");
+  }
   XLSX.utils.book_append_sheet(wb, ws, "Absence Report");
   XLSX.writeFile(wb, filename);
 }
@@ -2052,7 +2094,7 @@ function downloadHostelWorkbook(rosterRows, dateKeys, filename) {
 function downloadHostelRunWorkbook(run) {
   if (!run) throw new Error("Saved hostel report not found.");
   var matrix = (run.matrix && run.matrix.length) ? run.matrix : (run.rows || []);
-  downloadHostelWorkbook(matrix, run.dateKeys || [], "EOCNS_Absence_Report_" + String(run.start || "report") + "_to_" + String(run.end || "report") + ".xlsx");
+  downloadHostelWorkbook(matrix, run.dateKeys || [], "EOCNS_Absence_Report_" + String(run.start || "report") + "_to_" + String(run.end || "report") + ".xlsx", run.gateExportRows || []);
 }
 
 async function attachHostelRunToPending(run, result) {
@@ -2093,7 +2135,7 @@ async function persistHostelDraftRun(report) {
   matrix.forEach(function(row){row.rosterId=id+"::"+String(row.studentId);});
   var abs=matrix.filter(function(row){return row.absentDays>0;});
   var run={id:id,status:"draft",hostel:result.sourceHostel||"",sourceLocationId:result.sourceLocationId||null,
-    coverageDateKeys:result.coverageDateKeys||dateKeys.slice(),gateEvents:result.gateEvents||[],
+    coverageDateKeys:result.coverageDateKeys||dateKeys.slice(),gateEvents:result.gateEvents||[],gateExportRows:result.gateExportRows||[],
     createdAt:(existing&&existing.createdAt)||new Date().toISOString(),updatedAt:new Date().toISOString(),
     start:dateKeys[0],end:dateKeys[dateKeys.length-1],rate:rate,dateKeys:dateKeys,dayHeaders:report.dayHeaders||[],
     absenteeCount:abs.length,totalFine:abs.reduce(function(sum,row){return sum+row.fine;},0),studentCount:matrix.length,
@@ -2110,6 +2152,25 @@ async function persistHostelDraftRun(report) {
 }
 
 
+function updateHostelRunGateExportIdentity(run, machineNo, student) {
+  if (!run || !student || !Array.isArray(run.gateExportRows) || run.gateExportRows.length < 2) return false;
+  var headers = run.gateExportRows[0] || [];
+  var noCol = headers.indexOf("No.");
+  var nameCol = headers.indexOf("Name");
+  if (noCol < 0 || nameCol < 0) return false;
+  var serial = String(machineNo || "").trim().replace(/\.0$/, "");
+  if (!serial) return false;
+  var changed = false;
+  for (var i = 1; i < run.gateExportRows.length; i++) {
+    var row = run.gateExportRows[i];
+    if (row && String(row[noCol] || "").trim().replace(/\.0$/, "") === serial && String(row[nameCol] || "") !== String(student.name || "")) {
+      row[nameCol] = student.name || row[nameCol] || "";
+      changed = true;
+    }
+  }
+  return changed;
+}
+
 async function recordHostelIssueResolution(issue, action, details) {
   if (!issue) return;
   var runIds=issue.reportRunIds||[];
@@ -2118,6 +2179,12 @@ async function recordHostelIssueResolution(issue, action, details) {
     if(!run)continue;
     run.resolutions=run.resolutions||[];
     run.resolutions.push({issueId:issue.id||"",machineNo:issue.machineNo||"",studentId:issue.studentId||"",action:action,details:details||{},at:new Date().toISOString(),by:typeof getQaOfficerName==="function"?getQaOfficerName():"QA Officer"});
+    var resolvedStudents = await getAll("students");
+    var resolvedStudent = (resolvedStudents || []).find(function(s) {
+      return (issue.studentId && String(s.id) === String(issue.studentId)) ||
+        (issue.machineNo && String(s.serial || "").trim().replace(/\\.0$/, "") === String(issue.machineNo || "").trim().replace(/\\.0$/, ""));
+    });
+    if (resolvedStudent) updateHostelRunGateExportIdentity(run, issue.machineNo || resolvedStudent.serial, resolvedStudent);
     run.updatedAt=new Date().toISOString();
     await put("hostel_runs",run);
   }
@@ -2150,6 +2217,7 @@ async function reconcileHostelRunsForMachine(machineNo, student) {
   var updated = [], conflictChanged=false;
   for (var i = 0; i < candidates.length; i++) {
     var run = candidates[i];
+    var exportIdentityChanged = updateHostelRunGateExportIdentity(run, serial, student);
     if (norm(run.hostel) !== norm(hostel)) {
       var queue=await getAll("biometric_pending");
       var conflict=(queue||[]).find(function(q){return q&&q.status==="hostel_conflict"&&String(q.machineNo||"").trim()===serial&&String(q.studentId||"")===String(student.id)&&norm(q.gateHostel)===norm(run.hostel);});
@@ -2531,7 +2599,7 @@ async function finalizeHostelReportFromPreview() {
     hostel:(result&&result.sourceHostel)||(priorRun&&priorRun.hostel)||"",
     sourceLocationId:(result&&result.sourceLocationId)||(priorRun&&priorRun.sourceLocationId)||null,
     coverageDateKeys:(result&&result.coverageDateKeys)||(priorRun&&priorRun.coverageDateKeys)||dateKeys.slice(),
-    gateEvents:(result&&result.gateEvents)||(priorRun&&priorRun.gateEvents)||[],
+    gateEvents:(result&&result.gateEvents)||(priorRun&&priorRun.gateEvents)||[],gateExportRows:(result&&result.gateExportRows)||(priorRun&&priorRun.gateExportRows)||[],
     createdAt:(priorRun&&priorRun.createdAt)||new Date().toISOString(),updatedAt:new Date().toISOString(),
     start:start,end:end,rate:rate,dateKeys:dateKeys,dayHeaders:dayHeaders,absenteeCount:absentees.length,totalFine:total,
     studentCount:matrix.length,rows:absentees.map(function(r){return{studentId:r.id,rosterId:"",name:r.name,hostel:r.hostel,regNo:r.regNo||"",absentDays:r.absentDays,fine:r.fine,programme:r.programme||"",level:r.level||"",dayMarks:r.dayMarks||[]};}),
@@ -2545,7 +2613,7 @@ async function finalizeHostelReportFromPreview() {
     await writeAudit({action:priorRun?"update":"create",entity:"hostel_runs",entityId:run.id,reason:"Hostel report finalized from editable preview",
       details:{start:start,end:end,rate:rate,absenteeCount:absentees.length,totalFine:total,studentCount:matrix.length,edited:true}});
     markDirty("hostel_runs");await renderHostelRunsMaster();
-    downloadHostelWorkbook(matrix,dateKeys,"EOCNS_Absence_Report_"+start+"_to_"+end+".xlsx");
+    downloadHostelRunWorkbook(run);
     if(window.__lastHostelReport)window.__lastHostelReport.runId=run.id;
     setHostelStatus("Final report downloaded and saved ("+absentees.length+" students with absences; "+matrix.length+" students in the full roster). Resolved records are included. Publish when ready so other devices receive this run.","ok");
   }catch(err){console.error(err);setHostelStatus("Finalization failed: "+(err.message||String(err)),"error");}
