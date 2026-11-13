@@ -1674,6 +1674,7 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
   var master = await getAll("students");
   var bySerial = {};
   master.forEach(function(st) {
+    if (st.status && String(st.status).toLowerCase() !== "active") return;
     var serial = cleanId(st.serial);
     if (serial) {
       if (!bySerial[serial]) bySerial[serial] = [];
@@ -11833,6 +11834,7 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
   var master = await getAll("students");
   var bySerial = {};
   master.forEach(function(s) {
+    if(s.status&&String(s.status).toLowerCase()!=="active")return;
     var serial=String(s.serial||"").trim();
     if(serial){if(!bySerial[serial])bySerial[serial]=[];bySerial[serial].push(s);}
   });
