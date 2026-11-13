@@ -2289,7 +2289,6 @@ async function generateHostelReport() {
       " · unassigned " + unN +
       (confN ? (" · " + confN + " machine≠master conflicts") : "") +
       (exN ? (" · " + exN + " unreviewed machine user(s) held out until linked") : "") +
-      "" +
       " · saved to master sheet (Publish to keep on all devices).",
       "ok"
     );
