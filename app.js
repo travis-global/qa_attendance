@@ -1695,6 +1695,15 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
 
   var attendance = {}, students = {}, excludedPending = [], conflicts = [];
   var inferredUpdates = [];
+  // Discarded machine IDs are deliberately suppressed until an officer restores them.
+  var ignoredMachineIds = {};
+  try {
+    (await getAll("biometric_pending")).forEach(function(q) {
+      if (q && q.status === "discarded" && q.machineNo) {
+        ignoredMachineIds[String(q.machineNo).trim().replace(/\.0$/, "")] = true;
+      }
+    });
+  } catch (_) {}
   var activeMaster = (master || []).filter(function(st) {
     return !st.status || String(st.status).toLowerCase() === "active";
   });
@@ -1702,7 +1711,9 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
   // Resolve every gate machine user against the linked machine ID. Unknown IDs
   // remain in a persistent review queue; names are suggestions, never identity.
   Object.keys(gateUsers).forEach(function(machineNo) {
-    var user = gateUsers[machineNo], matches = bySerial[machineNo] || [];
+    var user = gateUsers[machineNo];
+    if (ignoredMachineIds[String(machineNo).trim().replace(/\.0$/, "")]) return;
+    var matches = bySerial[machineNo] || [];
     if (matches.length !== 1) {
       excludedPending.push({ machineNo: machineNo, name: user.machineName, reason: matches.length ? "machine ID is linked to multiple master students" : "machine ID is not linked to a master student" });
       pendingByMachine[machineNo] = user;
@@ -11225,7 +11236,20 @@ async function renderBioQueues() {
   var countEl = document.getElementById("bioClarifyCount");
   var list = [];
   try { list = await getAll("biometric_pending"); } catch (_) { list = []; }
-  list = (list || []).filter(function(x) { return x && x.status !== "linked"; });
+  list = (list || []).filter(function(x) { return x && x.status !== "linked" && x.status !== "discarded"; });
+  var ignored = (await getAll("biometric_pending")).filter(function(x) { return x && x.status === "discarded"; });
+  var ignoredBody = document.getElementById("bioIgnoredBody");
+  var ignoredCount = document.getElementById("bioIgnoredCount");
+  if (ignoredCount) ignoredCount.textContent = "Ignored: " + ignored.length + (ignored.length ? " — excluded until restored" : " — none");
+  if (ignoredBody) {
+    ignoredBody.innerHTML = ignored.length ? ignored.map(function(row) {
+      return '<tr><td><strong>' + escapeHtml(row.machineNo || "—") + '</strong></td>' +
+        '<td>' + escapeHtml(row.machineName || "—") + '</td>' +
+        '<td>' + escapeHtml(row.deviceLabel || "—") + '</td>' +
+        '<td class="muted-note">' + escapeHtml(row.discardedAt ? new Date(row.discardedAt).toLocaleString() : "—") + '</td>' +
+        '<td class="qa-edit-only">' + (isQaOfficer() ? '<button type="button" class="btn btn--primary btn--sm" data-bio-restore="' + escapeHtml(row.id) + '">Restore to review</button>' : "—") + '</td></tr>';
+    }).join("") : '<tr><td colspan="5" class="muted-note">No ignored machine users.</td></tr>';
+  }
   var clarify = list.filter(function(x) {
     return x.status === "clarify" || x.status === "conflict" || x.kind === "train";
   }).filter(function(x) {
@@ -11301,11 +11325,31 @@ async function renderBioQueues() {
   });
   document.querySelectorAll("[data-bio-discard]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
-      if (!confirm("Discard this device user from the queue?")) return;
       var issue=(await getAll("biometric_pending")).find(function(x){return x.id===btn.getAttribute("data-bio-discard");});
-      if(issue)await recordHostelIssueResolution(issue,"discarded_pending_machine",{reason:issue.reason||issue.note||""});
-      await del("biometric_pending", btn.getAttribute("data-bio-discard"));
-      markDirty("biometric discard");
+      if(!issue) return;
+      if (!confirm("Ignore this machine user?\n\nMachine ID: " + (issue.machineNo || "—") + "\nName: " + (issue.machineName || "—") + "\n\nThe ID and name will be excluded from future hostel matching and reports until an officer restores them. You can restore it later to link an existing student or create a new student.")) return;
+      issue.status = "discarded";
+      issue.discardedAt = new Date().toISOString();
+      issue.discardedBy = (typeof getQaOfficerName === "function" ? getQaOfficerName() : "") || "QA Officer";
+      issue.updatedAt = issue.discardedAt;
+      await recordHostelIssueResolution(issue,"discarded_pending_machine",{reason:issue.reason||issue.note||"", machineNo:issue.machineNo, machineName:issue.machineName});
+      await put("biometric_pending", issue);
+      markDirty("biometric discard / ignore");
+      await renderBioQueues();
+    });
+  });
+  document.querySelectorAll("[data-bio-restore]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      var issue=(await getAll("biometric_pending")).find(function(x){return x.id===btn.getAttribute("data-bio-restore");});
+      if(!issue || issue.status !== "discarded") return;
+      if (!confirm("Restore machine ID " + (issue.machineNo || "—") + " to the review queue? It will be considered again during matching. You can then link it to an existing student or create a student card.")) return;
+      issue.status = "unlinked";
+      issue.restoredAt = new Date().toISOString();
+      issue.updatedAt = issue.restoredAt;
+      delete issue.discardedAt;
+      delete issue.discardedBy;
+      await put("biometric_pending", issue);
+      markDirty("biometric ignored user restored");
       await renderBioQueues();
     });
   });
@@ -11698,13 +11742,17 @@ async function trainHostelFromExport(file, options) {
   var autoLink = 0, hostelSet = 0, already = 0, clarify = 0, unlinked = 0, conflicts = 0;
 
   var existingQ = await getAll("biometric_pending");
-  var openKeys = {};
+  var openKeys = {}, ignoredKeys = {};
   (existingQ || []).forEach(function(q) {
-    if (q && q.status !== "linked" && q.machineNo) openKeys[String(q.machineNo).trim()] = true;
+    if (!q || !q.machineNo) return;
+    var key = String(q.machineNo).trim().replace(/\.0$/, "");
+    if (q.status === "discarded") ignoredKeys[key] = true;
+    else if (q.status !== "linked") openKeys[key] = true;
   });
 
   for (var i = 0; i < list.length; i++) {
     var u = list[i];
+    if (ignoredKeys[String(u.machineNo).trim().replace(/\.0$/, "")]) continue;
     var maj = null;
     if (u.votes["1"] > u.votes["2"]) maj = "1";
     else if (u.votes["2"] > u.votes["1"]) maj = "2";
@@ -11951,15 +11999,18 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
     if(serial){if(!bySerial[serial])bySerial[serial]=[];bySerial[serial].push(s);}
   });
   var existingQ = await getAll("biometric_pending");
-  var openKeys = {};
+  var openKeys = {}, ignoredKeys = {};
   (existingQ || []).forEach(function(q) {
-    if (q && q.status !== "linked" && q.machineNo) openKeys[String(q.machineNo).trim()] = true;
+    if (!q || !q.machineNo) return;
+    var key = String(q.machineNo).trim().replace(/\.0$/, "");
+    if (q.status === "discarded") ignoredKeys[key] = true;
+    else if (q.status !== "linked") openKeys[key] = true;
   });
   var added = 0;
   for (var i = 0; i < candidates.length; i++) {
     var machineNo = candidates[i].machineNo;
     var stName = candidates[i].name || "";
-    if (!machineNo) continue;
+    if (!machineNo || ignoredKeys[String(machineNo).trim().replace(/\.0$/, "")]) continue;
     var duplicateMatches=bySerial[machineNo]||[];
     if (duplicateMatches.length===1) continue;
     if (openKeys[machineNo]) continue;
