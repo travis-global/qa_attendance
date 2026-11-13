@@ -1977,16 +1977,146 @@ function addHostelPreviewRow() {
   });
 }
 
-function downloadHostelWorkbook(absentees, dayHeaders, filename) {
-  const header = ["Name", "Hostel"].concat(dayHeaders).concat(["Days Absent", "Total Fine (₦)"]);
-  const data = [header];
-  absentees.forEach(r => {
-    data.push([r.name, r.hostel].concat(r.dayMarks).concat([r.absentDays, r.fine]));
+function downloadHostelWorkbook(rosterRows, dateKeys, filename) {
+  var headers = (dateKeys || []).map(function(k) {
+    var p = String(k || "").split("-");
+    return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : String(k || "");
   });
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Hostel Absentees");
+  var header = ["Names", "Hostel"].concat(headers).concat(["Total Fine (₦)"]);
+  var data = [header];
+  (rosterRows || []).forEach(function(r) {
+    var marks = (r.dayMarks || []).map(function(mark) {
+      return String(mark || "").trim().toUpperCase() === "A" || String(mark || "").trim().toUpperCase() === "X" ? "x" : "";
+    });
+    data.push([r.name || "", r.hostel || ""].concat(marks).concat([Number(r.fine || 0)]));
+  });
+  var ws = XLSX.utils.aoa_to_sheet(data);
+  var wb = XLSX.utils.book_new();
+  var endCol = header.length - 1;
+  var burgundy = "FF6F1728", beige = "FFF1EADD", white = "FFFFFFFF", line = "FFD8D0C7";
+  var headerStyle = {
+    font: { bold: true, color: { rgb: white }, name: "Arial", sz: 10 },
+    fill: { fgColor: { rgb: burgundy } },
+    alignment: { horizontal: "center", vertical: "center", wrapText: true },
+    border: { top: { style: "thin", color: { rgb: burgundy } }, bottom: { style: "thin", color: { rgb: burgundy } }, left: { style: "thin", color: { rgb: burgundy } }, right: { style: "thin", color: { rgb: burgundy } } }
+  };
+  var baseStyle = {
+    font: { name: "Arial", sz: 9, color: { rgb: "FF222222" } },
+    alignment: { horizontal: "center", vertical: "center" },
+    border: { top: { style: "hair", color: { rgb: line } }, bottom: { style: "hair", color: { rgb: line } }, left: { style: "hair", color: { rgb: line } }, right: { style: "hair", color: { rgb: line } } }
+  };
+  for (var c = 0; c < header.length; c++) {
+    var hcell = ws[XLSX.utils.encode_cell({ r: 0, c: c })];
+    if (hcell) hcell.s = headerStyle;
+  }
+  for (var rr = 1; rr < data.length; rr++) {
+    for (var cc = 0; cc < header.length; cc++) {
+      var cell = ws[XLSX.utils.encode_cell({ r: rr, c: cc })];
+      if (!cell) continue;
+      cell.s = Object.assign({}, baseStyle, { fill: { fgColor: { rgb: rr % 2 === 1 ? beige : white } } });
+      if (cc === 0) cell.s.alignment = { horizontal: "left", vertical: "center" };
+      if (cc === endCol) {
+        cell.s.font = { name: "Arial", sz: 9, bold: true, color: { rgb: "FF222222" } };
+        cell.z = '"₦"#,##0';
+      }
+    }
+  }
+  ws["!cols"] = [{ wch: 30 }, { wch: 16 }].concat(headers.map(function() { return { wch: 13 }; })).concat([{ wch: 18 }]);
+  ws["!rows"] = [{ hpt: 30 }];
+  for (var ri = 1; ri < data.length; ri++) ws["!rows"].push({ hpt: 21 });
+  ws["!freeze"] = { xSplit: 2, ySplit: 1, topLeftCell: "C2", activePane: "bottomRight", state: "frozen" };
+  ws["!autofilter"] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: Math.max(0, data.length - 1), c: endCol } }) };
+  ws["!pageSetup"] = { orientation: "landscape", fitToWidth: 1, fitToHeight: 0 };
+  ws["!margins"] = { left: 0.25, right: 0.25, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 };
+  XLSX.utils.book_append_sheet(wb, ws, "Absence Report");
   XLSX.writeFile(wb, filename);
+}
+
+function downloadHostelRunWorkbook(run) {
+  if (!run) throw new Error("Saved hostel report not found.");
+  var matrix = (run.matrix && run.matrix.length) ? run.matrix : (run.rows || []);
+  downloadHostelWorkbook(matrix, run.dateKeys || [], "EOCNS_Absence_Report_" + String(run.start || "report") + "_to_" + String(run.end || "report") + ".xlsx");
+}
+
+async function attachHostelRunToPending(run, result) {
+  var ids = {};
+  (result.excludedPending || []).forEach(function(x) { if (x && x.machineNo) ids[String(x.machineNo)] = true; });
+  (result.conflicts || []).forEach(function(x) { if (x && x.machineNo) ids[String(x.machineNo)] = true; });
+  if (!Object.keys(ids).length) return;
+  var queue = await getAll("biometric_pending"), changed = false;
+  for (var i = 0; i < queue.length; i++) {
+    var q = queue[i];
+    if (!q || !ids[String(q.machineNo || "")]) continue;
+    q.reportRunIds = q.reportRunIds || [];
+    if (q.reportRunIds.indexOf(run.id) < 0) q.reportRunIds.push(run.id);
+    q.reportContexts = q.reportContexts || [];
+    if (!q.reportContexts.some(function(x) { return x.runId === run.id; })) {
+      q.reportContexts.push({ runId: run.id, hostel: run.hostel, start: run.start, end: run.end, locationId: run.sourceLocationId });
+    }
+    q.updatedAt = new Date().toISOString();
+    await put("biometric_pending", q);
+    changed = true;
+  }
+  if (changed) markDirty("hostel pending report association");
+}
+
+async function reconcileHostelRunsForMachine(machineNo, student) {
+  var serial = String(machineNo || "").trim().replace(/\.0$/, "");
+  if (!serial || !student) return [];
+  var runs = await getAll("hostel_runs");
+  var candidates = (runs || []).filter(function(run) {
+    return (run.gateEvents || []).some(function(ev) { return String(ev.machineNo || "").trim() === serial; });
+  });
+  if (!candidates.length) return [];
+  function norm(h) { return String(h || "").toLowerCase().replace(/[^a-z0-9]/g, ""); }
+  var hostel = String(student.hostel || "").trim();
+  if (!hostel) {
+    var hostels = [];
+    candidates.forEach(function(run) { if (run.hostel && hostels.indexOf(run.hostel) < 0) hostels.push(run.hostel); });
+    if (hostels.length === 1) {
+      hostel = hostels[0];
+      student.hostel = hostel;
+      student.hostelSource = "resolved_gate_report";
+      student.updatedAt = new Date().toISOString();
+      await put("students", student);
+    }
+  }
+  if (!hostel) return [];
+  var updated = [];
+  for (var i = 0; i < candidates.length; i++) {
+    var run = candidates[i];
+    if (norm(run.hostel) !== norm(hostel)) continue;
+    run.matrix = run.matrix || [];
+    if (run.matrix.some(function(row) { return String(row.studentId) === String(student.id); })) continue;
+    var present = {};
+    (run.gateEvents || []).forEach(function(ev) {
+      if (String(ev.machineNo || "").trim() === serial) present[String(ev.dateKey)] = true;
+    });
+    var keys = run.dateKeys || [];
+    var marks = keys.map(function(key) { return present[key] ? "P" : "A"; });
+    var absent = marks.filter(function(mark) { return mark === "A"; }).length;
+    run.matrix.push({
+      studentId: String(student.id), rosterId: run.id + "::" + String(student.id), machineNo: serial,
+      name: student.name || "", regNo: student.regNo || "", hostel: student.hostel || run.hostel,
+      programme: student.programme || "", level: student.level || "", dayMarks: marks,
+      absentDays: absent, fine: absent * Number(run.rate || 0), resolvedFromPending: true
+    });
+    run.matrix.sort(function(a, b) { return String(a.name || "").localeCompare(String(b.name || "")); });
+    run.studentCount = run.matrix.length;
+    run.rows = run.matrix.filter(function(row) { return Number(row.absentDays || 0) > 0; }).map(function(row) { return Object.assign({}, row); });
+    run.absenteeCount = run.rows.length;
+    run.totalFine = run.rows.reduce(function(sum, row) { return sum + Number(row.fine || 0); }, 0);
+    run.resolutions = run.resolutions || [];
+    run.resolutions.push({ studentId: student.id, machineNo: serial, at: new Date().toISOString(), action: "linked_pending_machine_to_roster" });
+    run.updatedAt = new Date().toISOString();
+    await put("hostel_runs", run);
+    updated.push(run);
+  }
+  if (updated.length) {
+    markDirty("saved hostel reports updated after issue resolution");
+    try { await renderHostelRunsMaster(); } catch (_) {}
+  }
+  return updated;
 }
 
 
