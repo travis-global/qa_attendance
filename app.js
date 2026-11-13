@@ -2014,6 +2014,13 @@ function addHostelPreviewRow() {
   });
 }
 
+// Report-only name formatter: keep source records unchanged and standardise display as Title Case (Aa).
+function formatReportPersonName(value) {
+  return String(value == null ? "" : value).trim().toLowerCase().replace(/(^|[\\s'’-])([a-z])/g, function(_, boundary, letter) {
+    return boundary + letter.toUpperCase();
+  });
+}
+
 function downloadHostelWorkbook(rosterRows, dateKeys, filename, gateExportRows) {
   var headers = (dateKeys || []).map(function(k) {
     var p = String(k || "").split("-");
@@ -2025,7 +2032,7 @@ function downloadHostelWorkbook(rosterRows, dateKeys, filename, gateExportRows) 
     var marks = (r.dayMarks || []).map(function(mark) {
       return String(mark || "").trim().toUpperCase() === "A" || String(mark || "").trim().toUpperCase() === "X" ? "x" : "";
     });
-    data.push([r.name || "", r.hostel || ""].concat(marks).concat([Number(r.fine || 0)]));
+    data.push([formatReportPersonName(r.name), r.hostel || ""].concat(marks).concat([Number(r.fine || 0)]));
   });
   var ws = XLSX.utils.aoa_to_sheet(data);
   var wb = XLSX.utils.book_new();
@@ -2047,7 +2054,7 @@ function downloadHostelWorkbook(rosterRows, dateKeys, filename, gateExportRows) 
       return { wch: key === "name" ? 28 : (key === "date/time" ? 21 : (key === "department" ? 18 : 15)) };
     });
     gateWs["!freeze"] = { xSplit: 1, ySplit: 1, topLeftCell: "B2", activePane: "bottomRight", state: "frozen" };
-    gateWs["!autofilter"] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: Math.max(0, gateExportRows.length - 1), c: Math.max(0, gateHeaders.length - 1) } }) };
+    gateWs["!autofilter"] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: Math.max(0, reportGateRows.length - 1), c: Math.max(0, gateHeaders.length - 1) } }) };
     gateWs["!pageSetup"] = { orientation: "landscape", fitToWidth: 1, fitToHeight: 0 };
     gateWs["!margins"] = { left: 0.25, right: 0.25, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 };
     XLSX.utils.book_append_sheet(wb, gateWs, "Gate Attendance");
@@ -3188,7 +3195,7 @@ function printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, end
   var totalFine = absentees.reduce(function(s, r) { return s + r.fine; }, 0);
   var period = toDateKeyHostel(startDate) + " to " + toDateKeyHostel(endDate);
   var rows = absentees.map(function(r, i) {
-    return "<tr><td>" + (i + 1) + "</td><td>" + r.name + "</td><td>" + (r.regNo || "") + "</td><td>" + r.hostel +
+    return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(formatReportPersonName(r.name)) + "</td><td>" + escapeHtml(r.regNo || "") + "</td><td>" + escapeHtml(r.hostel || "") +
       "</td><td>" + r.absentDays + "</td><td>" + formatNairaHostel(r.fine) + "</td></tr>";
   }).join("");
   var w = window.open("", "_blank");
@@ -4201,7 +4208,7 @@ async function printDailyLectureReport() {
     courseBlocks += "<h2 class='sec'>Course " + (idx + 1) + " Information</h2>";
     courseBlocks += "<div class='meta'>" +
       "<div class='meta-row'><b>Course</b><span>" + escapeHtml(e.course || "—") + "</span></div>" +
-      "<div class='meta-row'><b>Lecturer</b><span>" + escapeHtml(e.lecturer || "—") + "</span></div>" +
+      "<div class='meta-row'><b>Lecturer</b><span>" + escapeHtml(formatReportPersonName(e.lecturer || "—")) + "</span></div>" +
       "<div class='meta-row'><b>Topic</b><span>" + escapeHtml(e.topic || "—") + "</span></div>" +
       "<div class='meta-row'><b>Date</b><span>" + escapeHtml(formatDateLong(e.date || date)) + "</span></div>" +
       "<div class='meta-row'><b>Time</b><span>" + escapeHtml(timeStr || "—") + "</span></div>" +
@@ -4216,7 +4223,7 @@ async function printDailyLectureReport() {
     if (absentList.length) {
       courseBlocks += "<table class='data absent'><thead><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
         absentList.map(function(a) {
-          return "<tr><td>" + escapeHtml(a.sn) + "</td><td>" + escapeHtml(a.name) + "</td></tr>";
+          return "<tr><td>" + escapeHtml(a.sn) + "</td><td>" + escapeHtml(formatReportPersonName(a.name)) + "</td></tr>";
         }).join("") + "</tbody></table>";
     } else {
       courseBlocks += "<p style='color:#1B7A3D;font-weight:600'>Full attendance — no absentees recorded.</p>";
@@ -4282,7 +4289,7 @@ async function printDailyLectureReport() {
   if (consol.length) {
     body += "<table class='data absent'><thead><tr><th>S/N</th><th>Full Name</th></tr></thead><tbody>" +
       consol.map(function(a) {
-        return "<tr><td>" + escapeHtml(a.sn) + "</td><td>" + escapeHtml(a.name) + "</td></tr>";
+        return "<tr><td>" + escapeHtml(a.sn) + "</td><td>" + escapeHtml(formatReportPersonName(a.name)) + "</td></tr>";
       }).join("") + "</tbody></table>";
   } else {
     body += "<p style='color:#1B7A3D;font-weight:600'>No absentees across recorded lectures.</p>";
@@ -4303,7 +4310,7 @@ async function printWeeklyProfessionalPack(payload) {
   var courseRows = (p.courseRows || []).map(function(r) {
     var st = String(r.status || "");
     var stColor = st.indexOf("Fully Delivered") >= 0 ? "#1B7A3D" : st.indexOf("Did not hold") >= 0 || st.indexOf("Missed") >= 0 ? "#B91C1C" : st.indexOf("Partial") >= 0 ? "#B8860B" : st.indexOf("Over") >= 0 ? "#1d4ed8" : "#64748b";
-    return "<tr><td><b>" + escapeHtml(r.course) + "</b></td><td>" + escapeHtml(r.lecturers || r.lecturer || "—") +
+    return "<tr><td><b>" + escapeHtml(r.course) + "</b></td><td>" + escapeHtml(formatReportPersonName(r.lecturers || r.lecturer || "—")) +
       "</td><td style='text-align:center'>" + r.scheduled + "</td><td style='text-align:center;color:#1B7A3D;font-weight:600'>" + r.delivered +
       "</td><td style='text-align:center;color:#B91C1C;font-weight:600'>" + (r.missed || "—") +
       "</td><td style='text-align:center'>" + escapeHtml(String(r.hrs || r.hrsDel || "—")) +
@@ -4312,7 +4319,7 @@ async function printWeeklyProfessionalPack(payload) {
   }).join("");
   var dayRows = (p.dayRows || []).map(function(r) {
     return "<tr><td>" + escapeHtml(r.date) + "</td><td>" + escapeHtml(r.day || "") + "</td><td><b>" + escapeHtml(r.course) +
-      "</b></td><td>" + escapeHtml(r.lecturer || "") + "</td><td>" + escapeHtml(r.topic || "") +
+      "</b></td><td>" + escapeHtml(formatReportPersonName(r.lecturer || "")) + "</td><td>" + escapeHtml(r.topic || "") +
       "</td><td>" + escapeHtml(r.time || "") + "</td><td>" + escapeHtml(String(r.hrs || "")) + "</td></tr>";
   }).join("");
   var barRows = (p.courseRows || []).filter(function(r) { return r.pct != null && r.scheduled > 0; }).map(function(r) {
@@ -6985,7 +6992,7 @@ function lecturerHoursTableHtml(p, forScreen) {
   if (p.mode === "month") {
     head = "<th>Lecturer</th><th>Staff ID</th><th>Contract / semester</th><th>Scheduled this month (h)</th><th>Target this month (h)</th><th>Delivered (h)</th><th>Weeks taught</th><th>Variance</th><th>Delivered to date (h)</th><th>Status</th>";
     rows = p.rows.map(function(r) {
-      return "<tr><td>" + escapeHtml(r.name) + "</td><td>" + escapeHtml(r.staffId) + "</td><td>" + r.contract + "</td><td>" + r.schedMonth + "</td><td>" + dash(r.target) +
+      return "<tr><td>" + escapeHtml(formatReportPersonName(r.name)) + "</td><td>" + escapeHtml(r.staffId) + "</td><td>" + r.contract + "</td><td>" + r.schedMonth + "</td><td>" + dash(r.target) +
         "</td><td>" + r.delivered + "</td><td>" + r.weeks + "</td><td>" + dash(r.variance) + "</td><td>" + r.toDate + "</td><td>" + escapeHtml(r.status) + "</td></tr>";
     }).join("");
   } else {
@@ -10576,7 +10583,7 @@ async function generateStudentRegisterReport() {
     return String(a.name || "").toUpperCase().localeCompare(String(b.name || "").toUpperCase());
   });
 
-  function aaName(n) { return String(n || "").trim().toUpperCase(); }
+  function aaName(n) { return formatReportPersonName(n); }
   function genderLabel(g) {
     var t = String(g || "").trim();
     if (!t) return "—";
@@ -10660,7 +10667,7 @@ async function generateStudentRegisterReport() {
   if (typeof svgDonut === "function" && students.length) {
     var genPct = Math.round((female / students.length) * 1000) / 10;
     body += "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center'>" + svgDonut(genPct, 130, "% female") +
-      "<p style='font-size:12px;max-width:360px'>Names shown in uppercase (AA). Core columns: Name, Reg. No, Gender.</p></div>";
+      "<p style='font-size:12px;max-width:360px'>Names shown in Title Case (Aa). Core columns: Name, Reg. No, Gender.</p></div>";
   }
   Object.keys(byProg).sort().forEach(function(k) {
     var rows = byProg[k].map(function(s, i) {
@@ -10676,7 +10683,7 @@ async function generateStudentRegisterReport() {
   }
   if (typeof reportGlossaryHtml === "function") {
     body += reportGlossaryHtml([
-      ["Name", "Shown in uppercase (AA) for uniformity on official registers."],
+      ["Name", "Shown in Title Case (Aa) for uniformity across official reports."],
       ["Reg. No", "Official registration / matriculation number."],
       ["Gender", "As recorded on the master list."]
     ]);
