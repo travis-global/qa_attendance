@@ -1984,7 +1984,7 @@ function downloadHostelWorkbook(rosterRows, dateKeys, filename) {
     var p = String(k || "").split("-");
     return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : String(k || "");
   });
-  var header = ["Names", "Hostel"].concat(headers).concat(["Total Fine (₦)"]);
+  var header = ["Names", "Hostel"].concat(headers).concat(["Total"]);
   var data = [header];
   (rosterRows || []).forEach(function(r) {
     var marks = (r.dayMarks || []).map(function(mark) {
