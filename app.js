@@ -1649,6 +1649,10 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     }
   }
   Object.keys(gateUsers).forEach(function(machineNo) {
+    if (!gateUsers[machineNo].locations[String(sourceId)]) {
+      delete gateUsers[machineNo];
+      return;
+    }
     gateUsers[machineNo].dates = gateUsers[machineNo].datesByLocation[String(sourceId)] || {};
   });
   var gateEvents = [], gateEventSeen = {}, sourcePresenceCoverage = {};
