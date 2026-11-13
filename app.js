@@ -1602,6 +1602,7 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
   var h1 = hostel1Name || "Hostel 1", h2 = hostel2Name || "Hostel 2";
   var startKey = toDateKeyHostel(startDate), endKey = toDateKeyHostel(endDate);
   var locationVotes = { "1": 0, "2": 0 };
+  var locationDateCoverage = { "1": {}, "2": {} };
   var gateUsers = {}, pendingByMachine = {};
 
   function cleanId(v) { return String(v == null ? "" : v).trim().replace(/\.0$/, ""); }
@@ -1622,12 +1623,15 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     var machineNo = cleanId(row[noCol]);
     if (!machineNo) continue;
     var lid = parseHostelLocationId(row[locCol]);
-    if (lid === 1 || lid === 2) locationVotes[String(lid)]++;
+    if (lid === 1 || lid === 2) {
+      locationVotes[String(lid)]++;
+      locationDateCoverage[String(lid)][toDateKeyHostel(dt)] = true;
+    }
     if (!gateUsers[machineNo]) {
-      gateUsers[machineNo] = { machineNo: machineNo, machineName: nameCol == null ? "" : String(row[nameCol] || "").trim(), dates: {}, locations: { "1": 0, "2": 0 } };
+      gateUsers[machineNo] = { machineNo: machineNo, machineName: nameCol == null ? "" : String(row[nameCol] || "").trim(), datesByLocation: { "1": {}, "2": {} }, dates: {}, locations: { "1": 0, "2": 0 } };
     }
     var status = String(statusCol == null ? "" : (row[statusCol] || "")).trim().toUpperCase();
-    if (status === "C/IN") gateUsers[machineNo].dates[toDateKeyHostel(dt)] = true;
+    if (status === "C/IN" && (lid === 1 || lid === 2)) gateUsers[machineNo].datesByLocation[String(lid)][toDateKeyHostel(dt)] = true;
     if (lid === 1 || lid === 2) gateUsers[machineNo].locations[String(lid)]++;
   }
 
@@ -1636,6 +1640,28 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
   if (!sourceId) throw new Error("The uploaded data does not have a clear dominant Location ID for this date range. Check the file or split mixed-hostel exports before generating a report.");
   var sourceHostel = sourceId === 1 ? h1 : h2;
   var sourceKey = hostelKey(sourceHostel);
+  var coverageDateKeys = [];
+  for (var coverageCursor = new Date(startDate); coverageCursor <= endDate; coverageCursor.setDate(coverageCursor.getDate() + 1)) {
+    var coverageKey = toDateKeyHostel(coverageCursor);
+    coverageDateKeys.push(coverageKey);
+    if (!locationDateCoverage[String(sourceId)][coverageKey]) {
+      throw new Error("Gate data is missing for " + coverageKey + " at " + sourceHostel + ". The system cannot safely classify that date as absent. Upload a complete gate export covering every selected date, or narrow the reporting period.");
+    }
+  }
+  Object.keys(gateUsers).forEach(function(machineNo) {
+    gateUsers[machineNo].dates = gateUsers[machineNo].datesByLocation[String(sourceId)] || {};
+  });
+  var gateEvents = [], gateEventSeen = {};
+  for (var ge = 1; ge < rows.length; ge++) {
+    var gateRow = rows[ge] || [], gateDate = parseAttendanceDateHostel(gateRow[dateCol]);
+    if (!gateDate || gateDate < startDate || gateDate > endDate) continue;
+    if (parseHostelLocationId(gateRow[locCol]) !== sourceId) continue;
+    if (String(statusCol == null ? "" : (gateRow[statusCol] || "")).trim().toUpperCase() !== "C/IN") continue;
+    var gateMachine = cleanId(gateRow[noCol]);
+    if (!gateMachine) continue;
+    var gateDateKey = toDateKeyHostel(gateDate), eventKey = gateMachine + "|" + gateDateKey;
+    if (!gateEventSeen[eventKey]) { gateEventSeen[eventKey] = true; gateEvents.push({ machineNo: gateMachine, dateKey: gateDateKey, locationId: sourceId, status: "C/IN" }); }
+  }
   var master = await getAll("students");
   var bySerial = {};
   master.forEach(function(st) {
@@ -1742,7 +1768,8 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     hostel1Name: h1, hostel2Name: h2, sourceHostel: sourceHostel,
     sourceLocationId: sourceId, locationVotes: locationVotes,
     excludedPending: excludedPending, pendingUsers: pendingByMachine,
-    conflicts: conflicts, autoHostelAssigned: inferredUpdates.length
+    conflicts: conflicts, autoHostelAssigned: inferredUpdates.length,
+    coverageDateKeys: coverageDateKeys, gateEvents: gateEvents
   };
 }
 function ordinalSuffixHostel(n) {
