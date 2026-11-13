@@ -1424,7 +1424,7 @@ function setHostelStatus(msg, kind) {
   const el = document.getElementById("hostelStatus");
   if (!el) return;
   el.textContent = msg || "";
-  el.style.color = kind === "err" ? "#b91c1c" : kind === "ok" ? "#047857" : "";
+  el.style.color = (kind === "err" || kind === "error") ? "#b91c1c" : kind === "ok" ? "#047857" : "";
 }
 
 function showHostelFileCheck(msg, kind) {
@@ -1566,6 +1566,10 @@ function parseHostelLocationId(raw) {
  * Master list is still used for name/reg matching. Conflicts (machine vs master) are flagged.
  */
 async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, hostel2Name) {
+  // Accept both Date objects and date-input strings; normalize to local midnight.
+  startDate = startDate instanceof Date ? dateOnlyHostel(startDate) : parseInputDateHostel(String(startDate || ""));
+  endDate = endDate instanceof Date ? dateOnlyHostel(endDate) : parseInputDateHostel(String(endDate || ""));
+  if (!startDate || !endDate || endDate < startDate) throw new Error("Choose a valid reporting date range.");
   const headerIndex = {};
   rows[0].forEach((v, i) => {
     const k = String(v).trim();
@@ -1785,15 +1789,16 @@ function renderHostelPreview(absentees, dayHeaders, rate) {
   if (!table) return;
   window.__hostelPreviewRate = rate; window.__hostelPreviewDayHeaders = dayHeaders || [];
   const thead = table.querySelector("thead"), tbody = table.querySelector("tbody");
-  thead.innerHTML = "<tr><th>Name</th><th>Hostel</th>" + (dayHeaders||[]).map(h=>"<th>"+escapeHtml(h)+"</th>").join("") + "<th>Days</th><th>Fine (₦)</th><th></th></tr>";
+  thead.innerHTML = "<tr><th>Student name</th><th>Reg. No.</th><th>Hostel</th>" + (dayHeaders||[]).map(h=>"<th>"+escapeHtml(h)+"</th>").join("") + "<th>Days absent</th><th>Fine (₦)</th><th></th></tr>";
   tbody.innerHTML = (absentees||[]).map(function(r,idx) {
     var days = (r.dayMarks||[]).map(function(m,di) {
       var raw=String(m==null?"":m).trim().toUpperCase(), v=(raw==="A"||raw==="X")?"A":"P";
       return '<td style="text-align:center;padding:2px"><input data-hp-day="'+di+'" value="'+v+'" maxlength="1" title="P=present; A=absent" style="width:2rem;text-align:center;text-transform:uppercase;padding:4px" /></td>';
     }).join("");
     return '<tr data-hp-idx="'+idx+'" data-hp-student-id="'+escapeHtml(r.id||"")+'" data-hp-regno="'+escapeHtml(r.regNo||"")+'" data-hp-programme="'+escapeHtml(r.programme||"")+'" data-hp-level="'+escapeHtml(r.level||"")+'">' +
-      '<td><input data-hp-name type="text" value="'+escapeHtml(r.name||"")+'" style="min-width:140px;width:100%" /></td>' +
-      '<td><input data-hp-hostel type="text" value="'+escapeHtml(r.hostel||"")+'" style="min-width:90px;width:100%" /></td>'+days+
+      '<td><input data-hp-name type="text" value="'+escapeHtml(r.name||"")+'" style="min-width:180px;width:100%" /></td>' +
+      '<td>'+escapeHtml(r.regNo||"—")+'</td>' +
+      '<td><input data-hp-hostel type="text" value="'+escapeHtml(r.hostel||"")+'" style="min-width:100px;width:100%" /></td>'+days+
       '<td data-hp-days style="text-align:center">'+(Number(r.absentDays)||0)+'</td>' +
       '<td><input data-hp-fine type="number" min="0" step="500" value="'+(Number(r.fine)||0)+'" style="width:6rem" readonly /></td>' +
       '<td><button type="button" class="btn btn--ghost btn--sm" data-hp-remove="'+idx+'">Remove</button></td></tr>';
@@ -1802,7 +1807,7 @@ function renderHostelPreview(absentees, dayHeaders, rate) {
   tbody.querySelectorAll("[data-hp-day]").forEach(function(inp){inp.addEventListener("change",function(){var v=String(inp.value||"").trim().toUpperCase();inp.value=(v==="A"||v==="X")?"A":"P";recalculateHostelPreviewFromDom();});});
   var total=(absentees||[]).reduce(function(sum,r){return sum+(Number(r.absentDays)||0)*Number(rate||0);},0);
   var sum=document.getElementById("hostelSummary");
-  if(sum)sum.textContent=(absentees||[]).length+" absentee row(s) · Rate ₦"+Number(rate||0).toLocaleString("en-NG")+"/day · Total fine "+formatNairaHostel(total)+" — P = present, A = absent. Fine is automatic.";
+  if(sum)sum.textContent=(absentees||[]).length+" student(s) with at least one absence · Rate ₦"+Number(rate||0).toLocaleString("en-NG")+"/day · Total fine "+formatNairaHostel(total)+". P = present; A = absent. Day marks recalculate fines automatically.";
   document.getElementById("hostelResults").hidden=false;
 }
 
@@ -1895,16 +1900,24 @@ function addHostelPreviewRow() {
     return '<td style="text-align:center;padding:2px"><input data-hp-day="' + di + '" value="P" maxlength="1" title="P=present; A=absent" style="width:2rem;text-align:center;text-transform:uppercase;padding:4px" /></td>';
   }).join("");
   var tr = document.createElement("tr");
-  tr.innerHTML = '<td><input data-hp-name type="text" value="" placeholder="FULL NAME" style="min-width:140px;width:100%" /></td>' +
-    '<td><input data-hp-hostel type="text" value="" placeholder="Hostel" style="min-width:90px;width:100%" /></td>' +
+  tr.innerHTML = '<td><input data-hp-name type="text" value="" placeholder="FULL NAME" style="min-width:180px;width:100%" /></td>' +
+    '<td>—</td>' +
+    '<td><input data-hp-hostel type="text" value="" placeholder="Hostel" style="min-width:100px;width:100%" /></td>' +
     days +
     '<td data-hp-days style="text-align:center">0</td>' +
-    '<td><input data-hp-fine type="number" min="0" step="500" value="0" style="width:6rem" /></td>' +
+    '<td><input data-hp-fine type="number" min="0" step="500" value="0" style="width:6rem" readonly /></td>' +
     '<td><button type="button" class="btn btn--ghost btn--sm" data-hp-remove="x">Remove</button></td>';
   tbody.appendChild(tr);
   tr.querySelector("[data-hp-remove]").addEventListener("click", function() {
     tr.remove();
     recalculateHostelPreviewFromDom();
+  });
+  tr.querySelectorAll("[data-hp-day]").forEach(function(inp) {
+    inp.addEventListener("change", function() {
+      var v = String(inp.value || "").trim().toUpperCase();
+      inp.value = (v === "A" || v === "X") ? "A" : "P";
+      recalculateHostelPreviewFromDom();
+    });
   });
 }
 
@@ -2135,6 +2148,9 @@ async function finalizeHostelReportFromPreview() {
   if(!isQaOfficer()){setHostelStatus("Sign in as QA Officer.","error");return;}
   var rows=recalculateHostelPreviewFromDom();
   if(!rows.length){setHostelStatus("Preview is empty. Upload gate data or add rows first.","error");return;}
+  if(rows.some(function(r){return !String(r.name||"").trim();})){
+    setHostelStatus("Every preview row needs a student name. Complete or remove blank rows before confirming.","error");return;
+  }
   var rate=Number(window.__hostelPreviewRate)||Number((document.getElementById("hostelRate")&&document.getElementById("hostelRate").value)||0)||0;
   var dayHeaders=window.__hostelPreviewDayHeaders||[],last=window.__lastHostelReport||{},result=last.result||null;
   var dateKeys=(result&&result.dates?result.dates:[]).map(function(d){return toDateKeyHostel(d);});
