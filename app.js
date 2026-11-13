@@ -2142,10 +2142,24 @@ async function reconcileHostelRunsForMachine(machineNo, student) {
     }
   }
   if (!hostel) return [];
-  var updated = [];
+  var updated = [], conflictChanged=false;
   for (var i = 0; i < candidates.length; i++) {
     var run = candidates[i];
-    if (norm(run.hostel) !== norm(hostel)) continue;
+    if (norm(run.hostel) !== norm(hostel)) {
+      var queue=await getAll("biometric_pending");
+      var conflict=(queue||[]).find(function(q){return q&&q.status==="hostel_conflict"&&String(q.machineNo||"").trim()===serial&&String(q.studentId||"")===String(student.id)&&norm(q.gateHostel)===norm(run.hostel);});
+      if(!conflict){
+        conflict={id:"hconf_resolved_"+Date.now().toString(36)+"_"+i,kind:"hostel_conflict",status:"hostel_conflict",machineNo:serial,machineName:student.name||"",studentName:student.name||"",studentId:student.id,regNo:student.regNo||"",masterHostel:hostel,gateHostel:run.hostel,locationId:run.sourceLocationId||null,reportRunIds:[],reportContexts:[],createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+      }
+      conflict.reportRunIds=conflict.reportRunIds||[];
+      if(conflict.reportRunIds.indexOf(run.id)<0)conflict.reportRunIds.push(run.id);
+      conflict.reportContexts=conflict.reportContexts||[];
+      if(!conflict.reportContexts.some(function(x){return x.runId===run.id;}))conflict.reportContexts.push({runId:run.id,hostel:run.hostel,start:run.start,end:run.end,locationId:run.sourceLocationId});
+      conflict.updatedAt=new Date().toISOString();
+      await put("biometric_pending",conflict);
+      conflictChanged=true;
+      continue;
+    }
     run.matrix = run.matrix || [];
     var present = {};
     (run.gateEvents || []).forEach(function(ev) {
@@ -2196,9 +2210,10 @@ async function reconcileHostelRunsForMachine(machineNo, student) {
     await put("hostel_runs", run);
     updated.push(run);
   }
-  if (updated.length) {
+  if (updated.length || conflictChanged) {
     markDirty("saved hostel reports updated after issue resolution");
     try { await renderHostelRunsMaster(); } catch (_) {}
+    try { await renderHostelConflicts(); } catch (_) {}
   }
   return updated;
 }
