@@ -2094,7 +2094,22 @@ function downloadHostelWorkbook(rosterRows, dateKeys, filename, gateExportRows) 
 function downloadHostelRunWorkbook(run) {
   if (!run) throw new Error("Saved hostel report not found.");
   var matrix = (run.matrix && run.matrix.length) ? run.matrix : (run.rows || []);
-  downloadHostelWorkbook(matrix, run.dateKeys || [], "EOCNS_Absence_Report_" + String(run.start || "report") + "_to_" + String(run.end || "report") + ".xlsx", run.gateExportRows || []);
+  var gateRows = run.gateExportRows || [];
+  window.__hostelExportStudents = await getAll("students");
+  // Older saved reports predate raw-row retention. Reconstruct the same nine-column
+  // attendance layout from their retained machine/date events without inventing times.
+  if ((!gateRows || gateRows.length < 2) && Array.isArray(run.gateEvents) && run.gateEvents.length) {
+    var students = [];
+    try { students = window.__hostelExportStudents || []; } catch (_) {}
+    var bySerial = {};
+    students.forEach(function(s) { if (s && s.serial) bySerial[String(s.serial).trim().replace(/\.0$/, "")] = s; });
+    gateRows = [["Department","Name","No.","Date/Time","Status","Location ID","ID Number","VerifyCode","CardNo"]];
+    run.gateEvents.forEach(function(ev) {
+      var student = bySerial[String(ev.machineNo || "").trim().replace(/\.0$/, "")] || {};
+      gateRows.push([run.hostel || "", student.name || "", String(ev.machineNo || ""), String(ev.dateKey || ""), ev.status || "C/IN", ev.locationId || run.sourceLocationId || "", student.regNo || "", "", ""]);
+    });
+  }
+  downloadHostelWorkbook(matrix, run.dateKeys || [], "EOCNS_Absence_Report_" + String(run.start || "report") + "_to_" + String(run.end || "report") + ".xlsx", gateRows);
 }
 
 async function attachHostelRunToPending(run, result) {
@@ -2182,7 +2197,7 @@ async function recordHostelIssueResolution(issue, action, details) {
     var resolvedStudents = await getAll("students");
     var resolvedStudent = (resolvedStudents || []).find(function(s) {
       return (issue.studentId && String(s.id) === String(issue.studentId)) ||
-        (issue.machineNo && String(s.serial || "").trim().replace(/\\.0$/, "") === String(issue.machineNo || "").trim().replace(/\\.0$/, ""));
+        (issue.machineNo && String(s.serial || "").trim().replace(/\.0$/, "") === String(issue.machineNo || "").trim().replace(/\.0$/, ""));
     });
     if (resolvedStudent) updateHostelRunGateExportIdentity(run, issue.machineNo || resolvedStudent.serial, resolvedStudent);
     run.updatedAt=new Date().toISOString();
@@ -2219,6 +2234,7 @@ async function reconcileHostelRunsForMachine(machineNo, student) {
     var run = candidates[i];
     var exportIdentityChanged = updateHostelRunGateExportIdentity(run, serial, student);
     if (norm(run.hostel) !== norm(hostel)) {
+      if (exportIdentityChanged) { run.updatedAt = new Date().toISOString(); await put("hostel_runs", run); }
       var queue=await getAll("biometric_pending");
       var conflict=(queue||[]).find(function(q){return q&&q.status==="hostel_conflict"&&String(q.machineNo||"").trim()===serial&&String(q.studentId||"")===String(student.id)&&norm(q.gateHostel)===norm(run.hostel);});
       if(!conflict){
