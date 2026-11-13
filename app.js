@@ -11338,6 +11338,7 @@ async function confirmBioCreateStudent() {
     student.bioAliases = [pending.machineName];
   }
   await put("students", student);
+  try { await reconcileHostelRunsForMachine(serial, student); } catch (reconcileErr) { console.warn("new student hostel report reconciliation", reconcileErr); }
   try {
     await writeAudit({
       action: "create",
@@ -11720,7 +11721,7 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
   var candidates = [];
   if (result && result.excludedPending && result.excludedPending.length) {
     result.excludedPending.forEach(function(ex) {
-      candidates.push({ machineNo: String(ex.machineNo || "").trim(), name: ex.name || "" });
+      candidates.push({ machineNo: String(ex.machineNo || "").trim(), name: ex.name || "", reason: ex.reason || "" });
     });
   } else if (result && result.students) {
     Object.keys(result.students).forEach(function(sid) {
