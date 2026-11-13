@@ -1782,6 +1782,22 @@ function buildAbsenteeRowsHostel(students, attendance, dates, rate) {
   return rows;
 }
 
+function buildHostelRosterRows(students, attendance, dates, rate) {
+  var rows = [];
+  Object.keys(students || {}).forEach(function(id) {
+    var meta = students[id] || {}, present = attendance[id] || new Set();
+    var dayMarks = (dates || []).map(function(d) {
+      return present && present.has && present.has(toDateKeyHostel(d)) ? "P" : "A";
+    });
+    var absentDays = dayMarks.filter(function(m) { return m === "A"; }).length;
+    rows.push({ id: id, name: meta.name || "", hostel: meta.hostel || "", regNo: meta.regNo || "",
+      programme: meta.programme || "", level: meta.level || "", dayMarks: dayMarks,
+      absentDays: absentDays, fine: absentDays * rate });
+  });
+  rows.sort(function(a, b) { return String(a.name || "").localeCompare(String(b.name || "")); });
+  return rows;
+}
+
 function formatNairaHostel(n) {
   return "₦" + Math.round(n).toLocaleString("en-NG");
 }
@@ -1819,7 +1835,7 @@ function renderHostelPreview(absentees, dayHeaders, rate) {
   tbody.querySelectorAll("[data-hp-day]").forEach(function(inp){inp.addEventListener("change",function(){var v=String(inp.value||"").trim().toUpperCase();inp.value=(v==="A"||v==="X")?"A":"P";recalculateHostelPreviewFromDom();});});
   var total=(absentees||[]).reduce(function(sum,r){return sum+(Number(r.absentDays)||0)*Number(rate||0);},0);
   var sum=document.getElementById("hostelSummary");
-  if(sum)sum.textContent=(absentees||[]).length+" student(s) with at least one absence · Rate ₦"+Number(rate||0).toLocaleString("en-NG")+"/day · Total fine "+formatNairaHostel(total)+". P = present; A = absent. Day marks recalculate fines automatically.";
+  if(sum)sum.textContent=(absentees||[]).length+" student(s) in the hostel master roster · "+(absentees||[]).filter(function(r){return Number(r.absentDays)>0;}).length+" with at least one absence · Rate ₦"+Number(rate||0).toLocaleString("en-NG")+"/day · Total fine "+formatNairaHostel(total)+". P = present; A = absent. Day marks recalculate fines automatically.";
   document.getElementById("hostelResults").hidden=false;
 }
 
@@ -1881,10 +1897,11 @@ async function previewHostelFromGate() {
     var result = await computeHostelAttendance(hostelParsedRows, startDate, endDate, hostel1Name, hostel2Name);
     var dayHeaders = buildDayHeadersHostel(result.dates);
     var absentees = buildAbsenteeRowsHostel(result.students, result.attendance, result.dates, rate);
-    // Include present-only students optionally? User asked edit absentees/names — keep absentees + allow add row
-    renderHostelPreview(absentees, dayHeaders, rate);
+    var rosterRows = buildHostelRosterRows(result.students, result.attendance, result.dates, rate);
+    // Review the complete master roster; the final liability sheet is derived from A marks.
+    renderHostelPreview(rosterRows, dayHeaders, rate);
     window.__lastHostelReport = {
-      absentees: absentees,
+      absentees: rosterRows,
       dayHeaders: dayHeaders,
       rate: rate,
       startDate: startDate,
@@ -2247,8 +2264,9 @@ async function generateHostelReport() {
 
     const dayHeaders = buildDayHeadersHostel(result.dates);
     const absentees = buildAbsenteeRowsHostel(result.students, result.attendance, result.dates, rate);
-    renderHostelPreview(absentees, dayHeaders, rate);
-    window.__lastHostelReport = { absentees: absentees, dayHeaders: dayHeaders, rate: rate, startDate: startDate, endDate: endDate, students: result.students, dates: result.dates, result: result };
+    const rosterRows = buildHostelRosterRows(result.students, result.attendance, result.dates, rate);
+    renderHostelPreview(rosterRows, dayHeaders, rate);
+    window.__lastHostelReport = { absentees: rosterRows, dayHeaders: dayHeaders, rate: rate, startDate: startDate, endDate: endDate, students: result.students, dates: result.dates, result: result };
     // Persist full master run (editable by QA with REF; published to data/hostel_runs.json)
     var dateKeys = (result.dates || []).map(function(d) { return toDateKeyHostel(d); });
     var matrix = [];
