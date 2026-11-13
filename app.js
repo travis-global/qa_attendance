@@ -2122,7 +2122,6 @@ async function reconcileHostelRunsForMachine(machineNo, student) {
     var run = candidates[i];
     if (norm(run.hostel) !== norm(hostel)) continue;
     run.matrix = run.matrix || [];
-    if (run.matrix.some(function(row) { return String(row.studentId) === String(student.id); })) continue;
     var present = {};
     (run.gateEvents || []).forEach(function(ev) {
       if (String(ev.machineNo || "").trim() === serial) present[String(ev.dateKey)] = true;
