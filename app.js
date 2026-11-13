@@ -2438,18 +2438,33 @@ async function finalizeHostelReportFromPreview() {
     if(target){target.name=edit.name||target.name;target.hostel=edit.hostel||target.hostel;target.dayMarks=edit.dayMarks.slice();target.absentDays=edit.absentDays;target.fine=edit.fine;}
     else matrix.push({studentId:edit.id||"",name:edit.name,regNo:edit.regNo||"",hostel:edit.hostel||"",programme:edit.programme||"",level:edit.level||"",dayMarks:edit.dayMarks.slice(),absentDays:edit.absentDays,fine:edit.fine});
   });
-  // Bring in students linked after the preview was created. Their saved gate events
-  // are retained on the draft run, so their marks belong to this exact date range.
+  // Detect preview edits so that a newly resolved identity can refresh its
+  // attendance from the retained gate events without undoing officer corrections.
+  var manuallyEditedIds={};
+  rows.forEach(function(edit){
+    if(!edit.id)return;
+    var original=(last.absentees||[]).find(function(row){return String(row.id)===String(edit.id);});
+    if(original&&JSON.stringify(original.dayMarks||[])!==JSON.stringify(edit.dayMarks||[]))manuallyEditedIds[String(edit.id)]=true;
+  });
+  // Bring in newly linked students, and refresh previously listed students whose
+  // machine IDs were resolved after the preview was created.
   if(priorRun&&priorRun.matrix){
     priorRun.matrix.forEach(function(saved){
       var sid=String(saved.studentId||"");
-      if(!sid||matrix.some(function(row){return String(row.studentId)===sid;}))return;
-      // Do not re-add a row the officer intentionally removed from the preview.
-      if(originallyPreviewedIds[sid])return;
-      matrix.push(Object.assign({},saved));
+      if(!sid)return;
+      var current=matrix.find(function(row){return String(row.studentId)===sid;});
+      if(current&&saved.resolvedFromPending){
+        current.machineNo=saved.machineNo||current.machineNo||"";
+        if(!manuallyEditedIds[sid]){
+          current.dayMarks=(saved.dayMarks||[]).slice();
+          current.absentDays=Number(saved.absentDays||0);
+          current.fine=Number(saved.fine||0);
+        }
+      }else if(!current&&!originallyPreviewedIds[sid]){
+        matrix.push(Object.assign({},saved));
+      }
     });
   }
-  matrix.forEach(function(row){row.rosterId=run.id+"::"+String(row.studentId);});
   matrix.forEach(function(row,index){if(!row.studentId)row.studentId="manual_"+String(last.runId||"report")+"_"+String(index+1);});
   matrix.sort(function(a,b){var h=String(a.hostel||"").localeCompare(String(b.hostel||""));return h||String(a.name||"").localeCompare(String(b.name||""));});
   var absentees=matrix.filter(function(r){return(Number(r.absentDays)||0)>0;}).map(function(r){return{id:r.studentId||"",name:r.name,hostel:r.hostel,regNo:r.regNo||"",programme:r.programme||"",level:r.level||"",dayMarks:r.dayMarks,absentDays:r.absentDays,fine:r.absentDays*rate};});
