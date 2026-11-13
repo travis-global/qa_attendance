@@ -1656,150 +1656,61 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     return false;
   }
 
-  // Resolve hostel from majority Location ID, then master list.
-  // If matched student has NO hostel on site, auto-write machine location onto master card.
+  // Master registry is authoritative. Location ID is diagnostic only.
   var autoHostelAssigned = 0;
   var sidsResolve = Object.keys(students);
   for (var ri = 0; ri < sidsResolve.length; ri++) {
-    var sid = sidsResolve[ri];
-    var st = students[sid];
-    var v = locVotes[sid] || { "1": 0, "2": 0 };
+    var sid = sidsResolve[ri], st = students[sid], v = locVotes[sid] || { "1": 0, "2": 0 };
     st.locationVotes = { "1": v["1"], "2": v["2"] };
-    var maj = null;
-    if (v["1"] > v["2"]) maj = 1;
-    else if (v["2"] > v["1"]) maj = 2;
+    var maj = v["1"] > v["2"] ? 1 : (v["2"] > v["1"] ? 2 : null);
     st.locationIdMajority = maj;
-    var fromMachine = null;
-    if (maj === 1) fromMachine = h1;
-    if (maj === 2) fromMachine = h2;
-    if (fromMachine) {
-      st.hostel = fromMachine;
-      st.hostelSource = "location_id";
-      if (st.masterHostel && !hostelIsBlank(st.masterHostel) && st.masterHostel !== fromMachine) {
-        st.hostelConflict = true;
-        st.gateHostel = fromMachine;
-      }
-      if (st.masterId && hostelIsBlank(st.masterHostel)) {
-        try {
-          var masterRec = null;
-          for (var mi = 0; mi < master.length; mi++) {
-            if (master[mi].id === st.masterId) { masterRec = master[mi]; break; }
-          }
-          if (masterRec && hostelIsBlank(masterRec.hostel)) {
-            var beforeH = masterRec.hostel || "";
-            masterRec.hostel = fromMachine;
-            masterRec.updatedAt = new Date().toISOString();
-            masterRec.hostelSource = "machine_location_id";
-            await put("students", masterRec);
-            st.masterHostel = fromMachine;
-            st.hostelAssignedFromMachine = true;
-            autoHostelAssigned++;
-            try {
-              await writeAudit({
-                action: "update",
-                entity: "students",
-                entityId: masterRec.id,
-                reason: "Auto-assigned hostel from biometric Location ID (was blank on master)",
-                details: {
-                  hostelBefore: beforeH,
-                  hostelAfter: fromMachine,
-                  machineNo: sid,
-                  locationIdMajority: maj,
-                  votes: v
-                }
-              });
-            } catch (_) {}
-          }
-        } catch (e) { console.warn("auto hostel assign", e); }
-      }
-    } else if (st.masterHostel && !hostelIsBlank(st.masterHostel)) {
-      st.hostel = st.masterHostel;
-      st.hostelSource = "master_list";
-    } else {
-      st.hostel = "Unassigned (no Location ID majority / master hostel)";
-      st.hostelSource = "unassigned";
-    }
+    st.gateHostel = maj === 1 ? h1 : (maj === 2 ? h2 : "");
+    st.hostel = st.masterHostel && !hostelIsBlank(st.masterHostel) ? st.masterHostel : "Unassigned";
+    st.hostelSource = st.masterHostel && !hostelIsBlank(st.masterHostel) ? "master_list" : "unassigned";
+    st.hostelConflict = !!(st.gateHostel && st.masterHostel && !hostelIsBlank(st.masterHostel) && st.gateHostel !== st.masterHostel);
   }
 
-
-
-  // Location mismatches: queue for officer clarity; hold off fee report until resolved
-  var locationConflictNos = {};
+  // Record mismatches for investigation, but do not suppress linked students.
   try {
-    var existingConf = await getAll("biometric_pending");
-    var confKeys = {};
+    var existingConf = await getAll("biometric_pending"), confKeys = {};
     (existingConf || []).forEach(function(q) {
       if (q && q.status === "hostel_conflict" && q.machineNo) confKeys[String(q.machineNo).trim()] = true;
     });
-    var confSids = Object.keys(students);
-    for (var ci = 0; ci < confSids.length; ci++) {
-      var csid = confSids[ci];
-      var cst = students[csid];
-      if (!cst || !cst.hostelConflict) continue;
-      locationConflictNos[String(csid).trim()] = true;
-      if (confKeys[String(csid).trim()]) continue;
+    for (var ci = 0; ci < sidsResolve.length; ci++) {
+      var csid = sidsResolve[ci], cst = students[csid];
+      if (!cst || !cst.hostelConflict || confKeys[String(csid).trim()]) continue;
       await put("biometric_pending", {
-        id: "hconf_" + Date.now().toString(36) + "_" + ci,
-        kind: "hostel_conflict",
-        status: "hostel_conflict",
-        machineNo: String(csid).trim(),
-        machineName: cst.name || "",
-        studentName: cst.name || "",
-        studentId: cst.masterId || null,
-        regNo: cst.regNo || "",
-        masterHostel: cst.masterHostel || "",
-        gateHostel: cst.gateHostel || cst.hostel || "",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        id: "hconf_" + Date.now().toString(36) + "_" + ci, kind: "hostel_conflict", status: "hostel_conflict",
+        machineNo: String(csid).trim(), machineName: cst.name || "", studentName: cst.name || "",
+        studentId: cst.masterId || null, regNo: cst.regNo || "", masterHostel: cst.masterHostel || "",
+        gateHostel: cst.gateHostel || "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
       });
-      confKeys[String(csid).trim()] = true;
     }
-    // any open hostel_conflict still holds off report even if not re-detected
-    (existingConf || []).forEach(function(q) {
-      if (q && q.status === "hostel_conflict" && q.machineNo) {
-        locationConflictNos[String(q.machineNo).trim()] = true;
-      }
-    });
   } catch (e) { console.warn("hostel conflict queue", e); }
 
-  // INSTITUTIONAL RULE: only master-linked students appear on the hostel report.
-  // Unmatched machine users are held in the review queue; after linking, regenerate.
+  // Only unmatched identities are excluded; conflict queue entries never exclude master-linked students.
   var pendingNos = {};
   try {
     var qlist = await getAll("biometric_pending");
     (qlist || []).forEach(function(q) {
-      if (!q || q.status === "linked") return;
-      if (q.machineNo != null && String(q.machineNo).trim() !== "") {
-        pendingNos[String(q.machineNo).trim()] = true;
-      }
+      if (!q || q.status === "linked" || q.status === "hostel_conflict") return;
+      if (q.machineNo != null && String(q.machineNo).trim()) pendingNos[String(q.machineNo).trim()] = true;
     });
   } catch (_) {}
-
   var excludedPending = [];
   Object.keys(students).forEach(function(sid) {
-    var st = students[sid];
-    var key = String(sid).trim();
-    var linked = false;
-    if (st && st.matched && st.masterId) linked = true;
+    var st = students[sid], key = String(sid).trim();
+    var linked = !!(st && st.matched && st.masterId);
     if (byNo[key]) linked = true;
     if (st && st.regNo && byNo[String(st.regNo).trim().toUpperCase()]) linked = true;
-    // Anyone still sitting in the open review queue stays off the report
-    if (pendingNos[key]) linked = false;
-    // Location conflict: hold off fee report until officer clarifies
-    if (typeof locationConflictNos !== "undefined" && locationConflictNos[key]) linked = false;
-    if (st && st.hostelConflict) linked = false;
+    if (pendingNos[key] && !(st && st.matched && st.masterId)) linked = false;
     if (!linked) {
-      excludedPending.push({
-        machineNo: key,
-        name: (st && st.name) || "",
-        reason: (st && st.hostelConflict) || (locationConflictNos && locationConflictNos[key])
-          ? "hostel location conflict — clarify before fee report"
-          : (pendingNos[key] ? "awaiting officer review" : "not linked to master list")
-      });
-      delete students[sid];
-      delete attendance[sid];
+      excludedPending.push({ machineNo:key, name:(st && st.name)||"", reason:pendingNos[key]?"awaiting officer identity review":"not linked to master list" });
+      delete students[sid]; delete attendance[sid];
     }
   });
+
+
 
   const dates = [];
   const cursor = new Date(startDate);
@@ -1843,27 +1754,15 @@ function buildDayHeadersHostel(dates) {
 function buildAbsenteeRowsHostel(students, attendance, dates, rate) {
   const rows = [];
   Object.keys(students).forEach(function(id) {
-    const meta = students[id];
-    const present = attendance[id] || new Set();
-    const dayMarks = dates.map(function(d) {
-      const key = toDateKeyHostel(d);
-      return present.has(key) ? "✓" : "";
-    });
-    const absentDays = dayMarks.filter(function(m) { return !m; }).length;
-    if (absentDays === 0) return;
-    rows.push({
-      id: id,
-      name: meta.name,
-      hostel: meta.hostel,
-      regNo: meta.regNo || "",
-      programme: meta.programme || "",
-      level: meta.level || "",
-      dayMarks: dayMarks,
-      absentDays: absentDays,
-      fine: absentDays * rate
-    });
+    const meta = students[id], present = attendance[id] || new Set();
+    const dayMarks = dates.map(function(d) { return present && present.has && present.has(toDateKeyHostel(d)) ? "P" : "A"; });
+    const absentDays = dayMarks.filter(function(m) { return m === "A"; }).length;
+    if (!absentDays) return;
+    rows.push({ id:id, name:meta.name||"", hostel:meta.hostel||"", regNo:meta.regNo||"",
+      programme:meta.programme||"", level:meta.level||"", dayMarks:dayMarks,
+      absentDays:absentDays, fine:absentDays*rate });
   });
-  rows.sort(function(a, b) { return a.name.localeCompare(b.name); });
+  rows.sort(function(a,b){return String(a.name||"").localeCompare(String(b.name||""));});
   return rows;
 }
 
@@ -1884,106 +1783,65 @@ function buildOutputBaseNameHostel(startDate, endDate) {
 function renderHostelPreview(absentees, dayHeaders, rate) {
   const table = document.getElementById("hostelPreviewTable");
   if (!table) return;
-  window.__hostelPreviewRate = rate;
-  window.__hostelPreviewDayHeaders = dayHeaders || [];
-  const thead = table.querySelector("thead");
-  const tbody = table.querySelector("tbody");
-  thead.innerHTML = "<tr><th>Name</th><th>Hostel</th>" +
-    (dayHeaders || []).map(function(h) { return "<th>" + escapeHtml(h) + "</th>"; }).join("") +
-    "<th>Days</th><th>Fine (₦)</th><th></th></tr>";
-  tbody.innerHTML = (absentees || []).map(function(r, idx) {
-    var days = (r.dayMarks || []).map(function(m, di) {
-      var v = (m === "P" || m === "A") ? m : (m ? String(m) : "A");
-      return '<td style="text-align:center;padding:2px"><input data-hp-day="' + di + '" value="' + escapeHtml(v) +
-        '" maxlength="1" title="P=present A=absent" style="width:2rem;text-align:center;text-transform:uppercase;padding:4px" /></td>';
+  window.__hostelPreviewRate = rate; window.__hostelPreviewDayHeaders = dayHeaders || [];
+  const thead = table.querySelector("thead"), tbody = table.querySelector("tbody");
+  thead.innerHTML = "<tr><th>Name</th><th>Hostel</th>" + (dayHeaders||[]).map(h=>"<th>"+escapeHtml(h)+"</th>").join("") + "<th>Days</th><th>Fine (₦)</th><th></th></tr>";
+  tbody.innerHTML = (absentees||[]).map(function(r,idx) {
+    var days = (r.dayMarks||[]).map(function(m,di) {
+      var raw=String(m==null?"":m).trim().toUpperCase(), v=(raw==="A"||raw==="X")?"A":"P";
+      return '<td style="text-align:center;padding:2px"><input data-hp-day="'+di+'" value="'+v+'" maxlength="1" title="P=present; A=absent" style="width:2rem;text-align:center;text-transform:uppercase;padding:4px" /></td>';
     }).join("");
-    return '<tr data-hp-idx="' + idx + '">' +
-      '<td><input data-hp-name type="text" value="' + escapeHtml(r.name || "") + '" style="min-width:140px;width:100%" /></td>' +
-      '<td><input data-hp-hostel type="text" value="' + escapeHtml(r.hostel || "") + '" style="min-width:90px;width:100%" /></td>' +
-      days +
-      '<td data-hp-days style="text-align:center">' + (r.absentDays != null ? r.absentDays : "") + '</td>' +
-      '<td><input data-hp-fine type="number" min="0" step="500" value="' + (Number(r.fine) || 0) + '" style="width:6rem" /></td>' +
-      '<td><button type="button" class="btn btn--ghost btn--sm" data-hp-remove="' + idx + '">Remove</button></td></tr>';
+    return '<tr data-hp-idx="'+idx+'" data-hp-student-id="'+escapeHtml(r.id||"")+'" data-hp-regno="'+escapeHtml(r.regNo||"")+'" data-hp-programme="'+escapeHtml(r.programme||"")+'" data-hp-level="'+escapeHtml(r.level||"")+'">' +
+      '<td><input data-hp-name type="text" value="'+escapeHtml(r.name||"")+'" style="min-width:140px;width:100%" /></td>' +
+      '<td><input data-hp-hostel type="text" value="'+escapeHtml(r.hostel||"")+'" style="min-width:90px;width:100%" /></td>'+days+
+      '<td data-hp-days style="text-align:center">'+(Number(r.absentDays)||0)+'</td>' +
+      '<td><input data-hp-fine type="number" min="0" step="500" value="'+(Number(r.fine)||0)+'" style="width:6rem" readonly /></td>' +
+      '<td><button type="button" class="btn btn--ghost btn--sm" data-hp-remove="'+idx+'">Remove</button></td></tr>';
   }).join("");
-  tbody.querySelectorAll("[data-hp-remove]").forEach(function(btn) {
-    btn.addEventListener("click", function() {
-      var tr = btn.closest("tr");
-      if (tr) tr.remove();
-      recalculateHostelPreviewFromDom();
-    });
-  });
-  tbody.querySelectorAll("[data-hp-day]").forEach(function(inp) {
-    inp.addEventListener("change", function() {
-      var v = String(inp.value || "").trim().toUpperCase();
-      if (v !== "P" && v !== "A") v = "A";
-      inp.value = v;
-    });
-  });
-  const totalFine = (absentees || []).reduce(function(s, r) { return s + (Number(r.fine) || 0); }, 0);
-  var sum = document.getElementById("hostelSummary");
-  if (sum) sum.textContent = (absentees || []).length + " row(s) in preview · Rate ₦" +
-    Number(rate || 0).toLocaleString("en-NG") + "/day · Total fine " + formatNairaHostel(totalFine) +
-    " — edit cells, then Recalculate or Confirm & download.";
-  document.getElementById("hostelResults").hidden = false;
+  tbody.querySelectorAll("[data-hp-remove]").forEach(function(btn){btn.addEventListener("click",function(){var tr=btn.closest("tr");if(tr)tr.remove();recalculateHostelPreviewFromDom();});});
+  tbody.querySelectorAll("[data-hp-day]").forEach(function(inp){inp.addEventListener("change",function(){var v=String(inp.value||"").trim().toUpperCase();inp.value=(v==="A"||v==="X")?"A":"P";recalculateHostelPreviewFromDom();});});
+  var total=(absentees||[]).reduce(function(sum,r){return sum+(Number(r.absentDays)||0)*Number(rate||0);},0);
+  var sum=document.getElementById("hostelSummary");
+  if(sum)sum.textContent=(absentees||[]).length+" absentee row(s) · Rate ₦"+Number(rate||0).toLocaleString("en-NG")+"/day · Total fine "+formatNairaHostel(total)+" — P = present, A = absent. Fine is automatic.";
+  document.getElementById("hostelResults").hidden=false;
 }
 
 /** Read editable preview table → absentee row objects */
+
+
 function collectHostelPreviewFromDom() {
-  var table = document.getElementById("hostelPreviewTable");
-  if (!table) return [];
-  var rate = Number(window.__hostelPreviewRate) || Number((document.getElementById("hostelRate") && document.getElementById("hostelRate").value) || 0) || 0;
-  var rows = [];
-  table.querySelectorAll("tbody tr").forEach(function(tr) {
-    var nameEl = tr.querySelector("[data-hp-name]");
-    var hostEl = tr.querySelector("[data-hp-hostel]");
-    var fineEl = tr.querySelector("[data-hp-fine]");
-    var dayInputs = tr.querySelectorAll("[data-hp-day]");
-    var dayMarks = [];
-    dayInputs.forEach(function(inp) {
-      var v = String(inp.value || "").trim().toUpperCase();
-      dayMarks.push(v === "P" ? "P" : "A");
-    });
-    var absentDays = dayMarks.filter(function(m) { return m === "A"; }).length;
-    var fine = fineEl && fineEl.value !== "" ? Number(fineEl.value) : (absentDays * rate);
-    if (isNaN(fine)) fine = absentDays * rate;
-    rows.push({
-      name: nameEl ? nameEl.value.trim() : "",
-      hostel: hostEl ? hostEl.value.trim() : "",
-      dayMarks: dayMarks,
-      absentDays: absentDays,
-      fine: fine
-    });
+  var table=document.getElementById("hostelPreviewTable"); if(!table)return [];
+  var rate=Number(window.__hostelPreviewRate)||Number((document.getElementById("hostelRate")&&document.getElementById("hostelRate").value)||0)||0;
+  var rows=[];
+  table.querySelectorAll("tbody tr").forEach(function(tr){
+    var nameEl=tr.querySelector("[data-hp-name]"),hostEl=tr.querySelector("[data-hp-hostel]"),marks=[];
+    tr.querySelectorAll("[data-hp-day]").forEach(function(inp){var v=String(inp.value==null?"":inp.value).trim().toUpperCase();marks.push(v==="A"||v==="X"?"A":"P");});
+    var absent=marks.filter(function(m){return m==="A";}).length;
+    rows.push({id:tr.getAttribute("data-hp-student-id")||"",name:nameEl?nameEl.value.trim():"",
+      hostel:hostEl?hostEl.value.trim():"",regNo:tr.getAttribute("data-hp-regno")||"",
+      programme:tr.getAttribute("data-hp-programme")||"",level:tr.getAttribute("data-hp-level")||"",
+      dayMarks:marks,absentDays:absent,fine:absent*rate});
   });
   return rows;
 }
 
 function recalculateHostelPreviewFromDom() {
-  var rate = Number((document.getElementById("hostelRate") && document.getElementById("hostelRate").value) || window.__hostelPreviewRate || 0) || 0;
-  window.__hostelPreviewRate = rate;
-  var table = document.getElementById("hostelPreviewTable");
-  if (!table) return [];
-  var total = 0;
-  var n = 0;
-  table.querySelectorAll("tbody tr").forEach(function(tr) {
-    n++;
-    var dayInputs = tr.querySelectorAll("[data-hp-day]");
-    var absent = 0;
-    dayInputs.forEach(function(inp) {
-      var v = String(inp.value || "").trim().toUpperCase();
-      if (v !== "P") { v = "A"; inp.value = "A"; absent++; }
-      else inp.value = "P";
-    });
-    var daysCell = tr.querySelector("[data-hp-days]");
-    if (daysCell) daysCell.textContent = String(absent);
-    var fineEl = tr.querySelector("[data-hp-fine]");
-    var fine = absent * rate;
-    if (fineEl) fineEl.value = String(fine);
-    total += fine;
+  var rate=Number((document.getElementById("hostelRate")&&document.getElementById("hostelRate").value)||window.__hostelPreviewRate||0)||0;
+  window.__hostelPreviewRate=rate;
+  var table=document.getElementById("hostelPreviewTable");if(!table)return [];
+  var total=0,n=0;
+  table.querySelectorAll("tbody tr").forEach(function(tr){
+    n++;var absent=0;
+    tr.querySelectorAll("[data-hp-day]").forEach(function(inp){var v=String(inp.value==null?"":inp.value).trim().toUpperCase();if(v==="A"||v==="X"){inp.value="A";absent++;}else inp.value="P";});
+    var days=tr.querySelector("[data-hp-days]");if(days)days.textContent=String(absent);
+    var fine=absent*rate,fe=tr.querySelector("[data-hp-fine]");if(fe)fe.value=String(fine);total+=fine;
   });
-  var sum = document.getElementById("hostelSummary");
-  if (sum) sum.textContent = n + " row(s) · Rate ₦" + rate.toLocaleString("en-NG") + "/day · Total fine " + formatNairaHostel(total) + " (from your edits)";
+  var sum=document.getElementById("hostelSummary");
+  if(sum)sum.textContent=n+" row(s) · Rate ₦"+rate.toLocaleString("en-NG")+"/day · Total fine "+formatNairaHostel(total)+" (calculated from A marks)";
   return collectHostelPreviewFromDom();
 }
+
+/** 
 
 async function previewHostelFromGate() {
   if (!hostelParsedRows || !hostelParsedRows.length) {
@@ -2036,7 +1894,7 @@ function addHostelPreviewRow() {
   var tbody = table.querySelector("tbody");
   if (!tbody) return;
   var days = headers.map(function(_, di) {
-    return '<td style="text-align:center;padding:2px"><input data-hp-day="' + di + '" value="A" maxlength="1" style="width:2rem;text-align:center;text-transform:uppercase;padding:4px" /></td>';
+    return '<td style="text-align:center;padding:2px"><input data-hp-day="' + di + '" value="P" maxlength="1" title="P=present; A=absent" style="width:2rem;text-align:center;text-transform:uppercase;padding:4px" /></td>';
   }).join("");
   var tr = document.createElement("tr");
   tr.innerHTML = '<td><input data-hp-name type="text" value="" placeholder="FULL NAME" style="min-width:140px;width:100%" /></td>' +
@@ -2272,65 +2130,50 @@ function closeHostelRunModal() {
 
 
 
-async function finalizeHostelReportFromPreview() {
-  if (!isQaOfficer()) { setHostelStatus("Sign in as QA Officer.", "error"); return; }
-  var rows = recalculateHostelPreviewFromDom();
-  if (!rows.length) {
-    setHostelStatus("Preview is empty. Upload gate data or add rows first.", "error");
-    return;
+async async function finalizeHostelReportFromPreview() {
+  if(!isQaOfficer()){setHostelStatus("Sign in as QA Officer.","error");return;}
+  var rows=recalculateHostelPreviewFromDom();
+  if(!rows.length){setHostelStatus("Preview is empty. Upload gate data or add rows first.","error");return;}
+  var rate=Number(window.__hostelPreviewRate)||Number((document.getElementById("hostelRate")&&document.getElementById("hostelRate").value)||0)||0;
+  var dayHeaders=window.__hostelPreviewDayHeaders||[],last=window.__lastHostelReport||{},result=last.result||null;
+  var dateKeys=(result&&result.dates?result.dates:[]).map(function(d){return toDateKeyHostel(d);});
+  if(!dateKeys.length){
+    var sd=parseInputDateHostel(document.getElementById("hostelStartDate")&&document.getElementById("hostelStartDate").value);
+    var ed=parseInputDateHostel(document.getElementById("hostelEndDate")&&document.getElementById("hostelEndDate").value);
+    if(sd&&ed&&ed>=sd)for(var d=new Date(sd);d<=ed;d.setDate(d.getDate()+1))dateKeys.push(toDateKeyHostel(new Date(d)));
   }
-  var rate = Number(window.__hostelPreviewRate) || Number((document.getElementById("hostelRate") && document.getElementById("hostelRate").value) || 0) || 0;
-  var dayHeaders = window.__hostelPreviewDayHeaders || [];
-  var startDate = document.getElementById("hostelStartDate") && document.getElementById("hostelStartDate").value;
-  var endDate = document.getElementById("hostelEndDate") && document.getElementById("hostelEndDate").value;
-  // Prefer edited absentees for download
-  var absentees = rows.filter(function(r) { return (Number(r.absentDays) || 0) > 0 || (Number(r.fine) || 0) > 0; });
-  if (!absentees.length) absentees = rows.slice();
-  try {
-    var fname = "EOCNS_Hostel_Absentees_" + (startDate || "start") + "_to_" + (endDate || "end") + ".xlsx";
-    downloadHostelWorkbook(absentees, dayHeaders, fname);
-    // Persist run using last compute + edited absentees when possible
-    var last = window.__lastHostelReport || {};
-    var result = last.result;
-    if (result) {
-      var runId = "hr_" + Date.now().toString(36);
-      var totalFine = absentees.reduce(function(s, r) { return s + (Number(r.fine) || 0); }, 0);
-      var run = {
-        id: runId,
-        start: startDate,
-        end: endDate,
-        rate: rate,
-        absenteeCount: absentees.length,
-        totalFine: totalFine,
-        studentCount: Object.keys(result.students || {}).length,
-        dayHeaders: dayHeaders,
-        absentees: absentees,
-        edited: true,
-        note: "Officer-edited preview before download",
-        source: "gate_export_edited",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      try { stampSessionFields(run); } catch (_) {}
-      await put("hostel_runs", run);
-      try {
-        await writeAudit({
-          action: "create",
-          entity: "hostel_runs",
-          entityId: run.id,
-          reason: "Hostel report finalized from editable preview",
-          details: { start: startDate, end: endDate, rate: rate, absenteeCount: absentees.length, totalFine: totalFine, edited: true }
-        });
-      } catch (_) {}
-      try { markDirty("hostel_runs"); } catch (_) {}
-      try { if (typeof renderHostelRunsMaster === "function") renderHostelRunsMaster(); } catch (_) {}
-    }
-    setHostelStatus("Report downloaded (" + absentees.length + " rows). Publish when ready so other devices see this run.", "ok");
-  } catch (err) {
-    console.error(err);
-    setHostelStatus("Download failed: " + (err.message || String(err)), "error");
-  }
+  if(!dateKeys.length){setHostelStatus("Report dates could not be resolved. Generate the report again.","error");return;}
+  var matrix=[];
+  if(result&&result.students)Object.keys(result.students).forEach(function(sid){
+    var meta=result.students[sid]||{},present=result.attendance&&result.attendance[sid]?result.attendance[sid]:new Set();
+    var marks=dateKeys.map(function(k){return present&&present.has&&present.has(k)?"P":"A";}),abs=marks.filter(function(m){return m==="A";}).length;
+    matrix.push({studentId:sid,name:meta.name||"",regNo:meta.regNo||"",hostel:meta.hostel||"",programme:meta.programme||"",level:meta.level||"",dayMarks:marks,absentDays:abs,fine:abs*rate});
+  });
+  rows.forEach(function(edit){
+    var target=matrix.find(function(m){return edit.id&&String(m.studentId)===String(edit.id);});
+    if(!target&&edit.regNo)target=matrix.find(function(m){return String(m.regNo||"").toLowerCase()===String(edit.regNo).toLowerCase();});
+    if(!target&&edit.name)target=matrix.find(function(m){return String(m.name||"").trim().toLowerCase()===edit.name.trim().toLowerCase();});
+    if(target){target.name=edit.name||target.name;target.hostel=edit.hostel||target.hostel;target.dayMarks=edit.dayMarks.slice();target.absentDays=edit.absentDays;target.fine=edit.fine;}
+    else matrix.push({studentId:edit.id||"",name:edit.name,regNo:edit.regNo||"",hostel:edit.hostel||"",programme:edit.programme||"",level:edit.level||"",dayMarks:edit.dayMarks.slice(),absentDays:edit.absentDays,fine:edit.fine});
+  });
+  matrix.sort(function(a,b){var h=String(a.hostel||"").localeCompare(String(b.hostel||""));return h||String(a.name||"").localeCompare(String(b.name||""));});
+  var absentees=matrix.filter(function(r){return(Number(r.absentDays)||0)>0;}).map(function(r){return{id:r.studentId||"",name:r.name,hostel:r.hostel,regNo:r.regNo||"",programme:r.programme||"",level:r.level||"",dayMarks:r.dayMarks,absentDays:r.absentDays,fine:r.absentDays*rate};});
+  var start=dateKeys[0],end=dateKeys[dateKeys.length-1],total=absentees.reduce(function(sum,r){return sum+r.fine;},0);
+  var run={id:"hr_"+Date.now().toString(36),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
+    start:start,end:end,rate:rate,dateKeys:dateKeys,dayHeaders:dayHeaders,absenteeCount:absentees.length,totalFine:total,
+    studentCount:matrix.length,rows:absentees.map(function(r){return{studentId:r.id,name:r.name,hostel:r.hostel,regNo:r.regNo||"",absentDays:r.absentDays,fine:r.fine,programme:r.programme||"",level:r.level||"",dayMarks:r.dayMarks||[]};}),
+    matrix:matrix,amendments:[],edited:true,note:"Officer-edited preview. P=present; A=absent. Hostel assignment follows the master student record.",source:"gate_export_edited"};
+  try{
+    stampSessionFields(run);await put("hostel_runs",run);
+    await writeAudit({action:"create",entity:"hostel_runs",entityId:run.id,reason:"Hostel report finalized from editable preview",
+      details:{start:start,end:end,rate:rate,absenteeCount:absentees.length,totalFine:total,studentCount:matrix.length,edited:true}});
+    markDirty("hostel_runs");await renderHostelRunsMaster();
+    downloadHostelWorkbook(absentees,dayHeaders,"EOCNS_Hostel_Absentees_"+start+"_to_"+end+".xlsx");
+    setHostelStatus("Final report downloaded and saved ("+absentees.length+" absentees; "+matrix.length+" students in the full attendance matrix). Publish when ready so other devices receive this run.","ok");
+  }catch(err){console.error(err);setHostelStatus("Finalization failed: "+(err.message||String(err)),"error");}
 }
+
+
 
 async function generateHostelReport() {
   if (!isQaOfficer()) { openOfficerLoginGate("hostel"); return; }
@@ -2366,7 +2209,7 @@ async function generateHostelReport() {
     const dayHeaders = buildDayHeadersHostel(result.dates);
     const absentees = buildAbsenteeRowsHostel(result.students, result.attendance, result.dates, rate);
     renderHostelPreview(absentees, dayHeaders, rate);
-    window.__lastHostelReport = { absentees: absentees, dayHeaders: dayHeaders, rate: rate, startDate: startDate, endDate: endDate, students: result.students, dates: result.dates };
+    window.__lastHostelReport = { absentees: absentees, dayHeaders: dayHeaders, rate: rate, startDate: startDate, endDate: endDate, students: result.students, dates: result.dates, result: result };
     // Persist full master run (editable by QA with REF; published to data/hostel_runs.json)
     var dateKeys = (result.dates || []).map(function(d) { return toDateKeyHostel(d); });
     var matrix = [];
@@ -2414,7 +2257,7 @@ async function generateHostelReport() {
       }),
       matrix: matrix,
       amendments: [],
-      note: "Hostel from majority Location ID (1/2) on C/IN punches in period; master list used when Location ID is missing or tied.",
+      note: "Master student record used for hostel classification; Location ID is diagnostic only.",
       source: "gate_export"
     };
     stampSessionFields(run);
@@ -2869,7 +2712,7 @@ function renderProfessionalHostelPreview(absentees, dayHeaders, rate, startDate,
     '<h3 style="margin:0 0 8px">Executive summary — Hostel boarding fee</h3>' +
     '<p style="margin:0 0 12px;line-height:1.5">Period <strong>' + period + '</strong>. Rate <strong>' + formatNairaHostel(rate) + '</strong> per absent night. ' +
     '<strong>' + absentees.length + '</strong> students incurred charges totalling <strong>' + formatNairaHostel(totalFine) + '</strong>. ' +
-    'Hostel labels use the <em>majority Location ID</em> (1 → Hostel 1, 2 → Hostel 2) on check-ins in the period; the student master list is the fallback when Location ID is missing or tied.</p>' +
+    'Hostel labels follow the student's master record; gate Location ID is diagnostic only and never overrides the master list.</p>' +
     '<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin-bottom:16px">' +
     '<div><div class="muted-note">Absentees by hostel</div>' + svgPie(pieSlices, 150) + '</div>' +
     '<div><div class="muted-note">Fines by hostel (₦)</div>' + svgBars(barItems, 280, 130) + '</div></div>' +
@@ -2910,7 +2753,7 @@ function printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, end
     "<h2>1. Executive summary</h2>" +
     "<p class=\"narrative\">This report covers <strong>" + period + "</strong> at a charge of <strong>" + formatNairaHostel(rate) +
     "</strong> per absent night. <strong>" + absentees.length + "</strong> students were absent on one or more nights, generating a combined liability of <strong>" +
-    formatNairaHostel(totalFine) + "</strong>. Hostel placement prefers majority biometric Location ID for the period (stable 1/2), with master-list fallback when the device field is empty or tied. Occasional software mix-ups can still appear — use REF edit on the master run if a row is wrong. Historical published runs remain unchanged if a student is later moved between hostels.</p>" +
+    formatNairaHostel(totalFine) + "</strong>. Hostel placement follows the master student record. Biometric Location ID is diagnostic only and does not override master hostel assignment. Occasional software mix-ups can still appear — use REF edit on the master run if a row is wrong. Historical published runs remain unchanged if a student is later moved between hostels.</p>" +
     "<div class=\"kpi\"><div><strong>" + absentees.length + "</strong>Absentees</div>" +
     "<div><strong>" + formatNairaHostel(totalFine) + "</strong>Total due</div>" +
     "<div><strong>" + formatNairaHostel(rate) + "</strong>Daily rate</div></div>" +
@@ -2920,7 +2763,7 @@ function printHostelProfessionalPack(absentees, dayHeaders, rate, startDate, end
     "<table><thead><tr><th>#</th><th>Name</th><th>Reg. No</th><th>Hostel (master)</th><th>Days</th><th>Amount</th></tr></thead><tbody>" +
     rows + "</tbody></table>" +
     "<h2>4. Certification</h2>" +
-    "<p class=\"narrative\">Prepared via the EOCNS QA Attendance System. Location ID majority used for hostel classification; master list as fallback.</p>" +
+    "<p class=\"narrative\">Prepared via the EOCNS QA Attendance System. Master student record used for hostel classification; Location ID retained for diagnostics only.</p>" +
     "<p style=\"margin-top:36px\">QA Officer: ______________________ &nbsp;&nbsp; Date: ______________</p>" +
     "</body></html>");
   w.document.close();
