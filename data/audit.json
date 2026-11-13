@@ -35870,5 +35870,53 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1572
+  },
+  {
+    "ref": "REF/EOCNS/QA/1050",
+    "action": "create",
+    "entity": "hostel_runs",
+    "entityId": "hr_mwf0fsec",
+    "reason": "Hostel report finalized from editable preview",
+    "details": {
+      "start": "2026-11-09",
+      "end": "2026-11-12",
+      "rate": 15000,
+      "absenteeCount": 51,
+      "totalFine": 2670000,
+      "studentCount": 75,
+      "edited": true
+    },
+    "timestamp": "2026-11-13T13:26:14.168Z",
+    "at": "2026-11-13T13:26:14.168Z",
+    "createdAt": "2026-11-13T13:26:14.168Z",
+    "whenLocal": "Fri, 13 Nov 2026, 14:26:14",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1573
+  },
+  {
+    "ref": "REF/EOCNS/QA/1051",
+    "action": "create",
+    "entity": "hostel_runs",
+    "entityId": "hr_mwf0rt25",
+    "reason": "Hostel report finalized from editable preview",
+    "details": {
+      "start": "2026-11-09",
+      "end": "2026-11-12",
+      "rate": 15000,
+      "absenteeCount": 50,
+      "totalFine": 2610000,
+      "studentCount": 75,
+      "edited": true
+    },
+    "timestamp": "2026-11-13T13:35:34.899Z",
+    "at": "2026-11-13T13:35:34.899Z",
+    "createdAt": "2026-11-13T13:35:34.899Z",
+    "whenLocal": "Fri, 13 Nov 2026, 14:35:34",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1574
   }
 ]
