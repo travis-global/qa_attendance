@@ -2181,11 +2181,20 @@ async function renderHostelRunsMaster() {
       '<td>' + (amendN ? (amendN + " edit(s)") : "—") + '</td>' +
       '<td class="qa-edit-only" style="white-space:nowrap">' +
         '<button type="button" class="btn btn--ghost btn--sm" data-hr-view="' + escapeHtml(r.id) + '">View</button> ' +
+        '<button type="button" class="btn btn--ghost btn--sm" data-hr-download="' + escapeHtml(r.id) + '">Download</button> ' +
         '<button type="button" class="btn btn--ghost btn--sm" data-hr-edit="' + escapeHtml(r.id) + '">Edit</button>' +
       '</td></tr>';
   }).join("");
   body.querySelectorAll("[data-hr-view]").forEach(function(btn) {
     btn.addEventListener("click", function() { openHostelRunViewer(btn.getAttribute("data-hr-view"), false); });
+  });
+  body.querySelectorAll("[data-hr-download]").forEach(function(btn) {
+    btn.addEventListener("click", async function() {
+      if(!isQaOfficer()){alert("Sign in as QA Officer to download the saved hostel report.");return;}
+      var saved=(await getAll("hostel_runs")).find(function(r){return r.id===btn.getAttribute("data-hr-download");});
+      if(!saved){alert("Saved hostel report not found.");return;}
+      try{downloadHostelRunWorkbook(saved);}catch(e){alert(e.message||String(e));}
+    });
   });
   body.querySelectorAll("[data-hr-edit]").forEach(function(btn) {
     btn.addEventListener("click", function() {
@@ -2902,6 +2911,7 @@ async function renderHostelConflicts() {
       s.hostelSource = "gate_conflict_accept";
       s.updatedAt = new Date().toISOString();
       await put("students", s);
+      try { await reconcileHostelRunsForMachine(row.machineNo, s); } catch (reconcileErr) { console.warn("hostel conflict report reconciliation", reconcileErr); }
       try {
         await writeAudit({
           action: "update",
@@ -10818,11 +10828,21 @@ async function bioLinkStudentSerial(studentId, machineNo, machineName, deviceLab
   var s = all.find(function(x) { return x.id === studentId; });
   if (!s) throw new Error("Student not found");
   // conflict: another student already has this serial
-  var clash = all.find(function(x) {
+  var clashes = all.filter(function(x) {
     return x.id !== studentId && String(x.serial || "").trim() === String(machineNo).trim();
   });
-  if (clash) {
-    throw new Error("Machine No. " + machineNo + " already linked to " + (clash.name || clash.regNo));
+  if (clashes.length && mode !== "manual") {
+    throw new Error("Machine No. " + machineNo + " is linked to another master record. Resolve the duplicate from the manual review screen.");
+  }
+  if (clashes.length && mode === "manual") {
+    for (var clashIndex=0; clashIndex<clashes.length; clashIndex++) {
+      var oldOwner=clashes[clashIndex], oldSerial=oldOwner.serial;
+      oldOwner.serial=""; oldOwner.updatedAt=new Date().toISOString();
+      oldOwner.serialConflictResolvedAt=oldOwner.updatedAt;
+      oldOwner.serialConflictResolvedInFavorOf=studentId;
+      await put("students",oldOwner);
+      try { await writeAudit({action:"update",entity:"students",entityId:oldOwner.id,reason:"Duplicate biometric machine ID resolved by QA Officer",details:{serial:oldSerial,assignedTo:studentId}}); } catch (_) {}
+    }
   }
   var beforeSerial = s.serial || "";
   s.serial = String(machineNo).trim();
@@ -10848,6 +10868,7 @@ async function bioLinkStudentSerial(studentId, machineNo, machineName, deviceLab
     }
   }
   await put("students", s);
+  try { await reconcileHostelRunsForMachine(machineNo, s); } catch (reconcileErr) { console.warn("hostel report reconciliation", reconcileErr); }
   try {
     await writeAudit({
       action: "update",
@@ -11712,7 +11733,8 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
   var master = await getAll("students");
   var bySerial = {};
   master.forEach(function(s) {
-    if (s.serial) bySerial[String(s.serial).trim()] = s;
+    var serial=String(s.serial||"").trim();
+    if(serial){if(!bySerial[serial])bySerial[serial]=[];bySerial[serial].push(s);}
   });
   var existingQ = await getAll("biometric_pending");
   var openKeys = {};
@@ -11724,7 +11746,8 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
     var machineNo = candidates[i].machineNo;
     var stName = candidates[i].name || "";
     if (!machineNo) continue;
-    if (bySerial[machineNo]) continue;
+    var duplicateMatches=bySerial[machineNo]||[];
+    if (duplicateMatches.length===1) continue;
     if (openKeys[machineNo]) continue;
     var ranked = [];
     try {
@@ -11742,15 +11765,18 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
       });
       ranked.sort(function(a, b) { return b.score - a.score; });
     } catch (_) {}
-    var status = ranked.length && ranked[0].score >= 55 ? "clarify" : "unlinked";
+    if(duplicateMatches.length>1) ranked=duplicateMatches.map(function(s){return{studentId:s.id,name:s.name,regNo:s.regNo||"",serial:s.serial||"",score:100};});
+    var status = duplicateMatches.length>1 ? "conflict" : (ranked.length && ranked[0].score >= 55 ? "clarify" : "unlinked");
     await put("biometric_pending", {
       id: "bio_h_" + Date.now().toString(36) + "_" + machineNo + "_" + i,
       kind: "hostel",
       machineNo: machineNo,
       machineName: stName,
-      deviceLabel: hostel1Name || "Gate export",
+      deviceLabel: (result && result.sourceHostel) || hostel1Name || "Gate export",
       status: status,
+      reason: candidates[i].reason || (duplicateMatches.length>1 ? "Machine ID is linked to multiple master students" : "Machine ID is not linked to a master student"),
       suggestions: ranked.slice(0, 5),
+      reportRunIds: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     });
