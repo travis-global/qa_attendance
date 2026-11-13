@@ -2588,6 +2588,9 @@ async function renderHostelRoster() {
     btn.onclick = function() { bioManualLinkPrompt(btn.getAttribute("data-hostel-link")); };
   });
 }
+// Expose roster renderer to the app's global view-navigation/startup handlers.
+window.renderHostelRoster = renderHostelRoster;
+
 
 async function renderHostelConflicts() {
   var body = document.getElementById("hostelConflictBody");
