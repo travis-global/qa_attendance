@@ -2013,8 +2013,9 @@ function downloadHostelWorkbook(rosterRows, dateKeys, filename) {
   }
   for (var rr = 1; rr < data.length; rr++) {
     for (var cc = 0; cc < header.length; cc++) {
-      var cell = ws[XLSX.utils.encode_cell({ r: rr, c: cc })];
-      if (!cell) continue;
+      var cellAddress = XLSX.utils.encode_cell({ r: rr, c: cc });
+      var cell = ws[cellAddress];
+      if (!cell) cell = ws[cellAddress] = { t: "s", v: "" };
       cell.s = Object.assign({}, baseStyle, { fill: { fgColor: { rgb: rr % 2 === 1 ? beige : white } } });
       if (cc === 0) cell.s.alignment = { horizontal: "left", vertical: "center" };
       if (cc === endCol) {
@@ -2128,13 +2129,38 @@ async function reconcileHostelRunsForMachine(machineNo, student) {
     });
     var keys = run.dateKeys || [];
     var marks = keys.map(function(key) { return present[key] ? "P" : "A"; });
-    var absent = marks.filter(function(mark) { return mark === "A"; }).length;
-    run.matrix.push({
-      studentId: String(student.id), rosterId: run.id + "::" + String(student.id), machineNo: serial,
-      name: student.name || "", regNo: student.regNo || "", hostel: student.hostel || run.hostel,
-      programme: student.programme || "", level: student.level || "", dayMarks: marks,
-      absentDays: absent, fine: absent * Number(run.rate || 0), resolvedFromPending: true
+    // Replay recorded officer amendments so resolving a machine ID does not erase
+    // a deliberate manual attendance correction on the same saved report.
+    (run.amendments || []).forEach(function(amendment) {
+      (amendment.changes || []).forEach(function(change) {
+        if ((String(change.studentId || "") === String(student.id) || String(change.student || "") === String(student.name || "")) &&
+            Number(change.dayIndex) >= 0 && Number(change.dayIndex) < marks.length && (change.to === "P" || change.to === "A")) {
+          marks[Number(change.dayIndex)] = change.to;
+        }
+      });
     });
+    var absent = marks.filter(function(mark) { return mark === "A"; }).length;
+    var existingRow = run.matrix.find(function(row) { return String(row.studentId) === String(student.id); });
+    if (existingRow) {
+      existingRow.rosterId = existingRow.rosterId || (run.id + "::" + String(student.id));
+      existingRow.machineNo = serial;
+      existingRow.name = student.name || existingRow.name || "";
+      existingRow.regNo = student.regNo || existingRow.regNo || "";
+      existingRow.hostel = student.hostel || run.hostel;
+      existingRow.programme = student.programme || existingRow.programme || "";
+      existingRow.level = student.level || existingRow.level || "";
+      existingRow.dayMarks = marks;
+      existingRow.absentDays = absent;
+      existingRow.fine = absent * Number(run.rate || 0);
+      existingRow.resolvedFromPending = true;
+    } else {
+      run.matrix.push({
+        studentId: String(student.id), rosterId: run.id + "::" + String(student.id), machineNo: serial,
+        name: student.name || "", regNo: student.regNo || "", hostel: student.hostel || run.hostel,
+        programme: student.programme || "", level: student.level || "", dayMarks: marks,
+        absentDays: absent, fine: absent * Number(run.rate || 0), resolvedFromPending: true
+      });
+    }
     run.matrix.sort(function(a, b) { return String(a.name || "").localeCompare(String(b.name || "")); });
     run.studentCount = run.matrix.length;
     run.rows = run.matrix.filter(function(row) { return Number(row.absentDays || 0) > 0; }).map(function(row) { return Object.assign({}, row); });
@@ -2324,7 +2350,7 @@ async function saveHostelRunEdit() {
       marks.push(m);
       if (m === "A") absent++;
       if (sel && m !== prev) {
-        changes.push({ student: r.name || r.regNo || ("#" + i), dayIndex: di, from: prev, to: m });
+        changes.push({ studentId: r.studentId || "", student: r.name || r.regNo || ("#" + i), dayIndex: di, from: prev, to: m });
       }
     }
     r.dayMarks = marks;
@@ -2424,7 +2450,10 @@ async function finalizeHostelReportFromPreview() {
       matrix.push(Object.assign({},saved));
     });
   }
-  matrix.forEach(function(row){row.rosterId=(last.runId||"")+"::"+String(row.studentId||"");});
+  matrix.forEach(function(row,index){
+    if(!row.studentId) row.studentId="manual_"+String(last.runId||"report")+"_"+String(index+1);
+    row.rosterId=(last.runId||"")+"::"+String(row.studentId);
+  });
   matrix.sort(function(a,b){var h=String(a.hostel||"").localeCompare(String(b.hostel||""));return h||String(a.name||"").localeCompare(String(b.name||""));});
   var absentees=matrix.filter(function(r){return(Number(r.absentDays)||0)>0;}).map(function(r){return{id:r.studentId||"",name:r.name,hostel:r.hostel,regNo:r.regNo||"",programme:r.programme||"",level:r.level||"",dayMarks:r.dayMarks,absentDays:r.absentDays,fine:r.absentDays*rate};});
   var start=dateKeys[0],end=dateKeys[dateKeys.length-1],total=absentees.reduce(function(sum,r){return sum+r.fine;},0);
