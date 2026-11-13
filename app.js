@@ -2030,71 +2030,22 @@ function downloadHostelWorkbook(rosterRows, dateKeys, filename, gateExportRows) 
   var ws = XLSX.utils.aoa_to_sheet(data);
   var wb = XLSX.utils.book_new();
   var endCol = header.length - 1;
-  var burgundy = "FF6F1728", beige = "FFF1EADD", white = "FFFFFFFF", line = "FFD8D0C7";
-  var headerStyle = {
-    font: { bold: true, color: { rgb: white }, name: "Arial", sz: 10 },
-    fill: { fgColor: { rgb: burgundy } },
-    alignment: { horizontal: "center", vertical: "center", wrapText: true },
-    border: { top: { style: "thin", color: { rgb: burgundy } }, bottom: { style: "thin", color: { rgb: burgundy } }, left: { style: "thin", color: { rgb: burgundy } }, right: { style: "thin", color: { rgb: burgundy } } }
-  };
-  var baseStyle = {
-    font: { name: "Arial", sz: 9, color: { rgb: "FF222222" } },
-    alignment: { horizontal: "center", vertical: "center" },
-    border: { top: { style: "hair", color: { rgb: line } }, bottom: { style: "hair", color: { rgb: line } }, left: { style: "hair", color: { rgb: line } }, right: { style: "hair", color: { rgb: line } } }
-  };
-  for (var c = 0; c < header.length; c++) {
-    var hcell = ws[XLSX.utils.encode_cell({ r: 0, c: c })];
-    if (hcell) hcell.s = headerStyle;
-  }
-  for (var rr = 1; rr < data.length; rr++) {
-    for (var cc = 0; cc < header.length; cc++) {
-      var cellAddress = XLSX.utils.encode_cell({ r: rr, c: cc });
-      var cell = ws[cellAddress];
-      if (!cell) cell = ws[cellAddress] = { t: "s", v: "" };
-      cell.s = Object.assign({}, baseStyle, { fill: { fgColor: { rgb: rr % 2 === 1 ? beige : white } } });
-      if (cc === 0) cell.s.alignment = { horizontal: "left", vertical: "center" };
-      if (cc === endCol) {
-        cell.s.font = { name: "Arial", sz: 9, bold: true, color: { rgb: "FF222222" } };
-        cell.z = '"₦"#,##0';
-      }
-    }
-  }
+
+  // Keep the workbook plain: no coloured fills, custom fonts, borders or row styling.
+  // Retain practical column widths and Excel's filter/freeze conveniences.
   ws["!cols"] = [{ wch: 30 }, { wch: 16 }].concat(headers.map(function() { return { wch: 13 }; })).concat([{ wch: 18 }]);
-  ws["!rows"] = [{ hpt: 30 }];
-  for (var ri = 1; ri < data.length; ri++) ws["!rows"].push({ hpt: 21 });
   ws["!freeze"] = { xSplit: 2, ySplit: 1, topLeftCell: "C2", activePane: "bottomRight", state: "frozen" };
   ws["!autofilter"] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: Math.max(0, data.length - 1), c: endCol } }) };
   ws["!pageSetup"] = { orientation: "landscape", fitToWidth: 1, fitToHeight: 0 };
   ws["!margins"] = { left: 0.25, right: 0.25, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 };
+
   if (Array.isArray(gateExportRows) && gateExportRows.length > 1) {
     var gateWs = XLSX.utils.aoa_to_sheet(gateExportRows);
     var gateHeaders = gateExportRows[0] || [];
-    var gateHeaderStyle = {
-      font: { bold: true, color: { rgb: white }, name: "Arial", sz: 10 },
-      fill: { fgColor: { rgb: burgundy } },
-      alignment: { horizontal: "center", vertical: "center", wrapText: true },
-      border: { top: { style: "thin", color: { rgb: burgundy } }, bottom: { style: "thin", color: { rgb: burgundy } }, left: { style: "thin", color: { rgb: burgundy } }, right: { style: "thin", color: { rgb: burgundy } } }
-    };
-    var gateBaseStyle = {
-      font: { name: "Arial", sz: 9, color: { rgb: "FF222222" } },
-      alignment: { horizontal: "center", vertical: "center" },
-      border: { top: { style: "hair", color: { rgb: line } }, bottom: { style: "hair", color: { rgb: line } }, left: { style: "hair", color: { rgb: line } }, right: { style: "hair", color: { rgb: line } } }
-    };
-    for (var gr = 0; gr < gateExportRows.length; gr++) {
-      for (var gc = 0; gc < gateHeaders.length; gc++) {
-        var ga = XLSX.utils.encode_cell({ r: gr, c: gc });
-        var gcell = gateWs[ga];
-        if (!gcell) gcell = gateWs[ga] = { t: "s", v: "" };
-        gcell.s = gr === 0 ? gateHeaderStyle : Object.assign({}, gateBaseStyle, { fill: { fgColor: { rgb: gr % 2 === 1 ? beige : white } } });
-        if (gr > 0 && gc === 1) gcell.s.alignment = { horizontal: "left", vertical: "center" };
-      }
-    }
     gateWs["!cols"] = gateHeaders.map(function(h) {
       var key = String(h || "").toLowerCase();
       return { wch: key === "name" ? 28 : (key === "date/time" ? 21 : (key === "department" ? 18 : 15)) };
     });
-    gateWs["!rows"] = [{ hpt: 30 }];
-    for (var grh = 1; grh < gateExportRows.length; grh++) gateWs["!rows"].push({ hpt: 20 });
     gateWs["!freeze"] = { xSplit: 1, ySplit: 1, topLeftCell: "B2", activePane: "bottomRight", state: "frozen" };
     gateWs["!autofilter"] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: Math.max(0, gateExportRows.length - 1), c: Math.max(0, gateHeaders.length - 1) } }) };
     gateWs["!pageSetup"] = { orientation: "landscape", fitToWidth: 1, fitToHeight: 0 };
