@@ -825,13 +825,29 @@
       }
     ],
     "reportRunIds": [
-      "hr_mwezn1o2"
+      "hr_mwezn1o2",
+      "hr_mwf0fsec",
+      "hr_mwf0rt25"
     ],
     "createdAt": "2026-11-13T13:03:53.110Z",
-    "updatedAt": "2026-11-13T13:03:53.154Z",
+    "updatedAt": "2026-11-13T13:35:34.896Z",
     "reportContexts": [
       {
         "runId": "hr_mwezn1o2",
+        "hostel": "Hostel 2",
+        "start": "2026-11-09",
+        "end": "2026-11-12",
+        "locationId": 2
+      },
+      {
+        "runId": "hr_mwf0fsec",
+        "hostel": "Hostel 2",
+        "start": "2026-11-09",
+        "end": "2026-11-12",
+        "locationId": 2
+      },
+      {
+        "runId": "hr_mwf0rt25",
         "hostel": "Hostel 2",
         "start": "2026-11-09",
         "end": "2026-11-12",
@@ -858,7 +874,9 @@
       "hr_mwezfqh5",
       "hr_mwezgegz",
       "hr_mwezhs62",
-      "hr_mwezn1o2"
+      "hr_mwezn1o2",
+      "hr_mwf0fsec",
+      "hr_mwf0rt25"
     ],
     "reportContexts": [
       {
@@ -909,9 +927,23 @@
         "start": "2026-11-09",
         "end": "2026-11-12",
         "locationId": 2
+      },
+      {
+        "runId": "hr_mwf0fsec",
+        "hostel": "Hostel 2",
+        "start": "2026-11-09",
+        "end": "2026-11-12",
+        "locationId": 2
+      },
+      {
+        "runId": "hr_mwf0rt25",
+        "hostel": "Hostel 2",
+        "start": "2026-11-09",
+        "end": "2026-11-12",
+        "locationId": 2
       }
     ],
     "createdAt": "2026-11-13T12:47:40.409Z",
-    "updatedAt": "2026-11-13T13:03:53.172Z"
+    "updatedAt": "2026-11-13T13:35:34.897Z"
   }
 ]
