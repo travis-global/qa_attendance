@@ -3021,6 +3021,7 @@ async function renderHostelConflicts() {
           details: { hostelBefore: before, hostelAfter: s.hostel, machineNo: row.machineNo }
         });
       } catch (_) {}
+      await recordHostelIssueResolution(row,"accepted_gate_hostel",{hostelBefore:before,hostelAfter:s.hostel});
       await del("biometric_pending", row.id);
       markDirty("hostel conflict accept");
       await renderHostelConflicts();
