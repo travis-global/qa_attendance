@@ -2357,7 +2357,7 @@ async function renderHostelRunsMaster() {
       if(!isQaOfficer()){alert("Sign in as QA Officer to download the saved hostel report.");return;}
       var saved=(await getAll("hostel_runs")).find(function(r){return r.id===btn.getAttribute("data-hr-download");});
       if(!saved){alert("Saved hostel report not found.");return;}
-      var linkedIssues=(await getAll("biometric_pending")).filter(function(item){return item&&item.status!=="linked"&&(item.reportRunIds||[]).indexOf(saved.id)>=0;});
+      var linkedIssues=(await getAll("biometric_pending")).filter(function(item){return item&&item.status!=="linked"&&item.status!=="discarded"&&(item.reportRunIds||[]).indexOf(saved.id)>=0;});
       if(linkedIssues.length){alert("This report still has "+linkedIssues.length+" unresolved issue(s). Resolve or explicitly dismiss them before downloading the report.");return;}
       try{await downloadHostelRunWorkbook(saved);}catch(e){alert(e.message||String(e));}
     });
@@ -2568,7 +2568,7 @@ async function finalizeHostelReportFromPreview() {
   if(lastCheck.runId){
     var pendingChecks=await getAll("biometric_pending");
     var unresolved=(pendingChecks||[]).filter(function(item){
-      return item && item.status!=="linked" && (item.reportRunIds||[]).indexOf(lastCheck.runId)>=0;
+      return item && item.status!=="linked" && item.status!=="discarded" && (item.reportRunIds||[]).indexOf(lastCheck.runId)>=0;
     });
     if(unresolved.length){
       await guideToHostelPendingReview(unresolved.length);
