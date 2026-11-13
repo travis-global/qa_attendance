@@ -1696,11 +1696,14 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
   var attendance = {}, students = {}, excludedPending = [], conflicts = [];
   var inferredUpdates = [];
   // Discarded machine IDs are deliberately suppressed until an officer restores them.
-  var ignoredMachineIds = {};
+  var ignoredMachineIds = {}, ignoredMachineNames = {};
+  function ignoredNameKey(value) { return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
   try {
     (await getAll("biometric_pending")).forEach(function(q) {
-      if (q && q.status === "discarded" && q.machineNo) {
-        ignoredMachineIds[String(q.machineNo).trim().replace(/\.0$/, "")] = true;
+      if (q && q.status === "discarded") {
+        if (q.machineNo) ignoredMachineIds[String(q.machineNo).trim().replace(/\.0$/, "")] = true;
+        var nameKey = ignoredNameKey(q.machineName);
+        if (nameKey) ignoredMachineNames[nameKey] = true;
       }
     });
   } catch (_) {}
@@ -1712,7 +1715,7 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
   // remain in a persistent review queue; names are suggestions, never identity.
   Object.keys(gateUsers).forEach(function(machineNo) {
     var user = gateUsers[machineNo];
-    if (ignoredMachineIds[String(machineNo).trim().replace(/\.0$/, "")]) return;
+    if (ignoredMachineIds[String(machineNo).trim().replace(/\.0$/, "")] || ignoredMachineNames[ignoredNameKey(user.machineName)]) return;
     var matches = bySerial[machineNo] || [];
     if (matches.length !== 1) {
       excludedPending.push({ machineNo: machineNo, name: user.machineName, reason: matches.length ? "machine ID is linked to multiple master students" : "machine ID is not linked to a master student" });
@@ -11742,17 +11745,21 @@ async function trainHostelFromExport(file, options) {
   var autoLink = 0, hostelSet = 0, already = 0, clarify = 0, unlinked = 0, conflicts = 0;
 
   var existingQ = await getAll("biometric_pending");
-  var openKeys = {}, ignoredKeys = {};
+  var openKeys = {}, ignoredKeys = {}, ignoredNames = {};
+  function ignoredNameKey(value) { return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
   (existingQ || []).forEach(function(q) {
-    if (!q || !q.machineNo) return;
-    var key = String(q.machineNo).trim().replace(/\.0$/, "");
-    if (q.status === "discarded") ignoredKeys[key] = true;
-    else if (q.status !== "linked") openKeys[key] = true;
+    if (!q) return;
+    var key = String(q.machineNo || "").trim().replace(/\.0$/, "");
+    if (q.status === "discarded") {
+      if (key) ignoredKeys[key] = true;
+      var nameKey = ignoredNameKey(q.machineName);
+      if (nameKey) ignoredNames[nameKey] = true;
+    } else if (q.status !== "linked" && key) openKeys[key] = true;
   });
 
   for (var i = 0; i < list.length; i++) {
     var u = list[i];
-    if (ignoredKeys[String(u.machineNo).trim().replace(/\.0$/, "")]) continue;
+    if (ignoredKeys[String(u.machineNo).trim().replace(/\.0$/, "")] || ignoredNames[ignoredNameKey(u.machineName)]) continue;
     var maj = null;
     if (u.votes["1"] > u.votes["2"]) maj = "1";
     else if (u.votes["2"] > u.votes["1"]) maj = "2";
@@ -12010,7 +12017,7 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
   for (var i = 0; i < candidates.length; i++) {
     var machineNo = candidates[i].machineNo;
     var stName = candidates[i].name || "";
-    if (!machineNo || ignoredKeys[String(machineNo).trim().replace(/\.0$/, "")]) continue;
+    if (!machineNo || ignoredKeys[String(machineNo).trim().replace(/\.0$/, "")] || ignoredNames[ignoredNameKey(stName)]) continue;
     var duplicateMatches=bySerial[machineNo]||[];
     if (duplicateMatches.length===1) continue;
     if (openKeys[machineNo]) continue;
