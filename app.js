@@ -2150,6 +2150,16 @@ async function finalizeHostelReportFromPreview() {
     var marks=dateKeys.map(function(k){return present&&present.has&&present.has(k)?"P":"A";}),abs=marks.filter(function(m){return m==="A";}).length;
     matrix.push({studentId:sid,name:meta.name||"",regNo:meta.regNo||"",hostel:meta.hostel||"",programme:meta.programme||"",level:meta.level||"",dayMarks:marks,absentDays:abs,fine:abs*rate});
   });
+  // A row removed from the absentee preview is intentionally removed from
+  // this run's liability schedule, while the other present-only matrix rows stay.
+  var previewedIds = {}, originallyPreviewedIds = {};
+  rows.forEach(function(edit){ if(edit.id) previewedIds[String(edit.id)] = true; });
+  (last.absentees || []).forEach(function(original){ if(original.id) originallyPreviewedIds[String(original.id)] = true; });
+  if (matrix.length && Object.keys(originallyPreviewedIds).length) {
+    matrix = matrix.filter(function(m) {
+      return !originallyPreviewedIds[String(m.studentId)] || !!previewedIds[String(m.studentId)];
+    });
+  }
   rows.forEach(function(edit){
     var target=matrix.find(function(m){return edit.id&&String(m.studentId)===String(edit.id);});
     if(!target&&edit.regNo)target=matrix.find(function(m){return String(m.regNo||"").toLowerCase()===String(edit.regNo).toLowerCase();});
