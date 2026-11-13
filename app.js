@@ -11832,6 +11832,7 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
   }
   if (!candidates.length) return;
   var master = await getAll("students");
+  master = (master || []).filter(function(s) { return !s.status || String(s.status).toLowerCase() === "active"; });
   var bySerial = {};
   master.forEach(function(s) {
     if(s.status&&String(s.status).toLowerCase()!=="active")return;
