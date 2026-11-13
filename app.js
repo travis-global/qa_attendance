@@ -2528,6 +2528,29 @@ function closeHostelRunModal() {
 
 
 
+async function guideToHostelPendingReview(unresolvedCount) {
+  // Refresh the biometric queues, expand Advanced setup, and take the officer to the review controls.
+  try { await renderBioQueues(); } catch (_) {}
+  try { await renderHostelConflicts(); } catch (_) {}
+  var mapCard = document.getElementById("biometricMapCard");
+  if (mapCard) {
+    var parent = mapCard.parentElement;
+    while (parent) {
+      if (String(parent.tagName || "").toLowerCase() === "details") parent.open = true;
+      parent = parent.parentElement;
+    }
+    mapCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    var details = mapCard.closest("details");
+    var summary = details && details.querySelector("summary");
+    if (summary) summary.focus({ preventScroll: true });
+  }
+  setHostelStatus(
+    "Report not downloaded yet. " + unresolvedCount +
+    " issue(s) linked to this report still need a decision. Advanced setup is now open. Review “Needs clarification” and “Unlinked pool” for machine IDs, and “Hostel location conflicts” for hostel mismatches. Use the available review, link, keep master, accept gate, discard or dismiss action as appropriate. When all report-linked issues are cleared, return to the preview and click “Confirm edits and download report” again.",
+    "error"
+  );
+}
+
 async function finalizeHostelReportFromPreview() {
   if(!isQaOfficer()){setHostelStatus("Sign in as QA Officer.","error");return;}
   var lastCheck=window.__lastHostelReport||{};
@@ -2537,7 +2560,7 @@ async function finalizeHostelReportFromPreview() {
       return item && item.status!=="linked" && (item.reportRunIds||[]).indexOf(lastCheck.runId)>=0;
     });
     if(unresolved.length){
-      setHostelStatus("Finalization paused: "+unresolved.length+" linked issue(s) still need review. Resolve or explicitly dismiss every pending machine ID / hostel conflict for this report, then confirm again.","error");
+      await guideToHostelPendingReview(unresolved.length);
       return;
     }
   }
