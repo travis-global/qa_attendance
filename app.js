@@ -2095,12 +2095,11 @@ async function downloadHostelRunWorkbook(run) {
   if (!run) throw new Error("Saved hostel report not found.");
   var matrix = (run.matrix && run.matrix.length) ? run.matrix : (run.rows || []);
   var gateRows = run.gateExportRows || [];
-  window.__hostelExportStudents = await getAll("students");
+  var students = [];
+  try { students = await getAll("students"); } catch (_) { students = []; }
   // Older saved reports predate raw-row retention. Reconstruct the same nine-column
   // attendance layout from their retained machine/date events without inventing times.
   if ((!gateRows || gateRows.length < 2) && Array.isArray(run.gateEvents) && run.gateEvents.length) {
-    var students = [];
-    try { students = window.__hostelExportStudents || []; } catch (_) {}
     var bySerial = {};
     students.forEach(function(s) { if (s && s.serial) bySerial[String(s.serial).trim().replace(/\.0$/, "")] = s; });
     gateRows = [["Department","Name","No.","Date/Time","Status","Location ID","ID Number","VerifyCode","CardNo"]];
