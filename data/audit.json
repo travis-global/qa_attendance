@@ -35918,5 +35918,137 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1574
+  },
+  {
+    "ref": "REF/EOCNS/QA/1012",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwi1l7i0g41j",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-02",
+      "course": "MID 315 — Research and Statistics",
+      "status": "Held",
+      "classKey": "300_midwifery",
+      "amended": false
+    },
+    "timestamp": "2026-11-15T16:21:45.151Z",
+    "at": "2026-11-15T16:21:45.151Z",
+    "createdAt": "2026-11-15T16:21:45.151Z",
+    "whenLocal": "Sun, 15 Nov 2026, 17:21:45",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1575
+  },
+  {
+    "ref": "REF/EOCNS/QA/1013",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwi23jcsl09u",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-02",
+      "course": "MID 313 — Family Planning",
+      "status": "Held",
+      "classKey": "300_midwifery",
+      "amended": false
+    },
+    "timestamp": "2026-11-15T16:36:00.321Z",
+    "at": "2026-11-15T16:36:00.321Z",
+    "createdAt": "2026-11-15T16:36:00.321Z",
+    "whenLocal": "Sun, 15 Nov 2026, 17:36:00",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1576
+  },
+  {
+    "ref": "REF/EOCNS/QA/0016",
+    "action": "update",
+    "entity": "qa_entries",
+    "entityId": "qa_mwi23jcsl09u",
+    "reason": "Corrected the Lecture end time",
+    "details": {
+      "date": "2026-11-02",
+      "course": "MID 313 — Family Planning",
+      "status": "Held",
+      "classKey": "300_midwifery",
+      "amended": true
+    },
+    "timestamp": "2026-11-15T16:37:38.363Z",
+    "at": "2026-11-15T16:37:38.363Z",
+    "createdAt": "2026-11-15T16:37:38.363Z",
+    "whenLocal": "Sun, 15 Nov 2026, 17:37:38",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1577
+  },
+  {
+    "ref": "REF/EOCNS/QA/1014",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwi3fvuwqyyz",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-02",
+      "course": "MID 311 — Reproductive Health I",
+      "status": "Held",
+      "classKey": "300_midwifery",
+      "amended": false
+    },
+    "timestamp": "2026-11-15T17:13:36.013Z",
+    "at": "2026-11-15T17:13:36.013Z",
+    "createdAt": "2026-11-15T17:13:36.013Z",
+    "whenLocal": "Sun, 15 Nov 2026, 18:13:36",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1578
+  },
+  {
+    "ref": "REF/EOCNS/QA/0016",
+    "action": "update",
+    "entity": "qa_entries",
+    "entityId": "qa_mwi3fvuwqyyz",
+    "reason": "Time correction",
+    "details": {
+      "date": "2026-11-02",
+      "course": "MID 311 — Reproductive Health I",
+      "status": "Held",
+      "classKey": "300_midwifery",
+      "amended": true
+    },
+    "timestamp": "2026-11-15T17:15:01.175Z",
+    "at": "2026-11-15T17:15:01.175Z",
+    "createdAt": "2026-11-15T17:15:01.175Z",
+    "whenLocal": "Sun, 15 Nov 2026, 18:15:01",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1579
+  },
+  {
+    "ref": "REF/EOCNS/QA/1015",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwi49j03qvnr",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-03",
+      "course": "MID 311 — Reproductive Health I",
+      "status": "Held",
+      "classKey": "300_midwifery",
+      "amended": false
+    },
+    "timestamp": "2026-11-15T17:36:39.037Z",
+    "at": "2026-11-15T17:36:39.037Z",
+    "createdAt": "2026-11-15T17:36:39.037Z",
+    "whenLocal": "Sun, 15 Nov 2026, 18:36:39",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1580
   }
 ]
