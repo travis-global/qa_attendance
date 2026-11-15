@@ -1035,5 +1035,769 @@
     "sessionName": "2026/2027 SESSION",
     "semesterId": "sess_mvt9hjbtg2q3o_s1",
     "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mwi1l7i0g41j",
+    "date": "2026-11-02",
+    "classKey": "300_midwifery",
+    "course": "MID 315 — Research and Statistics",
+    "lecturer": "Dr. Perpetual Eze",
+    "status": "Held",
+    "duration": 121,
+    "start": "08:00",
+    "end": "10:01",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "",
+    "assignment": "",
+    "remark": "",
+    "absent": [
+      "EOCNS/24/0008/MID. Chioma Gladys Okeoma",
+      "408. Chioma Blessing Chinedu",
+      "11. Oluchi Philomina Nwafor",
+      "EOCNS/24/0015/MID. Sarah ifunanya Chukwuma",
+      "EOCNS/24/0017/MID. Stephanie Nneoma Ojimba",
+      "417. Blessing Ali",
+      "FATIMA ADAEZE HARUNA",
+      "EOCNS/24/0020/MID. Usulor Chinecherem Dominic",
+      "PRECIOUS CHUKWUMA O.",
+      "Angela Ezinne Igwe",
+      "EOCNS/24/0042/MID. Joy Adaobi Ifeanyi",
+      "442. Mary Chisom Ugwu",
+      "EOCNS/24/0044/MID. Queen Ojonoda Dibiagwu",
+      "927. Chinemerem Deborah Okpuru",
+      "929. Makuochukwu Divine-Gift Obasi",
+      "ALOH NGOZI OTAKA",
+      "EOCNS/24/0051/MID. Chinweotito loveline",
+      "EOCNS/24/0075/MID. FAVOUR ONUOHA",
+      "474. Blessing Nwankwo",
+      "EOCNS/24/0103/GNS. Chinenye Angela",
+      "908. Promise Amaka Ikechukwu"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mwaqclkl_91",
+        "name": "Chioma Gladys Okeoma",
+        "regNo": "EOCNS/24/0008/MID",
+        "serial": "EOCNS/24/0008/MID"
+      },
+      {
+        "id": "stu_mwaqclcl_73",
+        "name": "Chioma Blessing Chinedu",
+        "regNo": "EOCNS/24/0009/MID",
+        "serial": "408"
+      },
+      {
+        "id": "stu_mvrzdaca2nvyk",
+        "name": "Oluchi Philomina Nwafor",
+        "regNo": "EOCNS/24/0012/MID",
+        "serial": "11"
+      },
+      {
+        "id": "stu_mwaqckvv_37",
+        "name": "Sarah ifunanya Chukwuma",
+        "regNo": "EOCNS/24/0015/MID",
+        "serial": "EOCNS/24/0015/MID"
+      },
+      {
+        "id": "stu_mwaqckur_34",
+        "name": "Stephanie Nneoma Ojimba",
+        "regNo": "EOCNS/24/0017/MID",
+        "serial": "EOCNS/24/0017/MID"
+      },
+      {
+        "id": "stu_mwaqckpv_21",
+        "name": "Blessing Ali",
+        "regNo": "EOCNS/24/0018/MID",
+        "serial": "417"
+      },
+      {
+        "id": "stu_mwc9n5vgw9hkw",
+        "name": "FATIMA ADAEZE HARUNA",
+        "regNo": "EOCNS/24/0019/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaqcl19_47",
+        "name": "Usulor Chinecherem Dominic",
+        "regNo": "EOCNS/24/0020/MID",
+        "serial": "EOCNS/24/0020/MID"
+      },
+      {
+        "id": "stu_mwc9ui7ill1kl",
+        "name": "PRECIOUS CHUKWUMA O.",
+        "regNo": "EOCNS/24/0032/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaucsbkybpw4",
+        "name": "Angela Ezinne Igwe",
+        "regNo": "EOCNS/24/0039",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaqckku_9",
+        "name": "Joy Adaobi Ifeanyi",
+        "regNo": "EOCNS/24/0042/MID",
+        "serial": "EOCNS/24/0042/MID"
+      },
+      {
+        "id": "stu_mvrzdacksgwcs",
+        "name": "Mary Chisom Ugwu",
+        "regNo": "EOCNS/24/0043/MID",
+        "serial": "442"
+      },
+      {
+        "id": "stu_mwaqckqk_23",
+        "name": "Queen Ojonoda Dibiagwu",
+        "regNo": "EOCNS/24/0044/MID",
+        "serial": "EOCNS/24/0044/MID"
+      },
+      {
+        "id": "stu_mvrzdacldpf3b",
+        "name": "Chinemerem Deborah Okpuru",
+        "regNo": "EOCNS/24/0046/MID",
+        "serial": "927"
+      },
+      {
+        "id": "stu_mvrzdaclb96tu",
+        "name": "Makuochukwu Divine-Gift Obasi",
+        "regNo": "EOCNS/24/0048/MID",
+        "serial": "929"
+      },
+      {
+        "id": "stu_mwc9teji1tbll",
+        "name": "ALOH NGOZI OTAKA",
+        "regNo": "EOCNS/24/0049/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaqckl7_10",
+        "name": "Chinweotito loveline",
+        "regNo": "EOCNS/24/0051/MID",
+        "serial": "EOCNS/24/0051/MID"
+      },
+      {
+        "id": "stu_mwaqclqm_105",
+        "name": "FAVOUR ONUOHA",
+        "regNo": "EOCNS/24/0075/MID",
+        "serial": "EOCNS/24/0075/MID"
+      },
+      {
+        "id": "stu_mwaqckj3_6",
+        "name": "Blessing Nwankwo",
+        "regNo": "EOCNS/24/0077/MID",
+        "serial": "474"
+      },
+      {
+        "id": "stu_mwaqcl2i_50",
+        "name": "Chinenye Angela",
+        "regNo": "EOCNS/24/0103/GNS",
+        "serial": "EOCNS/24/0103/GNS"
+      },
+      {
+        "id": "stu_mwezor9nre7bm",
+        "name": "Promise Amaka Ikechukwu",
+        "regNo": "TMP-EOCNS/26/0003/MID",
+        "serial": "908"
+      }
+    ],
+    "updatedAt": "2026-11-15T16:21:45.144Z",
+    "createdAt": "2026-11-15T16:21:45.144Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mwi23jcsl09u",
+    "date": "2026-11-02",
+    "classKey": "300_midwifery",
+    "course": "MID 313 — Family Planning",
+    "lecturer": "Mrs. Stella Chukwu",
+    "status": "Held",
+    "duration": 60,
+    "start": "10:00",
+    "end": "11:00",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "",
+    "remark": "",
+    "absent": [
+      "EOCNS/24/0008/MID. Chioma Gladys Okeoma",
+      "408. Chioma Blessing Chinedu",
+      "11. Oluchi Philomina Nwafor",
+      "EOCNS/24/0015/MID. Sarah ifunanya Chukwuma",
+      "EOCNS/24/0017/MID. Stephanie Nneoma Ojimba",
+      "417. Blessing Ali",
+      "FATIMA ADAEZE HARUNA",
+      "EOCNS/24/0020/MID. Usulor Chinecherem Dominic",
+      "28. Charity Charis Ajah",
+      "PRECIOUS CHUKWUMA O.",
+      "Angela Ezinne Igwe",
+      "EOCNS/24/0042/MID. Joy Adaobi Ifeanyi",
+      "442. Mary Chisom Ugwu",
+      "EOCNS/24/0044/MID. Queen Ojonoda Dibiagwu",
+      "927. Chinemerem Deborah Okpuru",
+      "929. Makuochukwu Divine-Gift Obasi",
+      "ALOH NGOZI OTAKA",
+      "EOCNS/24/0051/MID. Chinweotito loveline",
+      "EOCNS/24/0075/MID. FAVOUR ONUOHA",
+      "474. Blessing Nwankwo",
+      "EOCNS/24/0103/GNS. Chinenye Angela",
+      "908. Promise Amaka Ikechukwu"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mwaqclkl_91",
+        "name": "Chioma Gladys Okeoma",
+        "regNo": "EOCNS/24/0008/MID",
+        "serial": "EOCNS/24/0008/MID"
+      },
+      {
+        "id": "stu_mwaqclcl_73",
+        "name": "Chioma Blessing Chinedu",
+        "regNo": "EOCNS/24/0009/MID",
+        "serial": "408"
+      },
+      {
+        "id": "stu_mvrzdaca2nvyk",
+        "name": "Oluchi Philomina Nwafor",
+        "regNo": "EOCNS/24/0012/MID",
+        "serial": "11"
+      },
+      {
+        "id": "stu_mwaqckvv_37",
+        "name": "Sarah ifunanya Chukwuma",
+        "regNo": "EOCNS/24/0015/MID",
+        "serial": "EOCNS/24/0015/MID"
+      },
+      {
+        "id": "stu_mwaqckur_34",
+        "name": "Stephanie Nneoma Ojimba",
+        "regNo": "EOCNS/24/0017/MID",
+        "serial": "EOCNS/24/0017/MID"
+      },
+      {
+        "id": "stu_mwaqckpv_21",
+        "name": "Blessing Ali",
+        "regNo": "EOCNS/24/0018/MID",
+        "serial": "417"
+      },
+      {
+        "id": "stu_mwc9n5vgw9hkw",
+        "name": "FATIMA ADAEZE HARUNA",
+        "regNo": "EOCNS/24/0019/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaqcl19_47",
+        "name": "Usulor Chinecherem Dominic",
+        "regNo": "EOCNS/24/0020/MID",
+        "serial": "EOCNS/24/0020/MID"
+      },
+      {
+        "id": "stu_mvrzdacg4sae8",
+        "name": "Charity Charis Ajah",
+        "regNo": "EOCNS/24/0029/MID",
+        "serial": "28"
+      },
+      {
+        "id": "stu_mwc9ui7ill1kl",
+        "name": "PRECIOUS CHUKWUMA O.",
+        "regNo": "EOCNS/24/0032/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaucsbkybpw4",
+        "name": "Angela Ezinne Igwe",
+        "regNo": "EOCNS/24/0039",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaqckku_9",
+        "name": "Joy Adaobi Ifeanyi",
+        "regNo": "EOCNS/24/0042/MID",
+        "serial": "EOCNS/24/0042/MID"
+      },
+      {
+        "id": "stu_mvrzdacksgwcs",
+        "name": "Mary Chisom Ugwu",
+        "regNo": "EOCNS/24/0043/MID",
+        "serial": "442"
+      },
+      {
+        "id": "stu_mwaqckqk_23",
+        "name": "Queen Ojonoda Dibiagwu",
+        "regNo": "EOCNS/24/0044/MID",
+        "serial": "EOCNS/24/0044/MID"
+      },
+      {
+        "id": "stu_mvrzdacldpf3b",
+        "name": "Chinemerem Deborah Okpuru",
+        "regNo": "EOCNS/24/0046/MID",
+        "serial": "927"
+      },
+      {
+        "id": "stu_mvrzdaclb96tu",
+        "name": "Makuochukwu Divine-Gift Obasi",
+        "regNo": "EOCNS/24/0048/MID",
+        "serial": "929"
+      },
+      {
+        "id": "stu_mwc9teji1tbll",
+        "name": "ALOH NGOZI OTAKA",
+        "regNo": "EOCNS/24/0049/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaqckl7_10",
+        "name": "Chinweotito loveline",
+        "regNo": "EOCNS/24/0051/MID",
+        "serial": "EOCNS/24/0051/MID"
+      },
+      {
+        "id": "stu_mwaqclqm_105",
+        "name": "FAVOUR ONUOHA",
+        "regNo": "EOCNS/24/0075/MID",
+        "serial": "EOCNS/24/0075/MID"
+      },
+      {
+        "id": "stu_mwaqckj3_6",
+        "name": "Blessing Nwankwo",
+        "regNo": "EOCNS/24/0077/MID",
+        "serial": "474"
+      },
+      {
+        "id": "stu_mwaqcl2i_50",
+        "name": "Chinenye Angela",
+        "regNo": "EOCNS/24/0103/GNS",
+        "serial": "EOCNS/24/0103/GNS"
+      },
+      {
+        "id": "stu_mwezor9nre7bm",
+        "name": "Promise Amaka Ikechukwu",
+        "regNo": "TMP-EOCNS/26/0003/MID",
+        "serial": "908"
+      }
+    ],
+    "updatedAt": "2026-11-15T16:37:38.361Z",
+    "createdAt": "2026-11-15T16:36:00.316Z",
+    "amendments": [
+      {
+        "at": "2026-11-15T16:37:38.361Z",
+        "dateLabel": "15/11/2026, 17:37:38",
+        "ref": "REF/EOCNS/QA/0016",
+        "reason": "Corrected the Lecture end time",
+        "officer": "QA Officer",
+        "before": {
+          "status": "Held",
+          "lecturer": "Mrs. Stella Chukwu",
+          "course": "MID 313 — Family Planning",
+          "start": "10:00",
+          "end": "12:00",
+          "duration": 120,
+          "topic": "Revision"
+        }
+      }
+    ],
+    "lastAmendedAt": "2026-11-15T16:37:38.361Z",
+    "lastAmendedRef": "REF/EOCNS/QA/0016",
+    "lastAmendedReason": "Corrected the Lecture end time",
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mwi3fvuwqyyz",
+    "date": "2026-11-02",
+    "classKey": "300_midwifery",
+    "course": "MID 311 — Reproductive Health I",
+    "lecturer": "Mrs. Cecelia Ofoke Ede",
+    "status": "Held",
+    "duration": 60,
+    "start": "13:00",
+    "end": "14:00",
+    "topic": "Revision",
+    "objectives": "Revision",
+    "lectureSummary": "Revision",
+    "assignment": "",
+    "remark": "",
+    "absent": [
+      "EOCNS/24/0008/MID. Chioma Gladys Okeoma",
+      "408. Chioma Blessing Chinedu",
+      "11. Oluchi Philomina Nwafor",
+      "412. Annastecia Promise Otuonye",
+      "EOCNS/24/0015/MID. Sarah ifunanya Chukwuma",
+      "EOCNS/24/0017/MID. Stephanie Nneoma Ojimba",
+      "417. Blessing Ali",
+      "FATIMA ADAEZE HARUNA",
+      "EOCNS/24/0020/MID. Usulor Chinecherem Dominic",
+      "422. Chinenye Cynthia Omeh",
+      "PRECIOUS CHUKWUMA O.",
+      "Angela Ezinne Igwe",
+      "438. ANGELA EZINNE IGWE",
+      "EOCNS/24/0042/MID. Joy Adaobi Ifeanyi",
+      "442. Mary Chisom Ugwu",
+      "EOCNS/24/0044/MID. Queen Ojonoda Dibiagwu",
+      "927. Chinemerem Deborah Okpuru",
+      "929. Makuochukwu Divine-Gift Obasi",
+      "ALOH NGOZI OTAKA",
+      "EOCNS/24/0051/MID. Chinweotito loveline",
+      "EOCNS/24/0075/MID. FAVOUR ONUOHA",
+      "474. Blessing Nwankwo",
+      "EOCNS/24/0103/GNS. Chinenye Angela",
+      "908. Promise Amaka Ikechukwu"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mwaqclkl_91",
+        "name": "Chioma Gladys Okeoma",
+        "regNo": "EOCNS/24/0008/MID",
+        "serial": "EOCNS/24/0008/MID"
+      },
+      {
+        "id": "stu_mwaqclcl_73",
+        "name": "Chioma Blessing Chinedu",
+        "regNo": "EOCNS/24/0009/MID",
+        "serial": "408"
+      },
+      {
+        "id": "stu_mvrzdaca2nvyk",
+        "name": "Oluchi Philomina Nwafor",
+        "regNo": "EOCNS/24/0012/MID",
+        "serial": "11"
+      },
+      {
+        "id": "stu_mwaqckw6_38",
+        "name": "Annastecia Promise Otuonye",
+        "regNo": "EOCNS/24/0013/MID",
+        "serial": "412"
+      },
+      {
+        "id": "stu_mwaqckvv_37",
+        "name": "Sarah ifunanya Chukwuma",
+        "regNo": "EOCNS/24/0015/MID",
+        "serial": "EOCNS/24/0015/MID"
+      },
+      {
+        "id": "stu_mwaqckur_34",
+        "name": "Stephanie Nneoma Ojimba",
+        "regNo": "EOCNS/24/0017/MID",
+        "serial": "EOCNS/24/0017/MID"
+      },
+      {
+        "id": "stu_mwaqckpv_21",
+        "name": "Blessing Ali",
+        "regNo": "EOCNS/24/0018/MID",
+        "serial": "417"
+      },
+      {
+        "id": "stu_mwc9n5vgw9hkw",
+        "name": "FATIMA ADAEZE HARUNA",
+        "regNo": "EOCNS/24/0019/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaqcl19_47",
+        "name": "Usulor Chinecherem Dominic",
+        "regNo": "EOCNS/24/0020/MID",
+        "serial": "EOCNS/24/0020/MID"
+      },
+      {
+        "id": "stu_mwaqckxo_41",
+        "name": "Chinenye Cynthia Omeh",
+        "regNo": "EOCNS/24/0023/MID",
+        "serial": "422"
+      },
+      {
+        "id": "stu_mwc9ui7ill1kl",
+        "name": "PRECIOUS CHUKWUMA O.",
+        "regNo": "EOCNS/24/0032/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaucsbkybpw4",
+        "name": "Angela Ezinne Igwe",
+        "regNo": "EOCNS/24/0039",
+        "serial": ""
+      },
+      {
+        "id": "stu_mw9i4mzmzsbq0",
+        "name": "ANGELA EZINNE IGWE",
+        "regNo": "EOCNS/24/0039/MID",
+        "serial": "438"
+      },
+      {
+        "id": "stu_mwaqckku_9",
+        "name": "Joy Adaobi Ifeanyi",
+        "regNo": "EOCNS/24/0042/MID",
+        "serial": "EOCNS/24/0042/MID"
+      },
+      {
+        "id": "stu_mvrzdacksgwcs",
+        "name": "Mary Chisom Ugwu",
+        "regNo": "EOCNS/24/0043/MID",
+        "serial": "442"
+      },
+      {
+        "id": "stu_mwaqckqk_23",
+        "name": "Queen Ojonoda Dibiagwu",
+        "regNo": "EOCNS/24/0044/MID",
+        "serial": "EOCNS/24/0044/MID"
+      },
+      {
+        "id": "stu_mvrzdacldpf3b",
+        "name": "Chinemerem Deborah Okpuru",
+        "regNo": "EOCNS/24/0046/MID",
+        "serial": "927"
+      },
+      {
+        "id": "stu_mvrzdaclb96tu",
+        "name": "Makuochukwu Divine-Gift Obasi",
+        "regNo": "EOCNS/24/0048/MID",
+        "serial": "929"
+      },
+      {
+        "id": "stu_mwc9teji1tbll",
+        "name": "ALOH NGOZI OTAKA",
+        "regNo": "EOCNS/24/0049/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaqckl7_10",
+        "name": "Chinweotito loveline",
+        "regNo": "EOCNS/24/0051/MID",
+        "serial": "EOCNS/24/0051/MID"
+      },
+      {
+        "id": "stu_mwaqclqm_105",
+        "name": "FAVOUR ONUOHA",
+        "regNo": "EOCNS/24/0075/MID",
+        "serial": "EOCNS/24/0075/MID"
+      },
+      {
+        "id": "stu_mwaqckj3_6",
+        "name": "Blessing Nwankwo",
+        "regNo": "EOCNS/24/0077/MID",
+        "serial": "474"
+      },
+      {
+        "id": "stu_mwaqcl2i_50",
+        "name": "Chinenye Angela",
+        "regNo": "EOCNS/24/0103/GNS",
+        "serial": "EOCNS/24/0103/GNS"
+      },
+      {
+        "id": "stu_mwezor9nre7bm",
+        "name": "Promise Amaka Ikechukwu",
+        "regNo": "TMP-EOCNS/26/0003/MID",
+        "serial": "908"
+      }
+    ],
+    "updatedAt": "2026-11-15T17:15:01.171Z",
+    "createdAt": "2026-11-15T17:13:36.008Z",
+    "amendments": [
+      {
+        "at": "2026-11-15T17:15:01.171Z",
+        "dateLabel": "15/11/2026, 18:15:01",
+        "ref": "REF/EOCNS/QA/0016",
+        "reason": "Time correction",
+        "officer": "QA Officer",
+        "before": {
+          "status": "Held",
+          "lecturer": "Mrs. Cecelia Ofoke Ede",
+          "course": "MID 311 — Reproductive Health I",
+          "start": "11:00",
+          "end": "12:00",
+          "duration": 60,
+          "topic": "Revision"
+        }
+      }
+    ],
+    "lastAmendedAt": "2026-11-15T17:15:01.171Z",
+    "lastAmendedRef": "REF/EOCNS/QA/0016",
+    "lastAmendedReason": "Time correction",
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mwi49j03qvnr",
+    "date": "2026-11-03",
+    "classKey": "300_midwifery",
+    "course": "MID 311 — Reproductive Health I",
+    "lecturer": "Mrs. Cecelia Ofoke Ede",
+    "status": "Held",
+    "duration": 120,
+    "start": "08:00",
+    "end": "10:00",
+    "topic": "Revision",
+    "objectives": "",
+    "lectureSummary": "",
+    "assignment": "",
+    "remark": "",
+    "absent": [
+      "EOCNS/24/0008/MID. Chioma Gladys Okeoma",
+      "408. Chioma Blessing Chinedu",
+      "11. Oluchi Philomina Nwafor",
+      "EOCNS/24/0015/MID. Sarah ifunanya Chukwuma",
+      "EOCNS/24/0017/MID. Stephanie Nneoma Ojimba",
+      "417. Blessing Ali",
+      "FATIMA ADAEZE HARUNA",
+      "EOCNS/24/0020/MID. Usulor Chinecherem Dominic",
+      "PRECIOUS CHUKWUMA O.",
+      "Angela Ezinne Igwe",
+      "EOCNS/24/0042/MID. Joy Adaobi Ifeanyi",
+      "442. Mary Chisom Ugwu",
+      "EOCNS/24/0044/MID. Queen Ojonoda Dibiagwu",
+      "927. Chinemerem Deborah Okpuru",
+      "929. Makuochukwu Divine-Gift Obasi",
+      "ALOH NGOZI OTAKA",
+      "EOCNS/24/0051/MID. Chinweotito loveline",
+      "EOCNS/24/0075/MID. FAVOUR ONUOHA",
+      "474. Blessing Nwankwo",
+      "EOCNS/24/0103/GNS. Chinenye Angela",
+      "908. Promise Amaka Ikechukwu"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mwaqclkl_91",
+        "name": "Chioma Gladys Okeoma",
+        "regNo": "EOCNS/24/0008/MID",
+        "serial": "EOCNS/24/0008/MID"
+      },
+      {
+        "id": "stu_mwaqclcl_73",
+        "name": "Chioma Blessing Chinedu",
+        "regNo": "EOCNS/24/0009/MID",
+        "serial": "408"
+      },
+      {
+        "id": "stu_mvrzdaca2nvyk",
+        "name": "Oluchi Philomina Nwafor",
+        "regNo": "EOCNS/24/0012/MID",
+        "serial": "11"
+      },
+      {
+        "id": "stu_mwaqckvv_37",
+        "name": "Sarah ifunanya Chukwuma",
+        "regNo": "EOCNS/24/0015/MID",
+        "serial": "EOCNS/24/0015/MID"
+      },
+      {
+        "id": "stu_mwaqckur_34",
+        "name": "Stephanie Nneoma Ojimba",
+        "regNo": "EOCNS/24/0017/MID",
+        "serial": "EOCNS/24/0017/MID"
+      },
+      {
+        "id": "stu_mwaqckpv_21",
+        "name": "Blessing Ali",
+        "regNo": "EOCNS/24/0018/MID",
+        "serial": "417"
+      },
+      {
+        "id": "stu_mwc9n5vgw9hkw",
+        "name": "FATIMA ADAEZE HARUNA",
+        "regNo": "EOCNS/24/0019/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaqcl19_47",
+        "name": "Usulor Chinecherem Dominic",
+        "regNo": "EOCNS/24/0020/MID",
+        "serial": "EOCNS/24/0020/MID"
+      },
+      {
+        "id": "stu_mwc9ui7ill1kl",
+        "name": "PRECIOUS CHUKWUMA O.",
+        "regNo": "EOCNS/24/0032/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaucsbkybpw4",
+        "name": "Angela Ezinne Igwe",
+        "regNo": "EOCNS/24/0039",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaqckku_9",
+        "name": "Joy Adaobi Ifeanyi",
+        "regNo": "EOCNS/24/0042/MID",
+        "serial": "EOCNS/24/0042/MID"
+      },
+      {
+        "id": "stu_mvrzdacksgwcs",
+        "name": "Mary Chisom Ugwu",
+        "regNo": "EOCNS/24/0043/MID",
+        "serial": "442"
+      },
+      {
+        "id": "stu_mwaqckqk_23",
+        "name": "Queen Ojonoda Dibiagwu",
+        "regNo": "EOCNS/24/0044/MID",
+        "serial": "EOCNS/24/0044/MID"
+      },
+      {
+        "id": "stu_mvrzdacldpf3b",
+        "name": "Chinemerem Deborah Okpuru",
+        "regNo": "EOCNS/24/0046/MID",
+        "serial": "927"
+      },
+      {
+        "id": "stu_mvrzdaclb96tu",
+        "name": "Makuochukwu Divine-Gift Obasi",
+        "regNo": "EOCNS/24/0048/MID",
+        "serial": "929"
+      },
+      {
+        "id": "stu_mwc9teji1tbll",
+        "name": "ALOH NGOZI OTAKA",
+        "regNo": "EOCNS/24/0049/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaqckl7_10",
+        "name": "Chinweotito loveline",
+        "regNo": "EOCNS/24/0051/MID",
+        "serial": "EOCNS/24/0051/MID"
+      },
+      {
+        "id": "stu_mwaqclqm_105",
+        "name": "FAVOUR ONUOHA",
+        "regNo": "EOCNS/24/0075/MID",
+        "serial": "EOCNS/24/0075/MID"
+      },
+      {
+        "id": "stu_mwaqckj3_6",
+        "name": "Blessing Nwankwo",
+        "regNo": "EOCNS/24/0077/MID",
+        "serial": "474"
+      },
+      {
+        "id": "stu_mwaqcl2i_50",
+        "name": "Chinenye Angela",
+        "regNo": "EOCNS/24/0103/GNS",
+        "serial": "EOCNS/24/0103/GNS"
+      },
+      {
+        "id": "stu_mwezor9nre7bm",
+        "name": "Promise Amaka Ikechukwu",
+        "regNo": "TMP-EOCNS/26/0003/MID",
+        "serial": "908"
+      }
+    ],
+    "updatedAt": "2026-11-15T17:36:39.027Z",
+    "createdAt": "2026-11-15T17:36:39.027Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
   }
 ]
