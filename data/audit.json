@@ -36175,5 +36175,137 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1588
+  },
+  {
+    "ref": "REF/EOCNS/QA/1011",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwj3tayc6k65",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-13",
+      "course": "MID 215 — MEDICAL-SURGICAL NURSING II",
+      "status": "Held",
+      "classKey": "200_midwifery",
+      "amended": false
+    },
+    "timestamp": "2026-11-16T10:11:48.357Z",
+    "at": "2026-11-16T10:11:48.357Z",
+    "createdAt": "2026-11-16T10:11:48.357Z",
+    "whenLocal": "Mon, 16 Nov 2026, 11:11:48",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1589
+  },
+  {
+    "ref": "REF/EOCNS/QA/1012",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwj42zw0g883",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-13",
+      "course": "MID 315 — Research and Statistics",
+      "status": "Held",
+      "classKey": "300_midwifery",
+      "amended": false
+    },
+    "timestamp": "2026-11-16T10:19:20.836Z",
+    "at": "2026-11-16T10:19:20.836Z",
+    "createdAt": "2026-11-16T10:19:20.836Z",
+    "whenLocal": "Mon, 16 Nov 2026, 11:19:20",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1590
+  },
+  {
+    "ref": "REF/EOCNS/QA/1013",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwj4f2uc3t3t",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-13",
+      "course": "MID 312 — Infant",
+      "status": "Held",
+      "classKey": "300_midwifery",
+      "amended": false
+    },
+    "timestamp": "2026-11-16T10:28:44.366Z",
+    "at": "2026-11-16T10:28:44.366Z",
+    "createdAt": "2026-11-16T10:28:44.366Z",
+    "whenLocal": "Mon, 16 Nov 2026, 11:28:44",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1591
+  },
+  {
+    "ref": "REF/EOCNS/QA/1014",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mwj4hjlazvlf",
+    "reason": "Lecturer created",
+    "details": {
+      "name": "Mrs. Nzediegwu Patience Ijeoma",
+      "contractHoursPerSemester": null,
+      "courses": [
+        "MID 317"
+      ],
+      "assignments": [
+        {
+          "code": "MID 317",
+          "programme": "Midwifery",
+          "level": "300",
+          "hours": 120
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-16T10:30:39.289Z",
+    "at": "2026-11-16T10:30:39.289Z",
+    "createdAt": "2026-11-16T10:30:39.289Z",
+    "whenLocal": "Mon, 16 Nov 2026, 11:30:39",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1592
+  },
+  {
+    "ref": "REF/EOCNS/QA/16",
+    "action": "update",
+    "entity": "lecturers",
+    "entityId": "lec_mwj4hjlazvlf",
+    "reason": "Lecturer updated · 1 course assignment(s)",
+    "details": {
+      "name": "Mrs. Nzediegwu Patience Ijeoma",
+      "contractHoursPerSemester": 120,
+      "courses": [
+        "MID 317"
+      ],
+      "assignments": [
+        {
+          "code": "MID 317",
+          "programme": "Midwifery",
+          "level": "300",
+          "hours": 120
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-16T10:31:08.208Z",
+    "at": "2026-11-16T10:31:08.208Z",
+    "createdAt": "2026-11-16T10:31:08.208Z",
+    "whenLocal": "Mon, 16 Nov 2026, 11:31:08",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "official-letter",
+    "id": 1593
   }
 ]
