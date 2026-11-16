@@ -230,5 +230,61 @@
     "classKeys": [
       "300_midwifery"
     ]
+  },
+  {
+    "code": "MID 211",
+    "name": "CHILD HEALTH",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "MID 211"
+  },
+  {
+    "code": "MID 212",
+    "name": "MENTAL HEALTH/PSYCHIATRIC NURSING",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "MID 212"
+  },
+  {
+    "code": "MID 213",
+    "name": "HOME HEALTH CARE NURSING",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "MID 213"
+  },
+  {
+    "code": "MID 214",
+    "name": "ENTERPRENEURSHIP IN MIDWIFERY",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "MID 214"
+  },
+  {
+    "code": "MID 215",
+    "name": "MEDICAL-SURGICAL NURSING II",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "MID 215"
+  },
+  {
+    "code": "MID 216",
+    "name": "PRINCIPLES OF MANAGEMENT AND TEACHING",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "MID 216"
+  },
+  {
+    "code": "TUT 201",
+    "name": "TUTORIAL0",
+    "classKeys": [
+      "200_midwifery"
+    ],
+    "id": "TUT 201"
   }
 ]
