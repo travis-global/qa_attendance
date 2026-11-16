@@ -35986,25 +35986,22 @@
     "id": 1577
   },
   {
-    "ref": "REF/EOCNS/QA/1014",
-    "action": "create",
-    "entity": "qa_entries",
-    "entityId": "qa_mwi3fvuwqyyz",
-    "reason": "Lecture logged",
+    "ref": "REF/EOCNS/QA/",
+    "action": "delete",
+    "entity": "students",
+    "entityId": "stu_mwaucsbkybpw4",
+    "reason": "Removed from master list",
     "details": {
-      "date": "2026-11-02",
-      "course": "MID 311 — Reproductive Health I",
-      "status": "Held",
-      "classKey": "300_midwifery",
-      "amended": false
+      "name": "Angela Ezinne Igwe",
+      "regNo": "EOCNS/24/0039"
     },
-    "timestamp": "2026-11-15T17:13:36.013Z",
-    "at": "2026-11-15T17:13:36.013Z",
-    "createdAt": "2026-11-15T17:13:36.013Z",
-    "whenLocal": "Sun, 15 Nov 2026, 18:13:36",
+    "timestamp": "2026-11-16T08:27:10.673Z",
+    "at": "2026-11-16T08:27:10.673Z",
+    "createdAt": "2026-11-16T08:27:10.673Z",
+    "whenLocal": "Mon, 16 Nov 2026, 09:27:10",
     "user": "Alolote Fortunatus",
     "officer": "Alolote Fortunatus",
-    "source": "system",
+    "source": "official-letter",
     "id": 1578
   },
   {
