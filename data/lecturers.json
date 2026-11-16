@@ -669,5 +669,29 @@
     "status": "Active",
     "updatedAt": "2026-11-12T15:49:07.633Z",
     "createdAt": "2026-11-12T15:49:07.633Z"
+  },
+  {
+    "id": "lec_mwj4hjlazvlf",
+    "name": "Mrs. Nzediegwu Patience Ijeoma",
+    "staffId": "EOCNS/STF/2026/0024",
+    "phone": "",
+    "courses": [
+      "MID 317"
+    ],
+    "assignments": [
+      {
+        "code": "MID 317",
+        "programme": "Midwifery",
+        "level": "300",
+        "hours": 120
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 120,
+    "status": "Active",
+    "updatedAt": "2026-11-16T10:31:08.206Z",
+    "createdAt": "2026-11-16T10:30:39.214Z"
   }
 ]
