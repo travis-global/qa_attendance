@@ -35,7 +35,7 @@ function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": origin || "*",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, X-EOCNS-Key, X-Publish-Key",
+    "Access-Control-Allow-Headers": "Content-Type, X-EOCNS-Key, X-Publish-Key, Authorization",
     "Access-Control-Max-Age": "86400",
   };
 }
@@ -275,6 +275,124 @@ async function handleRejectEmail(env, request, payload, cors) {
   return json({ ok: true, emailed: true }, 200, cors);
 }
 
+
+// ===== Officer auth (PIN lives ONLY as Worker secret OFFICER_PIN) =====
+const loginAttempts = new Map();
+
+function clientIp(request) {
+  return request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "unknown";
+}
+
+function rateLimitLogin(ip) {
+  const now = Date.now();
+  let row = loginAttempts.get(ip);
+  if (!row || now > row.reset) {
+    row = { n: 0, reset: now + 15 * 60 * 1000 };
+    loginAttempts.set(ip, row);
+  }
+  row.n += 1;
+  return row.n <= 8;
+}
+
+function b64url(bytes) {
+  let s = btoa(String.fromCharCode(...bytes));
+  return s.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function b64urlFromStr(str) {
+  return b64url(new TextEncoder().encode(str));
+}
+
+async function hmacSign(secret, msg) {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(msg));
+  return b64url(new Uint8Array(sig));
+}
+
+async function makeSessionToken(env, officer) {
+  const secret = env.SESSION_SECRET || env.OFFICER_PIN || env.PUBLISH_KEY || "eocns-dev-session";
+  const exp = Date.now() + 12 * 60 * 60 * 1000;
+  const payload = b64urlFromStr(JSON.stringify({ v: 1, officer: officer || "QA Officer", exp }));
+  const sig = await hmacSign(secret, payload);
+  return payload + "." + sig;
+}
+
+async function verifySessionToken(env, token) {
+  if (!token || String(token).indexOf(".") < 0) return null;
+  const secret = env.SESSION_SECRET || env.OFFICER_PIN || env.PUBLISH_KEY || "eocns-dev-session";
+  const [payload, sig] = String(token).split(".");
+  const expect = await hmacSign(secret, payload);
+  if (sig !== expect) return null;
+  try {
+    let b64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    while (b64.length % 4) b64 += "=";
+    const data = JSON.parse(atob(b64));
+    if (!data.exp || Date.now() > data.exp) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function expectedOfficerPin(env) {
+  return String(env.OFFICER_PIN || "").trim();
+}
+
+async function handleLogin(env, request, payload, cors) {
+  const ip = clientIp(request);
+  if (!rateLimitLogin(ip)) {
+    return json({ error: "Too many login attempts. Try again in 15 minutes." }, 429, cors);
+  }
+  const pin = String(payload.pin || "").trim();
+  const officer = String(payload.officer || payload.name || "QA Officer").trim() || "QA Officer";
+  const expected = expectedOfficerPin(env);
+  if (!expected) {
+    return json({
+      error: "OFFICER_PIN is not configured on the Worker. Set secret: npx wrangler secret put OFFICER_PIN",
+    }, 503, cors);
+  }
+  if (!pin || pin !== expected) {
+    return json({ error: "Incorrect officer PIN." }, 401, cors);
+  }
+  const token = await makeSessionToken(env, officer);
+  return json({
+    ok: true,
+    token,
+    officer,
+    expiresInHours: 12,
+    message: "Signed in. Session is valid for about 12 hours.",
+  }, 200, cors);
+}
+
+async function handleVerifySession(env, payload, cors) {
+  const token = String(payload.token || "").trim();
+  const data = await verifySessionToken(env, token);
+  if (!data) return json({ ok: false, error: "Session expired or invalid." }, 401, cors);
+  return json({ ok: true, officer: data.officer, exp: data.exp }, 200, cors);
+}
+
+async function handleChangePin(env, request, payload, cors) {
+  const current = String(payload.currentPin || "").trim();
+  const next = String(payload.newPin || "").trim();
+  const expected = expectedOfficerPin(env);
+  if (!expected) return json({ error: "OFFICER_PIN not configured on Worker." }, 503, cors);
+  if (current !== expected) return json({ error: "Current PIN is incorrect." }, 401, cors);
+  if (!next || next.length < 6) return json({ error: "New PIN must be at least 6 characters." }, 400, cors);
+  return json({
+    ok: false,
+    requiresOps: true,
+    message:
+      "PIN verified. To finish rotation run: echo -n 'NEW_PIN' | npx wrangler secret put OFFICER_PIN",
+    hint: "After the secret updates, every device uses the new PIN. No GitHub config change needed.",
+  }, 200, cors);
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "*";
@@ -285,12 +403,19 @@ export default {
       return json({
         service: "eocns-publish",
         ok: true,
-        endpoints: ["publish (POST files)", "submit_pending (POST student)", "reject_email (POST)"],
+        auth: "Officer PIN is Worker secret OFFICER_PIN (not in GitHub).",
+        endpoints: [
+          "login (POST action=login)",
+          "verify_session (POST action=verify_session)",
+          "change_pin (POST action=change_pin — verifies; ops rotates secret)",
+          "publish (POST files)",
+          "submit_pending (POST student)",
+          "reject_email (POST)",
+        ],
       }, 200, cors);
     }
 
     if (request.method !== "POST") return json({ error: "POST only" }, 405, cors);
-    if (!env.GITHUB_TOKEN) return json({ error: "GITHUB_TOKEN secret not configured on worker" }, 500, cors);
 
     let payload;
     try { payload = await request.json(); } catch {
@@ -299,6 +424,10 @@ export default {
 
     const action = payload.action || (payload.files ? "publish" : (payload.student ? "submit_pending" : "publish"));
     try {
+      if (action === "login") return await handleLogin(env, request, payload, cors);
+      if (action === "verify_session") return await handleVerifySession(env, payload, cors);
+      if (action === "change_pin") return await handleChangePin(env, request, payload, cors);
+      if (!env.GITHUB_TOKEN) return json({ error: "GITHUB_TOKEN secret not configured on worker" }, 500, cors);
       if (action === "submit_pending") return await handleSubmitPending(env, payload, cors);
       if (action === "reject_email") return await handleRejectEmail(env, request, payload, cors);
       return await handlePublish(env, request, payload, cors);

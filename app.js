@@ -1,4 +1,4 @@
-/* EOCNS build v95 — outer bare report refs removed */
+/* EOCNS build v103 — outer bare report refs removed */
 (() => {
 "use strict";
 // Safe stubs so early event wiring never throws ReferenceError (real impls overwrite later)
@@ -97,16 +97,11 @@ function closeOfficerLoginGate() {
   if (gate) { gate.hidden = true; gate.removeAttribute("data-target-view"); }
 }
 
-function tryOfficerGateLogin() {
+async function tryOfficerGateLogin() {
   var pin = (document.getElementById("officerGatePin") && document.getElementById("officerGatePin").value || "").trim();
   var err = document.getElementById("officerGateError");
-  var expected = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA";
   if (!pin) {
     if (err) { err.hidden = false; err.textContent = "Enter the QA officer PIN."; }
-    return;
-  }
-  if (pin !== expected) {
-    if (err) { err.hidden = false; err.textContent = "Incorrect PIN. Access remains locked."; }
     return;
   }
   var nameInput = document.getElementById("officerGateName");
@@ -116,8 +111,25 @@ function tryOfficerGateLogin() {
     if (err) { err.hidden = false; err.textContent = "Enter your full name for the audit trail."; }
     return;
   }
+  if (err) { err.hidden = false; err.textContent = "Signing in…"; }
+  try {
+    if (typeof workerAuthLogin === "function") {
+      var body = await workerAuthLogin(pin, officerName);
+      if (typeof storeQaSessionToken === "function") storeQaSessionToken(body.token);
+      setQaOfficer(true, body.officer || officerName);
+    } else {
+      throw new Error("Auth helper missing");
+    }
+  } catch (e) {
+    var localPin = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.qaPin) || "";
+    if (localPin && pin === localPin) {
+      setQaOfficer(true, officerName);
+    } else {
+      if (err) { err.hidden = false; err.textContent = (e && e.message) ? e.message : "Incorrect PIN. Access remains locked."; }
+      return;
+    }
+  }
   if (err) err.hidden = true;
-  setQaOfficer(true, officerName);
   var gate = document.getElementById("officerLoginGate");
   var target = (gate && gate.getAttribute("data-target-view")) || "dashboard";
   closeOfficerLoginGate();
@@ -6714,6 +6726,7 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
 // REPO PERSISTENCE + QA OFFICER GATE
 // Master list: data/students.json in the repository
 // =========================================================
+const QA_SESSION_TOKEN_KEY = "eocns_qa_session_token";
 const QA_PIN_KEY = "eocns-qa-session";
 const QA_OFFICER_NAME_KEY = "eocns-qa-officer-name";
 /* PIN from APP_CONFIG.qaPin / data/config.json */
