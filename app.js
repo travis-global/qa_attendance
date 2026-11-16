@@ -377,6 +377,34 @@ function normalizeProgramme(p) {
   return t;
 }
 
+// Canonical student-name format: Title Case, applied to the master record itself.
+function normalizeStudentName(value) {
+  return String(value || "").trim().replace(/\s+/g, " ").toLowerCase().replace(/(^|[\s\-'])\p{L}/gu, function(match) {
+    return match.toUpperCase();
+  });
+}
+
+// One-time-safe migration: update only the name field in existing master records.
+// Student IDs, registration numbers, biometric links, attendance and all other fields remain untouched.
+async function normalizeExistingStudentNames() {
+  var all = await getAll("students");
+  var changed = 0;
+  for (var i = 0; i < all.length; i++) {
+    var student = all[i];
+    var normalized = normalizeStudentName(student.name);
+    if (normalized && normalized !== student.name) {
+      student.name = normalized;
+      await put("students", student);
+      changed++;
+    }
+  }
+  if (changed) {
+    try { markDirty("students"); } catch (e) { console.warn("Student-name normalization sync flag", e); }
+    console.info("Normalized student master-list names:", changed);
+  }
+  return changed;
+}
+
 /** Temporary reg numbers (TMP-… / TEMP-…) sort after permanent ones. */
 function isTempRegNo(reg) {
   var r = String(reg || "").trim().toUpperCase();
@@ -503,7 +531,7 @@ async function renderStudentsTable() {
         ' <button type="button" class="icon-btn-sm qa-edit-only" data-del-stu="' + id + '">Del</button>';
     }
     return "<tr data-stu-id=\"" + id + "\">" + cb +
-      "<td><div class=\"cell-main\" data-profile-stu=\"" + id + "\" style=\"cursor:pointer\" title=\"Open DSA full record\">" + escapeHtml(String(s.name || "").toUpperCase()) + "</div></td>" +
+      "<td><div class=\"cell-main\" data-profile-stu=\"" + id + "\" style=\"cursor:pointer\" title=\"Open DSA full record\">" + escapeHtml(normalizeStudentName(s.name)) + "</div></td>" +
       "<td>" + escapeHtml(s.regNo || "—") + "</td>" +
       "<td>" + escapeHtml(s.programme || "—") + "</td>" +
       "<td>" + escapeHtml(String(s.level || "—")) + "</td>" +
@@ -668,7 +696,7 @@ async function saveStudent(e) {
   if (e && e.preventDefault) e.preventDefault();
   try {
     const id = (document.getElementById("studentId") && document.getElementById("studentId").value || "").trim() || null;
-    const name = (document.getElementById("studentName") && document.getElementById("studentName").value || "").trim();
+    const name = normalizeStudentName(document.getElementById("studentName") && document.getElementById("studentName").value || "");
     let regNo = (document.getElementById("studentRegNo") && document.getElementById("studentRegNo").value || "").trim();
     const programme = (document.getElementById("studentProgramme") && document.getElementById("studentProgramme").value || "").trim();
     const level = (document.getElementById("studentLevel") && document.getElementById("studentLevel").value || "").trim();
@@ -2767,6 +2795,7 @@ openDB().then(async () => {
       console.info("EOCNS repo updates pulled:", syncRes.pulled);
     }
   } catch (e) { console.warn("repo sync", e); }
+  try { await normalizeExistingStudentNames(); } catch (e) { console.error("Student master-list name normalization failed", e); }
   try { startSmartRepoWatch(); } catch (e) { console.warn("smart watch", e); }
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
   try { refreshDashboardStats(); } catch (e) { console.warn("stats", e); }
@@ -3472,7 +3501,7 @@ async function importStudentsCsv(file, options) {
 
   for (var r = 1; r < lines.length; r++) {
     var cols = splitCsv(lines[r]);
-    var name = (cols[iName] || "").trim();
+    var name = normalizeStudentName(cols[iName] || "");
     if (!name) { skippedEmpty++; continue; }
     var regNo = iReg >= 0 ? String(cols[iReg] || "").trim() : "";
     var csvProg = iProg >= 0 ? String(cols[iProg] || "").trim() : "";
@@ -11512,7 +11541,7 @@ function closeBioCreateStudentModal() {
 async function confirmBioCreateStudent() {
   if (!isQaOfficer()) return;
   var pendingId = document.getElementById("bioCreatePendingId").value;
-  var name = (document.getElementById("bioCreateName").value || "").trim();
+  var name = normalizeStudentName(document.getElementById("bioCreateName").value || "");
   var serial = (document.getElementById("bioCreateSerial").value || "").trim();
   var regNo = (document.getElementById("bioCreateRegNo").value || "").trim();
   var programme = (document.getElementById("bioCreateProgramme").value || "").trim();
