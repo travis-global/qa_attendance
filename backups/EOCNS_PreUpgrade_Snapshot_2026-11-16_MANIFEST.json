@@ -1,0 +1,213 @@
+{
+  "createdAt": "2026-11-16T08:46:11.495707+00:00",
+  "purpose": "Pre-upgrade freeze before Worker-only PIN auth, encryption-at-rest, lazy loading",
+  "git": {
+    "commit": "18f5e93507c5c46f9378aa2ee811015774f77289",
+    "log": "18f5e93507c5c46f9378aa2ee811015774f77289 | 2026-11-16 09:43:33 +0100 | Normalize existing student master-list names",
+    "repo": "travis-global/qa_attendance"
+  },
+  "counts": {
+    "attendance": 0,
+    "audit": 1481,
+    "biometric_pending": 28,
+    "config": 1,
+    "courses": 29,
+    "discipline": 0,
+    "hostel_runs": 9,
+    "lecturers": 23,
+    "levels": 3,
+    "pending_students": 1,
+    "programmes": 3,
+    "qa_entries": 35,
+    "remedial": 0,
+    "remedial_assignments": 0,
+    "remedial_enrolment": 0,
+    "remedial_logs": 0,
+    "remedial_meta": 1,
+    "remedial_timetable": 1,
+    "sessions": 1,
+    "students": 424,
+    "timetables": 1
+  },
+  "files": [
+    {
+      "name": "attendance.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "audit.json",
+      "bytes": 991533,
+      "sha256": "aca65ef957dc8243da067dd81b4bcd6cbda67352e28dca09c31fb28303976680",
+      "count": 1481
+    },
+    {
+      "name": "biometric_pending.json",
+      "bytes": 24254,
+      "sha256": "aad55a2f7a71a5cd4e7ca7016ba913576f8d6a657aed2a5144d3cb78a40d7f04",
+      "count": 28
+    },
+    {
+      "name": "config.json",
+      "bytes": 442,
+      "sha256": "4a35cea47ad79f0bdfc5244a82d44301662b986299905f165ea3f82b943d126b",
+      "count": 1
+    },
+    {
+      "name": "courses.json",
+      "bytes": 3750,
+      "sha256": "021853ef5e5342936ba3415b5427b1e97111e09fe721ca0b4f9dad24937da57d",
+      "count": 29
+    },
+    {
+      "name": "discipline.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "hostel_runs.json",
+      "bytes": 912364,
+      "sha256": "c7ccfca2bed2f46aa7d1a27110094d1544b2fdf929ed57548f663790f87aa865",
+      "count": 9
+    },
+    {
+      "name": "lecturers.json",
+      "bytes": 14514,
+      "sha256": "613d673b70de2b2b480aafc67ea6c521a86ac60110e18b1b5b0699a50574fe48",
+      "count": 23
+    },
+    {
+      "name": "levels.json",
+      "bytes": 290,
+      "sha256": "4491b72397eb82feaacbda132b0934b02653c3e0410bb9e2396173cb6d1818d9",
+      "count": 3
+    },
+    {
+      "name": "pending_students.json",
+      "bytes": 38928,
+      "sha256": "0c6ce25986cf61faaddf6699e8d3b593fdd5be0659132bb8f4962d819df98e7e",
+      "count": 1
+    },
+    {
+      "name": "programmes.json",
+      "bytes": 313,
+      "sha256": "58148459905003fd75cfdeed9ef9223c66e163811f7b23e1cf903e1c66d69bb4",
+      "count": 3
+    },
+    {
+      "name": "qa_entries.json",
+      "bytes": 50276,
+      "sha256": "554502487853eced70b9bc828850e07d360df84b00c89bcffaf21a70dee61fd6",
+      "count": 35
+    },
+    {
+      "name": "remedial.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "remedial_assignments.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "remedial_enrolment.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "remedial_logs.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "remedial_meta.json",
+      "bytes": 183,
+      "sha256": "8f9bc458978c00734822af391bbea3d5e0fb17f25d6163cc3cede79818f5fd9c",
+      "count": 1
+    },
+    {
+      "name": "remedial_timetable.json",
+      "bytes": 17,
+      "sha256": "176d5f35ccf0d4c5c4ba469f88b339dbde100b71d87b6afcad106553b81391fa",
+      "count": 1
+    },
+    {
+      "name": "sessions.json",
+      "bytes": 343,
+      "sha256": "371a321661743eca38a7ac324ad516c107350545468699ae1186cc82e6be2156",
+      "count": 1
+    },
+    {
+      "name": "students.json",
+      "bytes": 130981,
+      "sha256": "0c03a5fe6f86538e85c44cce461ade5d1ca05a4d44ccd837b2b5f4781ca376e1",
+      "count": 424
+    },
+    {
+      "name": "timetables.json",
+      "bytes": 7429,
+      "sha256": "8092757130c973d50e2431ab384585c5dfe48f6d231bc3f08bcfc4d75aa578b0",
+      "count": 1
+    }
+  ],
+  "livePagesParity": {
+    "attendance": "match",
+    "audit": "match",
+    "biometric_pending": "match",
+    "config": "match",
+    "courses": "match",
+    "discipline": "match",
+    "hostel_runs": "match",
+    "lecturers": "match",
+    "levels": "match",
+    "pending_students": "match",
+    "programmes": "match",
+    "qa_entries": "match",
+    "remedial": "match",
+    "remedial_assignments": "match",
+    "remedial_enrolment": "match",
+    "remedial_logs": "match",
+    "remedial_meta": "match",
+    "remedial_timetable": "match",
+    "sessions": "match",
+    "students": "match",
+    "timetables": "match"
+  },
+  "code": {
+    "app.js": {
+      "bytes": 607346,
+      "sha256": "0de4e5ad8f25030399c8b6cdf34f3c7ecc3b9782cf7ee37e9f761bf848e4bf11"
+    },
+    "index.html": {
+      "bytes": 115117,
+      "sha256": "7b56fc55c337cb934f1efafaa97177380c2dc324f88b92684fe5287a8ba6314d"
+    },
+    "style.css": {
+      "bytes": 29915,
+      "sha256": "8fe1d2fd5c747e178411f91ed9f52f74dd533e209675f18f2c24e9369e919f50"
+    },
+    "register.html": {
+      "bytes": 8718,
+      "sha256": "4db4f5f16721223c23a27556e3fd89e390a4a23cc7bac78915d69b19485f12e3"
+    },
+    "cloudflare-worker/src/index.js": {
+      "bytes": 13855,
+      "sha256": "4b7cb0366d67f0f5447e61db0fd6e5addce8869717cc89ec5206d92af8b68e1a"
+    }
+  },
+  "systemNotes": [
+    "Students use Title Case via normalizeStudentName",
+    "Hostel runs store full gateExportRows/matrix; 9 runs on disk",
+    "Biometric pending includes ignored/discarded machine users",
+    "Worker: eocns-publish.alemfort12.workers.dev \u2014 GITHUB_TOKEN + PUBLISH_KEY",
+    "PIN still in data/config.json (qaPin) \u2014 to move to Worker secrets",
+    "app.js?v=102 at snapshot time"
+  ]
+}
