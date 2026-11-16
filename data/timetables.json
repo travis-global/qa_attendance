@@ -380,5 +380,129 @@
         "hours": 2
       }
     ]
+  },
+  "200_midwifery": {
+    "class_name": "200_midwifery",
+    "slots": [
+      {
+        "weekday": 0,
+        "code": "MID 214",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 0,
+        "code": "PRAC 201",
+        "start": "10:00",
+        "end": "11:45",
+        "hours": 1.45
+      },
+      {
+        "weekday": 0,
+        "code": "MID 211",
+        "start": "12:30",
+        "end": "14:00",
+        "hours": 1.5
+      },
+      {
+        "weekday": 1,
+        "code": "MID 213",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 1,
+        "code": "TUT 201",
+        "start": "10:00",
+        "end": "11:45",
+        "hours": 1.5
+      },
+      {
+        "weekday": 1,
+        "code": "MID 213",
+        "start": "12:30",
+        "end": "14:00",
+        "hours": 1.5
+      },
+      {
+        "weekday": 1,
+        "code": "TUT 201",
+        "start": "14:00",
+        "end": "15:00",
+        "hours": 1
+      },
+      {
+        "weekday": 2,
+        "code": "MID 212",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 2,
+        "code": "TUT 201",
+        "start": "10:00",
+        "end": "11:45",
+        "hours": 2
+      },
+      {
+        "weekday": 2,
+        "code": "MID 212",
+        "start": "12:30",
+        "end": "14:00",
+        "hours": 1.5
+      },
+      {
+        "weekday": 3,
+        "code": "PRAC 201",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 3,
+        "code": "MID 211",
+        "start": "10:00",
+        "end": "11:45",
+        "hours": 2
+      },
+      {
+        "weekday": 3,
+        "code": "MID 216",
+        "start": "12:30",
+        "end": "15:00",
+        "hours": 2.5
+      },
+      {
+        "weekday": 4,
+        "code": "MID 215",
+        "start": "08:00",
+        "end": "10:00",
+        "hours": 2
+      },
+      {
+        "weekday": 4,
+        "code": "TUT 201",
+        "start": "10:00",
+        "end": "11:45",
+        "hours": 2
+      },
+      {
+        "weekday": 4,
+        "code": "MID 215",
+        "start": "12:30",
+        "end": "14:00",
+        "hours": 1.5
+      },
+      {
+        "weekday": 4,
+        "code": "TUT 201",
+        "start": "14:00",
+        "end": "15:00",
+        "hours": 1
+      }
+    ]
   }
 }
