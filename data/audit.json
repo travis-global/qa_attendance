@@ -36636,5 +36636,49 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1603
+  },
+  {
+    "ref": "REF/EOCNS/QA/1001",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwkr2e9kar0o",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-16",
+      "course": "NUR 211 — NUR 211",
+      "status": "Held",
+      "classKey": "200_nursing",
+      "amended": false
+    },
+    "timestamp": "2026-11-17T13:50:29.818Z",
+    "at": "2026-11-17T13:50:29.818Z",
+    "createdAt": "2026-11-17T13:50:29.818Z",
+    "whenLocal": "Tue, 17 Nov 2026, 14:50:29",
+    "user": "Alolote fortunatus",
+    "officer": "Alolote fortunatus",
+    "source": "system",
+    "id": 1604
+  },
+  {
+    "ref": "REF/EOCNS/QA/1002",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwkriaeuc28g",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-16",
+      "course": "NUS 114 — Human Physiology I",
+      "status": "Held",
+      "classKey": "200_nursing",
+      "amended": false
+    },
+    "timestamp": "2026-11-17T14:02:51.320Z",
+    "at": "2026-11-17T14:02:51.320Z",
+    "createdAt": "2026-11-17T14:02:51.320Z",
+    "whenLocal": "Tue, 17 Nov 2026, 15:02:51",
+    "user": "Alolote fortunatus",
+    "officer": "Alolote fortunatus",
+    "source": "system",
+    "id": 1605
   }
 ]
