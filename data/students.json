@@ -398,7 +398,7 @@
     "level": 100,
     "code": "NDN",
     "regNo": "EOCNS/26/0012/GNS",
-    "hostel": "",
+    "hostel": "Off-campus",
     "status": "Active",
     "gender": "Female",
     "phone": "",
@@ -2464,6 +2464,20 @@
     "id": "stu_mwaqcmmi_175"
   },
   {
+    "serial": "",
+    "name": "Gladys Anameti Bassey",
+    "programme": "General Nursing",
+    "level": 100,
+    "code": "GNS",
+    "regNo": "EOCNS/26/0083/GNS",
+    "hostel": "Hostel 1",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mwkn9ieb7z177"
+  },
+  {
     "serial": "EOCNS/24/0014/GNS",
     "name": "Gladys Igboke",
     "programme": "General Nursing",
@@ -3646,7 +3660,7 @@
     "level": 100,
     "code": "NDN",
     "regNo": "EOCNS/26/0075/GNS",
-    "hostel": "",
+    "hostel": "Off-campus",
     "status": "Active",
     "gender": "Female",
     "phone": "",
@@ -3968,7 +3982,7 @@
     "level": 100,
     "code": "NDN",
     "regNo": "EOCNS/26/0013/GNS",
-    "hostel": "",
+    "hostel": "Off-campus",
     "status": "Active",
     "gender": "Female",
     "phone": "",
@@ -4590,6 +4604,20 @@
     "phone": "",
     "email": "",
     "id": "stu_mwaq0867_68"
+  },
+  {
+    "serial": "EOCNS/26/0080/GNS",
+    "name": "Onwujekwe Sochima Living-Hope",
+    "programme": "ND Nursing",
+    "level": 100,
+    "code": "NDN",
+    "regNo": "EOCNS/26/0080/GNS",
+    "hostel": "Hostel 1",
+    "status": "Active",
+    "gender": "Female",
+    "phone": "",
+    "email": "",
+    "id": "stu_mwapkb4r_14"
   },
   {
     "serial": "EOCNS/25/0019/GNS",
@@ -5318,20 +5346,6 @@
     "phone": "",
     "email": "",
     "id": "stu_mwaqclok_100"
-  },
-  {
-    "serial": "EOCNS/26/0080/GNS",
-    "name": "Sochima Onwujekwe",
-    "programme": "ND Nursing",
-    "level": 100,
-    "code": "NDN",
-    "regNo": "EOCNS/26/0080/GNS",
-    "hostel": "",
-    "status": "Active",
-    "gender": "Female",
-    "phone": "",
-    "email": "",
-    "id": "stu_mwapkb4r_14"
   },
   {
     "serial": "143",
