@@ -2076,5 +2076,116 @@
     "sessionName": "2026/2027 SESSION",
     "semesterId": "sess_mvt9hjbtg2q3o_s1",
     "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mwj5f0syeyp2",
+    "date": "2026-11-13",
+    "classKey": "300_midwifery",
+    "course": "MID 317 — Practicum",
+    "lecturer": "Mrs. Nzediegwu Patience Ijeoma",
+    "status": "Held",
+    "duration": 60,
+    "start": "13:00",
+    "end": "14:00",
+    "topic": "Instrumentation",
+    "objectives": "Instrumentation in Midwifery Practice.",
+    "lectureSummary": "the lecture covered Instrumentation.",
+    "assignment": "None was given",
+    "remark": "",
+    "absent": [
+      "EOCNS/24/0008/MID. Chioma Gladys Okeoma",
+      "11. Oluchi Philomina Nwafor",
+      "EOCNS/24/0017/MID. Stephanie Nneoma Ojimba",
+      "417. Blessing Ali",
+      "Precious Chukwuma O.",
+      "EOCNS/24/0042/MID. Joy Adaobi Ifeanyi",
+      "EOCNS/24/0044/MID. Queen Ojonoda Dibiagwu",
+      "Aloh Ngozi Otaka",
+      "EOCNS/24/0051/MID. Chinweotito Loveline",
+      "EOCNS/24/0075/MID. Favour Onuoha",
+      "474. Blessing Nwankwo",
+      "EOCNS/24/0103/GNS. Chinenye Angela"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mwaqclkl_91",
+        "name": "Chioma Gladys Okeoma",
+        "regNo": "EOCNS/24/0008/MID",
+        "serial": "EOCNS/24/0008/MID"
+      },
+      {
+        "id": "stu_mvrzdaca2nvyk",
+        "name": "Oluchi Philomina Nwafor",
+        "regNo": "EOCNS/24/0012/MID",
+        "serial": "11"
+      },
+      {
+        "id": "stu_mwaqckur_34",
+        "name": "Stephanie Nneoma Ojimba",
+        "regNo": "EOCNS/24/0017/MID",
+        "serial": "EOCNS/24/0017/MID"
+      },
+      {
+        "id": "stu_mwaqckpv_21",
+        "name": "Blessing Ali",
+        "regNo": "EOCNS/24/0018/MID",
+        "serial": "417"
+      },
+      {
+        "id": "stu_mwc9ui7ill1kl",
+        "name": "Precious Chukwuma O.",
+        "regNo": "EOCNS/24/0032/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaqckku_9",
+        "name": "Joy Adaobi Ifeanyi",
+        "regNo": "EOCNS/24/0042/MID",
+        "serial": "EOCNS/24/0042/MID"
+      },
+      {
+        "id": "stu_mwaqckqk_23",
+        "name": "Queen Ojonoda Dibiagwu",
+        "regNo": "EOCNS/24/0044/MID",
+        "serial": "EOCNS/24/0044/MID"
+      },
+      {
+        "id": "stu_mwc9teji1tbll",
+        "name": "Aloh Ngozi Otaka",
+        "regNo": "EOCNS/24/0049/MID",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwaqckl7_10",
+        "name": "Chinweotito Loveline",
+        "regNo": "EOCNS/24/0051/MID",
+        "serial": "EOCNS/24/0051/MID"
+      },
+      {
+        "id": "stu_mwaqclqm_105",
+        "name": "Favour Onuoha",
+        "regNo": "EOCNS/24/0075/MID",
+        "serial": "EOCNS/24/0075/MID"
+      },
+      {
+        "id": "stu_mwaqckj3_6",
+        "name": "Blessing Nwankwo",
+        "regNo": "EOCNS/24/0077/MID",
+        "serial": "474"
+      },
+      {
+        "id": "stu_mwaqcl2i_50",
+        "name": "Chinenye Angela",
+        "regNo": "EOCNS/24/0103/GNS",
+        "serial": "EOCNS/24/0103/GNS"
+      }
+    ],
+    "updatedAt": "2026-11-16T10:56:41.170Z",
+    "createdAt": "2026-11-16T10:56:41.170Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
   }
 ]
