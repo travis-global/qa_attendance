@@ -2191,6 +2191,12 @@ async function deduplicateHostelRunsInStore(){
  for(var entry of groups.entries()){var g=entry[1];if(g.length<2){if(g[0]&&!g[0].identityKey){g[0].identityKey=hostelRunIdentityKey(g[0]);await put("hostel_runs",g[0]);}continue;}
   g.sort(function(a,b){var sc=function(x){return(x.status==="final"?1e15:0)+(x.edited?1e12:0)+Date.parse(x.updatedAt||x.createdAt||0);};return sc(b)-sc(a);});
   var keep=g[0],others=g.slice(1),m=new Map((keep.matrix||[]).map(function(r){return[String(r.studentId||"manual:"+r.name),r];}));
+  // Preserve biometric issue links by redirecting them to the surviving hostel report.
+  var removedIds=others.map(function(x){return x.id;}),pendingRows=await getAll("biometric_pending");
+  for(var p=0;p<pendingRows.length;p++){var pendingItem=pendingRows[p];if(!pendingItem||!Array.isArray(pendingItem.reportRunIds))continue;
+    var hadDuplicate=removedIds.some(function(id){return pendingItem.reportRunIds.indexOf(id)>=0;});
+    if(hadDuplicate){pendingItem.reportRunIds=Array.from(new Set(pendingItem.reportRunIds.map(function(id){return removedIds.indexOf(id)>=0?keep.id:id;})));await put("biometric_pending",pendingItem);}
+  }
   others.slice().reverse().forEach(function(run){(run.matrix||[]).forEach(function(row){var k=String(row.studentId||"manual:"+row.name),cur=m.get(k);if(!cur){m.set(k,Object.assign({},row));return;}["machineNo","name","regNo","hostel","programme","level"].forEach(function(f){if((cur[f]==null||cur[f]==="")&&row[f]!=null&&row[f]!=="")cur[f]=row[f];});if((!cur.dayMarks||!cur.dayMarks.length)&&row.dayMarks)cur.dayMarks=row.dayMarks.slice();});});
   keep.matrix=Array.from(m.values());keep.matrix.forEach(function(r){r.rosterId=keep.id+"::"+String(r.studentId||"");});
   keep.rows=keep.matrix.filter(function(r){return Number(r.absentDays||0)>0;}).map(function(r){return{studentId:r.studentId,rosterId:r.rosterId,name:r.name,hostel:r.hostel,regNo:r.regNo||"",absentDays:r.absentDays,fine:r.fine,programme:r.programme||"",level:r.level||"",dayMarks:(r.dayMarks||[]).slice()};});
