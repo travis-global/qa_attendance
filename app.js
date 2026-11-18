@@ -5353,10 +5353,14 @@ async function buildStudentFullRecord(id) {
     var runs = await getAll("hostel_runs");
     (runs || []).forEach(function(run) {
       if (!run) return;
-      var rosterRows = Array.isArray(run.rows) ? run.rows :
-        (Array.isArray(run.matrix) ? run.matrix : (Array.isArray(run.attendance) ? run.attendance : []));
+      // The full matrix is authoritative: run.rows may contain only absentees.
+      // Prefer the immutable student ID, then use legacy identity matching.
+      var rosterRows = Array.isArray(run.matrix) ? run.matrix :
+        (Array.isArray(run.rows) ? run.rows : (Array.isArray(run.attendance) ? run.attendance : []));
       var matched = rosterRows.find(function(row) {
-        return rowMatchesStudent(row, keys) || (row && row.studentId && row.studentId === s.id);
+        return !!(row && row.studentId && String(row.studentId) === String(s.id));
+      }) || rosterRows.find(function(row) {
+        return rowMatchesStudent(row, keys);
       });
       if (matched) {
         var marks = Array.isArray(matched.dayMarks) ? matched.dayMarks :
@@ -5542,7 +5546,11 @@ async function openStudentFullRecord(id) {
       '<button type="button" class="btn btn--ghost btn--sm" id="dsaDossierClear">Clear filters</button></div>' +
       '<span class="muted-note" id="dsaDossierResultCount">Showing all available records</span></div>' +
     section("1. Disciplinary cases", data.discipline.length, tableWrap("<th>Date</th><th>Case type</th><th>Status</th><th>Official REF</th><th>Incident / outcome</th>", discRows), "discipline") +
-    section("2. Hostel attendance history", data.hostel.length, tableWrap("<th>Period</th><th>Machine ID</th><th>Present</th><th>Absent</th><th>Fine</th><th>Hostel</th>", hostRows), "hostel") +
+    section("2. Hostel attendance history", data.hostel.length,
+      hostRows
+        ? tableWrap("<th>Period</th><th>Machine ID</th><th>Present</th><th>Absent</th><th>Fine</th><th>Hostel</th>", hostRows)
+        : '<p class="muted-note" style="margin:0">No hostel attendance record was found for this student in the saved hostel reports.</p>',
+      "hostel") +
     section("3. Class attendance &amp; lecture participation", data.classAttendance.length, tableWrap("<th>Date</th><th>Course</th><th>Mark</th><th>Lecture status</th><th>Lecturer</th><th>Source</th>", classRows), "class") +
     section("4. QA lecture absences", data.absents.length, tableWrap("<th>Date</th><th>Course</th><th>Lecture status</th><th>Class</th><th>Lecturer</th>", absRows), "absences") +
     section("5. Remedial enrolment &amp; attendance", data.remedial.length + data.remedialLogs.length, remInner, "remedial") +
@@ -10416,11 +10424,22 @@ async function saveCourseForm(e) {
   var sameTitle = COURSES_CACHE.find(function(c) { return normTitle(c.name) === normTitle(name) && normCourseCode(c.code) !== normCourseCode(original || code); });
   if (sameTitle && !confirm('A course titled "' + sameTitle.name + '" already exists as ' + sameTitle.code + ". Add " + code + " with the same title anyway?")) return;
   var classKeys = keysRaw ? keysRaw.split(",").map(function(s) { return s.trim(); }).filter(Boolean) : [];
-  if (original && original !== code) {
-    try { await del("courses", original); } catch (_) {}
-  }
   var rec = { code: code, name: name, classKeys: classKeys };
-  await put("courses", rec);
+  // Commit a rename/update atomically. Never delete the existing course first:
+  // if the replacement fails, IndexedDB rolls the whole transaction back.
+  await new Promise(function(resolve, reject) {
+    if (!db) { reject(new Error("Database not ready")); return; }
+    var courseTx;
+    try {
+      courseTx = db.transaction("courses", "readwrite");
+      var store = courseTx.objectStore("courses");
+      if (original && original !== code) store.delete(original);
+      store.put(rec);
+    } catch (err) { reject(err); return; }
+    courseTx.oncomplete = function() { resolve(); };
+    courseTx.onerror = function() { reject(courseTx.error || new Error("Course transaction failed")); };
+    courseTx.onabort = function() { reject(courseTx.error || new Error("Course transaction was aborted")); };
+  });
   await writeAudit({
     action: original ? "update" : "create",
     entity: "courses",
