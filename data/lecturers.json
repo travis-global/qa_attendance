@@ -693,5 +693,29 @@
     "status": "Active",
     "updatedAt": "2026-11-16T10:31:08.206Z",
     "createdAt": "2026-11-16T10:30:39.214Z"
+  },
+  {
+    "id": "lec_mwlq3cvd652p",
+    "name": "Mr. Icheku Emmanuel",
+    "staffId": "EOCNS/STF/2026/0025",
+    "phone": "",
+    "courses": [
+      "NUS 116"
+    ],
+    "assignments": [
+      {
+        "code": "NUS 116",
+        "programme": "Nursing",
+        "level": "100",
+        "hours": 30
+      }
+    ],
+    "sessionIds": [
+      "sess_mvt9hjbtg2q3o"
+    ],
+    "contractHoursPerSemester": 30,
+    "status": "Active",
+    "updatedAt": "2026-11-18T06:11:01.224Z",
+    "createdAt": "2026-11-18T06:11:01.224Z"
   }
 ]
