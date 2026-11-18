@@ -37112,5 +37112,82 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1621
+  },
+  {
+    "ref": "REF/EOCNS/QA/1032",
+    "action": "create",
+    "entity": "lecturers",
+    "entityId": "lec_mwlq3cvd652p",
+    "reason": "Lecturer created",
+    "details": {
+      "name": "Mr. Icheku Emmanuel",
+      "contractHoursPerSemester": 30,
+      "courses": [
+        "NUS 116"
+      ],
+      "assignments": [
+        {
+          "code": "NUS 116",
+          "programme": "Nursing",
+          "level": "100",
+          "hours": 30
+        }
+      ],
+      "sessionIds": [
+        "sess_mvt9hjbtg2q3o"
+      ]
+    },
+    "timestamp": "2026-11-18T06:11:01.225Z",
+    "at": "2026-11-18T06:11:01.225Z",
+    "createdAt": "2026-11-18T06:11:01.225Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:11:01",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1622
+  },
+  {
+    "ref": "REF/EOCNS/QA/1033",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwlqbve9w88h",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-17",
+      "course": "NUS 116 — Use of Computer",
+      "status": "Held",
+      "classKey": "100_nursing",
+      "amended": false
+    },
+    "timestamp": "2026-11-18T06:17:38.488Z",
+    "at": "2026-11-18T06:17:38.488Z",
+    "createdAt": "2026-11-18T06:17:38.488Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:17:38",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1623
+  },
+  {
+    "ref": "REF/EOCNS/QA/1034",
+    "action": "create",
+    "entity": "qa_entries",
+    "entityId": "qa_mwlqhwkg64o7",
+    "reason": "Lecture logged",
+    "details": {
+      "date": "2026-11-17",
+      "course": "NUS 115 — Introduction to Sociology",
+      "status": "Held",
+      "classKey": "100_nursing",
+      "amended": false
+    },
+    "timestamp": "2026-11-18T06:22:19.942Z",
+    "at": "2026-11-18T06:22:19.942Z",
+    "createdAt": "2026-11-18T06:22:19.942Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:22:19",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1624
   }
 ]
