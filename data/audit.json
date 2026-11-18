@@ -38260,5 +38260,140 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1664
+  },
+  {
+    "ref": "REF/EOCNS/QA/1001",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaqclqm_105",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "regNo": "EOCNS/24/0075/MID",
+      "name": "Favour Onuoha"
+    },
+    "timestamp": "2026-11-18T12:28:33.965Z",
+    "at": "2026-11-18T12:28:33.965Z",
+    "createdAt": "2026-11-18T12:28:33.965Z",
+    "whenLocal": "Wed, 18 Nov 2026, 13:28:33",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1665
+  },
+  {
+    "ref": "REF/EOCNS/QA/1002",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaqckpv_21",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "regNo": "EOCNS/24/0018/MID",
+      "name": "Blessing Ali"
+    },
+    "timestamp": "2026-11-18T12:29:09.927Z",
+    "at": "2026-11-18T12:29:09.927Z",
+    "createdAt": "2026-11-18T12:29:09.927Z",
+    "whenLocal": "Wed, 18 Nov 2026, 13:29:09",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1666
+  },
+  {
+    "ref": "REF/EOCNS/QA/1003",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaqclkl_91",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "regNo": "EOCNS/24/0008/MID",
+      "name": "Chioma Gladys Okeoma"
+    },
+    "timestamp": "2026-11-18T12:30:30.619Z",
+    "at": "2026-11-18T12:30:30.619Z",
+    "createdAt": "2026-11-18T12:30:30.619Z",
+    "whenLocal": "Wed, 18 Nov 2026, 13:30:30",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1667
+  },
+  {
+    "ref": "REF/EOCNS/QA/1004",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaqckku_9",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "regNo": "EOCNS/24/0042/MID",
+      "name": "Joy Adaobi Ifeanyi"
+    },
+    "timestamp": "2026-11-18T12:31:04.363Z",
+    "at": "2026-11-18T12:31:04.363Z",
+    "createdAt": "2026-11-18T12:31:04.363Z",
+    "whenLocal": "Wed, 18 Nov 2026, 13:31:04",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1668
+  },
+  {
+    "ref": "REF/EOCNS/QA/1005",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwc9o4wmyqzpo",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Midwifery",
+        "level": "300"
+      },
+      "after": {
+        "programme": "Midwifery",
+        "level": "200"
+      },
+      "regNo": "EOCNS/24/0003/MID",
+      "name": "Onwe Precious Chiamaka"
+    },
+    "timestamp": "2026-11-18T12:31:31.481Z",
+    "at": "2026-11-18T12:31:31.481Z",
+    "createdAt": "2026-11-18T12:31:31.481Z",
+    "whenLocal": "Wed, 18 Nov 2026, 13:31:31",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1669
   }
 ]
