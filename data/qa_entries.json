@@ -3673,5 +3673,171 @@
     "sessionName": "2026/2027 SESSION",
     "semesterId": "sess_mvt9hjbtg2q3o_s1",
     "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mwlqbve9w88h",
+    "date": "2026-11-17",
+    "classKey": "100_nursing",
+    "course": "NUS 116 — Use of Computer",
+    "lecturer": "Mr. Icheku Emmanuel",
+    "status": "Held",
+    "duration": 105,
+    "start": "08:25",
+    "end": "10:10",
+    "topic": "Components of Computer",
+    "objectives": "Components of Computer",
+    "lectureSummary": "Components of Computer",
+    "assignment": "None was given",
+    "remark": "Class participation was above average",
+    "absent": [
+      "EOCNS/26/0012/GNS. Ani Amaelochukwu Juliet",
+      "Nnaji Onyinyechi A.",
+      "Olapo Lateefah Ayomide",
+      "Onwe Uka-Amaka Divine",
+      "Ogodo Joy Mary",
+      "Nwonumara Nneka I.",
+      "Olumachi Ogbonnaya E.",
+      "Unachi Nwanneka A."
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mwapkbge_63",
+        "name": "Ani Amaelochukwu Juliet",
+        "regNo": "EOCNS/26/0012/GNS",
+        "serial": "EOCNS/26/0012/GNS"
+      },
+      {
+        "id": "stu_mvut1kwa5st7x",
+        "name": "Nnaji Onyinyechi A.",
+        "regNo": "EOCNS/26/0015/GNS",
+        "serial": ""
+      },
+      {
+        "id": "stu_mw9mfbzhnze8w",
+        "name": "Olapo Lateefah Ayomide",
+        "regNo": "EOCNS/26/0070/GNS",
+        "serial": ""
+      },
+      {
+        "id": "stu_mvusmd3df2hl5",
+        "name": "Onwe Uka-Amaka Divine",
+        "regNo": "EOCNS/26/0073/GNS",
+        "serial": ""
+      },
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "Ogodo Joy Mary",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      },
+      {
+        "id": "stu_mw678r1u6tqw3",
+        "name": "Nwonumara Nneka I.",
+        "regNo": "TMP-EOCNS/26/0008/GNS",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwdu72mtmnz4b",
+        "name": "Olumachi Ogbonnaya E.",
+        "regNo": "TMP-EOCNS/26/0015/GNS",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwduegh8g5p5a",
+        "name": "Unachi Nwanneka A.",
+        "regNo": "TMP-EOCNS/26/0017/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-18T06:17:38.481Z",
+    "createdAt": "2026-11-18T06:17:38.481Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mwlqhwkg64o7",
+    "date": "2026-11-17",
+    "classKey": "100_nursing",
+    "course": "NUS 115 — Introduction to Sociology",
+    "lecturer": "Mrs. Anthonia Arua",
+    "status": "Held",
+    "duration": 80,
+    "start": "13:42",
+    "end": "15:02",
+    "topic": "Presentation",
+    "objectives": "Presentation",
+    "lectureSummary": "Presentation",
+    "assignment": "None was given",
+    "remark": "Class participation was above average",
+    "absent": [
+      "EOCNS/26/0012/GNS. Ani Amaelochukwu Juliet",
+      "Nnaji Onyinyechi A.",
+      "Olapo Lateefah Ayomide",
+      "EOCNS/26/0075/GNS. Nwanneka Abigail Unachi",
+      "EOCNS/26/0079/GNS. Onwe Nkechinyere O",
+      "Ogodo Joy Mary",
+      "Nwonumara Nneka I.",
+      "Olumachi Ogbonnaya E."
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mwapkbge_63",
+        "name": "Ani Amaelochukwu Juliet",
+        "regNo": "EOCNS/26/0012/GNS",
+        "serial": "EOCNS/26/0012/GNS"
+      },
+      {
+        "id": "stu_mvut1kwa5st7x",
+        "name": "Nnaji Onyinyechi A.",
+        "regNo": "EOCNS/26/0015/GNS",
+        "serial": ""
+      },
+      {
+        "id": "stu_mw9mfbzhnze8w",
+        "name": "Olapo Lateefah Ayomide",
+        "regNo": "EOCNS/26/0070/GNS",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwapkb40_12",
+        "name": "Nwanneka Abigail Unachi",
+        "regNo": "EOCNS/26/0075/GNS",
+        "serial": "EOCNS/26/0075/GNS"
+      },
+      {
+        "id": "stu_mwapkb0p_1",
+        "name": "Onwe Nkechinyere O",
+        "regNo": "EOCNS/26/0079/GNS",
+        "serial": "EOCNS/26/0079/GNS"
+      },
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "Ogodo Joy Mary",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": ""
+      },
+      {
+        "id": "stu_mw678r1u6tqw3",
+        "name": "Nwonumara Nneka I.",
+        "regNo": "TMP-EOCNS/26/0008/GNS",
+        "serial": ""
+      },
+      {
+        "id": "stu_mwdu72mtmnz4b",
+        "name": "Olumachi Ogbonnaya E.",
+        "regNo": "TMP-EOCNS/26/0015/GNS",
+        "serial": ""
+      }
+    ],
+    "updatedAt": "2026-11-18T06:22:19.936Z",
+    "createdAt": "2026-11-18T06:22:19.936Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
   }
 ]
