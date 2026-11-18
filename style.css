@@ -1321,3 +1321,30 @@ body.role-officer .nav-item--officer.is-locked::after { content: none; }
 .bio-summary .bio-kpi .val { font-size: 1.25rem; font-weight: 700; color: #1B3A6B; }
 .bio-match-list { font-size: 0.82rem; line-height: 1.35; }
 .bio-match-list button { margin-top: 4px; }
+
+
+/* DSA student dossier — searchable official record presentation */
+.dsa-dossier-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--border);border-left:4px solid var(--primary,#0f766e);border-radius:8px;background:var(--surface,#fff);margin:10px 0}
+.dsa-dossier-heading div{display:flex;flex-direction:column;gap:3px}
+.dsa-dossier-heading strong{font-size:.82rem;letter-spacing:.04em}
+.dsa-dossier-heading span,.dsa-dossier-heading b{font-size:.72rem;color:var(--muted,#64748b);letter-spacing:.06em}
+.dsa-dossier-profile{padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface,#fff)}
+.dsa-dossier-profile>div:first-child{display:flex;flex-direction:column;gap:3px;margin-bottom:12px}
+.dsa-dossier-profile>div:first-child strong{font-size:1.05rem}
+.dsa-dossier-profile>div:first-child span{font-size:.82rem;color:var(--muted,#64748b)}
+.dsa-dossier-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.dsa-dossier-meta span{display:flex;flex-direction:column;gap:3px;font-size:.84rem}
+.dsa-dossier-meta b{font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted,#64748b)}
+.dsa-dossier-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0}
+.dsa-dossier-kpis>div{padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--surface,#fff);display:flex;flex-direction:column;gap:3px}
+.dsa-dossier-kpis strong{font-size:1.2rem}
+.dsa-dossier-kpis span{font-size:.72rem;color:var(--muted,#64748b)}
+.dsa-dossier-tools{padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--surface,#fff);margin:12px 0}
+.dsa-dossier-tools__title{font-size:.8rem;font-weight:700;margin-bottom:8px}
+.dsa-dossier-tools>input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:7px;background:var(--bg,#fff);color:inherit;margin-bottom:8px}
+.dsa-dossier-filter-row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
+.dsa-dossier-filter-row select,.dsa-dossier-filter-row input{padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg,#fff);color:inherit}
+.dsa-dossier-filter-row label{display:flex;flex-direction:column;gap:3px;font-size:.72rem;color:var(--muted,#64748b)}
+.dsa-dossier-tools .muted-note{display:block;margin-top:8px}
+.record-section[hidden],.record-section tr[hidden]{display:none!important}
+@media(max-width:600px){.dsa-dossier-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.dsa-dossier-heading>b{width:100%}}
