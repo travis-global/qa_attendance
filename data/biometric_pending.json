@@ -825,8 +825,6 @@
       }
     ],
     "reportRunIds": [
-      "hr_mwezn1o2",
-      "hr_mwf0fsec",
       "hr_mwf0rt25"
     ],
     "createdAt": "2026-11-13T13:03:53.110Z",
@@ -868,14 +866,6 @@
     "gateHostel": "Hostel 2",
     "locationId": 2,
     "reportRunIds": [
-      "hr_mweyzc8l",
-      "hr_mwez3wc6",
-      "hr_mwez4uuh",
-      "hr_mwezfqh5",
-      "hr_mwezgegz",
-      "hr_mwezhs62",
-      "hr_mwezn1o2",
-      "hr_mwf0fsec",
       "hr_mwf0rt25"
     ],
     "reportContexts": [
