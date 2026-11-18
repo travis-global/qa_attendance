@@ -14,6 +14,20 @@
       "300"
     ],
     "createdAt": "2026-10-29T08:08:36.372Z",
-    "updatedAt": "2026-10-29T08:08:36.372Z"
+    "updatedAt": "2026-11-18T06:25:46.342Z",
+    "semesters": [
+      {
+        "id": "sess_mvt9hjbtg2q3o_s1",
+        "name": "1st Semester",
+        "startDate": "2026-10-26",
+        "endDate": ""
+      },
+      {
+        "id": "sess_mvt9hjbtg2q3o_s2",
+        "name": "2nd Semester",
+        "startDate": "",
+        "endDate": ""
+      }
+    ]
   }
 ]
