@@ -36680,5 +36680,437 @@
     "officer": "Alolote fortunatus",
     "source": "system",
     "id": 1605
+  },
+  {
+    "ref": "REF/EOCNS/QA/1016",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq07zb_45",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0088/GNS",
+      "name": "Anusi Amarachi Juliet"
+    },
+    "timestamp": "2026-11-18T05:58:54.865Z",
+    "at": "2026-11-18T05:58:54.865Z",
+    "createdAt": "2026-11-18T05:58:54.865Z",
+    "whenLocal": "Wed, 18 Nov 2026, 06:58:54",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1606
+  },
+  {
+    "ref": "REF/EOCNS/QA/1017",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq08n3_117",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0051/GNS",
+      "name": "Onyenuma Makochukwu Christiana"
+    },
+    "timestamp": "2026-11-18T05:59:20.926Z",
+    "at": "2026-11-18T05:59:20.926Z",
+    "createdAt": "2026-11-18T05:59:20.926Z",
+    "whenLocal": "Wed, 18 Nov 2026, 06:59:20",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1607
+  },
+  {
+    "ref": "REF/EOCNS/QA/1018",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq07ne_12",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0139/GNS",
+      "name": "Ejimbe Gloria Chidimma"
+    },
+    "timestamp": "2026-11-18T05:59:40.055Z",
+    "at": "2026-11-18T05:59:40.055Z",
+    "createdAt": "2026-11-18T05:59:40.055Z",
+    "whenLocal": "Wed, 18 Nov 2026, 06:59:40",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1608
+  },
+  {
+    "ref": "REF/EOCNS/QA/1019",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq080t_50",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0099/GNS",
+      "name": "Chioma Chibueze"
+    },
+    "timestamp": "2026-11-18T05:59:56.793Z",
+    "at": "2026-11-18T05:59:56.793Z",
+    "createdAt": "2026-11-18T05:59:56.793Z",
+    "whenLocal": "Wed, 18 Nov 2026, 06:59:56",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1609
+  },
+  {
+    "ref": "REF/EOCNS/QA/1020",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq0930_161",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0002/GNS",
+      "name": "Nnachi Anya Nnachi"
+    },
+    "timestamp": "2026-11-18T06:01:42.331Z",
+    "at": "2026-11-18T06:01:42.331Z",
+    "createdAt": "2026-11-18T06:01:42.331Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:01:42",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1610
+  },
+  {
+    "ref": "REF/EOCNS/QA/1021",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq0844_61",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0070/GNS",
+      "name": "Shulamite Modestus Nzubechi"
+    },
+    "timestamp": "2026-11-18T06:01:57.145Z",
+    "at": "2026-11-18T06:01:57.145Z",
+    "createdAt": "2026-11-18T06:01:57.145Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:01:57",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1611
+  },
+  {
+    "ref": "REF/EOCNS/QA/1022",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq08b9_81",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0065/GNS",
+      "name": "Anne Helen Njoku"
+    },
+    "timestamp": "2026-11-18T06:02:19.650Z",
+    "at": "2026-11-18T06:02:19.650Z",
+    "createdAt": "2026-11-18T06:02:19.650Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:02:19",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1612
+  },
+  {
+    "ref": "REF/EOCNS/QA/1023",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq08bu_83",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0064/GNS",
+      "name": "Ezeokoli Benita"
+    },
+    "timestamp": "2026-11-18T06:02:41.428Z",
+    "at": "2026-11-18T06:02:41.428Z",
+    "createdAt": "2026-11-18T06:02:41.428Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:02:41",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1613
+  },
+  {
+    "ref": "REF/EOCNS/QA/1024",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq093q_163",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0132/GNS",
+      "name": "Tochukwu Salvation Ogba"
+    },
+    "timestamp": "2026-11-18T06:02:58.949Z",
+    "at": "2026-11-18T06:02:58.949Z",
+    "createdAt": "2026-11-18T06:02:58.949Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:02:58",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1614
+  },
+  {
+    "ref": "REF/EOCNS/QA/1025",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq081s_53",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0095/GNS",
+      "name": "Ifunanya Chukwu"
+    },
+    "timestamp": "2026-11-18T06:03:15.819Z",
+    "at": "2026-11-18T06:03:15.819Z",
+    "createdAt": "2026-11-18T06:03:15.819Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:03:15",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1615
+  },
+  {
+    "ref": "REF/EOCNS/QA/1026",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq08zz_152",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0026/GNS",
+      "name": "Nwonyi Abigail Akachukwu"
+    },
+    "timestamp": "2026-11-18T06:03:43.740Z",
+    "at": "2026-11-18T06:03:43.740Z",
+    "createdAt": "2026-11-18T06:03:43.740Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:03:43",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1616
+  },
+  {
+    "ref": "REF/EOCNS/QA/1027",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq0917_156",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0027/GNS",
+      "name": "Chisom Loveth"
+    },
+    "timestamp": "2026-11-18T06:03:58.890Z",
+    "at": "2026-11-18T06:03:58.890Z",
+    "createdAt": "2026-11-18T06:03:58.890Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:03:58",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1617
+  },
+  {
+    "ref": "REF/EOCNS/QA/1028",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq08i7_103",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0030/GNS",
+      "name": "Juliet Chukwuma"
+    },
+    "timestamp": "2026-11-18T06:04:23.629Z",
+    "at": "2026-11-18T06:04:23.629Z",
+    "createdAt": "2026-11-18T06:04:23.629Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:04:23",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1618
+  },
+  {
+    "ref": "REF/EOCNS/QA/1029",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq08ha_100",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0028/GNS",
+      "name": "Ebube Nice Okwor"
+    },
+    "timestamp": "2026-11-18T06:04:39.151Z",
+    "at": "2026-11-18T06:04:39.151Z",
+    "createdAt": "2026-11-18T06:04:39.151Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:04:39",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1619
+  },
+  {
+    "ref": "REF/EOCNS/QA/1030",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq08qg_126",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0090/GNS",
+      "name": "Chiemelie Joy Chinyereugo"
+    },
+    "timestamp": "2026-11-18T06:04:55.819Z",
+    "at": "2026-11-18T06:04:55.819Z",
+    "createdAt": "2026-11-18T06:04:55.819Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:04:55",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1620
+  },
+  {
+    "ref": "REF/EOCNS/QA/1031",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq08e9_91",
+    "reason": "Programme/level move (upgrade or transfer)",
+    "details": {
+      "before": {
+        "programme": "Nursing",
+        "level": "200"
+      },
+      "after": {
+        "programme": "Nursing",
+        "level": "100"
+      },
+      "regNo": "EOCNS/25/0112/GNS",
+      "name": "Chiamaka Isreal"
+    },
+    "timestamp": "2026-11-18T06:05:26.023Z",
+    "at": "2026-11-18T06:05:26.023Z",
+    "createdAt": "2026-11-18T06:05:26.023Z",
+    "whenLocal": "Wed, 18 Nov 2026, 07:05:26",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1621
   }
 ]
