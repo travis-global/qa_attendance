@@ -187,10 +187,30 @@ function persistSyncMeta(key, value) {
 function markDirty(reason) {
   EOCNS_DIRTY = true;
   persistSyncMeta("dirty", true);
+  try { refreshOpenStudentDossier(); } catch (_) {}
   try {
     var el = document.getElementById("dirtyBanner");
     if (el) { el.hidden = false; el.textContent = "Unsaved local changes" + (reason ? " (" + reason + ")" : "") + " — Publish to repository in Settings before you leave, or you may lose work on another device."; }
   } catch (_) {}
+}
+function refreshOpenStudentDossier() {
+  var id = window.__fullRecordStudentId;
+  var modal = document.getElementById("studentFullRecordModal");
+  if (!id || !modal || modal.hidden || window.__dsaRefreshQueued) return;
+  window.__dsaRefreshQueued = true;
+  setTimeout(function() {
+    window.__dsaRefreshQueued = false;
+    if (!window.__fullRecordStudentId || !modal || modal.hidden) return;
+    var saved = {};
+    ["dsaDossierQuery","dsaDossierType","dsaDossierFrom","dsaDossierTo"].forEach(function(key) {
+      var el = document.getElementById(key); saved[key] = el ? el.value : "";
+    });
+    openStudentFullRecord(window.__fullRecordStudentId).then(function() {
+      Object.keys(saved).forEach(function(key) { var el = document.getElementById(key); if (el) el.value = saved[key]; });
+      var q = document.getElementById("dsaDossierQuery");
+      if (q) q.dispatchEvent(new Event("input", { bubbles: true }));
+    }).catch(function(err) { console.warn("DSA dossier refresh", err); });
+  }, 120);
 }
 function clearDirty() {
   EOCNS_DIRTY = false;
@@ -604,8 +624,9 @@ async function bulkMoveStudents() {
       details: { before: before, after: { programme: s.programme, level: s.level }, regNo: s.regNo, name: s.name }
     });
   }
+  markDirty("student programme/level transfer");
   await renderStudentsTable();
-  alert("Updated " + ids.length + " student record(s). Historical logs are unchanged.");
+  alert("Updated " + ids.length + " student record(s). Historical logs are unchanged. The changes are marked as unpublished — use Settings → Publish to repository to keep them on GitHub.");
 }
 async function bulkDeactivateStudents() {
   if (!isQaOfficer()) return;
@@ -5176,178 +5197,196 @@ async function buildStudentFullRecord(id) {
   var s = all.find(function(x) { return x.id === id; });
   if (!s) return null;
   var keys = studentRecordMatchKeys(s);
+  var absents = [], classAtt = [], hostel = [], rem = [], remLogs = [], disc = [], audit = [];
 
-  // QA lecture absences
-  var qa = [];
-  try { qa = await getAll("qa_entries"); } catch (_) { qa = []; }
-  var absents = [];
-  (qa || []).forEach(function(e) {
-    var hit = false;
-    if (Array.isArray(e.absentDetails)) {
-      hit = e.absentDetails.some(function(d) {
-        return d.id === s.id || (keys.reg && d.regNo && String(d.regNo).toUpperCase() === keys.reg) ||
-          (keys.name && d.name && String(d.name).toLowerCase() === keys.name);
-      });
+  function sameClass(classKey) {
+    var actual = String(classKey || "").trim();
+    if (!actual) return false;
+    var expected = "";
+    try { expected = makeClassKey(s.level, s.programme); } catch (_) {}
+    if (actual === expected) return true;
+    try {
+      var pl = classKeyToProgrammeLevel(actual);
+      return String(pl.level || "") === String(s.level || "").replace(/level/ig, "").trim() &&
+        programmeSlug(pl.programme) === programmeSlug(s.programme);
+    } catch (_) { return false; }
+  }
+  function absentFromEntry(entry) {
+    var details = Array.isArray(entry.absentDetails) ? entry.absentDetails : [];
+    if (details.some(function(d) { return rowMatchesStudent(d, keys); })) return true;
+    var raw = Array.isArray(entry.absent) ? entry.absent : [];
+    return raw.some(function(value) {
+      var v = String(value || "").toLowerCase();
+      return (keys.name && v.indexOf(keys.name) >= 0) ||
+        (keys.reg && v.indexOf(keys.reg.toLowerCase()) >= 0) ||
+        (keys.serial && v.indexOf(keys.serial.toLowerCase()) >= 0);
+    });
+  }
+  function addClassRecord(record) {
+    var same = classAtt.find(function(x) {
+      return x.date === record.date && String(x.course || "").toLowerCase() === String(record.course || "").toLowerCase();
+    });
+    if (same) {
+      same.sources = same.sources || [];
+      if (record.source && same.sources.indexOf(record.source) < 0) same.sources.push(record.source);
+      if (record.mark === "A" || same.mark == null) same.mark = record.mark;
+      if (record.status) same.status = record.status;
+      if (record.topic) same.topic = record.topic;
+      return;
     }
-    if (!hit && Array.isArray(e.absent)) {
-      hit = e.absent.some(function(a) {
-        var t = String(a).toLowerCase();
-        return (keys.name && t.indexOf(keys.name) >= 0) || (keys.reg && t.indexOf(keys.reg.toLowerCase()) >= 0);
-      });
-    }
-    if (hit) absents.push(e);
-  });
-  absents.sort(function(a, b) { return String(b.date || "").localeCompare(String(a.date || "")); });
+    record.sources = record.source ? [record.source] : [];
+    classAtt.push(record);
+  }
 
-  // Class attendance sheets (per day/course mark)
-  var classAtt = [];
+  // Daily QA lecture register: every scheduled/logged lecture for this student's class.
+  try {
+    var qa = await getAll("qa_entries");
+    (qa || []).forEach(function(e) {
+      if (!e || !sameClass(e.classKey)) return;
+      var absent = absentFromEntry(e);
+      if (absent) {
+        absents.push(e);
+      }
+      if (e.status === "Held" || e.status === "Partial" || e.status === "Missed") {
+        addClassRecord({
+          date: e.date || "", course: e.course || "", programme: s.programme || "",
+          level: s.level || "", mark: absent ? "A" : (e.status === "Held" || e.status === "Partial" ? "P" : "Missed"),
+          status: e.status || "", topic: e.topic || "", lecturer: e.lecturer || "",
+          start: e.start || "", end: e.end || "", source: "Daily QA", entryId: e.id || ""
+        });
+      }
+    });
+  } catch (_) {}
+
+  // Separate class attendance sheets (student-ID keyed, with legacy registration-number fallback).
   try {
     var sheets = await getAll("attendance");
     (sheets || []).forEach(function(sheet) {
       if (!sheet || !sheet.marks) return;
       var mark = null;
       if (sheet.marks[s.id] != null) mark = sheet.marks[s.id];
-      else if (keys.reg && sheet.marks[keys.reg] != null) mark = sheet.marks[keys.reg];
-      else {
-        Object.keys(sheet.marks).forEach(function(mid) {
-          if (mark != null) return;
-          if (keys.reg && String(mid).toUpperCase() === keys.reg) mark = sheet.marks[mid];
+      if (mark == null && keys.reg && sheet.marks[keys.reg] != null) mark = sheet.marks[keys.reg];
+      if (mark == null) {
+        Object.keys(sheet.marks).some(function(mid) {
+          if (keys.reg && String(mid).toUpperCase() === keys.reg) { mark = sheet.marks[mid]; return true; }
+          return false;
         });
       }
       if (mark == null) return;
-      classAtt.push({
-        date: sheet.date || "",
-        course: sheet.course || "",
-        programme: sheet.programme || "",
-        level: sheet.level || "",
-        mark: mark,
-        sheetId: sheet.id
+      addClassRecord({
+        date: sheet.date || "", course: sheet.course || "", programme: sheet.programme || "",
+        level: sheet.level || "", mark: mark, sheetId: sheet.id, source: "Attendance sheet"
       });
     });
   } catch (_) {}
-  classAtt.sort(function(a, b) { return String(b.date || "").localeCompare(String(a.date || "")); });
+  absents.sort(function(a,b){ return String(b.date||"").localeCompare(String(a.date||"")); });
+  classAtt.sort(function(a,b){ return String(b.date||"").localeCompare(String(a.date||"")); });
 
-  // Hostel runs — matrix keyed by machine ID / serial
-  var hostel = [];
+  // Hostel reports store one row per student in rows/matrix arrays (not keyed objects).
   try {
     var runs = await getAll("hostel_runs");
     (runs || []).forEach(function(run) {
       if (!run) return;
+      var rosterRows = Array.isArray(run.rows) ? run.rows :
+        (Array.isArray(run.matrix) ? run.matrix : (Array.isArray(run.attendance) ? run.attendance : []));
+      var matched = rosterRows.find(function(row) {
+        return rowMatchesStudent(row, keys) || (row && row.studentId && row.studentId === s.id);
+      });
+      if (matched) {
+        var marks = Array.isArray(matched.dayMarks) ? matched.dayMarks :
+          (Array.isArray(matched.marks) ? matched.marks : []);
+        var present = 0, absent = 0;
+        marks.forEach(function(v) {
+          var m = String(v == null ? "" : v).toUpperCase();
+          if (m === "P" || m === "PRESENT" || m === "1" || v === true) present++;
+          else if (m === "A" || m === "ABSENT" || m === "0" || v === false) absent++;
+        });
+        hostel.push({
+          runId: run.id,
+          label: run.label || run.title || ((run.start || run.startDate || "") + " → " + (run.end || run.endDate || "")),
+          startDate: run.start || run.startDate || (run.dateKeys || [])[0] || "",
+          endDate: run.end || run.endDate || (run.dateKeys || []).slice(-1)[0] || "",
+          machineNo: matched.machineNo || matched.serial || s.serial || "",
+          present: present, absent: absent,
+          fine: Number(matched.fine || 0),
+          hostelName: matched.hostel || s.hostel || "",
+          dayMarks: marks.slice(),
+          amendments: (run.amendments || []).filter(function(a) {
+            return rowMatchesStudent(a, keys) || (a && String(a.machineNo || a.serial || "") === String(matched.machineNo || ""));
+          })
+        });
+        return;
+      }
+      // Backward compatibility for older keyed-object hostel records.
       var matrix = run.matrix || run.attendance || {};
+      if (Array.isArray(matrix)) return;
       var studentMeta = run.students || run.roster || {};
       var matchKey = null;
       if (keys.serial && matrix[keys.serial] != null) matchKey = keys.serial;
-      if (!matchKey && keys.serial && studentMeta[keys.serial]) matchKey = keys.serial;
-      if (!matchKey) {
-        Object.keys(studentMeta).forEach(function(k) {
-          if (matchKey) return;
-          var meta = studentMeta[k] || {};
-          if (rowMatchesStudent(meta, keys) || (keys.serial && k === keys.serial)) matchKey = k;
-        });
-      }
-      if (!matchKey && keys.reg) {
-        Object.keys(matrix).forEach(function(k) {
-          if (matchKey) return;
-          var meta = studentMeta[k] || {};
-          if (String(meta.regNo || "").toUpperCase() === keys.reg) matchKey = k;
-        });
-      }
+      if (!matchKey) Object.keys(studentMeta).some(function(k) {
+        if (rowMatchesStudent(studentMeta[k] || {}, keys) || (keys.serial && k === keys.serial)) { matchKey = k; return true; }
+        return false;
+      });
       if (!matchKey) return;
-      var days = matrix[matchKey];
-      var present = 0, absent = 0, dayList = [];
-      if (days && typeof days === "object") {
-        if (Array.isArray(days)) {
-          days.forEach(function(d) {
-            dayList.push(d);
-            if (d === "P" || d === true || d === "present") present++;
-            else absent++;
-          });
-        } else {
-          Object.keys(days).forEach(function(dk) {
-            var v = days[dk];
-            dayList.push(dk + ":" + v);
-            if (v === "P" || v === true || v === "present" || v === 1) present++;
-            else if (v === "A" || v === false || v === "absent" || v === 0) absent++;
-          });
-        }
-      }
-      var fine = 0;
-      try {
-        if (run.fines && run.fines[matchKey] != null) fine = Number(run.fines[matchKey]) || 0;
-      } catch (_) {}
+      var days = matrix[matchKey], present = 0, absent = 0;
+      if (Array.isArray(days)) days.forEach(function(v) { if (v === "P" || v === true || v === "present") present++; else if (v === "A" || v === false || v === "absent") absent++; });
+      else if (days && typeof days === "object") Object.keys(days).forEach(function(k) {
+        var v = days[k]; if (v === "P" || v === true || v === "present" || v === 1) present++;
+        else if (v === "A" || v === false || v === "absent" || v === 0) absent++;
+      });
       hostel.push({
-        runId: run.id,
-        label: run.label || run.title || ((run.startDate || "") + " → " + (run.endDate || "")),
-        startDate: run.startDate || "",
-        endDate: run.endDate || "",
-        machineNo: matchKey,
-        present: present,
-        absent: absent,
-        fine: fine,
+        runId: run.id, label: run.label || run.title || ((run.start || "") + " → " + (run.end || "")),
+        startDate: run.start || "", endDate: run.end || "", machineNo: matchKey,
+        present: present, absent: absent, fine: Number((run.fines || {})[matchKey] || 0),
         hostelName: (studentMeta[matchKey] && studentMeta[matchKey].hostel) || s.hostel || "",
-        amendments: (run.amendments || []).filter(function(a) {
-          return rowMatchesStudent(a, keys) || (a && String(a.machineNo || a.serial || "") === String(matchKey));
-        })
+        amendments: (run.amendments || []).filter(function(a) { return rowMatchesStudent(a, keys); })
       });
     });
   } catch (_) {}
-  hostel.sort(function(a, b) { return String(b.startDate || "").localeCompare(String(a.startDate || "")); });
+  hostel.sort(function(a,b){ return String(b.startDate||"").localeCompare(String(a.startDate||"")); });
 
-  // Remedial enrolment + logs
-  var rem = [];
   try {
-    rem = (await getAll("remedial_enrolment")).filter(function(r) { return rowMatchesStudent(r, keys) || (r.matric && keys.reg && String(r.matric).toUpperCase() === keys.reg); });
+    rem = (await getAll("remedial_enrolment")).filter(function(r) {
+      return rowMatchesStudent(r, keys) || (r.matric && keys.reg && String(r.matric).toUpperCase() === keys.reg);
+    });
   } catch (_) {}
-  var remLogs = [];
   try {
     var logs = await getAll("remedial_logs");
     (logs || []).forEach(function(log) {
       if (!log) return;
       if (rowMatchesStudent(log, keys)) { remLogs.push(log); return; }
       if (log.marks && (log.marks[s.id] != null || (keys.reg && log.marks[keys.reg] != null))) {
-        remLogs.push({
-          date: log.date || "",
-          course: log.course || log.code || "",
-          mark: log.marks[s.id] != null ? log.marks[s.id] : log.marks[keys.reg],
-          sessionName: log.sessionName || ""
-        });
+        remLogs.push({ date: log.date || "", course: log.course || log.code || "",
+          mark: log.marks[s.id] != null ? log.marks[s.id] : log.marks[keys.reg], sessionName: log.sessionName || "" });
       }
-      if (Array.isArray(log.presentIds) && log.presentIds.indexOf(s.id) >= 0) {
+      if (Array.isArray(log.presentIds) && log.presentIds.indexOf(s.id) >= 0)
         remLogs.push({ date: log.date || "", course: log.course || log.code || "", mark: "P", sessionName: log.sessionName || "" });
-      }
-      if (Array.isArray(log.absentDetails) && log.absentDetails.some(function(d) { return rowMatchesStudent(d, keys); })) {
+      if (Array.isArray(log.absentDetails) && log.absentDetails.some(function(d) { return rowMatchesStudent(d, keys); }))
         remLogs.push({ date: log.date || "", course: log.course || log.code || "", mark: "A", sessionName: log.sessionName || "" });
-      }
     });
   } catch (_) {}
-
-  // Discipline
-  var disc = [];
   try {
     disc = (await getAll("discipline")).filter(function(d) { return rowMatchesStudent(d, keys); });
   } catch (_) {}
-  disc.sort(function(a, b) { return String(b.date || "").localeCompare(String(a.date || "")); });
-
-  // Audit
-  var audit = [];
+  disc.sort(function(a,b){ return String(b.date||"").localeCompare(String(a.date||"")); });
   try {
     audit = (await getAll("audit")).filter(function(a) {
-      if (!a) return false;
-      if (a.entityId === s.id) return true;
-      if (a.details && rowMatchesStudent(a.details, keys)) return true;
-      return false;
-    }).slice(0, 50);
+      return !!a && (a.entityId === s.id || (a.details && rowMatchesStudent(a.details, keys)));
+    }).sort(function(a,b){ return String(b.at||b.timestamp||"").localeCompare(String(a.at||a.timestamp||"")); }).slice(0,100);
   } catch (_) {}
 
+  var classesAttended = classAtt.filter(function(x) {
+    var m = String(x.mark == null ? "" : x.mark).toUpperCase();
+    return m === "P" || m === "PRESENT" || m === "1" || x.mark === true;
+  }).length;
+  var classesAbsent = classAtt.filter(function(x) {
+    var m = String(x.mark == null ? "" : x.mark).toUpperCase();
+    return m === "A" || m === "ABSENT" || m === "0" || x.mark === false;
+  }).length;
   return {
-    student: s,
-    absents: absents,
-    classAttendance: classAtt,
-    hostel: hostel,
-    remedial: rem,
-    remedialLogs: remLogs,
-    discipline: disc,
-    audit: audit
+    student:s, absents:absents, classAttendance:classAtt, classesAttended:classesAttended,
+    classesAbsent:classesAbsent, hostel:hostel, remedial:rem, remedialLogs:remLogs,
+    discipline:disc, audit:audit
   };
 }
 
@@ -5357,89 +5396,146 @@ async function openStudentFullRecord(id) {
   var data = await buildStudentFullRecord(id);
   if (!data) return;
   var s = data.student;
-  document.getElementById("studentFullRecordTitle").textContent = "DSA full record — " + (s.name || "");
+  var title = document.getElementById("studentFullRecordTitle");
+  if (title) title.textContent = "DSA Student Dossier — " + (s.name || "");
   var photo = s.photoDataUrl
-    ? '<div class="passport-frame" style="margin-bottom:12px"><img src="' + s.photoDataUrl + '" alt="" /></div>'
+    ? '<div class="passport-frame" style="margin-bottom:12px"><img src="' + s.photoDataUrl + '" alt="Student passport photograph" /></div>'
     : "";
-  function section(title, count, inner, reportKey) {
+  function section(label, count, inner, reportKey) {
     var badge = count != null ? " (" + count + ")" : "";
     var btn = reportKey
-      ? ' <button type="button" class="btn btn--ghost btn--sm qa-edit-only" data-stu-report="' + reportKey + '">Report</button>'
+      ? ' <button type="button" class="btn btn--ghost btn--sm qa-edit-only" data-stu-report="' + reportKey + '">Generate section report</button>'
       : "";
-    return '<div class="record-section" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">' +
-      "<h4 style=\"margin:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap\">" + title + badge + btn + "</h4>" +
-      inner + "</div>";
+    return '<section class="record-section" data-dossier-section="' + (reportKey || "") + '" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">' +
+      "<h4 style=\"margin:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap\">" + label + badge + btn + "</h4>" + inner + "</section>";
   }
-  function none() { return '<p class="muted-note" style="margin:0">None on file</p>'; }
+  function none() { return '<p class="muted-note" style="margin:0">No matching records are currently on file.</p>'; }
   function tableWrap(head, rows) {
     if (!rows) return none();
-    return '<div class="table-scroll" style="max-height:220px;overflow:auto"><table class="data-table"><thead><tr>' + head +
+    return '<div class="table-scroll" style="max-height:260px;overflow:auto"><table class="data-table"><thead><tr>' + head +
       "</tr></thead><tbody>" + rows + "</tbody></table></div>";
   }
-
-  var discRows = data.discipline.length ? data.discipline.map(function(d) {
+  var discRows = data.discipline.map(function(d) {
     return "<tr><td>" + escapeHtml(d.date || "") + "</td><td>" + escapeHtml(d.type || "") + "</td><td>" +
       escapeHtml(d.status || "") + "</td><td>" + escapeHtml(d.ref || "") + "</td><td>" + escapeHtml(d.summary || d.details || "") + "</td></tr>";
-  }).join("") : "";
-
-  var hostRows = data.hostel.length ? data.hostel.map(function(h) {
-    return "<tr><td>" + escapeHtml(h.label || "") + "</td><td>" + escapeHtml(String(h.machineNo || "—")) +
-      "</td><td>" + h.present + "</td><td>" + h.absent + "</td><td>" + (h.fine ? ("₦" + h.fine) : "—") + "</td></tr>";
-  }).join("") : "";
-
-  var classRows = data.classAttendance.length ? data.classAttendance.slice(0, 100).map(function(c) {
+  }).join("");
+  var hostRows = data.hostel.map(function(h) {
+    var period = [h.startDate,h.endDate].filter(Boolean).join(" – ") || h.label || "";
+    return "<tr><td>" + escapeHtml(period) + "</td><td>" + escapeHtml(String(h.machineNo || "—")) +
+      "</td><td>" + h.present + "</td><td>" + h.absent + "</td><td>" + (h.fine ? ("₦" + Number(h.fine).toLocaleString("en-NG")) : "—") +
+      "</td><td>" + escapeHtml(h.hostelName || "—") + "</td></tr>";
+  }).join("");
+  var classRows = data.classAttendance.map(function(c) {
+    var mark = c.mark == null ? "—" : String(c.mark);
     return "<tr><td>" + escapeHtml(c.date || "") + "</td><td>" + escapeHtml(c.course || "") +
-      "</td><td>" + escapeHtml(String(c.mark)) + "</td><td>" + escapeHtml(c.programme || "") + " " + escapeHtml(String(c.level || "")) + "</td></tr>";
-  }).join("") : "";
-
-  var absRows = data.absents.length ? data.absents.map(function(e) {
+      "</td><td>" + escapeHtml(mark) + "</td><td>" + escapeHtml(c.status || "") + "</td><td>" +
+      escapeHtml(c.lecturer || "") + "</td><td>" + escapeHtml((c.sources || []).join(" + ") || "—") + "</td></tr>";
+  }).join("");
+  var absRows = data.absents.map(function(e) {
     return "<tr><td>" + escapeHtml(e.date || "") + "</td><td>" + escapeHtml(e.course || "") +
-      "</td><td>" + escapeHtml(e.status || "") + "</td><td>" + escapeHtml(e.classKey || "") + "</td></tr>";
-  }).join("") : "";
-
+      "</td><td>" + escapeHtml(e.status || "") + "</td><td>" + escapeHtml(e.classKey || "") +
+      "</td><td>" + escapeHtml(e.lecturer || "") + "</td></tr>";
+  }).join("");
   var remInner = "";
   if (!data.remedial.length && !data.remedialLogs.length) remInner = none();
   else {
-    remInner = "";
-    if (data.remedial.length) {
-      remInner += "<p style=\"margin:0 0 6px\"><strong>Enrolment:</strong> " + data.remedial.map(function(r) {
-        return escapeHtml((r.courses || r.courseCodes || []).join(", ") || "enrolled");
-      }).join(" · ") + "</p>";
-    }
-    if (data.remedialLogs.length) {
-      remInner += tableWrap("<th>Date</th><th>Course</th><th>Mark</th>", data.remedialLogs.slice(0, 50).map(function(l) {
-        return "<tr><td>" + escapeHtml(l.date || "") + "</td><td>" + escapeHtml(l.course || "") +
-          "</td><td>" + escapeHtml(String(l.mark || "")) + "</td></tr>";
-      }).join(""));
-    }
+    if (data.remedial.length) remInner += "<p><strong>Enrolment:</strong> " + data.remedial.map(function(r) {
+      return escapeHtml((r.courses || r.courseCodes || []).join(", ") || "Enrolled");
+    }).join(" · ") + "</p>";
+    if (data.remedialLogs.length) remInner += tableWrap("<th>Date</th><th>Course</th><th>Mark</th>", data.remedialLogs.map(function(l) {
+      return "<tr><td>" + escapeHtml(l.date || "") + "</td><td>" + escapeHtml(l.course || "") +
+        "</td><td>" + escapeHtml(String(l.mark || "")) + "</td></tr>";
+    }).join(""));
   }
-
-  var auditRows = data.audit.length ? data.audit.map(function(a) {
+  var auditRows = data.audit.map(function(a) {
     return "<tr><td>" + escapeHtml(a.at || a.timestamp || a.createdAt || "") + "</td><td>" +
-      escapeHtml(a.action || "") + "</td><td>" + escapeHtml(a.user || a.officer || "") +
-      "</td><td>" + escapeHtml(a.reason || "") + "</td></tr>";
-  }).join("") : "";
-
+      escapeHtml(a.action || "") + "</td><td>" + escapeHtml(a.entity || "") + "</td><td>" +
+      escapeHtml(a.user || a.officer || "") + "</td><td>" + escapeHtml(a.reason || "") + "</td></tr>";
+  }).join("");
   var body = document.getElementById("studentFullRecordBody");
+  if (!body) return;
   body.innerHTML = photo +
-    "<p style=\"margin:0 0 8px\"><strong>" + escapeHtml(formatReportPersonName(s.name)) + "</strong><br/>" +
-    "Reg: " + escapeHtml(s.regNo || "—") + " · Machine ID: " + escapeHtml(s.serial || "—") + "<br/>" +
-    escapeHtml(s.programme || "") + " · Level " + escapeHtml(String(s.level || "")) +
-    " · Hostel: " + escapeHtml(s.hostel || "—") + " · Status: " + escapeHtml(s.status || "Active") + "</p>" +
-    '<p class="muted-note" style="margin:0 0 8px">Sections pull every stored hostel, class, discipline, remedial and audit touch for this student. Generate a section report or the full dossier.</p>' +
-    section("1. Disciplinary cases", data.discipline.length, tableWrap("<th>Date</th><th>Type</th><th>Status</th><th>REF</th><th>Notes</th>", discRows), "discipline") +
-    section("2. Hostel attendance runs", data.hostel.length, tableWrap("<th>Run</th><th>Machine ID</th><th>Present</th><th>Absent</th><th>Fine</th>", hostRows), "hostel") +
-    section("3. Class attendance sheets", data.classAttendance.length, tableWrap("<th>Date</th><th>Course</th><th>Mark</th><th>Class</th>", classRows), "class") +
-    section("4. QA lecture absences", data.absents.length, tableWrap("<th>Date</th><th>Course</th><th>Status</th><th>Class</th>", absRows), "absences") +
-    section("5. Remedial", (data.remedial.length + data.remedialLogs.length), remInner, "remedial") +
-    section("6. Audit trail", data.audit.length, tableWrap("<th>When</th><th>Action</th><th>Who</th><th>Reason</th>", auditRows), "audit");
+    '<div class="dsa-dossier-heading"><div><strong>EASTERN OAK COLLEGE OF NURSING SCIENCES</strong><span>STUDENT AFFAIRS &amp; QUALITY ASSURANCE</span></div><b>CONFIDENTIAL STUDENT RECORD</b></div>' +
+    '<div class="dsa-dossier-profile"><div><strong>' + escapeHtml(formatReportPersonName(s.name)) + '</strong><span>' +
+      escapeHtml(s.regNo || "Registration number not recorded") + '</span></div><div class="dsa-dossier-meta">' +
+      '<span><b>Programme</b>' + escapeHtml(s.programme || "—") + '</span>' +
+      '<span><b>Level</b>' + escapeHtml(String(s.level || "—")) + '</span>' +
+      '<span><b>Hostel</b>' + escapeHtml(s.hostel || "—") + '</span>' +
+      '<span><b>Machine ID</b>' + escapeHtml(s.serial || "—") + '</span>' +
+      '<span><b>Gender</b>' + escapeHtml(s.gender || "—") + '</span>' +
+      '<span><b>Status</b>' + escapeHtml(s.status || "Active") + '</span></div></div>' +
+    '<div class="dsa-dossier-kpis">' +
+      '<div><strong>' + data.classesAttended + '</strong><span>Classes attended</span></div>' +
+      '<div><strong>' + data.classesAbsent + '</strong><span>Class absences</span></div>' +
+      '<div><strong>' + data.hostel.reduce(function(n,x){return n+x.present;},0) + '</strong><span>Hostel present marks</span></div>' +
+      '<div><strong>' + data.discipline.length + '</strong><span>Disciplinary cases</span></div></div>' +
+    '<div class="dsa-dossier-tools"><div class="dsa-dossier-tools__title">Dossier query &amp; record filters</div>' +
+      '<input type="search" id="dsaDossierQuery" placeholder="Search name, course, lecturer, REF, hostel, action or record details…" autocomplete="off" />' +
+      '<div class="dsa-dossier-filter-row"><select id="dsaDossierType"><option value="">All record sections</option><option value="discipline">Disciplinary cases</option><option value="hostel">Hostel attendance</option><option value="class">Class attendance</option><option value="absences">QA lecture absences</option><option value="remedial">Remedial records</option><option value="audit">Audit trail</option></select>' +
+      '<label>From <input type="date" id="dsaDossierFrom" /></label><label>To <input type="date" id="dsaDossierTo" /></label>' +
+      '<button type="button" class="btn btn--ghost btn--sm" id="dsaDossierClear">Clear filters</button></div>' +
+      '<span class="muted-note" id="dsaDossierResultCount">Showing all available records</span></div>' +
+    section("1. Disciplinary cases", data.discipline.length, tableWrap("<th>Date</th><th>Case type</th><th>Status</th><th>Official REF</th><th>Incident / outcome</th>", discRows), "discipline") +
+    section("2. Hostel attendance history", data.hostel.length, tableWrap("<th>Period</th><th>Machine ID</th><th>Present</th><th>Absent</th><th>Fine</th><th>Hostel</th>", hostRows), "hostel") +
+    section("3. Class attendance &amp; lecture participation", data.classAttendance.length, tableWrap("<th>Date</th><th>Course</th><th>Mark</th><th>Lecture status</th><th>Lecturer</th><th>Source</th>", classRows), "class") +
+    section("4. QA lecture absences", data.absents.length, tableWrap("<th>Date</th><th>Course</th><th>Lecture status</th><th>Class</th><th>Lecturer</th>", absRows), "absences") +
+    section("5. Remedial enrolment &amp; attendance", data.remedial.length + data.remedialLogs.length, remInner, "remedial") +
+    section("6. Official audit trail", data.audit.length, tableWrap("<th>When</th><th>Action</th><th>Record type</th><th>Officer</th><th>Reason</th>", auditRows), "audit");
 
-  body.querySelectorAll("[data-stu-report]").forEach(function(btn) {
-    btn.addEventListener("click", function() {
-      printStudentSectionReport(id, btn.getAttribute("data-stu-report"));
+  // Attach searchable metadata to all dossier rows without changing stored records.
+  body.querySelectorAll(".record-section").forEach(function(sec) {
+    sec.querySelectorAll("tbody tr").forEach(function(row) {
+      row.setAttribute("data-dossier-row", "1");
+      var first = row.cells && row.cells[0] ? row.cells[0].textContent : "";
+      var match = String(first || "").match(/\d{4}-\d{2}-\d{2}/);
+      if (match) row.setAttribute("data-dossier-date", match[0]);
     });
   });
-
+  function applyDossierFilters() {
+    var q = String((document.getElementById("dsaDossierQuery") || {}).value || "").trim().toLowerCase();
+    var type = String((document.getElementById("dsaDossierType") || {}).value || "");
+    var from = String((document.getElementById("dsaDossierFrom") || {}).value || "");
+    var to = String((document.getElementById("dsaDossierTo") || {}).value || "");
+    var shown = 0, total = 0;
+    body.querySelectorAll(".record-section").forEach(function(sec) {
+      var key = sec.getAttribute("data-dossier-section") || "";
+      var typeOk = !type || key === type;
+      var rows = Array.prototype.slice.call(sec.querySelectorAll("[data-dossier-row]"));
+      total += rows.length;
+      var visible = 0;
+      rows.forEach(function(row) {
+        var date = row.getAttribute("data-dossier-date") || "";
+        var dateOk = (!from || (date && date >= from)) && (!to || (date && date <= to));
+        var textOk = !q || row.textContent.toLowerCase().indexOf(q) >= 0;
+        var show = typeOk && dateOk && textOk;
+        row.hidden = !show;
+        if (show) visible++;
+      });
+      var nonTableText = sec.textContent.toLowerCase();
+      var sectionHasRows = rows.length > 0;
+      var showSection = typeOk && (sectionHasRows ? visible > 0 : (!q || nonTableText.indexOf(q) >= 0) && !from && !to);
+      sec.hidden = !showSection;
+      shown += visible;
+    });
+    var result = document.getElementById("dsaDossierResultCount");
+    if (result) result.textContent = "Showing " + shown + " matching log row(s)" + (total ? " out of " + total + " searchable rows" : "");
+  }
+  ["dsaDossierQuery","dsaDossierType","dsaDossierFrom","dsaDossierTo"].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener("input", applyDossierFilters);
+    if (el && el.tagName === "SELECT") el.addEventListener("change", applyDossierFilters);
+  });
+  var clear = document.getElementById("dsaDossierClear");
+  if (clear) clear.addEventListener("click", function() {
+    ["dsaDossierQuery","dsaDossierType","dsaDossierFrom","dsaDossierTo"].forEach(function(id) {
+      var el = document.getElementById(id); if (el) el.value = "";
+    });
+    applyDossierFilters();
+  });
+  body.querySelectorAll("[data-stu-report]").forEach(function(btn) {
+    btn.addEventListener("click", function() { printStudentSectionReport(id, btn.getAttribute("data-stu-report")); });
+  });
+  applyDossierFilters();
   window.__fullRecordStudentId = id;
   var modal = document.getElementById("studentFullRecordModal");
   if (modal) { modal.hidden = false; modal.removeAttribute("hidden"); modal.style.display = ""; }
@@ -8475,10 +8571,13 @@ async function loadQaAbsentRoster(classKey) {
     }
     return okP && okL;
   });
-  // permanent reg nos first, temporary (TMP-…) last; within group by reg no
-  list.sort(compareStudentsByRegNo);
+  // Match the printed attendance sheets: A–Z by student name, then registration number.
+  list.sort(function(a,b) {
+    var byName = String(a.name || "").localeCompare(String(b.name || ""), "en", { sensitivity: "base" });
+    return byName || String(a.regNo || "").localeCompare(String(b.regNo || ""), "en", { sensitivity: "base" });
+  });
   QA_ABSENT_ROSTER = list.map(function(s, i) {
-    return { id: s.id, name: s.name || "", regNo: s.regNo || "", serial: s.serial != null ? String(s.serial) : String(i + 1) };
+    return { id: s.id, name: s.name || "", regNo: s.regNo || "", serial: s.serial != null && String(s.serial).trim() ? String(s.serial) : String(i + 1) };
   });
   return QA_ABSENT_ROSTER;
 }
@@ -10235,7 +10334,8 @@ function closeCourseForm() {
 }
 
 async function saveCourseForm(e) {
-  if (e && e.preventDefault) e.preventDefault();
+  if (e && typeof e.preventDefault === "function") e.preventDefault();
+  if (e && typeof e.stopPropagation === "function") e.stopPropagation();
   if (!isQaOfficer()) return;
   var original = (document.getElementById("courseEditOriginalCode").value || "").trim();
   var code = (document.getElementById("courseCode").value || "").trim();
@@ -10292,9 +10392,17 @@ async function addCoursePrompt() {
     addBtn.addEventListener("click", function() { openCourseForm(null); });
   }
   var form = document.getElementById("courseForm");
-  if (form && !form.__courseWired) {
-    form.__courseWired = true;
-    form.addEventListener("submit", saveCourseForm);
+  if (form) {
+    // Assign the native submit handler directly so the browser's default GET
+    // submission can never reload the app if listener registration is disrupted.
+    form.onsubmit = function(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      saveCourseForm(e).catch(function(err) {
+        console.error("Course save failed", err);
+        alert("The course could not be saved. Your existing course record has not been deliberately removed. Details: " + (err && err.message ? err.message : String(err)));
+      });
+      return false;
+    };
   }
   ["btnCloseCourseModal", "btnCancelCourse", "courseModalBackdrop"].forEach(function(id) {
     var el = document.getElementById(id);
