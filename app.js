@@ -2167,6 +2167,41 @@ async function attachHostelRunToPending(run, result) {
 }
 
 
+
+function hostelRunIdentityKey(run){
+ if(!run)return "";var dates=(run.coverageDateKeys||run.dateKeys||[run.start,run.end]).filter(Boolean).map(String).sort();
+ var events=(run.gateEvents||[]).map(function(e){return[e.machineNo,e.dateKey,e.locationId,e.status].map(function(v){return String(v==null?"":v).trim().toLowerCase();}).join("|");}).sort();
+ if(!events.length&&Array.isArray(run.gateExportRows)&&run.gateExportRows.length>1)events=run.gateExportRows.slice(1).map(function(r){return[r[2],r[3],r[4],r[5]].map(function(v){return String(v==null?"":v).trim().toLowerCase();}).join("|");}).sort();
+ if(!events.length)return "";var raw=["v1",String(run.hostel||"").trim().toLowerCase(),String(run.sourceLocationId||""),dates.join(","),String(run.sessionId||""),String(run.semesterId||""),events.join(";")].join("::");
+ var h=2166136261;for(var i=0;i<raw.length;i++){h^=raw.charCodeAt(i);h=Math.imul(h,16777619);}return"hostelrun-v1-"+(h>>>0).toString(36);
+}
+async function findDuplicateHostelRun(run){
+ var key=hostelRunIdentityKey(run);if(!key)return null;var all=await getAll("hostel_runs");
+ var matches=all.filter(function(x){return x&&x.id!==run.id&&(x.identityKey===key||hostelRunIdentityKey(x)===key);});
+ matches.sort(function(a,b){var sc=function(x){return(x.status==="final"?1e15:0)+(x.edited?1e12:0)+Date.parse(x.updatedAt||x.createdAt||0);};return sc(b)-sc(a);});return matches[0]||null;
+}
+function mergeHostelRunHistory(keeper,duplicates){
+ var all=[keeper].concat(duplicates||[]);function merge(field,keyFn){var m=new Map();all.forEach(function(r){(r[field]||[]).forEach(function(x){var k=keyFn(x);if(!m.has(k))m.set(k,x);});});return Array.from(m.values());}
+ keeper.resolutions=merge("resolutions",function(x){return[x.studentId,x.machineNo,x.action].join("|");});
+ keeper.amendments=merge("amendments",function(x){return JSON.stringify(x);});
+ keeper.mergedFromIds=Array.from(new Set((keeper.mergedFromIds||[]).concat((duplicates||[]).map(function(x){return x.id;}).filter(Boolean)))).filter(function(id){return id!==keeper.id;});
+}
+async function deduplicateHostelRunsInStore(){
+ var all=await getAll("hostel_runs"),groups=new Map();all.forEach(function(r){var k=hostelRunIdentityKey(r)||("legacy:"+String(r.id||""));if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r);});var removed=0;
+ for(var entry of groups.entries()){var g=entry[1];if(g.length<2){if(g[0]&&!g[0].identityKey){g[0].identityKey=hostelRunIdentityKey(g[0]);await put("hostel_runs",g[0]);}continue;}
+  g.sort(function(a,b){var sc=function(x){return(x.status==="final"?1e15:0)+(x.edited?1e12:0)+Date.parse(x.updatedAt||x.createdAt||0);};return sc(b)-sc(a);});
+  var keep=g[0],others=g.slice(1),m=new Map((keep.matrix||[]).map(function(r){return[String(r.studentId||"manual:"+r.name),r];}));
+  others.slice().reverse().forEach(function(run){(run.matrix||[]).forEach(function(row){var k=String(row.studentId||"manual:"+row.name),cur=m.get(k);if(!cur){m.set(k,Object.assign({},row));return;}["machineNo","name","regNo","hostel","programme","level"].forEach(function(f){if((cur[f]==null||cur[f]==="")&&row[f]!=null&&row[f]!=="")cur[f]=row[f];});if((!cur.dayMarks||!cur.dayMarks.length)&&row.dayMarks)cur.dayMarks=row.dayMarks.slice();});});
+  keep.matrix=Array.from(m.values());keep.matrix.forEach(function(r){r.rosterId=keep.id+"::"+String(r.studentId||"");});
+  keep.rows=keep.matrix.filter(function(r){return Number(r.absentDays||0)>0;}).map(function(r){return{studentId:r.studentId,rosterId:r.rosterId,name:r.name,hostel:r.hostel,regNo:r.regNo||"",absentDays:r.absentDays,fine:r.fine,programme:r.programme||"",level:r.level||"",dayMarks:(r.dayMarks||[]).slice()};});
+  keep.studentCount=keep.matrix.length;keep.absenteeCount=keep.rows.length;keep.totalFine=keep.rows.reduce(function(s,r){return s+Number(r.fine||0);},0);
+  keep.identityKey=entry[0].indexOf("legacy:")===0?"":entry[0];mergeHostelRunHistory(keep,others);await put("hostel_runs",keep);
+  for(var i=0;i<others.length;i++){await del("hostel_runs",others[i].id);removed++;}
+  await writeAudit({action:"deduplicate",entity:"hostel_runs",entityId:keep.id,reason:"Consolidated duplicate hostel report records",details:{removedRecordIds:others.map(function(x){return x.id;}),keptRecordId:keep.id,recordsRemoved:others.length}});
+ }
+ if(removed){markDirty("hostel report duplicate cleanup");try{await renderHostelRunsMaster();}catch(_){}}return removed;
+}
+
 async function persistHostelDraftRun(report) {
   if (!report || !report.result || !report.result.students) return null;
   var result=report.result, dateKeys=(result.dates||[]).map(function(d){return toDateKeyHostel(d);});
@@ -2178,6 +2213,8 @@ async function persistHostelDraftRun(report) {
     matrix.push({studentId:String(sid),machineNo:meta.machineNo||"",name:meta.name||"",regNo:meta.regNo||"",hostel:meta.hostel||"",programme:meta.programme||"",level:meta.level||"",dayMarks:marks,absentDays:absent,fine:absent*rate});
   });
   var existing=report.runId?(await getAll("hostel_runs")).find(function(x){return x.id===report.runId;}):null;
+  var probe={hostel:result.sourceHostel||"",sourceLocationId:result.sourceLocationId||null,coverageDateKeys:result.coverageDateKeys||dateKeys,dateKeys:dateKeys,gateEvents:result.gateEvents||[],gateExportRows:result.gateExportRows||[]};
+  stampSessionFields(probe);if(!existing)existing=await findDuplicateHostelRun(probe);
   var id=(existing&&existing.id)||report.runId||("hr_"+Date.now().toString(36));
   matrix.forEach(function(row){row.rosterId=id+"::"+String(row.studentId);});
   var abs=matrix.filter(function(row){return row.absentDays>0;});
@@ -2189,9 +2226,9 @@ async function persistHostelDraftRun(report) {
     rows:abs.map(function(row){return Object.assign({},row);}),matrix:matrix,
     amendments:(existing&&existing.amendments)||[],resolutions:(existing&&existing.resolutions)||[],
     note:"Draft attendance report. P=present; A=absent. Hostel assignment follows the master student record.",source:"gate_export_draft"};
-  stampSessionFields(run);
-  await put("hostel_runs",run);
-  report.runId=id;
+  stampSessionFields(run);run.identityKey=hostelRunIdentityKey(run);
+  if(existing&&existing.status==="final"&&existing.edited){report.runId=existing.id;}
+  else{if(existing){run.resolutions=existing.resolutions||[];run.amendments=existing.amendments||[];}await put("hostel_runs",run);report.runId=id;}
   await attachHostelRunToPending(run,result);
   markDirty("hostel report draft");
   try{await renderHostelRunsMaster();}catch(_){}
@@ -2368,7 +2405,8 @@ async function renderHostelRunsMaster() {
       '<td class="qa-edit-only" style="white-space:nowrap">' +
         '<button type="button" class="btn btn--ghost btn--sm" data-hr-view="' + escapeHtml(r.id) + '">View</button> ' +
         '<button type="button" class="btn btn--ghost btn--sm" data-hr-download="' + escapeHtml(r.id) + '">Download</button> ' +
-        '<button type="button" class="btn btn--ghost btn--sm" data-hr-edit="' + escapeHtml(r.id) + '">Edit</button>' +
+        '<button type="button" class="btn btn--ghost btn--sm" data-hr-edit="' + escapeHtml(r.id) + '">Edit</button> ' +
+        '<button type="button" class="btn btn--danger btn--sm" data-hr-delete="' + escapeHtml(r.id) + '">Delete</button>' +
       '</td></tr>';
   }).join("");
   body.querySelectorAll("[data-hr-view]").forEach(function(btn) {
@@ -2390,6 +2428,19 @@ async function renderHostelRunsMaster() {
       openHostelRunViewer(btn.getAttribute("data-hr-edit"), true);
     });
   });
+  body.querySelectorAll("[data-hr-delete]").forEach(function(btn){btn.addEventListener("click",function(){deleteHostelRun(btn.getAttribute("data-hr-delete"));});});
+}
+async function deleteHostelRun(id){
+ if(!isQaOfficer()){alert("Sign in as QA Officer to delete a hostel report.");return;}
+ var run=(await getAll("hostel_runs")).find(function(x){return x.id===id;});if(!run){alert("Hostel report not found.");return;}
+ var ref=prompt("Official REF to delete this hostel report:","REF/EOCNS/QA/");if(ref==null||!String(ref).trim())return;
+ var reason=prompt("Reason for deleting this hostel report:","Duplicate / incorrect hostel attendance record");if(reason==null||!String(reason).trim())return;
+ var period=(run.start||"?")+" to "+(run.end||"?");
+ if(!confirm("Permanently delete the hostel report for "+period+"?\n\n"+(run.hostel||"Hostel")+" · "+(run.studentCount||0)+" students.\nThis cannot be undone except by restoring a backup."))return;
+ await writeAudit({action:"delete",entity:"hostel_runs",entityId:id,externalRef:String(ref).trim(),reason:String(reason).trim(),details:{hostel:run.hostel||"",start:run.start||"",end:run.end||"",studentCount:run.studentCount||0,absenteeCount:run.absenteeCount||0}});
+ var pending=await getAll("biometric_pending");for(var i=0;i<pending.length;i++){var item=pending[i];if(!item||!Array.isArray(item.reportRunIds)||item.reportRunIds.indexOf(id)<0)continue;item.reportRunIds=item.reportRunIds.filter(function(x){return x!==id;});await put("biometric_pending",item);}
+ await del("hostel_runs",id);markDirty("hostel report deletion");await renderHostelRunsMaster();
+ alert("Hostel report deleted and recorded in the audit trail. Publish changes to repository to make the deletion permanent across devices.");
 }
 
 async function openHostelRunViewer(id, editable) {
@@ -2679,7 +2730,9 @@ async function finalizeHostelReportFromPreview() {
   matrix.forEach(function(row){row.rosterId=run.id+"::"+String(row.studentId||"");});
   run.rows.forEach(function(row){var full=matrix.find(function(m){return String(m.studentId)===String(row.studentId);});if(full)row.rosterId=full.rosterId;});
   try{
-    stampSessionFields(run);await put("hostel_runs",run);
+    stampSessionFields(run);run.identityKey=hostelRunIdentityKey(run);
+    if(priorRun){run.resolutions=priorRun.resolutions||[];run.amendments=priorRun.amendments||[];}
+    await put("hostel_runs",run);
     try{await attachHostelRunToPending(run,result||{});}catch(attachErr){console.warn("pending run association",attachErr);}
     await writeAudit({action:priorRun?"update":"create",entity:"hostel_runs",entityId:run.id,reason:"Hostel report finalized from editable preview",
       details:{start:start,end:end,rate:rate,absenteeCount:absentees.length,totalFine:total,studentCount:matrix.length,edited:true}});
@@ -2778,9 +2831,15 @@ async function generateHostelReport() {
       note: "Master student record used for hostel classification; Location ID is diagnostic only.",
       source: "gate_export"
     };
-    stampSessionFields(run);
-    await put("hostel_runs", run);
-    try {
+    stampSessionFields(run);run.identityKey=hostelRunIdentityKey(run);
+    var duplicateRun=await findDuplicateHostelRun(run);
+    if(duplicateRun){run.id=duplicateRun.id;run.createdAt=duplicateRun.createdAt||run.createdAt;run.resolutions=duplicateRun.resolutions||[];run.amendments=duplicateRun.amendments||[];run.identityKey=hostelRunIdentityKey(run);
+      if(!(duplicateRun.status==="final"&&duplicateRun.edited))await put("hostel_runs",run);
+    }else{var baseId="hr_"+run.identityKey.replace(/^hostelrun-v1-/,"");run.id=baseId;
+      var collision=(await getAll("hostel_runs")).find(function(x){return x.id===run.id&&x.identityKey!==run.identityKey;});if(collision)run.id=baseId+"_"+Date.now().toString(36);
+      run.identityKey=hostelRunIdentityKey(run);await put("hostel_runs",run);}
+    if(window.__lastHostelReport)window.__lastHostelReport.runId=run.id;
+    if(!duplicateRun)try {
       await writeAudit({
         action: "create",
         entity: "hostel_runs",
@@ -2829,6 +2888,7 @@ openDB().then(async () => {
     }
   } catch (e) { console.warn("repo sync", e); }
   try { await normalizeExistingStudentNames(); } catch (e) { console.error("Student master-list name normalization failed", e); }
+  try { await deduplicateHostelRunsInStore(); } catch (e) { console.error("Hostel duplicate cleanup failed", e); }
   try { startSmartRepoWatch(); } catch (e) { console.warn("smart watch", e); }
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
   try { refreshDashboardStats(); } catch (e) { console.warn("stats", e); }
