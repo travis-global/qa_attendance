@@ -3839,5 +3839,968 @@
     "sessionName": "2026/2027 SESSION",
     "semesterId": "sess_mvt9hjbtg2q3o_s1",
     "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mwnqlh1xhv0y",
+    "date": "2026-11-18",
+    "classKey": "100_nursing",
+    "course": "NUS 113 — Human Anatomy",
+    "lecturer": "Mr. Simon Udu",
+    "status": "Held",
+    "duration": 102,
+    "start": "08:18",
+    "end": "10:00",
+    "topic": "Embryological Development",
+    "objectives": "",
+    "lectureSummary": "",
+    "assignment": "None was given",
+    "remark": "Class participation was above average",
+    "absent": [
+      "EOCNS/26/0012/GNS. Ani Amaelochukwu Juliet",
+      "12. Ani Blessing Chika",
+      "63. Benjamin Adaeze Esther",
+      "169. Blessing Ezinne Chukwu",
+      "25. Blessing Samuel",
+      "EOCNS/25/0018/GNS. Chiamaka Bliss",
+      "EOCNS/25/0008/GNS. Chicheta Sarah",
+      "213. Chidera Enyigwe",
+      "98. Chidiebube Jennifer",
+      "118. Chidiogo Caroline Ileagu",
+      "65. Chiemezie Udochukwu Gift",
+      "194. Chika Rejoice Olamma",
+      "EOCNS/25/0092/GNS. Chinaza Abigal",
+      "EOCNS/25/0027/GNS. Chisom Loveth",
+      "122. Chukwu Anthonia Amaka",
+      "134. Destiny Nnamani",
+      "48. Ebube Nice Okwor",
+      "EOCNS/25/0056/GNS. Eja Treasure Samuel",
+      "EOCNS/25/0162/GNS. Favour Nzewi",
+      "115. Ifunanya Chukwu",
+      "198. John Deborah Chat",
+      "50. Juliet Chukwuma",
+      "177. Kasarachi Vincent",
+      "EOCNS/25/0155/GNS. Melody Chiamaka",
+      "164. Miracle Uche",
+      "125. Mmesoma Nwogbu",
+      "EOCNS/25/0086/GNS. Nwafor Oluebube Cynthia",
+      "EOCNS/25/0026/GNS. Nwonyi Abigail Akachukwu",
+      "207. Obasi Blessing",
+      "170. Ogechi Preciousrita Ugwu",
+      "107. Ogodo Joy Mary",
+      "EOCNS/25/0004/GNS. Ohaji Sarah Onyinyechi",
+      "114. Ojong Abigail",
+      "218. Okafor Ugochukwu Kennedy",
+      "EOCNS/25/0149/GNS. Oko Maureen Nmanna",
+      "219. Onwo Joy",
+      "EOCNS/25/0130/GNS. Onyinyechi Benjamin",
+      "130. Oraidu Ifeoma Sation",
+      "168. Precious Omenihu",
+      "EOCNS/25/0147/GNS. Prisca Ulumma Oko",
+      "90. Shulamite Modestus Nzubechi",
+      "135. Taiwo Favour Omobewaji",
+      "152. Tochukwu Salvation Ogba",
+      "EOCNS/25/0040/GNS. Ubi Eteng Rejoice",
+      "EOCNS/25/0136/GNS. Ugochi Miracle Celestine",
+      "EOCNS/25/0058/GNS. Ugochukwu Ukamaka Favour"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mwapkbge_63",
+        "name": "Ani Amaelochukwu Juliet",
+        "regNo": "EOCNS/26/0012/GNS",
+        "serial": "EOCNS/26/0012/GNS"
+      },
+      {
+        "id": "stu_mvuskvyq43dmp",
+        "name": "Ani Blessing Chika",
+        "regNo": "EOCNS/26/0071/GNS",
+        "serial": "12"
+      },
+      {
+        "id": "stu_mwaq08jn_107",
+        "name": "Benjamin Adaeze Esther",
+        "regNo": "EOCNS/25/0043/GNS",
+        "serial": "63"
+      },
+      {
+        "id": "stu_mwaq07tx_28",
+        "name": "Blessing Ezinne Chukwu",
+        "regNo": "EOCNS/25/0135/GNS",
+        "serial": "169"
+      },
+      {
+        "id": "stu_mwaq094v_166",
+        "name": "Blessing Samuel",
+        "regNo": "EOCNS/25/0005/GNS",
+        "serial": "25"
+      },
+      {
+        "id": "stu_mwaq08rx_130",
+        "name": "Chiamaka Bliss",
+        "regNo": "EOCNS/25/0018/GNS",
+        "serial": "EOCNS/25/0018/GNS"
+      },
+      {
+        "id": "stu_mwaq091w_158",
+        "name": "Chicheta Sarah",
+        "regNo": "EOCNS/25/0008/GNS",
+        "serial": "EOCNS/25/0008/GNS"
+      },
+      {
+        "id": "stu_mwaq07pi_15",
+        "name": "Chidera Enyigwe",
+        "regNo": "EOCNS/25/0152/GNS",
+        "serial": "213"
+      },
+      {
+        "id": "stu_mwaq08em_92",
+        "name": "Chidiebube Jennifer",
+        "regNo": "EOCNS/25/0078/GNS",
+        "serial": "98"
+      },
+      {
+        "id": "stu_mwaq0851_64",
+        "name": "Chidiogo Caroline Ileagu",
+        "regNo": "EOCNS/25/0098/GNS",
+        "serial": "118"
+      },
+      {
+        "id": "stu_mwaq08hx_102",
+        "name": "Chiemezie Udochukwu Gift",
+        "regNo": "EOCNS/25/0045/GNS",
+        "serial": "65"
+      },
+      {
+        "id": "stu_mwaq093c_162",
+        "name": "Chika Rejoice Olamma",
+        "regNo": "EOCNS/25/0141/GNS",
+        "serial": "194"
+      },
+      {
+        "id": "stu_mwaq08k2_108",
+        "name": "Chinaza Abigal",
+        "regNo": "EOCNS/25/0092/GNS",
+        "serial": "EOCNS/25/0092/GNS"
+      },
+      {
+        "id": "stu_mwaq0917_156",
+        "name": "Chisom Loveth",
+        "regNo": "EOCNS/25/0027/GNS",
+        "serial": "EOCNS/25/0027/GNS"
+      },
+      {
+        "id": "stu_mwaq08r7_128",
+        "name": "Chukwu Anthonia Amaka",
+        "regNo": "EOCNS/25/0102/GNS",
+        "serial": "122"
+      },
+      {
+        "id": "stu_mwaq07tc_26",
+        "name": "Destiny Nnamani",
+        "regNo": "EOCNS/25/0114/GNS",
+        "serial": "134"
+      },
+      {
+        "id": "stu_mwaq08ha_100",
+        "name": "Ebube Nice Okwor",
+        "regNo": "EOCNS/25/0028/GNS",
+        "serial": "48"
+      },
+      {
+        "id": "stu_mwaq08dc_88",
+        "name": "Eja Treasure Samuel",
+        "regNo": "EOCNS/25/0056/GNS",
+        "serial": "EOCNS/25/0056/GNS"
+      },
+      {
+        "id": "stu_mwaq08d1_87",
+        "name": "Favour Nzewi",
+        "regNo": "EOCNS/25/0162/GNS",
+        "serial": "EOCNS/25/0162/GNS"
+      },
+      {
+        "id": "stu_mwaq081s_53",
+        "name": "Ifunanya Chukwu",
+        "regNo": "EOCNS/25/0095/GNS",
+        "serial": "115"
+      },
+      {
+        "id": "stu_mwaq08gm_98",
+        "name": "John Deborah Chat",
+        "regNo": "EOCNS/25/0046/GNS",
+        "serial": "198"
+      },
+      {
+        "id": "stu_mwaq08i7_103",
+        "name": "Juliet Chukwuma",
+        "regNo": "EOCNS/25/0030/GNS",
+        "serial": "50"
+      },
+      {
+        "id": "stu_mwaq08ga_97",
+        "name": "Kasarachi Vincent",
+        "regNo": "EOCNS/25/0129/GNS",
+        "serial": "177"
+      },
+      {
+        "id": "stu_mwaq07gp_6",
+        "name": "Melody Chiamaka",
+        "regNo": "EOCNS/25/0155/GNS",
+        "serial": "EOCNS/25/0155/GNS"
+      },
+      {
+        "id": "stu_mwaq1n0fgdlkl",
+        "name": "Miracle Uche",
+        "regNo": "EOCNS/25/0016/GNS",
+        "serial": "164"
+      },
+      {
+        "id": "stu_mwaq090l_154",
+        "name": "Mmesoma Nwogbu",
+        "regNo": "EOCNS/25/0105/GNS",
+        "serial": "125"
+      },
+      {
+        "id": "stu_mwaq07zx_47",
+        "name": "Nwafor Oluebube Cynthia",
+        "regNo": "EOCNS/25/0086/GNS",
+        "serial": "EOCNS/25/0086/GNS"
+      },
+      {
+        "id": "stu_mwaq08zz_152",
+        "name": "Nwonyi Abigail Akachukwu",
+        "regNo": "EOCNS/25/0026/GNS",
+        "serial": "EOCNS/25/0026/GNS"
+      },
+      {
+        "id": "stu_mwaq07ln_9",
+        "name": "Obasi Blessing",
+        "regNo": "EOCNS/25/0148/GNS",
+        "serial": "207"
+      },
+      {
+        "id": "stu_mwaq08fe_94",
+        "name": "Ogechi Preciousrita Ugwu",
+        "regNo": "EOCNS/25/0048/GNS",
+        "serial": "170"
+      },
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "Ogodo Joy Mary",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": "107"
+      },
+      {
+        "id": "stu_mwaq0943_164",
+        "name": "Ohaji Sarah Onyinyechi",
+        "regNo": "EOCNS/25/0004/GNS",
+        "serial": "EOCNS/25/0004/GNS"
+      },
+      {
+        "id": "stu_mwaq07yd_42",
+        "name": "Ojong Abigail",
+        "regNo": "EOCNS/25/0094/GNS",
+        "serial": "114"
+      },
+      {
+        "id": "stu_mw68jsk2iree7",
+        "name": "Okafor Ugochukwu Kennedy",
+        "regNo": "EOCNS/25/0158/GNS",
+        "serial": "218"
+      },
+      {
+        "id": "stu_mwaq07qp_18",
+        "name": "Oko Maureen Nmanna",
+        "regNo": "EOCNS/25/0149/GNS",
+        "serial": "EOCNS/25/0149/GNS"
+      },
+      {
+        "id": "stu_mwaq0867_68",
+        "name": "Onwo Joy",
+        "regNo": "EOCNS/25/0159/GNS",
+        "serial": "219"
+      },
+      {
+        "id": "stu_mwaq08t9_134",
+        "name": "Onyinyechi Benjamin",
+        "regNo": "EOCNS/25/0130/GNS",
+        "serial": "EOCNS/25/0130/GNS"
+      },
+      {
+        "id": "stu_mvut0gx6e9ck9",
+        "name": "Oraidu Ifeoma Sation",
+        "regNo": "EOCNS/26/0032/GNS",
+        "serial": "130"
+      },
+      {
+        "id": "stu_mwaq085y_67",
+        "name": "Precious Omenihu",
+        "regNo": "EOCNS/25/0143/GNS",
+        "serial": "168"
+      },
+      {
+        "id": "stu_mwaq08tn_135",
+        "name": "Prisca Ulumma Oko",
+        "regNo": "EOCNS/25/0147/GNS",
+        "serial": "EOCNS/25/0147/GNS"
+      },
+      {
+        "id": "stu_mwaq0844_61",
+        "name": "Shulamite Modestus Nzubechi",
+        "regNo": "EOCNS/25/0070/GNS",
+        "serial": "90"
+      },
+      {
+        "id": "stu_mwaq08p2_122",
+        "name": "Taiwo Favour Omobewaji",
+        "regNo": "EOCNS/25/0115/GNS",
+        "serial": "135"
+      },
+      {
+        "id": "stu_mwaq093q_163",
+        "name": "Tochukwu Salvation Ogba",
+        "regNo": "EOCNS/25/0132/GNS",
+        "serial": "152"
+      },
+      {
+        "id": "stu_mwaq08xj_145",
+        "name": "Ubi Eteng Rejoice",
+        "regNo": "EOCNS/25/0040/GNS",
+        "serial": "EOCNS/25/0040/GNS"
+      },
+      {
+        "id": "stu_mwaq07r9_19",
+        "name": "Ugochi Miracle Celestine",
+        "regNo": "EOCNS/25/0136/GNS",
+        "serial": "EOCNS/25/0136/GNS"
+      },
+      {
+        "id": "stu_mwaq08il_104",
+        "name": "Ugochukwu Ukamaka Favour",
+        "regNo": "EOCNS/25/0058/GNS",
+        "serial": "EOCNS/25/0058/GNS"
+      }
+    ],
+    "updatedAt": "2026-11-19T16:00:38.805Z",
+    "createdAt": "2026-11-19T16:00:38.805Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mwnqyrvk6j33",
+    "date": "2026-11-19",
+    "classKey": "100_nursing",
+    "course": "GNS 102 — Communication in English",
+    "lecturer": "Mr. George Umeh",
+    "status": "Held",
+    "duration": 128,
+    "start": "08:37",
+    "end": "10:45",
+    "topic": "Word Classes in English",
+    "objectives": "",
+    "lectureSummary": "",
+    "assignment": "None was given",
+    "remark": "Class participation was above average",
+    "absent": [
+      "12. Ani Blessing Chika",
+      "63. Benjamin Adaeze Esther",
+      "169. Blessing Ezinne Chukwu",
+      "25. Blessing Samuel",
+      "EOCNS/25/0018/GNS. Chiamaka Bliss",
+      "EOCNS/25/0008/GNS. Chicheta Sarah",
+      "213. Chidera Enyigwe",
+      "98. Chidiebube Jennifer",
+      "118. Chidiogo Caroline Ileagu",
+      "65. Chiemezie Udochukwu Gift",
+      "194. Chika Rejoice Olamma",
+      "EOCNS/25/0092/GNS. Chinaza Abigal",
+      "EOCNS/25/0027/GNS. Chisom Loveth",
+      "122. Chukwu Anthonia Amaka",
+      "134. Destiny Nnamani",
+      "EOCNS/25/0162/GNS. Favour Nzewi",
+      "198. John Deborah Chat",
+      "50. Juliet Chukwuma",
+      "177. Kasarachi Vincent",
+      "EOCNS/25/0155/GNS. Melody Chiamaka",
+      "113. Mgbuga Martha",
+      "164. Miracle Uche",
+      "EOCNS/25/0086/GNS. Nwafor Oluebube Cynthia",
+      "95. Nwonumara Nneka I.",
+      "170. Ogechi Preciousrita Ugwu",
+      "107. Ogodo Joy Mary",
+      "EOCNS/25/0004/GNS. Ohaji Sarah Onyinyechi",
+      "114. Ojong Abigail",
+      "218. Okafor Ugochukwu Kennedy",
+      "EOCNS/25/0149/GNS. Oko Maureen Nmanna",
+      "219. Onwo Joy",
+      "EOCNS/25/0130/GNS. Onyinyechi Benjamin",
+      "130. Oraidu Ifeoma Sation",
+      "131. Ozulu Victory Ozioma",
+      "168. Precious Omenihu",
+      "EOCNS/25/0147/GNS. Prisca Ulumma Oko",
+      "135. Taiwo Favour Omobewaji",
+      "EOCNS/25/0040/GNS. Ubi Eteng Rejoice",
+      "EOCNS/25/0058/GNS. Ugochukwu Ukamaka Favour"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuskvyq43dmp",
+        "name": "Ani Blessing Chika",
+        "regNo": "EOCNS/26/0071/GNS",
+        "serial": "12"
+      },
+      {
+        "id": "stu_mwaq08jn_107",
+        "name": "Benjamin Adaeze Esther",
+        "regNo": "EOCNS/25/0043/GNS",
+        "serial": "63"
+      },
+      {
+        "id": "stu_mwaq07tx_28",
+        "name": "Blessing Ezinne Chukwu",
+        "regNo": "EOCNS/25/0135/GNS",
+        "serial": "169"
+      },
+      {
+        "id": "stu_mwaq094v_166",
+        "name": "Blessing Samuel",
+        "regNo": "EOCNS/25/0005/GNS",
+        "serial": "25"
+      },
+      {
+        "id": "stu_mwaq08rx_130",
+        "name": "Chiamaka Bliss",
+        "regNo": "EOCNS/25/0018/GNS",
+        "serial": "EOCNS/25/0018/GNS"
+      },
+      {
+        "id": "stu_mwaq091w_158",
+        "name": "Chicheta Sarah",
+        "regNo": "EOCNS/25/0008/GNS",
+        "serial": "EOCNS/25/0008/GNS"
+      },
+      {
+        "id": "stu_mwaq07pi_15",
+        "name": "Chidera Enyigwe",
+        "regNo": "EOCNS/25/0152/GNS",
+        "serial": "213"
+      },
+      {
+        "id": "stu_mwaq08em_92",
+        "name": "Chidiebube Jennifer",
+        "regNo": "EOCNS/25/0078/GNS",
+        "serial": "98"
+      },
+      {
+        "id": "stu_mwaq0851_64",
+        "name": "Chidiogo Caroline Ileagu",
+        "regNo": "EOCNS/25/0098/GNS",
+        "serial": "118"
+      },
+      {
+        "id": "stu_mwaq08hx_102",
+        "name": "Chiemezie Udochukwu Gift",
+        "regNo": "EOCNS/25/0045/GNS",
+        "serial": "65"
+      },
+      {
+        "id": "stu_mwaq093c_162",
+        "name": "Chika Rejoice Olamma",
+        "regNo": "EOCNS/25/0141/GNS",
+        "serial": "194"
+      },
+      {
+        "id": "stu_mwaq08k2_108",
+        "name": "Chinaza Abigal",
+        "regNo": "EOCNS/25/0092/GNS",
+        "serial": "EOCNS/25/0092/GNS"
+      },
+      {
+        "id": "stu_mwaq0917_156",
+        "name": "Chisom Loveth",
+        "regNo": "EOCNS/25/0027/GNS",
+        "serial": "EOCNS/25/0027/GNS"
+      },
+      {
+        "id": "stu_mwaq08r7_128",
+        "name": "Chukwu Anthonia Amaka",
+        "regNo": "EOCNS/25/0102/GNS",
+        "serial": "122"
+      },
+      {
+        "id": "stu_mwaq07tc_26",
+        "name": "Destiny Nnamani",
+        "regNo": "EOCNS/25/0114/GNS",
+        "serial": "134"
+      },
+      {
+        "id": "stu_mwaq08d1_87",
+        "name": "Favour Nzewi",
+        "regNo": "EOCNS/25/0162/GNS",
+        "serial": "EOCNS/25/0162/GNS"
+      },
+      {
+        "id": "stu_mwaq08gm_98",
+        "name": "John Deborah Chat",
+        "regNo": "EOCNS/25/0046/GNS",
+        "serial": "198"
+      },
+      {
+        "id": "stu_mwaq08i7_103",
+        "name": "Juliet Chukwuma",
+        "regNo": "EOCNS/25/0030/GNS",
+        "serial": "50"
+      },
+      {
+        "id": "stu_mwaq08ga_97",
+        "name": "Kasarachi Vincent",
+        "regNo": "EOCNS/25/0129/GNS",
+        "serial": "177"
+      },
+      {
+        "id": "stu_mwaq07gp_6",
+        "name": "Melody Chiamaka",
+        "regNo": "EOCNS/25/0155/GNS",
+        "serial": "EOCNS/25/0155/GNS"
+      },
+      {
+        "id": "stu_mwaq08ax_80",
+        "name": "Mgbuga Martha",
+        "regNo": "EOCNS/25/0093/GNS",
+        "serial": "113"
+      },
+      {
+        "id": "stu_mwaq1n0fgdlkl",
+        "name": "Miracle Uche",
+        "regNo": "EOCNS/25/0016/GNS",
+        "serial": "164"
+      },
+      {
+        "id": "stu_mwaq07zx_47",
+        "name": "Nwafor Oluebube Cynthia",
+        "regNo": "EOCNS/25/0086/GNS",
+        "serial": "EOCNS/25/0086/GNS"
+      },
+      {
+        "id": "stu_mw678r1u6tqw3",
+        "name": "Nwonumara Nneka I.",
+        "regNo": "TMP-EOCNS/26/0008/GNS",
+        "serial": "95"
+      },
+      {
+        "id": "stu_mwaq08fe_94",
+        "name": "Ogechi Preciousrita Ugwu",
+        "regNo": "EOCNS/25/0048/GNS",
+        "serial": "170"
+      },
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "Ogodo Joy Mary",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": "107"
+      },
+      {
+        "id": "stu_mwaq0943_164",
+        "name": "Ohaji Sarah Onyinyechi",
+        "regNo": "EOCNS/25/0004/GNS",
+        "serial": "EOCNS/25/0004/GNS"
+      },
+      {
+        "id": "stu_mwaq07yd_42",
+        "name": "Ojong Abigail",
+        "regNo": "EOCNS/25/0094/GNS",
+        "serial": "114"
+      },
+      {
+        "id": "stu_mw68jsk2iree7",
+        "name": "Okafor Ugochukwu Kennedy",
+        "regNo": "EOCNS/25/0158/GNS",
+        "serial": "218"
+      },
+      {
+        "id": "stu_mwaq07qp_18",
+        "name": "Oko Maureen Nmanna",
+        "regNo": "EOCNS/25/0149/GNS",
+        "serial": "EOCNS/25/0149/GNS"
+      },
+      {
+        "id": "stu_mwaq0867_68",
+        "name": "Onwo Joy",
+        "regNo": "EOCNS/25/0159/GNS",
+        "serial": "219"
+      },
+      {
+        "id": "stu_mwaq08t9_134",
+        "name": "Onyinyechi Benjamin",
+        "regNo": "EOCNS/25/0130/GNS",
+        "serial": "EOCNS/25/0130/GNS"
+      },
+      {
+        "id": "stu_mvut0gx6e9ck9",
+        "name": "Oraidu Ifeoma Sation",
+        "regNo": "EOCNS/26/0032/GNS",
+        "serial": "130"
+      },
+      {
+        "id": "stu_mvusxpyc8bz5r",
+        "name": "Ozulu Victory Ozioma",
+        "regNo": "EOCNS/26/0008/GNS",
+        "serial": "131"
+      },
+      {
+        "id": "stu_mwaq085y_67",
+        "name": "Precious Omenihu",
+        "regNo": "EOCNS/25/0143/GNS",
+        "serial": "168"
+      },
+      {
+        "id": "stu_mwaq08tn_135",
+        "name": "Prisca Ulumma Oko",
+        "regNo": "EOCNS/25/0147/GNS",
+        "serial": "EOCNS/25/0147/GNS"
+      },
+      {
+        "id": "stu_mwaq08p2_122",
+        "name": "Taiwo Favour Omobewaji",
+        "regNo": "EOCNS/25/0115/GNS",
+        "serial": "135"
+      },
+      {
+        "id": "stu_mwaq08xj_145",
+        "name": "Ubi Eteng Rejoice",
+        "regNo": "EOCNS/25/0040/GNS",
+        "serial": "EOCNS/25/0040/GNS"
+      },
+      {
+        "id": "stu_mwaq08il_104",
+        "name": "Ugochukwu Ukamaka Favour",
+        "regNo": "EOCNS/25/0058/GNS",
+        "serial": "EOCNS/25/0058/GNS"
+      }
+    ],
+    "updatedAt": "2026-11-19T16:10:59.360Z",
+    "createdAt": "2026-11-19T16:10:59.360Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
+  },
+  {
+    "id": "qa_mwnrkmgksmpf",
+    "date": "2026-11-19",
+    "classKey": "100_nursing",
+    "course": "GNS 111 — Citizenship Education",
+    "lecturer": "Mrs. Ngozi Nwaubani",
+    "status": "Held",
+    "duration": 62,
+    "start": "10:18",
+    "end": "11:20",
+    "topic": "Continuation on Understanding the Nigerian Constitution.",
+    "objectives": "",
+    "lectureSummary": "",
+    "assignment": "None was given.",
+    "remark": "Class participation was above average.",
+    "absent": [
+      "12. Ani Blessing Chika",
+      "63. Benjamin Adaeze Esther",
+      "169. Blessing Ezinne Chukwu",
+      "25. Blessing Samuel",
+      "EOCNS/25/0018/GNS. Chiamaka Bliss",
+      "EOCNS/25/0008/GNS. Chicheta Sarah",
+      "213. Chidera Enyigwe",
+      "98. Chidiebube Jennifer",
+      "118. Chidiogo Caroline Ileagu",
+      "65. Chiemezie Udochukwu Gift",
+      "194. Chika Rejoice Olamma",
+      "EOCNS/25/0092/GNS. Chinaza Abigal",
+      "EOCNS/25/0027/GNS. Chisom Loveth",
+      "122. Chukwu Anthonia Amaka",
+      "134. Destiny Nnamani",
+      "EOCNS/25/0056/GNS. Eja Treasure Samuel",
+      "EOCNS/25/0162/GNS. Favour Nzewi",
+      "198. John Deborah Chat",
+      "50. Juliet Chukwuma",
+      "177. Kasarachi Vincent",
+      "EOCNS/25/0155/GNS. Melody Chiamaka",
+      "113. Mgbuga Martha",
+      "164. Miracle Uche",
+      "EOCNS/26/0078/GNS. Nneka Lmmaculate Nwonumara",
+      "EOCNS/25/0086/GNS. Nwafor Oluebube Cynthia",
+      "95. Nwonumara Nneka I.",
+      "170. Ogechi Preciousrita Ugwu",
+      "107. Ogodo Joy Mary",
+      "EOCNS/25/0004/GNS. Ohaji Sarah Onyinyechi",
+      "114. Ojong Abigail",
+      "218. Okafor Ugochukwu Kennedy",
+      "EOCNS/25/0149/GNS. Oko Maureen Nmanna",
+      "219. Onwo Joy",
+      "EOCNS/25/0130/GNS. Onyinyechi Benjamin",
+      "130. Oraidu Ifeoma Sation",
+      "131. Ozulu Victory Ozioma",
+      "168. Precious Omenihu",
+      "EOCNS/25/0147/GNS. Prisca Ulumma Oko",
+      "135. Taiwo Favour Omobewaji",
+      "EOCNS/25/0040/GNS. Ubi Eteng Rejoice",
+      "EOCNS/25/0058/GNS. Ugochukwu Ukamaka Favour"
+    ],
+    "absentDetails": [
+      {
+        "id": "stu_mvuskvyq43dmp",
+        "name": "Ani Blessing Chika",
+        "regNo": "EOCNS/26/0071/GNS",
+        "serial": "12"
+      },
+      {
+        "id": "stu_mwaq08jn_107",
+        "name": "Benjamin Adaeze Esther",
+        "regNo": "EOCNS/25/0043/GNS",
+        "serial": "63"
+      },
+      {
+        "id": "stu_mwaq07tx_28",
+        "name": "Blessing Ezinne Chukwu",
+        "regNo": "EOCNS/25/0135/GNS",
+        "serial": "169"
+      },
+      {
+        "id": "stu_mwaq094v_166",
+        "name": "Blessing Samuel",
+        "regNo": "EOCNS/25/0005/GNS",
+        "serial": "25"
+      },
+      {
+        "id": "stu_mwaq08rx_130",
+        "name": "Chiamaka Bliss",
+        "regNo": "EOCNS/25/0018/GNS",
+        "serial": "EOCNS/25/0018/GNS"
+      },
+      {
+        "id": "stu_mwaq091w_158",
+        "name": "Chicheta Sarah",
+        "regNo": "EOCNS/25/0008/GNS",
+        "serial": "EOCNS/25/0008/GNS"
+      },
+      {
+        "id": "stu_mwaq07pi_15",
+        "name": "Chidera Enyigwe",
+        "regNo": "EOCNS/25/0152/GNS",
+        "serial": "213"
+      },
+      {
+        "id": "stu_mwaq08em_92",
+        "name": "Chidiebube Jennifer",
+        "regNo": "EOCNS/25/0078/GNS",
+        "serial": "98"
+      },
+      {
+        "id": "stu_mwaq0851_64",
+        "name": "Chidiogo Caroline Ileagu",
+        "regNo": "EOCNS/25/0098/GNS",
+        "serial": "118"
+      },
+      {
+        "id": "stu_mwaq08hx_102",
+        "name": "Chiemezie Udochukwu Gift",
+        "regNo": "EOCNS/25/0045/GNS",
+        "serial": "65"
+      },
+      {
+        "id": "stu_mwaq093c_162",
+        "name": "Chika Rejoice Olamma",
+        "regNo": "EOCNS/25/0141/GNS",
+        "serial": "194"
+      },
+      {
+        "id": "stu_mwaq08k2_108",
+        "name": "Chinaza Abigal",
+        "regNo": "EOCNS/25/0092/GNS",
+        "serial": "EOCNS/25/0092/GNS"
+      },
+      {
+        "id": "stu_mwaq0917_156",
+        "name": "Chisom Loveth",
+        "regNo": "EOCNS/25/0027/GNS",
+        "serial": "EOCNS/25/0027/GNS"
+      },
+      {
+        "id": "stu_mwaq08r7_128",
+        "name": "Chukwu Anthonia Amaka",
+        "regNo": "EOCNS/25/0102/GNS",
+        "serial": "122"
+      },
+      {
+        "id": "stu_mwaq07tc_26",
+        "name": "Destiny Nnamani",
+        "regNo": "EOCNS/25/0114/GNS",
+        "serial": "134"
+      },
+      {
+        "id": "stu_mwaq08dc_88",
+        "name": "Eja Treasure Samuel",
+        "regNo": "EOCNS/25/0056/GNS",
+        "serial": "EOCNS/25/0056/GNS"
+      },
+      {
+        "id": "stu_mwaq08d1_87",
+        "name": "Favour Nzewi",
+        "regNo": "EOCNS/25/0162/GNS",
+        "serial": "EOCNS/25/0162/GNS"
+      },
+      {
+        "id": "stu_mwaq08gm_98",
+        "name": "John Deborah Chat",
+        "regNo": "EOCNS/25/0046/GNS",
+        "serial": "198"
+      },
+      {
+        "id": "stu_mwaq08i7_103",
+        "name": "Juliet Chukwuma",
+        "regNo": "EOCNS/25/0030/GNS",
+        "serial": "50"
+      },
+      {
+        "id": "stu_mwaq08ga_97",
+        "name": "Kasarachi Vincent",
+        "regNo": "EOCNS/25/0129/GNS",
+        "serial": "177"
+      },
+      {
+        "id": "stu_mwaq07gp_6",
+        "name": "Melody Chiamaka",
+        "regNo": "EOCNS/25/0155/GNS",
+        "serial": "EOCNS/25/0155/GNS"
+      },
+      {
+        "id": "stu_mwaq08ax_80",
+        "name": "Mgbuga Martha",
+        "regNo": "EOCNS/25/0093/GNS",
+        "serial": "113"
+      },
+      {
+        "id": "stu_mwaq1n0fgdlkl",
+        "name": "Miracle Uche",
+        "regNo": "EOCNS/25/0016/GNS",
+        "serial": "164"
+      },
+      {
+        "id": "stu_mwapkb69_21",
+        "name": "Nneka Lmmaculate Nwonumara",
+        "regNo": "EOCNS/26/0078/GNS",
+        "serial": "EOCNS/26/0078/GNS"
+      },
+      {
+        "id": "stu_mwaq07zx_47",
+        "name": "Nwafor Oluebube Cynthia",
+        "regNo": "EOCNS/25/0086/GNS",
+        "serial": "EOCNS/25/0086/GNS"
+      },
+      {
+        "id": "stu_mw678r1u6tqw3",
+        "name": "Nwonumara Nneka I.",
+        "regNo": "TMP-EOCNS/26/0008/GNS",
+        "serial": "95"
+      },
+      {
+        "id": "stu_mwaq08fe_94",
+        "name": "Ogechi Preciousrita Ugwu",
+        "regNo": "EOCNS/25/0048/GNS",
+        "serial": "170"
+      },
+      {
+        "id": "stu_mvuqp5gp9bco2",
+        "name": "Ogodo Joy Mary",
+        "regNo": "TMP-EOCNS/26/0004/GNS",
+        "serial": "107"
+      },
+      {
+        "id": "stu_mwaq0943_164",
+        "name": "Ohaji Sarah Onyinyechi",
+        "regNo": "EOCNS/25/0004/GNS",
+        "serial": "EOCNS/25/0004/GNS"
+      },
+      {
+        "id": "stu_mwaq07yd_42",
+        "name": "Ojong Abigail",
+        "regNo": "EOCNS/25/0094/GNS",
+        "serial": "114"
+      },
+      {
+        "id": "stu_mw68jsk2iree7",
+        "name": "Okafor Ugochukwu Kennedy",
+        "regNo": "EOCNS/25/0158/GNS",
+        "serial": "218"
+      },
+      {
+        "id": "stu_mwaq07qp_18",
+        "name": "Oko Maureen Nmanna",
+        "regNo": "EOCNS/25/0149/GNS",
+        "serial": "EOCNS/25/0149/GNS"
+      },
+      {
+        "id": "stu_mwaq0867_68",
+        "name": "Onwo Joy",
+        "regNo": "EOCNS/25/0159/GNS",
+        "serial": "219"
+      },
+      {
+        "id": "stu_mwaq08t9_134",
+        "name": "Onyinyechi Benjamin",
+        "regNo": "EOCNS/25/0130/GNS",
+        "serial": "EOCNS/25/0130/GNS"
+      },
+      {
+        "id": "stu_mvut0gx6e9ck9",
+        "name": "Oraidu Ifeoma Sation",
+        "regNo": "EOCNS/26/0032/GNS",
+        "serial": "130"
+      },
+      {
+        "id": "stu_mvusxpyc8bz5r",
+        "name": "Ozulu Victory Ozioma",
+        "regNo": "EOCNS/26/0008/GNS",
+        "serial": "131"
+      },
+      {
+        "id": "stu_mwaq085y_67",
+        "name": "Precious Omenihu",
+        "regNo": "EOCNS/25/0143/GNS",
+        "serial": "168"
+      },
+      {
+        "id": "stu_mwaq08tn_135",
+        "name": "Prisca Ulumma Oko",
+        "regNo": "EOCNS/25/0147/GNS",
+        "serial": "EOCNS/25/0147/GNS"
+      },
+      {
+        "id": "stu_mwaq08p2_122",
+        "name": "Taiwo Favour Omobewaji",
+        "regNo": "EOCNS/25/0115/GNS",
+        "serial": "135"
+      },
+      {
+        "id": "stu_mwaq08xj_145",
+        "name": "Ubi Eteng Rejoice",
+        "regNo": "EOCNS/25/0040/GNS",
+        "serial": "EOCNS/25/0040/GNS"
+      },
+      {
+        "id": "stu_mwaq08il_104",
+        "name": "Ugochukwu Ukamaka Favour",
+        "regNo": "EOCNS/25/0058/GNS",
+        "serial": "EOCNS/25/0058/GNS"
+      }
+    ],
+    "updatedAt": "2026-11-19T16:27:58.772Z",
+    "createdAt": "2026-11-19T16:27:58.772Z",
+    "amendments": [],
+    "sessionId": "sess_mvt9hjbtg2q3o",
+    "sessionName": "2026/2027 SESSION",
+    "semesterId": "sess_mvt9hjbtg2q3o_s1",
+    "semesterName": "1st Semester"
   }
 ]
