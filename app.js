@@ -9041,15 +9041,46 @@ async function saveQaEntry(e) {
 }
 
 async function deleteQaEntry(id) {
-  if (!confirm("Delete this QA entry?")) return;
-  await new Promise((resolve, reject) => {
-    const t = db.transaction("qa_entries", "readwrite");
-    t.objectStore("qa_entries").delete(id);
-    t.oncomplete = () => resolve();
-    t.onerror = () => reject(t.error);
+  if (!isQaOfficer()) { alert("Sign in as QA Officer before deleting a Daily QA entry."); return; }
+  var entries = await getAll("qa_entries");
+  var entry = entries.find(function(x) { String(x.id) === String(id); });
+  if (!entry) { alert("This QA log could not be found. Refresh the Daily QA view."); return; }
+  var officer = (prompt("Officer name (required for the deletion audit):", getQaOfficerName()) || "").trim();
+  if (!officer) { alert("Officer name is required. Nothing was deleted."); return; }
+  var pin = prompt("Enter QA Officer PIN to authorize permanent deletion:");
+  if (pin === null) return;
+  var expected = String((APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA").trim();
+  if (String(pin).trim() !== expected) { alert("Incorrect PIN. Nothing was deleted."); return; }
+  var reason = (prompt("Reason for permanently deleting this exact lecture record:") || "").trim();
+  if (!reason) { alert("A reason is required. Nothing was deleted."); return; }
+  var ref = (prompt("Official deletion REF (required):") || "").trim();
+  if (!ref) { alert("Official REF is required. Nothing was deleted."); return; }
+  var detailsLabel = (entry.date || "") + " | " + (entry.course || "") + " | " + (entry.lecturer || "") + " | " + (entry.classKey || "");
+  if (!confirm("PERMANENTLY remove this exact Daily QA lecture log?\n\n" + detailsLabel + "\n\nReports generated earlier are not automatically rewritten. Publish the deletion and regenerate reports as needed.")) return;
+  var now = new Date(), stamp = now.toISOString();
+  var audit = {
+    ref: ref, action: "delete", entity: "qa_entries", entityId: entry.id,
+    reason: reason, details: { deletedRecord: entry, exactRecordRemoval: true },
+    timestamp: stamp, at: stamp, createdAt: stamp,
+    whenLocal: now.toLocaleString("en-GB", {weekday:"short",year:"numeric",month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}),
+    user: officer, officer: officer, source: "official-letter"
+  };
+  await new Promise(function(resolve, reject) {
+    var t;
+    try {
+      t = db.transaction(["qa_entries", "audit"], "readwrite");
+      t.objectStore("qa_entries").delete(entry.id);
+      t.objectStore("audit").add(audit);
+    } catch (err) { reject(err); return; }
+    t.oncomplete = function() { resolve(); };
+    t.onerror = function() { reject(t.error || new Error("Deletion/audit transaction failed")); };
+    t.onabort = function() { reject(t.error || new Error("Deletion was aborted")); };
   });
-  await writeAudit({ action: "update", entity: "qa_entries", entityId: id, reason: "Deleted QA entry", details: {} });
+  try { sessionStorage.setItem(QA_OFFICER_NAME_KEY, officer); } catch (_) {}
+  markDirty("permanent QA lecture-log deletion");
   await renderQaDaily();
+  try { refreshDashboardStats(); } catch (_) {}
+  alert("The exact QA log was permanently removed locally and the deletion audit recorded. Publish to synchronize it to the repository.");
 }
 
 
@@ -9193,8 +9224,9 @@ async function renderQaDaily() {
     return "<tr><td>" + escapeHtml(slot.start + "–" + slot.end) + "</td><td>" + escapeHtml(courseName(slot.code)) +
       "</td><td>" + slot.hours + "</td><td><span class=\"badge " + badge + "\">" + escapeHtml(status) + "</span></td><td>" +
       escapeHtml(lecturer) + "</td><td>" + mins + "</td>" + (isQaOfficer() && ent
-        ? ('<td class="qa-edit-only"><button type="button" class="icon-btn-sm" data-edit-qa="' + ent.id + '">Edit</button> ' +
-           '<button type="button" class="icon-btn-sm" data-report-qa="' + escapeHtml(ent.id) + '">Report</button></td>')
+        ? ('<td class="qa-edit-only"><button type="button" class="icon-btn-sm" data-edit-qa="' + escapeHtml(ent.id) + '">Edit</button> ' +
+           '<button type="button" class="icon-btn-sm" data-report-qa="' + escapeHtml(ent.id) + '">Report</button> ' +
+           '<button type="button" class="icon-btn-sm" data-delete-qa="' + escapeHtml(ent.id) + '" style="color:#b91c1c">Delete</button></td>')
         : editCell) + "</tr>";
   });
   entries.forEach(function(e) {
@@ -9205,7 +9237,8 @@ async function renderQaDaily() {
     var badge = e.status === "Held" ? "badge--green" : e.status === "Missed" ? "badge--amber" : "badge--muted";
     rows.push("<tr><td>—</td><td>" + escapeHtml(e.course) + " <span class=\"cell-sub\">extra</span></td><td>—</td><td><span class=\"badge " + badge + "\">" +
       escapeHtml(e.status) + "</span></td><td>" + escapeHtml(e.lecturer || "—") + "</td><td>" + (e.duration != null ? e.duration : "—") +
-      '</td><td class="qa-edit-only">' + (isQaOfficer() ? ('<button type="button" class="icon-btn-sm" data-edit-qa="' + e.id + '">Edit</button>') : "") + "</td></tr>");
+      '</td><td class="qa-edit-only">' + (isQaOfficer() ? ('<button type="button" class="icon-btn-sm" data-edit-qa="' + escapeHtml(e.id) + '">Edit</button> ' +
+      '<button type="button" class="icon-btn-sm" data-delete-qa="' + escapeHtml(e.id) + '" style="color:#b91c1c">Delete</button>') : "") + "</td></tr>");
   });
   if (!rows.length) {
     tbody.innerHTML = "";
@@ -9217,6 +9250,9 @@ async function renderQaDaily() {
   tbody.innerHTML = rows.join("");
   tbody.querySelectorAll("[data-edit-qa]").forEach(function(btn) {
     btn.addEventListener("click", function() { openQaEntryForm(btn.getAttribute("data-edit-qa")); });
+  });
+  tbody.querySelectorAll("[data-delete-qa]").forEach(function(btn) {
+    btn.addEventListener("click", function() { deleteQaEntry(btn.getAttribute("data-delete-qa")); });
   });
   tbody.querySelectorAll("[data-log-slot]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
