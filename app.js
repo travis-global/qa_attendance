@@ -10464,17 +10464,18 @@ async function saveCourseForm(e) {
   // Commit a rename/update atomically. Never delete the existing course first:
   // if the replacement fails, IndexedDB rolls the whole transaction back.
   await new Promise(function(resolve, reject) {
-    if (!db) { reject(new Error("Database not ready")); return; }
+    if (!db || !db.objectStoreNames.contains("courses")) { reject(new Error("Courses database/store is unavailable. Reload the app and try again.")); return; }
     var courseTx;
     try {
-      courseTx = db.transaction("courses", "readwrite");
+      courseTx = db.transaction(["courses"], "readwrite");
+      // Attach transaction lifecycle handlers before queuing operations.
+      courseTx.oncomplete = function() { resolve(); };
+      courseTx.onerror = function() { reject(courseTx.error || new Error("IndexedDB course write failed")); };
+      courseTx.onabort = function() { reject(courseTx.error || new Error("IndexedDB course update was aborted")); };
       var store = courseTx.objectStore("courses");
       if (original && original !== code) store.delete(original);
       store.put(rec);
-    } catch (err) { reject(err); return; }
-    courseTx.oncomplete = function() { resolve(); };
-    courseTx.onerror = function() { reject(courseTx.error || new Error("Course transaction failed")); };
-    courseTx.onabort = function() { reject(courseTx.error || new Error("Course transaction was aborted")); };
+    } catch (err) { reject(err); }
   });
   await writeAudit({
     action: original ? "update" : "create",
