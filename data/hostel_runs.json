@@ -14811,7 +14811,7 @@
       ]
     ],
     "createdAt": "2026-11-20T09:51:10.212Z",
-    "updatedAt": "2026-11-20T15:03:07.357Z",
+    "updatedAt": "2026-11-20T15:21:47.602Z",
     "start": "2026-11-15",
     "end": "2026-11-19",
     "rate": 15000,
@@ -14829,16 +14829,16 @@
       "18th",
       "19th"
     ],
-    "absenteeCount": 120,
-    "totalFine": 8265000,
-    "studentCount": 193,
+    "absenteeCount": 118,
+    "totalFine": 8115000,
+    "studentCount": 191,
     "rows": [
       {
-        "studentId": "stu_mwaq084r_63",
-        "machineNo": "105",
         "name": "Adesanya Deborah",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0085/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -14847,17 +14847,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq084r_63"
+        ]
       },
       {
-        "studentId": "stu_mwaq07y2_41",
-        "machineNo": "103",
         "name": "Agbo Loveth",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0083/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -14866,17 +14863,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07y2_41"
+        ]
       },
       {
-        "studentId": "stu_mwaq08w0_141",
-        "machineNo": "180",
         "name": "Agbo Precious Kosisochukwu",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0013/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -14885,36 +14879,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08w0_141"
+        ]
       },
       {
-        "studentId": "stu_mvuvud1olx5d9",
-        "machineNo": "stu_mvuvud1olx5d9",
-        "name": "Alolote Fortunatus",
-        "regNo": "EOCNS/26/0147/GNS",
-        "hostel": "Hostel 1",
-        "programme": "Midwifery",
-        "level": "100",
-        "dayMarks": [
-          "A",
-          "A",
-          "A",
-          "A",
-          "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mvuvud1olx5d9"
-      },
-      {
-        "studentId": "stu_mwaq082p_56",
-        "machineNo": "87",
         "name": "Amaka Gift Emeka",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0067/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -14923,17 +14895,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq082p_56"
+        ]
       },
       {
-        "studentId": "stu_mwaq08dz_90",
-        "machineNo": "144",
         "name": "Anaeto Goodness Chinaecherem",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0124/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -14942,17 +14911,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08dz_90"
+        ]
       },
       {
-        "studentId": "stu_mw9i4mzmzsbq0",
-        "machineNo": "438",
         "name": "Angela Ezinne Igwe",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/24/0039/MID",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Midwifery",
         "level": "300",
         "dayMarks": [
@@ -14961,17 +14927,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mw9i4mzmzsbq0"
+        ]
       },
       {
-        "studentId": "stu_mwaqckw6_38",
-        "machineNo": "412",
         "name": "Annastecia Promise Otuonye",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/24/0013/MID",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Midwifery",
         "level": "300",
         "dayMarks": [
@@ -14980,17 +14943,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaqckw6_38"
+        ]
       },
       {
-        "studentId": "stu_mwaq07zb_45",
-        "machineNo": "108",
         "name": "Anusi Amarachi Juliet",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0088/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -14999,17 +14959,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07zb_45"
+        ]
       },
       {
-        "studentId": "stu_mwaq080k_49",
-        "machineNo": "111",
         "name": "Augusatina Ilochi",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0091/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15018,17 +14975,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq080k_49"
+        ]
       },
       {
-        "studentId": "stu_mvuszawbbvyhs",
-        "machineNo": "1577",
         "name": "Azu Loveth Ifeanyi",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/26/0059/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 2,
+        "fine": 30000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15037,17 +14991,14 @@
           "P",
           "A",
           "P"
-        ],
-        "absentDays": 2,
-        "fine": 30000,
-        "rosterId": "hr_mwosu6bo::stu_mvuszawbbvyhs"
+        ]
       },
       {
-        "studentId": "stu_mwaq08jn_107",
-        "machineNo": "63",
         "name": "Benjamin Adaeze Esther",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0043/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15056,17 +15007,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08jn_107"
+        ]
       },
       {
-        "studentId": "stu_mwaq08yx_149",
-        "machineNo": "187",
         "name": "Blessing Ekunyi Eze",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0015/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15075,17 +15023,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08yx_149"
+        ]
       },
       {
-        "studentId": "stu_mwaq094v_166",
-        "machineNo": "25",
         "name": "Blessing Samuel",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0005/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15094,17 +15039,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq094v_166"
+        ]
       },
       {
-        "studentId": "stu_mwaq08e9_91",
-        "machineNo": "132",
         "name": "Chiamaka Isreal",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0112/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15113,17 +15055,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08e9_91"
+        ]
       },
       {
-        "studentId": "stu_mwaq08q2_125",
-        "machineNo": "53",
         "name": "Chiamaka Treasure Offor",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0033/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15132,17 +15071,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08q2_125"
+        ]
       },
       {
-        "studentId": "stu_mwaq07pi_15",
-        "machineNo": "213",
         "name": "Chidera Enyigwe",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0152/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15151,17 +15087,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07pi_15"
+        ]
       },
       {
-        "studentId": "stu_mwaq08em_92",
-        "machineNo": "98",
         "name": "Chidiebube Jennifer",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0078/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15170,17 +15103,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08em_92"
+        ]
       },
       {
-        "studentId": "stu_mwaq08cf_85",
-        "machineNo": "190",
         "name": "Chidiebube Mary Ugah",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0038/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15189,17 +15119,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08cf_85"
+        ]
       },
       {
-        "studentId": "stu_mwaq08hk_101",
-        "machineNo": "167",
         "name": "Chidimma John",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0142/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15208,17 +15135,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08hk_101"
+        ]
       },
       {
-        "studentId": "stu_mwaq0851_64",
-        "machineNo": "118",
         "name": "Chidiogo Caroline Ileagu",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0098/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15227,17 +15151,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq0851_64"
+        ]
       },
       {
-        "studentId": "stu_mwaq08qg_126",
-        "machineNo": "165",
         "name": "Chiemelie Joy Chinyereugo",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0090/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15246,17 +15167,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08qg_126"
+        ]
       },
       {
-        "studentId": "stu_mwaq08hx_102",
-        "machineNo": "65",
         "name": "Chiemezie Udochukwu Gift",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0045/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15265,18 +15183,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08hx_102"
+        ]
       },
       {
-        "studentId": "stu_mwaq08kc_109",
-        "rosterId": "hr_mwosu6bo::stu_mwaq08kc_109",
-        "machineNo": "569",
         "name": "Chijioke Amarachi",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0037/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 1,
+        "fine": 15000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15285,17 +15199,14 @@
           "P",
           "P",
           "P"
-        ],
-        "absentDays": 1,
-        "fine": 15000,
-        "resolvedFromPending": true
+        ]
       },
       {
-        "studentId": "stu_mwaq093c_162",
-        "machineNo": "194",
         "name": "Chika Rejoice Olamma",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0141/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15304,17 +15215,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq093c_162"
+        ]
       },
       {
-        "studentId": "stu_mwaq07zl_46",
-        "machineNo": "104",
         "name": "Chima Nnedimma",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0084/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15323,17 +15231,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07zl_46"
+        ]
       },
       {
-        "studentId": "stu_mvrzdaci05e3p",
-        "machineNo": "35",
         "name": "Chinedu Francis Ekwe",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/24/0036/MID",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Midwifery",
         "level": "300",
         "dayMarks": [
@@ -15342,17 +15247,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mvrzdaci05e3p"
+        ]
       },
       {
-        "studentId": "stu_mwaqckxo_41",
-        "machineNo": "422",
         "name": "Chinenye Cynthia Omeh",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/24/0023/MID",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Midwifery",
         "level": "300",
         "dayMarks": [
@@ -15361,17 +15263,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaqckxo_41"
+        ]
       },
       {
-        "studentId": "stu_mwaq085c_65",
-        "machineNo": "116",
         "name": "Chinenye Eunice Ocho",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0096/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15380,17 +15279,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq085c_65"
+        ]
       },
       {
-        "studentId": "stu_mwaq080t_50",
-        "machineNo": "119",
         "name": "Chioma Chibueze",
-        "regNo": "EOCNS/25/0099/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0099/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15399,17 +15295,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq080t_50"
+        ]
       },
       {
-        "studentId": "stu_mwaq0808_48",
-        "machineNo": "137",
         "name": "Chioma Pauline",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0117/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15418,17 +15311,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq0808_48"
+        ]
       },
       {
-        "studentId": "stu_mwaq090w_155",
-        "machineNo": "172",
         "name": "Chisom Udeh",
-        "regNo": "EOCNS/25/0036/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0036/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15437,17 +15327,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq090w_155"
+        ]
       },
       {
-        "studentId": "stu_mvrzdacei0dw3",
-        "machineNo": "20",
         "name": "Chizoba Assumpta Ikeme",
-        "regNo": "EOCNS/24/0021/MID",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/24/0021/MID",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Midwifery",
         "level": "200",
         "dayMarks": [
@@ -15456,17 +15343,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mvrzdacei0dw3"
+        ]
       },
       {
-        "studentId": "stu_mwaq0838_58",
-        "machineNo": "91",
         "name": "Christabel Louis",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0071/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15475,17 +15359,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq0838_58"
+        ]
       },
       {
-        "studentId": "stu_mwaq08r7_128",
-        "machineNo": "122",
         "name": "Chukwu Anthonia Amaka",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0102/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15494,17 +15375,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08r7_128"
+        ]
       },
       {
-        "studentId": "stu_mwaq091j_157",
-        "machineNo": "204",
         "name": "Chukwu Emmanuel",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0003/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15513,17 +15391,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq091j_157"
+        ]
       },
       {
-        "studentId": "stu_mwaq07jy_8",
-        "machineNo": "160",
         "name": "Chukwuma Aghaegbuna",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0154/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15532,17 +15407,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07jy_8"
+        ]
       },
       {
-        "studentId": "stu_mwaq07ws_37",
-        "machineNo": "175",
         "name": "Clementina Chisom",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0145/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15551,36 +15423,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07ws_37"
+        ]
       },
       {
-        "studentId": "stu_mwaq07vq_34",
-        "machineNo": "109",
-        "name": "Clinton Ekuma Otu",
-        "regNo": "EOCNS/25/0089/GNS",
-        "hostel": "Hostel 1",
-        "programme": "Nursing",
-        "level": "200",
-        "dayMarks": [
-          "A",
-          "A",
-          "A",
-          "A",
-          "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07vq_34"
-      },
-      {
-        "studentId": "stu_mwaq07v4_32",
-        "machineNo": "191",
         "name": "Cordelia Nwabuisi",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0100/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15589,17 +15439,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07v4_32"
+        ]
       },
       {
-        "studentId": "stu_mwaq08zl_151",
-        "machineNo": "202",
         "name": "Cynthia Nmesoma",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0022/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15608,17 +15455,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08zl_151"
+        ]
       },
       {
-        "studentId": "stu_mwaq07fc_2",
-        "machineNo": "222",
         "name": "Damian Oluebube",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0163/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15627,17 +15471,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07fc_2"
+        ]
       },
       {
-        "studentId": "stu_mwaq07tc_26",
-        "machineNo": "134",
         "name": "Destiny Nnamani",
-        "regNo": "EOCNS/25/0114/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0114/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15646,17 +15487,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07tc_26"
+        ]
       },
       {
-        "studentId": "stu_mwaq092b_159",
-        "machineNo": "21",
         "name": "Divine Chinecherem Adoke",
-        "regNo": "EOCNS/25/0001/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0001/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15665,17 +15503,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq092b_159"
+        ]
       },
       {
-        "studentId": "stu_mwaq08ha_100",
-        "machineNo": "48",
         "name": "Ebube Nice Okwor",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0028/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15684,17 +15519,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08ha_100"
+        ]
       },
       {
-        "studentId": "stu_mwaq07ne_12",
-        "machineNo": "206",
         "name": "Ejimbe Gloria Chidimma",
-        "regNo": "EOCNS/25/0139/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0139/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15703,17 +15535,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07ne_12"
+        ]
       },
       {
-        "studentId": "stu_mwaqclh0_83",
-        "machineNo": "350",
         "name": "Eke Victor Ifeanyichukwu",
-        "regNo": "EOCNS/24/0062/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/24/0062/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "300",
         "dayMarks": [
@@ -15722,17 +15551,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaqclh0_83"
+        ]
       },
       {
-        "studentId": "stu_mwaq08uw_138",
-        "machineNo": "448",
         "name": "Eleke Nelson",
-        "regNo": "EOCNS/25/0133/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0133/GNS",
+        "absentDays": 1,
+        "fine": 15000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15741,17 +15567,14 @@
           "A",
           "P",
           "P"
-        ],
-        "absentDays": 1,
-        "fine": 15000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08uw_138"
+        ]
       },
       {
-        "studentId": "stu_mwaqcko0_16",
-        "machineNo": "EOCNS/24/0038/MID",
         "name": "Emmanuel Chiemeka Obinka",
-        "regNo": "EOCNS/24/0038/MID",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/24/0038/MID",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Midwifery",
         "level": "200",
         "dayMarks": [
@@ -15760,55 +15583,46 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaqcko0_16"
+        ]
       },
       {
-        "studentId": "stu_mwaq083j_59",
-        "machineNo": "205",
         "name": "Emmanuel Idika",
-        "regNo": "EOCNS/25/0075/GNS",
         "hostel": "Hostel 1",
-        "programme": "Nursing",
-        "level": "200",
-        "dayMarks": [
-          "A",
-          "A",
-          "A",
-          "A",
-          "A"
-        ],
+        "regNo": "EOCNS/25/0075/GNS",
         "absentDays": 5,
         "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq083j_59"
-      },
-      {
-        "studentId": "stu_mwaq0871_70",
-        "machineNo": "490",
-        "name": "Enyenwa Immaculata Chiamaka",
-        "regNo": "EOCNS/25/0073/GNS",
-        "hostel": "Hostel 1",
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
-          "P",
-          "P",
-          "P",
+          "A",
+          "A",
+          "A",
           "A",
           "A"
-        ],
+        ]
+      },
+      {
+        "name": "Enyenwa Immaculata Chiamaka",
+        "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0073/GNS",
         "absentDays": 2,
         "fine": 30000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq0871_70"
+        "programme": "Nursing",
+        "level": "200",
+        "dayMarks": [
+          "P",
+          "P",
+          "P",
+          "A",
+          "A"
+        ]
       },
       {
-        "studentId": "stu_mwaq08s9_131",
-        "machineNo": "40",
         "name": "Eze Ukamaka Ebere",
-        "regNo": "EOCNS/25/0020/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0020/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15817,17 +15631,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08s9_131"
+        ]
       },
       {
-        "studentId": "stu_mwaq08bu_83",
-        "machineNo": "192",
         "name": "Ezeokoli Benita",
-        "regNo": "EOCNS/25/0064/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0064/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15836,17 +15647,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08bu_83"
+        ]
       },
       {
-        "studentId": "stu_mwaq08mr_116",
-        "machineNo": "55",
         "name": "Ezinwanne Claudia Welibe",
-        "regNo": "EOCNS/25/0035/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0035/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15855,17 +15663,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08mr_116"
+        ]
       },
       {
-        "studentId": "stu_mwc9n5vgw9hkw",
-        "machineNo": "418",
         "name": "Fatima Adaeze Haruna",
-        "regNo": "EOCNS/24/0019/MID",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/24/0019/MID",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Midwifery",
         "level": "300",
         "dayMarks": [
@@ -15874,17 +15679,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwc9n5vgw9hkw"
+        ]
       },
       {
-        "studentId": "stu_mwaq082f_55",
-        "machineNo": "183",
         "name": "Favour Nkeiruka Onah",
-        "regNo": "EOCNS/25/0125/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0125/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15893,17 +15695,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq082f_55"
+        ]
       },
       {
-        "studentId": "stu_mvrzdacroebrp",
-        "machineNo": "66",
         "name": "Gideon Ugah Odoh",
-        "regNo": "EOCNS/24/0071/MID",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/24/0071/MID",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Midwifery",
         "level": "200",
         "dayMarks": [
@@ -15912,17 +15711,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mvrzdacroebrp"
+        ]
       },
       {
-        "studentId": "stu_mwaq08nh_118",
-        "machineNo": "52",
         "name": "Gift Chioma Igboke",
-        "regNo": "EOCNS/25/0032/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0032/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15931,17 +15727,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08nh_118"
+        ]
       },
       {
-        "studentId": "stu_mwkn9ieb7z177",
-        "machineNo": "stu_mwkn9ieb7z177",
         "name": "Gladys Anameti Bassey",
-        "regNo": "EOCNS/26/0083/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/26/0083/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -15950,17 +15743,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwkn9ieb7z177"
+        ]
       },
       {
-        "studentId": "stu_mwaq07p1_14",
-        "machineNo": "154",
         "name": "Great Eze",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0134/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -15969,55 +15759,46 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07p1_14"
+        ]
       },
       {
-        "studentId": "stu_mwaq08yl_148",
-        "machineNo": "224",
         "name": "Henry Igwe-Nomeh",
-        "regNo": "EOCNS/25/0165/GNS",
         "hostel": "Hostel 1",
-        "programme": "Nursing",
-        "level": "200",
-        "dayMarks": [
-          "A",
-          "A",
-          "A",
-          "A",
-          "A"
-        ],
+        "regNo": "EOCNS/25/0165/GNS",
         "absentDays": 5,
         "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08yl_148"
-      },
-      {
-        "studentId": "stu_mwaq07ns_13",
-        "machineNo": "509",
-        "name": "Idoko Faith",
-        "regNo": "EOCNS/25/0151/GNS",
-        "hostel": "Hostel 1",
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
-          "P",
-          "P",
+          "A",
+          "A",
           "A",
           "A",
           "A"
-        ],
+        ]
+      },
+      {
+        "name": "Idoko Faith",
+        "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0151/GNS",
         "absentDays": 3,
         "fine": 45000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07ns_13"
+        "programme": "Nursing",
+        "level": "200",
+        "dayMarks": [
+          "P",
+          "P",
+          "A",
+          "A",
+          "A"
+        ]
       },
       {
-        "studentId": "stu_mwaq08fz_96",
-        "machineNo": "178",
         "name": "Israel Amaka Goodness",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0039/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16026,17 +15807,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08fz_96"
+        ]
       },
       {
-        "studentId": "stu_mwaq07ua_29",
-        "machineNo": "173",
         "name": "James Pavelina",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0118/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16045,17 +15823,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07ua_29"
+        ]
       },
       {
-        "studentId": "stu_mvs98wh5p9wl4",
-        "machineNo": "stu_mvs98wh5p9wl4",
         "name": "Jennifer Aikhionbare",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/26/0005/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16064,17 +15839,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mvs98wh5p9wl4"
+        ]
       },
       {
-        "studentId": "stu_mvrzdacqxi6oa",
-        "machineNo": "60",
         "name": "John Chukwu Ube",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/24/0065/MID",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Midwifery",
         "level": "300",
         "dayMarks": [
@@ -16083,17 +15855,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mvrzdacqxi6oa"
+        ]
       },
       {
-        "studentId": "stu_mwaq08gm_98",
-        "machineNo": "198",
         "name": "John Deborah Chat",
-        "regNo": "EOCNS/25/0046/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0046/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16102,17 +15871,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08gm_98"
+        ]
       },
       {
-        "studentId": "stu_mvrzdacje8tsn",
-        "machineNo": "39",
         "name": "Joy Onyekachi Ucha",
-        "regNo": "EOCNS/24/0040/MID",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/24/0040/MID",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Midwifery",
         "level": "300",
         "dayMarks": [
@@ -16121,17 +15887,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mvrzdacje8tsn"
+        ]
       },
       {
-        "studentId": "stu_mwaq08i7_103",
-        "machineNo": "50",
         "name": "Juliet Chukwuma",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0030/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16140,17 +15903,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08i7_103"
+        ]
       },
       {
-        "studentId": "stu_mwaq08ga_97",
-        "machineNo": "177",
         "name": "Kasarachi Vincent",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0129/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16159,17 +15919,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08ga_97"
+        ]
       },
       {
-        "studentId": "stu_mwaq07sf_23",
-        "machineNo": "148",
         "name": "Lucy Nwachukwu",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0128/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16178,17 +15935,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07sf_23"
+        ]
       },
       {
-        "studentId": "stu_mwaq08ax_80",
-        "machineNo": "113",
         "name": "Mgbuga Martha",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0093/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16197,17 +15951,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08ax_80"
+        ]
       },
       {
-        "studentId": "stu_mwaq1n0fgdlkl",
-        "machineNo": "164",
         "name": "Miracle Uche",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0016/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16216,17 +15967,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq1n0fgdlkl"
+        ]
       },
       {
-        "studentId": "stu_mwaq086j_69",
-        "machineNo": "99",
         "name": "Mkpuma Marycynthia Chiziterem",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0079/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16235,17 +15983,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq086j_69"
+        ]
       },
       {
-        "studentId": "stu_mwaq088m_74",
-        "machineNo": "133",
         "name": "Ndubuisi Victory",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0113/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16254,17 +15999,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq088m_74"
+        ]
       },
       {
-        "studentId": "stu_mwaq08cr_86",
-        "machineNo": "77",
         "name": "Nmachi Nwali",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0057/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16273,17 +16015,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08cr_86"
+        ]
       },
       {
-        "studentId": "stu_mwaq07t0_25",
-        "machineNo": "146",
         "name": "Nnabuike Ozokonkwo",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0126/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16292,17 +16031,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07t0_25"
+        ]
       },
       {
-        "studentId": "stu_mwaq0896_75",
-        "machineNo": "136",
         "name": "Ntoka Chidimma Precious",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0116/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16311,17 +16047,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq0896_75"
+        ]
       },
       {
-        "studentId": "stu_mwaq07sp_24",
-        "machineNo": "151",
         "name": "Nwufoh Jennifer Chiamaka",
-        "regNo": "EOCNS/25/0131/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0131/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16330,17 +16063,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07sp_24"
+        ]
       },
       {
-        "studentId": "stu_mwaq07ln_9",
-        "machineNo": "207",
         "name": "Obasi Blessing Eje",
-        "regNo": "EOCNS/25/0148/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0148/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16349,17 +16079,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07ln_9"
+        ]
       },
       {
-        "studentId": "stu_mw9mdsbg02k7f",
-        "machineNo": "1583",
         "name": "Odo Callista Kelechi",
-        "regNo": "EOCNS/26/0076/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/26/0076/GNS",
+        "absentDays": 1,
+        "fine": 15000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16368,17 +16095,14 @@
           "P",
           "A",
           "P"
-        ],
-        "absentDays": 1,
-        "fine": 15000,
-        "rosterId": "hr_mwosu6bo::stu_mw9mdsbg02k7f"
+        ]
       },
       {
-        "studentId": "stu_mwcbntngm9zg0",
-        "machineNo": "",
         "name": "Ogbonna Ugochukwu",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/26/0116/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16387,17 +16111,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwcbntngm9zg0"
+        ]
       },
       {
-        "studentId": "stu_mwaq07yz_44",
-        "machineNo": "121",
         "name": "Ogechi Annastecia",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0101/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16406,17 +16127,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07yz_44"
+        ]
       },
       {
-        "studentId": "stu_mwaq08fe_94",
-        "machineNo": "170",
         "name": "Ogechi Preciousrita Ugwu",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0048/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16425,17 +16143,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08fe_94"
+        ]
       },
       {
-        "studentId": "stu_mwaq07yd_42",
-        "machineNo": "114",
         "name": "Ojong Abigail",
-        "regNo": "EOCNS/25/0094/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0094/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16444,17 +16159,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07yd_42"
+        ]
       },
       {
-        "studentId": "stu_mwaq07w6_35",
-        "machineNo": "186",
         "name": "Okafor Chinenye Annastecia",
-        "regNo": "EOCNS/25/0104/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0104/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16463,36 +16175,30 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07w6_35"
+        ]
       },
       {
-        "studentId": "stu_mvuqo9eva0kwf",
-        "machineNo": "1571",
         "name": "Okoye Promise Chinelo",
-        "regNo": "TMP-EOCNS/26/0003/GNS",
         "hostel": "Hostel 1",
-        "programme": "Nursing",
-        "level": "100",
-        "dayMarks": [
-          "P",
-          "P",
-          "P",
-          "P",
-          "A"
-        ],
+        "regNo": "TMP-EOCNS/26/0003/GNS",
         "absentDays": 1,
         "fine": 15000,
-        "rosterId": "hr_mwosu6bo::stu_mvuqo9eva0kwf"
+        "programme": "Nursing",
+        "level": "100",
+        "dayMarks": [
+          "P",
+          "P",
+          "P",
+          "P",
+          "A"
+        ]
       },
       {
-        "studentId": "stu_mwaq07pu_16",
-        "machineNo": "208",
         "name": "Oluebube Dominica Usulor",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0146/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16501,17 +16207,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07pu_16"
+        ]
       },
       {
-        "studentId": "stu_mwaq07uk_30",
-        "machineNo": "142",
         "name": "Oluga Chioma Francisca",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0122/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16520,17 +16223,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07uk_30"
+        ]
       },
       {
-        "studentId": "stu_mwaq08va_139",
-        "machineNo": "221",
         "name": "Omoha Chioma Confidence",
-        "regNo": "EOCNS/25/0031/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0031/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16539,17 +16239,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08va_139"
+        ]
       },
       {
-        "studentId": "stu_mwaq0867_68",
-        "machineNo": "219",
         "name": "Onwo Joy",
-        "regNo": "EOCNS/25/0159/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0159/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16558,17 +16255,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq0867_68"
+        ]
       },
       {
-        "studentId": "stu_mwapkb4r_14",
-        "machineNo": "EOCNS/26/0080/GNS",
         "name": "Onwujekwe Sochima Living-Hope",
-        "regNo": "EOCNS/26/0080/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/26/0080/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "ND Nursing",
         "level": "100",
         "dayMarks": [
@@ -16577,17 +16271,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwapkb4r_14"
+        ]
       },
       {
-        "studentId": "stu_mwaq08n3_117",
-        "machineNo": "171",
         "name": "Onyenuma Makochukwu Christiana",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0051/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16596,17 +16287,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08n3_117"
+        ]
       },
       {
-        "studentId": "stu_mwaq08t9_134",
-        "machineNo": "150",
         "name": "Onyinyechi Benjamin",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0130/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16615,17 +16303,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08t9_134"
+        ]
       },
       {
-        "studentId": "stu_mwaq08bk_82",
-        "machineNo": "129",
         "name": "Peace Chisom",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0109/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16634,17 +16319,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08bk_82"
+        ]
       },
       {
-        "studentId": "stu_mwaq08vo_140",
-        "machineNo": "43",
         "name": "Perpetua Chioma Maduka",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0023/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16653,17 +16335,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08vo_140"
+        ]
       },
       {
-        "studentId": "stu_mwaq084h_62",
-        "machineNo": "117",
         "name": "Philomina Ola Akani",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0097/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16672,17 +16351,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq084h_62"
+        ]
       },
       {
-        "studentId": "stu_mwaq083u_60",
-        "machineNo": "131",
         "name": "Precious Amarachi Oko-Uche",
-        "regNo": "EOCNS/25/0111/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0111/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16691,17 +16367,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq083u_60"
+        ]
       },
       {
-        "studentId": "stu_mwaq08rl_129",
-        "machineNo": "531",
         "name": "Precious Nmesoma Philip",
-        "regNo": "EOCNS/25/0017/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0017/GNS",
+        "absentDays": 1,
+        "fine": 15000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16710,17 +16383,14 @@
           "P",
           "A",
           "P"
-        ],
-        "absentDays": 1,
-        "fine": 15000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08rl_129"
+        ]
       },
       {
-        "studentId": "stu_mwaq085y_67",
-        "machineNo": "168",
         "name": "Precious Omenihu",
-        "regNo": "EOCNS/25/0143/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0143/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16729,17 +16399,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq085y_67"
+        ]
       },
       {
-        "studentId": "stu_mwaq08gx_99",
-        "machineNo": "577",
         "name": "Princess Chinemerem Duke",
-        "regNo": "EOCNS/25/0049/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0049/GNS",
+        "absentDays": 1,
+        "fine": 15000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16748,17 +16415,14 @@
           "P",
           "P",
           "P"
-        ],
-        "absentDays": 1,
-        "fine": 15000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08gx_99"
+        ]
       },
       {
-        "studentId": "stu_mwaq08ao_79",
-        "machineNo": "182",
         "name": "Priscilla Faith Nweke",
-        "regNo": "EOCNS/25/0082/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0082/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16767,37 +16431,30 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08ao_79"
+        ]
       },
       {
-        "studentId": "stu_mwezor9nre7bm",
-        "rosterId": "hr_mwosu6bo::stu_mwezor9nre7bm",
-        "machineNo": "423",
         "name": "Promise Amaka Ikechukwu",
-        "regNo": "TMP-EOCNS/26/0003/MID",
         "hostel": "Hostel 1",
-        "programme": "Midwifery",
-        "level": "300",
-        "dayMarks": [
-          "A",
-          "P",
-          "P",
-          "A",
-          "P"
-        ],
+        "regNo": "TMP-EOCNS/26/0003/MID",
         "absentDays": 2,
         "fine": 30000,
-        "resolvedFromPending": true
+        "programme": "Midwifery",
+        "level": "300",
+        "dayMarks": [
+          "A",
+          "P",
+          "P",
+          "A",
+          "P"
+        ]
       },
       {
-        "studentId": "stu_mwaq07yp_43",
-        "machineNo": "406",
         "name": "Promise Nzubechi Orih",
-        "regNo": "EOCNS/25/0080/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0080/GNS",
+        "absentDays": 1,
+        "fine": 15000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16806,17 +16463,14 @@
           "P",
           "P",
           "P"
-        ],
-        "absentDays": 1,
-        "fine": 15000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07yp_43"
+        ]
       },
       {
-        "studentId": "stu_mwaq082z_57",
-        "machineNo": "94",
         "name": "Raphael Ugwu",
-        "regNo": "EOCNS/25/0074/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0074/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16825,17 +16479,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq082z_57"
+        ]
       },
       {
-        "studentId": "stu_mvrzdacf2v41g",
-        "machineNo": "481",
         "name": "Rechael Chidiogo Chibuzor",
-        "regNo": "EOCNS/24/0025/MID",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/24/0025/MID",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Midwifery",
         "level": "200",
         "dayMarks": [
@@ -16844,36 +16495,30 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mvrzdacf2v41g"
+        ]
       },
       {
-        "studentId": "stu_mwaq08pe_123",
-        "machineNo": "572",
         "name": "Samuel Emeka",
-        "regNo": "EOCNS/25/0042/GNS",
         "hostel": "Hostel 1",
-        "programme": "Nursing",
-        "level": "200",
-        "dayMarks": [
-          "P",
-          "A",
-          "A",
-          "A",
-          "A"
-        ],
+        "regNo": "EOCNS/25/0042/GNS",
         "absentDays": 4,
         "fine": 60000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08pe_123"
+        "programme": "Nursing",
+        "level": "200",
+        "dayMarks": [
+          "P",
+          "A",
+          "A",
+          "A",
+          "A"
+        ]
       },
       {
-        "studentId": "stu_mwaq0844_61",
-        "machineNo": "90",
         "name": "Shulamite Modestus Nzubechi",
-        "regNo": "EOCNS/25/0070/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0070/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16882,17 +16527,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq0844_61"
+        ]
       },
       {
-        "studentId": "stu_mwaq07tm_27",
-        "machineNo": "157",
         "name": "Simon Clara",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0137/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16901,17 +16543,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07tm_27"
+        ]
       },
       {
-        "studentId": "stu_mwaq07rk_20",
-        "machineNo": "143",
         "name": "Somkene Amuzie",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0123/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -16920,55 +16559,46 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07rk_20"
+        ]
       },
       {
-        "studentId": "stu_mwaq08ok_121",
-        "machineNo": "166",
         "name": "Soneye Noheemot Oluwafunmilayo",
-        "regNo": "EOCNS/25/0120/GNS",
         "hostel": "Hostel 1",
-        "programme": "Nursing",
-        "level": "200",
-        "dayMarks": [
-          "A",
-          "A",
-          "A",
-          "A",
-          "A"
-        ],
+        "regNo": "EOCNS/25/0120/GNS",
         "absentDays": 5,
         "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08ok_121"
-      },
-      {
-        "studentId": "stu_mwaq07mk_10",
-        "machineNo": "507",
-        "name": "Sunday Emmanuella Ebubechi",
-        "regNo": "EOCNS/25/0153/GNS",
-        "hostel": "Hostel 1",
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
-          "P",
-          "P",
-          "P",
-          "P",
+          "A",
+          "A",
+          "A",
+          "A",
           "A"
-        ],
+        ]
+      },
+      {
+        "name": "Sunday Emmanuella Ebubechi",
+        "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0153/GNS",
         "absentDays": 1,
         "fine": 15000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07mk_10"
+        "programme": "Nursing",
+        "level": "200",
+        "dayMarks": [
+          "P",
+          "P",
+          "P",
+          "P",
+          "A"
+        ]
       },
       {
-        "studentId": "stu_mwaq08p2_122",
-        "machineNo": "135",
         "name": "Taiwo Favour Omobewaji",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0115/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16977,17 +16607,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08p2_122"
+        ]
       },
       {
-        "studentId": "stu_mwaq093q_163",
-        "machineNo": "152",
         "name": "Tochukwu Salvation Ogba",
-        "regNo": "EOCNS/25/0132/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0132/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "100",
         "dayMarks": [
@@ -16996,17 +16623,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq093q_163"
+        ]
       },
       {
-        "studentId": "stu_mvrzdacqif7ex",
-        "machineNo": "464",
         "name": "Uchechi Glory Emeka",
-        "regNo": "EOCNS/24/0066/MID",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/24/0066/MID",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Midwifery",
         "level": "200",
         "dayMarks": [
@@ -17015,17 +16639,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mvrzdacqif7ex"
+        ]
       },
       {
-        "studentId": "stu_mwaq0822_54",
-        "machineNo": "193",
         "name": "Udokanma Osuagwu",
+        "hostel": "Hostel 1",
         "regNo": "EOCNS/25/0076/GNS",
-        "hostel": "Hostel 1",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -17034,17 +16655,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq0822_54"
+        ]
       },
       {
-        "studentId": "stu_mwaq08do_89",
-        "machineNo": "128",
         "name": "Ugwunta Salomie Kamsiyochukwu",
-        "regNo": "EOCNS/25/0108/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0108/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -17053,17 +16671,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08do_89"
+        ]
       },
       {
-        "studentId": "stu_mwaqcly0_121",
-        "machineNo": "542",
         "name": "Umenwaka Marycynthia",
-        "regNo": "EOCNS/24/0068/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/24/0068/GNS",
+        "absentDays": 4,
+        "fine": 60000,
         "programme": "Nursing",
         "level": "300",
         "dayMarks": [
@@ -17072,17 +16687,14 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 4,
-        "fine": 60000,
-        "rosterId": "hr_mwosu6bo::stu_mwaqcly0_121"
+        ]
       },
       {
-        "studentId": "stu_mwaq08ix_105",
-        "machineNo": "574",
         "name": "Victory Ezenwa",
-        "regNo": "EOCNS/25/0044/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0044/GNS",
+        "absentDays": 1,
+        "fine": 15000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -17091,17 +16703,14 @@
           "P",
           "P",
           "P"
-        ],
-        "absentDays": 1,
-        "fine": 15000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq08ix_105"
+        ]
       },
       {
-        "studentId": "stu_mwaq07uu_31",
-        "machineNo": "139",
         "name": "Victory Ndubueze Chidera",
-        "regNo": "EOCNS/25/0119/GNS",
         "hostel": "Hostel 1",
+        "regNo": "EOCNS/25/0119/GNS",
+        "absentDays": 5,
+        "fine": 75000,
         "programme": "Nursing",
         "level": "200",
         "dayMarks": [
@@ -17110,10 +16719,7 @@
           "A",
           "A",
           "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07uu_31"
+        ]
       }
     ],
     "matrix": [
@@ -17211,25 +16817,6 @@
         "absentDays": 0,
         "fine": 0,
         "rosterId": "hr_mwosu6bo::stu_mvus6j4xiyiyj"
-      },
-      {
-        "studentId": "stu_mvuvud1olx5d9",
-        "machineNo": "stu_mvuvud1olx5d9",
-        "name": "Alolote Fortunatus",
-        "regNo": "EOCNS/26/0147/GNS",
-        "hostel": "Hostel 1",
-        "programme": "Midwifery",
-        "level": "100",
-        "dayMarks": [
-          "A",
-          "A",
-          "A",
-          "A",
-          "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mvuvud1olx5d9"
       },
       {
         "studentId": "stu_mwaq082p_56",
@@ -18108,25 +17695,6 @@
         "absentDays": 5,
         "fine": 75000,
         "rosterId": "hr_mwosu6bo::stu_mwaq07ws_37"
-      },
-      {
-        "studentId": "stu_mwaq07vq_34",
-        "machineNo": "109",
-        "name": "Clinton Ekuma Otu",
-        "regNo": "EOCNS/25/0089/GNS",
-        "hostel": "Hostel 1",
-        "programme": "Nursing",
-        "level": "200",
-        "dayMarks": [
-          "A",
-          "A",
-          "A",
-          "A",
-          "A"
-        ],
-        "absentDays": 5,
-        "fine": 75000,
-        "rosterId": "hr_mwosu6bo::stu_mwaq07vq_34"
       },
       {
         "studentId": "stu_mwaq07v4_32",
@@ -20792,7 +20360,31 @@
         "rosterId": "hr_mwosu6bo::stu_mwaq07uu_31"
       }
     ],
-    "amendments": [],
+    "amendments": [
+      {
+        "ref": "REF/EOCNS/QA/16",
+        "reason": "student not in hostel",
+        "at": "2026-11-20T15:21:47.602Z",
+        "by": "QA Officer",
+        "changes": [],
+        "deletedRows": [
+          {
+            "studentId": "stu_mvuvud1olx5d9",
+            "rosterId": "hr_mwosu6bo::stu_mvuvud1olx5d9",
+            "name": "Alolote Fortunatus",
+            "regNo": "EOCNS/26/0147/GNS",
+            "hostel": "Hostel 1"
+          },
+          {
+            "studentId": "stu_mwaq07vq_34",
+            "rosterId": "hr_mwosu6bo::stu_mwaq07vq_34",
+            "name": "Clinton Ekuma Otu",
+            "regNo": "EOCNS/25/0089/GNS",
+            "hostel": "Hostel 1"
+          }
+        ]
+      }
+    ],
     "resolutions": [
       {
         "studentId": "stu_mwaq08a2_77",
