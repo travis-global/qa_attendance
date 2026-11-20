@@ -3254,7 +3254,7 @@ async function renderHostelConflicts() {
       if (!row) return;
       // Keep the official master hostel and retain the decision in the report history.
       await recordHostelIssueResolution(row,"kept_master_hostel",{masterHostel:row.masterHostel,gateHostel:row.gateHostel});
-      await del("biometric_pending", row.id);
+      row.status = "resolved"; row.resolution = "kept_master_hostel"; row.resolvedAt = new Date().toISOString(); row.updatedAt = row.resolvedAt; await put("biometric_pending", row);
       markDirty("hostel conflict keep");
       await renderHostelConflicts();
     };
@@ -3282,7 +3282,7 @@ async function renderHostelConflicts() {
         });
       } catch (_) {}
       await recordHostelIssueResolution(row,"accepted_gate_hostel",{hostelBefore:before,hostelAfter:s.hostel});
-      await del("biometric_pending", row.id);
+      row.status = "resolved"; row.resolution = "accepted_gate_hostel"; row.resolvedAt = new Date().toISOString(); row.updatedAt = row.resolvedAt; await put("biometric_pending", row);
       markDirty("hostel conflict accept");
       await renderHostelConflicts();
       try { await renderHostelRoster(); } catch (_) {}
@@ -3291,8 +3291,7 @@ async function renderHostelConflicts() {
   document.querySelectorAll("[data-hc-discard]").forEach(function(btn) {
     btn.onclick = async function() {
       var issue=(await getAll("biometric_pending")).find(function(x){return x.id===btn.getAttribute("data-hc-discard");});
-      if(issue)await recordHostelIssueResolution(issue,"dismissed_conflict",{masterHostel:issue.masterHostel,gateHostel:issue.gateHostel});
-      await del("biometric_pending", btn.getAttribute("data-hc-discard"));
+      if(issue){await recordHostelIssueResolution(issue,"dismissed_conflict",{masterHostel:issue.masterHostel,gateHostel:issue.gateHostel});issue.status="resolved";issue.resolution="dismissed_conflict";issue.resolvedAt=new Date().toISOString();issue.updatedAt=issue.resolvedAt;await put("biometric_pending",issue);}
       markDirty("hostel conflict dismiss");
       await renderHostelConflicts();
     };
