@@ -5,7 +5,7 @@
     "machineNo": "104",
     "machineName": "Nnedinma Miracle Chima",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "resolved",
     "suggestions": [
       {
         "studentId": "stu_mvutitt5cul62",
@@ -27,7 +27,10 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.794Z",
-    "updatedAt": "2026-11-11T10:44:37.794Z"
+    "updatedAt": "2026-11-20T14:15:14.220Z",
+    "resolution": "linked_to_student",
+    "studentId": "stu_mwaq07zl_46",
+    "resolvedAt": "2026-11-20T14:15:14.220Z"
   },
   {
     "id": "train_mwbzs9bc_49",
@@ -35,7 +38,7 @@
     "machineNo": "111",
     "machineName": "Augustina Ogochukwu Iloc",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "resolved",
     "suggestions": [
       {
         "studentId": "stu_mvusbc9awsly1",
@@ -57,7 +60,10 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.800Z",
-    "updatedAt": "2026-11-11T10:44:37.800Z"
+    "updatedAt": "2026-11-20T14:15:21.072Z",
+    "resolution": "linked_to_student",
+    "studentId": "stu_mwaq080k_49",
+    "resolvedAt": "2026-11-20T14:15:21.072Z"
   },
   {
     "id": "train_mwbzs9c4_66",
@@ -65,7 +71,7 @@
     "machineNo": "132",
     "machineName": "Chiamaka Jenny Israel",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "resolved",
     "suggestions": [
       {
         "studentId": "stu_mvut9mhyt7pwf",
@@ -87,7 +93,10 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.828Z",
-    "updatedAt": "2026-11-11T10:44:37.828Z"
+    "updatedAt": "2026-11-20T14:15:32.143Z",
+    "resolution": "linked_to_student",
+    "studentId": "stu_mwaq08e9_91",
+    "resolvedAt": "2026-11-20T14:15:32.143Z"
   },
   {
     "id": "train_mwbzs9cn_79",
@@ -95,7 +104,7 @@
     "machineNo": "150",
     "machineName": "Oyinyechi Mary Benjamin",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "resolved",
     "suggestions": [
       {
         "studentId": "stu_mvrzdacksgwcs",
@@ -117,7 +126,10 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.848Z",
-    "updatedAt": "2026-11-11T10:44:37.848Z"
+    "updatedAt": "2026-11-20T14:15:44.275Z",
+    "resolution": "linked_to_student",
+    "studentId": "stu_mwaq08t9_134",
+    "resolvedAt": "2026-11-20T14:15:44.275Z"
   },
   {
     "id": "train_mwbzs9cx_86",
@@ -125,7 +137,7 @@
     "machineNo": "160",
     "machineName": "Aghaegbuna Chukewuma",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "resolved",
     "suggestions": [
       {
         "studentId": "stu_mwaq07jy_8",
@@ -147,7 +159,10 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.857Z",
-    "updatedAt": "2026-11-11T10:44:37.857Z"
+    "updatedAt": "2026-11-20T14:15:47.603Z",
+    "resolution": "linked_to_student",
+    "studentId": "stu_mwaq07jy_8",
+    "resolvedAt": "2026-11-20T14:15:47.603Z"
   },
   {
     "id": "train_mwbzs9d5_91",
@@ -187,7 +202,7 @@
     "machineNo": "177",
     "machineName": "Rejoice Vincent K.",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "resolved",
     "suggestions": [
       {
         "studentId": "stu_mwaq08ga_97",
@@ -209,7 +224,10 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.878Z",
-    "updatedAt": "2026-11-11T10:44:37.878Z"
+    "updatedAt": "2026-11-20T14:15:50.067Z",
+    "resolution": "linked_to_student",
+    "studentId": "stu_mwaq08ga_97",
+    "resolvedAt": "2026-11-20T14:15:50.067Z"
   },
   {
     "id": "train_mwbzs9dm_102",
@@ -281,7 +299,7 @@
     "machineNo": "193",
     "machineName": "Osuagwu Precious Udokama",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "resolved",
     "suggestions": [
       {
         "studentId": "stu_mvs9sf0ar5n1h",
@@ -303,7 +321,10 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.901Z",
-    "updatedAt": "2026-11-11T10:44:37.901Z"
+    "updatedAt": "2026-11-20T14:16:02.301Z",
+    "resolution": "linked_to_student",
+    "studentId": "stu_mwaq0822_54",
+    "resolvedAt": "2026-11-20T14:16:02.301Z"
   },
   {
     "id": "train_mwbzs9ee_121",
@@ -311,7 +332,7 @@
     "machineNo": "202",
     "machineName": "Odo Cynthia Mmesoma",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "resolved",
     "suggestions": [
       {
         "studentId": "stu_mvrzdacpbsbsd",
@@ -333,7 +354,10 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.910Z",
-    "updatedAt": "2026-11-11T10:44:37.910Z"
+    "updatedAt": "2026-11-20T14:16:14.637Z",
+    "resolution": "linked_to_student",
+    "studentId": "stu_mwaq08zl_151",
+    "resolvedAt": "2026-11-20T14:16:14.637Z"
   },
   {
     "id": "train_mwbzs9ef_122",
@@ -373,7 +397,7 @@
     "machineNo": "222",
     "machineName": "Oluebube Sharon Demian",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "resolved",
     "suggestions": [
       {
         "studentId": "stu_mvutitt5cul62",
@@ -395,7 +419,10 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.931Z",
-    "updatedAt": "2026-11-11T10:44:37.931Z"
+    "updatedAt": "2026-11-20T14:16:23.164Z",
+    "resolution": "linked_to_student",
+    "studentId": "stu_mwaq07fc_2",
+    "resolvedAt": "2026-11-20T14:16:23.164Z"
   },
   {
     "id": "train_mwbzs9f6_140",
@@ -403,7 +430,7 @@
     "machineNo": "355",
     "machineName": "Marycythia M. Umenwaka",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "resolved",
     "suggestions": [
       {
         "studentId": "stu_mwaqcly0_121",
@@ -425,7 +452,10 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.938Z",
-    "updatedAt": "2026-11-11T10:44:37.938Z"
+    "updatedAt": "2026-11-20T14:16:27.146Z",
+    "resolution": "linked_to_student",
+    "studentId": "stu_mwaqcly0_121",
+    "resolvedAt": "2026-11-20T14:16:27.146Z"
   },
   {
     "id": "train_mwbzs9f7_141",
