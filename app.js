@@ -174,7 +174,9 @@ function showView(viewId) {
         else if (rosterNote) rosterNote.textContent = "The hostel register is still starting. Please wait a moment and open Hostel again.";
       }, 500);
     }
-    try { renderBioQueues(); } catch (_) {}
+    // Refresh the biometric queues without triggering a second conflict render.
+    // The dedicated call below owns the conflict table's loading sequence.
+    try { renderBioQueues(true); } catch (_) {}
     try { renderHostelConflicts(); } catch (_) {}
   }
   if (viewId === "timetable-board") { if (typeof window.renderTimetableBoard === "function") window.renderTimetableBoard(); else if (typeof renderTimetableBoard === "function") renderTimetableBoard(); }
@@ -2448,7 +2450,9 @@ async function renderHostelRunsMaster() {
       if(linkedIssues.length){
         var issueNames=linkedIssues.map(function(item,i){return (i+1)+". "+(item.machineName||item.studentName||"Unnamed machine user")+" (ID "+(item.machineNo||"—")+") — "+String(item.status||"needs review").replace(/_/g," ");}).join("\n");
         showView("hostel");
-        try{await renderBioQueues();}catch(_){}
+        // Do not let the general queue renderer launch another conflict render
+        // after the saved-report-specific records have been supplied.
+        try{await renderBioQueues(true);}catch(_){}
         try{await renderHostelConflicts(linkedIssues.filter(function(item){return item.status==="hostel_conflict";}));}catch(_){}
         // The review tools live inside the collapsed Advanced setup details.
         // Open that section automatically and take the officer to the exact review card.
@@ -11568,7 +11572,7 @@ async function bioImportAndMatch() {
   }
 }
 
-async function renderBioQueues() {
+async function renderBioQueues(skipConflictRender) {
   var clarifyBody = document.getElementById("bioClarifyBody");
   var unlinkedBody = document.getElementById("bioUnlinkedBody");
   var countEl = document.getElementById("bioClarifyCount");
@@ -11696,7 +11700,9 @@ async function renderBioQueues() {
       openBioCreateStudentModal(btn.getAttribute("data-bio-create"));
     });
   });
-  try { await renderHostelConflicts(); } catch (_) {}
+  if (!skipConflictRender) {
+    try { await renderHostelConflicts(); } catch (_) {}
+  }
 }
 
 async function openBioClarifyModal(pendingId) {
