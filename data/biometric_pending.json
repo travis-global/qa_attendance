@@ -155,7 +155,7 @@
     "machineNo": "167",
     "machineName": "John Chidinmma Mercy",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "discarded",
     "suggestions": [
       {
         "studentId": "stu_mvrzdacqxi6oa",
@@ -177,7 +177,9 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.865Z",
-    "updatedAt": "2026-11-11T10:44:37.865Z"
+    "updatedAt": "2026-11-20T13:35:16.837Z",
+    "discardedAt": "2026-11-20T13:35:16.837Z",
+    "discardedBy": "Alolote Fortunatus"
   },
   {
     "id": "train_mwbzs9di_100",
