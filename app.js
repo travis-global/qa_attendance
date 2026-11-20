@@ -2432,7 +2432,17 @@ async function renderHostelRunsMaster() {
       var saved=(await getAll("hostel_runs")).find(function(r){return r.id===btn.getAttribute("data-hr-download");});
       if(!saved){alert("Saved hostel report not found.");return;}
       var linkedIssues=(await getAll("biometric_pending")).filter(function(item){return item&&["clarify","conflict","unlinked","hostel_conflict"].indexOf(item.status)>=0&&(item.reportRunIds||[]).indexOf(saved.id)>=0;});
-      if(linkedIssues.length){alert("This report still has "+linkedIssues.length+" unresolved issue(s). Resolve or explicitly dismiss them before downloading the report.");return;}
+      if(linkedIssues.length){
+        var issueNames=linkedIssues.map(function(item,i){return (i+1)+". "+(item.machineName||item.studentName||"Unnamed machine user")+" (ID "+(item.machineNo||"—")+") — "+String(item.status||"needs review").replace(/_/g," ");}).join("\n");
+        showView("hostel");
+        try{await renderBioQueues();}catch(_){}
+        try{await renderHostelConflicts();}catch(_){}
+        var guide=document.getElementById("hostelStatus");
+        var guideText="This saved report has "+linkedIssues.length+" item(s) to review before download:\n\n"+issueNames+"\n\nUse the matching review section below: Clarify Queue, Unlinked Pool, or Hostel Conflicts. After resolving them, return to Saved Hostel Reports and download again.";
+        if(guide){guide.textContent=guideText;guide.style.whiteSpace="pre-line";guide.scrollIntoView({behavior:"smooth",block:"center"});}
+        alert(guideText);
+        return;
+      }
       try{await downloadHostelRunWorkbook(saved);}catch(e){alert(e.message||String(e));}
     });
   });
