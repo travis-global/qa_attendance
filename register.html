@@ -144,7 +144,7 @@ document.getElementById("regForm").addEventListener("submit", async (e) => {
   msg.className = "msg";
   msg.textContent = "";
   const student = {
-    name: document.getElementById("name").value.trim(),
+    name: String(document.getElementById("name").value || "").trim().replace(/\s+/g, " ").toUpperCase(),
     email: document.getElementById("email").value.trim(),
     regNo: document.getElementById("regNo").value.trim(),
     programme: document.getElementById("programme").value,
