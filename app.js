@@ -3254,6 +3254,10 @@ window.renderHostelRoster = renderHostelRoster;
 
 
 async function renderHostelConflicts(itemsOverride) {
+  // Prevent an older asynchronous database read from overwriting a newer,
+  // explicitly supplied list (for example, the saved-report review flow).
+  var renderToken = (window.__hostelConflictRenderToken || 0) + 1;
+  window.__hostelConflictRenderToken = renderToken;
   var body = document.getElementById("hostelConflictBody");
   var countEl = document.getElementById("hostelConflictCount");
   if (!body) return;
@@ -3263,11 +3267,14 @@ async function renderHostelConflicts(itemsOverride) {
     // records directly so the review table cannot disagree with that warning.
     list = Array.isArray(itemsOverride) ? itemsOverride : await getAll("biometric_pending");
   } catch (err) {
+    if (window.__hostelConflictRenderToken !== renderToken) return;
     if (countEl) countEl.textContent = "Conflicts could not be loaded";
     body.innerHTML = '<tr><td colspan="5" class="muted-note">Unable to read the conflict queue. Use Refresh or reload the app, then try again.</td></tr>';
     console.error("renderHostelConflicts failed", err);
     return;
   }
+  // A later render has taken over while this one was waiting for IndexedDB.
+  if (window.__hostelConflictRenderToken !== renderToken) return;
   list = (list || []).filter(function(x) { return x && x.status === "hostel_conflict"; });
   if (countEl) countEl.textContent = "Conflicts: " + list.length + (list.length ? " (held off fee reports)" : " — none");
   if (!list.length) {
