@@ -98,6 +98,22 @@ async function githubPutFile(env, path, contentText, message, sha) {
 }
 
 
+function checkPublishKey(env, request, payload) {
+  // PUBLISH_KEY is optional for deployments that intentionally do not use
+  // the shared publish-key layer. When configured, require an exact match.
+  const expected = String(env.PUBLISH_KEY || "").trim();
+  if (!expected) return true;
+
+  const supplied = String(
+    request.headers.get("X-EOCNS-Key") ||
+    request.headers.get("X-Publish-Key") ||
+    (payload && payload.publishKey) ||
+    ""
+  ).trim();
+
+  return supplied.length > 0 && supplied === expected;
+}
+
 async function handlePublish(env, request, payload, cors) {
   if (!checkPublishKey(env, request, payload)) {
     return json({
