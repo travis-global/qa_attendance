@@ -12355,7 +12355,7 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
         try { showView("hostel"); } catch (_) {}
         var card = document.getElementById("biometricMapCard");
         if (card) card.scrollIntoView({ behavior: "smooth", block: "start" });
-        try { startMatchQueueBatch("clarify"); } catch (_) {}
+        try { startMatchQueueBatch("clarify", (window.__lastHostelReport || {}).runId); } catch (_) {}
       }
     }, 400);
   }
