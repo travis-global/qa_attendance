@@ -1668,7 +1668,7 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
 
   function cleanId(v) { return String(v == null ? "" : v).trim().replace(/\.0$/, ""); }
   function isGateCheckInStatus(raw) {
-    var status = String(raw == null ? "" : raw).trim().toUpperCase().replace(/[\\s_-]+/g, "");
+    var status = String(raw == null ? "" : raw).trim().toUpperCase().replace(/[\s_-]+/g, "");
     return status === "C/IN" || status === "CHECKIN" || status === "IN" || status === "ENTRY";
   }
   function isBlankHostel(h) {
