@@ -177,7 +177,7 @@ function showView(viewId) {
     // Refresh the biometric queues without triggering a second conflict render.
     // The dedicated call below owns the conflict table's loading sequence.
     try { renderBioQueues(true); } catch (_) {}
-    try { renderHostelConflicts(); } catch (_) {}
+    try { renderHostelConflicts(); } catch (e) { console.error("renderHostelConflicts", e); }
   }
   if (viewId === "timetable-board") { if (typeof window.renderTimetableBoard === "function") window.renderTimetableBoard(); else if (typeof renderTimetableBoard === "function") renderTimetableBoard(); }
   if (viewId === "qa-daily") renderQaDaily();
@@ -2135,7 +2135,7 @@ function downloadHostelWorkbook(rosterRows, dateKeys, filename, gateExportRows) 
       return { wch: key === "name" ? 28 : (key === "date/time" ? 21 : (key === "department" ? 18 : 15)) };
     });
     gateWs["!freeze"] = { xSplit: 1, ySplit: 1, topLeftCell: "B2", activePane: "bottomRight", state: "frozen" };
-    gateWs["!autofilter"] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: Math.max(0, reportGateRows.length - 1), c: Math.max(0, gateHeaders.length - 1) } }) };
+    gateWs["!autofilter"] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: Math.max(0, gateExportRows.length - 1), c: Math.max(0, gateHeaders.length - 1) } }) };
     gateWs["!pageSetup"] = { orientation: "landscape", fitToWidth: 1, fitToHeight: 0 };
     gateWs["!margins"] = { left: 0.25, right: 0.25, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 };
     XLSX.utils.book_append_sheet(wb, gateWs, "Gate Attendance");
@@ -2400,13 +2400,107 @@ async function reconcileHostelRunsForMachine(machineNo, student) {
   if (updated.length || conflictChanged) {
     markDirty("saved hostel reports updated after issue resolution");
     try { await renderHostelRunsMaster(); } catch (_) {}
-    try { await renderHostelConflicts(); } catch (_) {}
+    try { await renderHostelConflicts(); } catch (e) { console.error("renderHostelConflicts", e); }
   }
   return updated;
 }
 
 
 /** List saved hostel runs (master sheet) — newest first. */
+async function renderHostelConflicts(itemsOverride) {
+  // Prevent an older asynchronous database read from overwriting a newer,
+  // explicitly supplied list (for example, the saved-report review flow).
+  var renderToken = (window.__hostelConflictRenderToken || 0) + 1;
+  window.__hostelConflictRenderToken = renderToken;
+  var body = document.getElementById("hostelConflictBody");
+  var countEl = document.getElementById("hostelConflictCount");
+  if (!body) return;
+  var list = [];
+  try {
+    // A saved-report blocker passes the exact records it just read. Use those
+    // records directly so the review table cannot disagree with that warning.
+    list = Array.isArray(itemsOverride) && itemsOverride.length ? itemsOverride : await getAll("biometric_pending");
+  } catch (err) {
+    if (window.__hostelConflictRenderToken !== renderToken) return;
+    if (countEl) countEl.textContent = "Conflicts could not be loaded";
+    body.innerHTML = '<tr><td colspan="5" class="muted-note">Unable to read the conflict queue. Use Refresh or reload the app, then try again.</td></tr>';
+    console.error("renderHostelConflicts failed", err);
+    return;
+  }
+  // A later render has taken over while this one was waiting for IndexedDB.
+  if (window.__hostelConflictRenderToken !== renderToken) return;
+  list = (list || []).filter(function(x) { return x && x.status === "hostel_conflict"; });
+  if (countEl) countEl.textContent = "Conflicts: " + list.length + (list.length ? " (held off fee reports)" : " — none");
+  if (!list.length) {
+    body.innerHTML = '<tr><td colspan="5" class="muted-note">No location conflicts.</td></tr>';
+    return;
+  }
+  body.innerHTML = list.map(function(row) {
+    return "<tr>" +
+      "<td><strong>" + escapeHtml(row.machineNo || "") + "</strong></td>" +
+      "<td>" + escapeHtml(row.studentName || row.machineName || "") +
+        (row.regNo ? (" · " + escapeHtml(row.regNo)) : "") + "</td>" +
+      "<td>" + escapeHtml(row.masterHostel || "—") + "</td>" +
+      "<td>" + escapeHtml(row.gateHostel || "") + "</td>" +
+      '<td class="qa-edit-only">' +
+        (isQaOfficer() ? (
+          '<button type="button" class="btn btn--primary btn--sm" data-hc-keep="' + escapeHtml(row.id) + '">Keep master</button> ' +
+          '<button type="button" class="btn btn--ghost btn--sm" data-hc-accept="' + escapeHtml(row.id) + '">Accept gate</button> ' +
+          '<button type="button" class="btn btn--ghost btn--sm" data-hc-discard="' + escapeHtml(row.id) + '">Dismiss</button>'
+        ) : "—") +
+      "</td></tr>";
+  }).join("");
+  document.querySelectorAll("[data-hc-keep]").forEach(function(btn) {
+    btn.onclick = async function() {
+      var row = (await getAll("biometric_pending")).find(function(x) { return x.id === btn.getAttribute("data-hc-keep"); });
+      if (!row) return;
+      // Keep the official master hostel and retain the decision in the report history.
+      await recordHostelIssueResolution(row,"kept_master_hostel",{masterHostel:row.masterHostel,gateHostel:row.gateHostel});
+      row.status = "resolved"; row.resolution = "kept_master_hostel"; row.resolvedAt = new Date().toISOString(); row.updatedAt = row.resolvedAt; await put("biometric_pending", row);
+      markDirty("hostel conflict keep");
+      await renderHostelConflicts();
+    };
+  });
+  document.querySelectorAll("[data-hc-accept]").forEach(function(btn) {
+    btn.onclick = async function() {
+      var row = (await getAll("biometric_pending")).find(function(x) { return x.id === btn.getAttribute("data-hc-accept"); });
+      if (!row || !row.studentId) return;
+      var all = await getAll("students");
+      var s = all.find(function(x) { return x.id === row.studentId; });
+      if (!s) return;
+      var before = s.hostel || "";
+      s.hostel = row.gateHostel || s.hostel;
+      s.hostelSource = "gate_conflict_accept";
+      s.updatedAt = new Date().toISOString();
+      await put("students", s);
+      try { await reconcileHostelRunsForMachine(row.machineNo, s); } catch (reconcileErr) { console.warn("hostel conflict report reconciliation", reconcileErr); }
+      try {
+        await writeAudit({
+          action: "update",
+          entity: "students",
+          entityId: s.id,
+          reason: "Accepted gate Location ID hostel over master",
+          details: { hostelBefore: before, hostelAfter: s.hostel, machineNo: row.machineNo }
+        });
+      } catch (_) {}
+      await recordHostelIssueResolution(row,"accepted_gate_hostel",{hostelBefore:before,hostelAfter:s.hostel});
+      row.status = "resolved"; row.resolution = "accepted_gate_hostel"; row.resolvedAt = new Date().toISOString(); row.updatedAt = row.resolvedAt; await put("biometric_pending", row);
+      markDirty("hostel conflict accept");
+      await renderHostelConflicts();
+      try { await renderHostelRoster(); } catch (_) {}
+    };
+  });
+  document.querySelectorAll("[data-hc-discard]").forEach(function(btn) {
+    btn.onclick = async function() {
+      var issue=(await getAll("biometric_pending")).find(function(x){return x.id===btn.getAttribute("data-hc-discard");});
+      if(issue){await recordHostelIssueResolution(issue,"dismissed_conflict",{masterHostel:issue.masterHostel,gateHostel:issue.gateHostel});issue.status="resolved";issue.resolution="dismissed_conflict";issue.resolvedAt=new Date().toISOString();issue.updatedAt=issue.resolvedAt;await put("biometric_pending",issue);}
+      markDirty("hostel conflict dismiss");
+      await renderHostelConflicts();
+    };
+  });
+}
+window.renderHostelConflicts = renderHostelConflicts;
+
 async function renderHostelRunsMaster() {
   var body = document.getElementById("hostelRunsBody");
   var countEl = document.getElementById("hostelRunsCount");
@@ -2448,23 +2542,25 @@ async function renderHostelRunsMaster() {
       if(!saved){alert("Saved hostel report not found.");return;}
       var linkedIssues=(await getAll("biometric_pending")).filter(function(item){return item&&["clarify","conflict","unlinked","hostel_conflict"].indexOf(item.status)>=0&&(item.reportRunIds||[]).indexOf(saved.id)>=0;});
       if(linkedIssues.length){
-        var issueNames=linkedIssues.map(function(item,i){return (i+1)+". "+(item.machineName||item.studentName||"Unnamed machine user")+" (ID "+(item.machineNo||"—")+") — "+String(item.status||"needs review").replace(/_/g," ");}).join("\n");
+        var hostelConflictIssues=linkedIssues.filter(function(item){return item.status==="hostel_conflict";});
+        var biometricIssues=linkedIssues.filter(function(item){return ["clarify","conflict","unlinked"].indexOf(item.status)>=0;});
+        var issueNames=linkedIssues.map(function(item,i){return (i+1)+". "+(item.machineName||item.studentName||"Unnamed machine user")+" (ID "+(item.machineNo||"—")+") — "+String(item.status||"needs review").replace(/_/g," ");}).join("\\n");
         showView("hostel");
-        // Do not let the general queue renderer launch another conflict render
-        // after the saved-report-specific records have been supplied.
-        try{await renderBioQueues(true);}catch(_){}
-        try{await renderHostelConflicts(linkedIssues.filter(function(item){return item.status==="hostel_conflict";}));}catch(_){}
-        // The review tools live inside the collapsed Advanced setup details.
-        // Open that section automatically and take the officer to the exact review card.
+        try { await renderBioQueues(true); } catch (e) { console.error("renderBioQueues", e); }
+        try { await renderHostelConflicts(hostelConflictIssues); } catch (e) { console.error("renderHostelConflicts", e); }
         var conflictCard=document.getElementById("hostelConflictCard");
-        var reviewDetails=conflictCard;
+        var biometricCard=document.getElementById("biometricMapCard");
+        var targetCard=hostelConflictIssues.length?conflictCard:(biometricIssues.length?biometricCard:null);
+        var reviewDetails=targetCard;
         while(reviewDetails && String(reviewDetails.tagName||"").toLowerCase()!=="details"){reviewDetails=reviewDetails.parentElement;}
         if(reviewDetails)reviewDetails.open=true;
         var guide=document.getElementById("hostelStatus");
-        var guideText="This saved report has "+linkedIssues.length+" item(s) to review before download:\n\n"+issueNames+"\n\nThe review section has been opened for you. In Hostel Conflicts, choose Keep master if the master-list hostel is correct, Accept gate if the gate location reflects the student\u2019s correct hostel, or Dismiss if this mismatch should no longer be reviewed. Then return to Saved Hostel Reports and download again.";
+        var instructions=hostelConflictIssues.length
+          ? "In Hostel Conflicts, choose Keep master if the master-list hostel is correct, Accept gate if the gate location reflects the student’s correct hostel, or Dismiss if this mismatch should no longer be reviewed."
+          : "In Biometric Map Review, clarify or link each name, or move unresolved names to the Unlinked Pool for later review.";
+        var guideText="This saved report has "+linkedIssues.length+" item(s) to review before download:\\n\\n"+issueNames+"\\n\\n"+instructions+" Then return to Saved Hostel Reports and download again.";
         if(guide){guide.textContent=guideText;guide.style.whiteSpace="pre-line";}
-        var hasHostelConflict=linkedIssues.some(function(item){return item.status==="hostel_conflict";});
-        var target=hasHostelConflict&&conflictCard?conflictCard:guide;
+        var target=targetCard||guide;
         if(target)target.scrollIntoView({behavior:"smooth",block:"center"});
         alert(guideText);
         return;
@@ -2667,17 +2763,17 @@ async function ignoreHostelIssuesForCurrentReport() {
   if (!report.runId) { setHostelStatus("Report draft ID is missing. Generate the preview again.", "error"); return; }
   var queue = await getAll("biometric_pending");
   var issues = (queue || []).filter(function(q) {
-    return q && ["clarify","conflict","unlinked"].indexOf(q.status) >= 0 &&
+    return q && ["clarify","conflict","unlinked","hostel_conflict"].indexOf(q.status) >= 0 &&
       q.kind !== "csv" && (q.reportRunIds || []).indexOf(report.runId) >= 0;
   });
   if (!issues.length) { setHostelStatus("No unresolved machine users are linked to this report.", "ok"); return; }
   var names = issues.map(function(q, i) {
     return (i + 1) + ". " + (q.machineName || "Unnamed machine user") + " (ID " + (q.machineNo || "—") + ")";
-  }).join("\\n");
-  var warning = "Ignore " + issues.length + " unresolved machine user(s) for THIS report only?\\n\\n" + names +
-    "\\n\\nTheir records will remain saved in the biometric review queue. They will NOT be globally discarded or deleted. " +
+  }).join("\n");
+  var warning = "Ignore " + issues.length + " unresolved machine user(s) for THIS report only?\n\n" + names +
+    "\n\nTheir records will remain saved in the biometric review queue. They will NOT be globally discarded or deleted. " +
     "If you generate this report now, these users will be excluded from its attendance, absence and fine calculations " +
-    "until they are linked and the report is regenerated.\\n\\nContinue?";
+    "until they are linked and the report is regenerated.\n\nContinue?";
   if (!confirm(warning)) return;
   for (var i = 0; i < issues.length; i++) {
     var q = issues[i];
@@ -2693,20 +2789,20 @@ async function ignoreHostelIssuesForCurrentReport() {
 }
 
 async function guideToHostelPendingReview(unresolvedCount) {
-  try { await renderBioQueues(); } catch (_) {}
-  try { await renderHostelConflicts(); } catch (_) {}
+  try { await renderBioQueues(true); } catch (e) { console.error("renderBioQueues", e); }
+  try { await renderHostelConflicts(); } catch (e) { console.error("renderHostelConflicts", e); }
   var report = window.__lastHostelReport || {}, queue = [];
   try { queue = await getAll("biometric_pending"); } catch (_) {}
   var issues = (queue || []).filter(function(q) {
-    return q && ["clarify","conflict","unlinked"].indexOf(q.status) >= 0 &&
+    return q && ["clarify","conflict","unlinked","hostel_conflict"].indexOf(q.status) >= 0 &&
       q.kind !== "csv" && (q.reportRunIds || []).indexOf(report.runId) >= 0;
   });
   var names = issues.map(function(q, i) {
     return (i + 1) + ". " + (q.machineName || "Unnamed machine user") + " (ID " + (q.machineNo || "—") + ")";
-  }).join("\\n");
-  var msg = "Report not downloaded yet. " + unresolvedCount + " machine user(s) await review for this report:\\n\\n" +
+  }).join("\n");
+  var msg = "Report not downloaded yet. " + unresolvedCount + " machine user(s) await review for this report:\n\n" +
     (names || "The linked review records could not be listed.") +
-    "\\n\\nLink the names above, or ignore all for this report only. Ignoring keeps the records saved in the review queue, but these users will be absent from this report and its attendance/fine calculations.";
+    "\n\nLink the names above, or ignore all for this report only. Ignoring keeps the records saved in the review queue, but these users will be absent from this report and its attendance/fine calculations.";
   setHostelStatus(msg, "error");
   var mapCard = document.getElementById("biometricMapCard");
   if (mapCard) {
@@ -2953,7 +3049,7 @@ async function generateHostelReport() {
       else unN++;
     });
     confN = (result.conflicts && result.conflicts.length) || 0;
-    try { await renderHostelConflicts(); } catch (_) {}
+    try { await renderHostelConflicts(); } catch (e) { console.error("renderHostelConflicts", e); }
     var exN = (result._excludedN || (result.excludedPending && result.excludedPending.length) || 0);
     setHostelStatus(
       "Report ready · " + absentees.length + " absentees · master-list hostel assignments " + mastN +
@@ -3255,101 +3351,6 @@ async function renderHostelRoster() {
 }
 // Expose roster renderer to the app's global view-navigation/startup handlers.
 window.renderHostelRoster = renderHostelRoster;
-
-
-async function renderHostelConflicts(itemsOverride) {
-  // Prevent an older asynchronous database read from overwriting a newer,
-  // explicitly supplied list (for example, the saved-report review flow).
-  var renderToken = (window.__hostelConflictRenderToken || 0) + 1;
-  window.__hostelConflictRenderToken = renderToken;
-  var body = document.getElementById("hostelConflictBody");
-  var countEl = document.getElementById("hostelConflictCount");
-  if (!body) return;
-  var list = [];
-  try {
-    // A saved-report blocker passes the exact records it just read. Use those
-    // records directly so the review table cannot disagree with that warning.
-    list = Array.isArray(itemsOverride) ? itemsOverride : await getAll("biometric_pending");
-  } catch (err) {
-    if (window.__hostelConflictRenderToken !== renderToken) return;
-    if (countEl) countEl.textContent = "Conflicts could not be loaded";
-    body.innerHTML = '<tr><td colspan="5" class="muted-note">Unable to read the conflict queue. Use Refresh or reload the app, then try again.</td></tr>';
-    console.error("renderHostelConflicts failed", err);
-    return;
-  }
-  // A later render has taken over while this one was waiting for IndexedDB.
-  if (window.__hostelConflictRenderToken !== renderToken) return;
-  list = (list || []).filter(function(x) { return x && x.status === "hostel_conflict"; });
-  if (countEl) countEl.textContent = "Conflicts: " + list.length + (list.length ? " (held off fee reports)" : " — none");
-  if (!list.length) {
-    body.innerHTML = '<tr><td colspan="5" class="muted-note">No location conflicts.</td></tr>';
-    return;
-  }
-  body.innerHTML = list.map(function(row) {
-    return "<tr>" +
-      "<td><strong>" + escapeHtml(row.machineNo || "") + "</strong></td>" +
-      "<td>" + escapeHtml(row.studentName || row.machineName || "") +
-        (row.regNo ? (" · " + escapeHtml(row.regNo)) : "") + "</td>" +
-      "<td>" + escapeHtml(row.masterHostel || "—") + "</td>" +
-      "<td>" + escapeHtml(row.gateHostel || "") + "</td>" +
-      '<td class="qa-edit-only">' +
-        (isQaOfficer() ? (
-          '<button type="button" class="btn btn--primary btn--sm" data-hc-keep="' + escapeHtml(row.id) + '">Keep master</button> ' +
-          '<button type="button" class="btn btn--ghost btn--sm" data-hc-accept="' + escapeHtml(row.id) + '">Accept gate</button> ' +
-          '<button type="button" class="btn btn--ghost btn--sm" data-hc-discard="' + escapeHtml(row.id) + '">Dismiss</button>'
-        ) : "—") +
-      "</td></tr>";
-  }).join("");
-  document.querySelectorAll("[data-hc-keep]").forEach(function(btn) {
-    btn.onclick = async function() {
-      var row = (await getAll("biometric_pending")).find(function(x) { return x.id === btn.getAttribute("data-hc-keep"); });
-      if (!row) return;
-      // Keep the official master hostel and retain the decision in the report history.
-      await recordHostelIssueResolution(row,"kept_master_hostel",{masterHostel:row.masterHostel,gateHostel:row.gateHostel});
-      row.status = "resolved"; row.resolution = "kept_master_hostel"; row.resolvedAt = new Date().toISOString(); row.updatedAt = row.resolvedAt; await put("biometric_pending", row);
-      markDirty("hostel conflict keep");
-      await renderHostelConflicts();
-    };
-  });
-  document.querySelectorAll("[data-hc-accept]").forEach(function(btn) {
-    btn.onclick = async function() {
-      var row = (await getAll("biometric_pending")).find(function(x) { return x.id === btn.getAttribute("data-hc-accept"); });
-      if (!row || !row.studentId) return;
-      var all = await getAll("students");
-      var s = all.find(function(x) { return x.id === row.studentId; });
-      if (!s) return;
-      var before = s.hostel || "";
-      s.hostel = row.gateHostel || s.hostel;
-      s.hostelSource = "gate_conflict_accept";
-      s.updatedAt = new Date().toISOString();
-      await put("students", s);
-      try { await reconcileHostelRunsForMachine(row.machineNo, s); } catch (reconcileErr) { console.warn("hostel conflict report reconciliation", reconcileErr); }
-      try {
-        await writeAudit({
-          action: "update",
-          entity: "students",
-          entityId: s.id,
-          reason: "Accepted gate Location ID hostel over master",
-          details: { hostelBefore: before, hostelAfter: s.hostel, machineNo: row.machineNo }
-        });
-      } catch (_) {}
-      await recordHostelIssueResolution(row,"accepted_gate_hostel",{hostelBefore:before,hostelAfter:s.hostel});
-      row.status = "resolved"; row.resolution = "accepted_gate_hostel"; row.resolvedAt = new Date().toISOString(); row.updatedAt = row.resolvedAt; await put("biometric_pending", row);
-      markDirty("hostel conflict accept");
-      await renderHostelConflicts();
-      try { await renderHostelRoster(); } catch (_) {}
-    };
-  });
-  document.querySelectorAll("[data-hc-discard]").forEach(function(btn) {
-    btn.onclick = async function() {
-      var issue=(await getAll("biometric_pending")).find(function(x){return x.id===btn.getAttribute("data-hc-discard");});
-      if(issue){await recordHostelIssueResolution(issue,"dismissed_conflict",{masterHostel:issue.masterHostel,gateHostel:issue.gateHostel});issue.status="resolved";issue.resolution="dismissed_conflict";issue.resolvedAt=new Date().toISOString();issue.updatedAt=issue.resolvedAt;await put("biometric_pending",issue);}
-      markDirty("hostel conflict dismiss");
-      await renderHostelConflicts();
-    };
-  });
-}
-
 
 
 function svgPie(slices, size) {
@@ -11701,7 +11702,7 @@ async function renderBioQueues(skipConflictRender) {
     });
   });
   if (!skipConflictRender) {
-    try { await renderHostelConflicts(); } catch (_) {}
+    try { await renderHostelConflicts(); } catch (e) { console.error("renderHostelConflicts", e); }
   }
 }
 
