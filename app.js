@@ -2626,7 +2626,7 @@ function closeHostelRunModal() {
 
 
 
-async async function ignoreHostelIssuesForCurrentReport() {
+async function ignoreHostelIssuesForCurrentReport() {
   var report = window.__lastHostelReport || {};
   if (!report.runId) { setHostelStatus("Report draft ID is missing. Generate the preview again.", "error"); return; }
   var queue = await getAll("biometric_pending");
