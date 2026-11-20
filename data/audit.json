@@ -43653,5 +43653,365 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1881
+  },
+  {
+    "ref": "REF/EOCNS/QA/1021",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaqckoq_18",
+    "reason": "Accepted gate Location ID hostel over master",
+    "details": {
+      "hostelBefore": "Hostel 2",
+      "hostelAfter": "Hostel 1",
+      "machineNo": "476"
+    },
+    "timestamp": "2026-11-20T15:03:00.623Z",
+    "at": "2026-11-20T15:03:00.623Z",
+    "createdAt": "2026-11-20T15:03:00.623Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:00",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1882
+  },
+  {
+    "ref": "REF/EOCNS/QA/1022",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "hr_mwosu6bo",
+    "reason": "Hostel attendance issue resolved: accepted_gate_hostel",
+    "details": {
+      "issueId": "hconf_mwos3e1m_0",
+      "machineNo": "476",
+      "studentId": "stu_mwaqckoq_18",
+      "resolution": "accepted_gate_hostel",
+      "extra": {
+        "hostelBefore": "Hostel 2",
+        "hostelAfter": "Hostel 1"
+      }
+    },
+    "timestamp": "2026-11-20T15:03:00.641Z",
+    "at": "2026-11-20T15:03:00.641Z",
+    "createdAt": "2026-11-20T15:03:00.641Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:00",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1883
+  },
+  {
+    "ref": "REF/EOCNS/QA/1023",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvrzdach9mpa2",
+    "reason": "Accepted gate Location ID hostel over master",
+    "details": {
+      "hostelBefore": "Off-campus",
+      "hostelAfter": "Hostel 1",
+      "machineNo": "479"
+    },
+    "timestamp": "2026-11-20T15:03:01.718Z",
+    "at": "2026-11-20T15:03:01.718Z",
+    "createdAt": "2026-11-20T15:03:01.718Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:01",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1884
+  },
+  {
+    "ref": "REF/EOCNS/QA/1024",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "hr_mwosu6bo",
+    "reason": "Hostel attendance issue resolved: accepted_gate_hostel",
+    "details": {
+      "issueId": "hconf_mwos3e1n_1",
+      "machineNo": "479",
+      "studentId": "stu_mvrzdach9mpa2",
+      "resolution": "accepted_gate_hostel",
+      "extra": {
+        "hostelBefore": "Off-campus",
+        "hostelAfter": "Hostel 1"
+      }
+    },
+    "timestamp": "2026-11-20T15:03:01.736Z",
+    "at": "2026-11-20T15:03:01.736Z",
+    "createdAt": "2026-11-20T15:03:01.736Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:01",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1885
+  },
+  {
+    "ref": "REF/EOCNS/QA/1025",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvs9weg9bwro3",
+    "reason": "Accepted gate Location ID hostel over master",
+    "details": {
+      "hostelBefore": "Off-campus",
+      "hostelAfter": "Hostel 2",
+      "machineNo": "1535"
+    },
+    "timestamp": "2026-11-20T15:03:03.538Z",
+    "at": "2026-11-20T15:03:03.538Z",
+    "createdAt": "2026-11-20T15:03:03.538Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:03",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1886
+  },
+  {
+    "ref": "REF/EOCNS/QA/1026",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "hr_mwf0rt25",
+    "reason": "Hostel attendance issue resolved: accepted_gate_hostel",
+    "details": {
+      "issueId": "hconf_resolved_mwez273t_0",
+      "machineNo": "1535",
+      "studentId": "stu_mvs9weg9bwro3",
+      "resolution": "accepted_gate_hostel",
+      "extra": {
+        "hostelBefore": "Off-campus",
+        "hostelAfter": "Hostel 2"
+      }
+    },
+    "timestamp": "2026-11-20T15:03:03.552Z",
+    "at": "2026-11-20T15:03:03.552Z",
+    "createdAt": "2026-11-20T15:03:03.552Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:03",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1887
+  },
+  {
+    "ref": "REF/EOCNS/QA/1027",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq08kc_109",
+    "reason": "Accepted gate Location ID hostel over master",
+    "details": {
+      "hostelBefore": "Hostel 2",
+      "hostelAfter": "Hostel 1",
+      "machineNo": "569"
+    },
+    "timestamp": "2026-11-20T15:03:04.045Z",
+    "at": "2026-11-20T15:03:04.045Z",
+    "createdAt": "2026-11-20T15:03:04.045Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:04",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1888
+  },
+  {
+    "ref": "REF/EOCNS/QA/1028",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "hr_mwosu6bo",
+    "reason": "Hostel attendance issue resolved: accepted_gate_hostel",
+    "details": {
+      "issueId": "hconf_resolved_mwosy9y0_0",
+      "machineNo": "569",
+      "studentId": "stu_mwaq08kc_109",
+      "resolution": "accepted_gate_hostel",
+      "extra": {
+        "hostelBefore": "Hostel 2",
+        "hostelAfter": "Hostel 1"
+      }
+    },
+    "timestamp": "2026-11-20T15:03:04.061Z",
+    "at": "2026-11-20T15:03:04.061Z",
+    "createdAt": "2026-11-20T15:03:04.061Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:04",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1889
+  },
+  {
+    "ref": "REF/EOCNS/QA/1029",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvsa27y634fx7",
+    "reason": "Accepted gate Location ID hostel over master",
+    "details": {
+      "hostelBefore": "Off-campus",
+      "hostelAfter": "Hostel 1",
+      "machineNo": "1550"
+    },
+    "timestamp": "2026-11-20T15:03:04.377Z",
+    "at": "2026-11-20T15:03:04.377Z",
+    "createdAt": "2026-11-20T15:03:04.377Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:04",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1890
+  },
+  {
+    "ref": "REF/EOCNS/QA/1030",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "hr_mwosu6bo",
+    "reason": "Hostel attendance issue resolved: accepted_gate_hostel",
+    "details": {
+      "issueId": "hconf_resolved_mwosz19l_0",
+      "machineNo": "1550",
+      "studentId": "stu_mvsa27y634fx7",
+      "resolution": "accepted_gate_hostel",
+      "extra": {
+        "hostelBefore": "Off-campus",
+        "hostelAfter": "Hostel 1"
+      }
+    },
+    "timestamp": "2026-11-20T15:03:04.393Z",
+    "at": "2026-11-20T15:03:04.393Z",
+    "createdAt": "2026-11-20T15:03:04.393Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:04",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1891
+  },
+  {
+    "ref": "REF/EOCNS/QA/1031",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mvusn8llu2sh6",
+    "reason": "Accepted gate Location ID hostel over master",
+    "details": {
+      "hostelBefore": "Hostel 2",
+      "hostelAfter": "Hostel 1",
+      "machineNo": "1566"
+    },
+    "timestamp": "2026-11-20T15:03:04.824Z",
+    "at": "2026-11-20T15:03:04.824Z",
+    "createdAt": "2026-11-20T15:03:04.824Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:04",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1892
+  },
+  {
+    "ref": "REF/EOCNS/QA/1032",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "hr_mwosu6bo",
+    "reason": "Hostel attendance issue resolved: accepted_gate_hostel",
+    "details": {
+      "issueId": "hconf_resolved_mwot0gg8_0",
+      "machineNo": "1566",
+      "studentId": "stu_mvusn8llu2sh6",
+      "resolution": "accepted_gate_hostel",
+      "extra": {
+        "hostelBefore": "Hostel 2",
+        "hostelAfter": "Hostel 1"
+      }
+    },
+    "timestamp": "2026-11-20T15:03:04.840Z",
+    "at": "2026-11-20T15:03:04.840Z",
+    "createdAt": "2026-11-20T15:03:04.840Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:04",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1893
+  },
+  {
+    "ref": "REF/EOCNS/QA/1033",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwc9qzjaofdj7",
+    "reason": "Accepted gate Location ID hostel over master",
+    "details": {
+      "hostelBefore": "Hostel 2",
+      "hostelAfter": "Hostel 1",
+      "machineNo": "413"
+    },
+    "timestamp": "2026-11-20T15:03:05.548Z",
+    "at": "2026-11-20T15:03:05.548Z",
+    "createdAt": "2026-11-20T15:03:05.548Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:05",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1894
+  },
+  {
+    "ref": "REF/EOCNS/QA/1034",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "hr_mwosu6bo",
+    "reason": "Hostel attendance issue resolved: accepted_gate_hostel",
+    "details": {
+      "issueId": "hconf_resolved_mwotykgm_0",
+      "machineNo": "413",
+      "studentId": "stu_mwc9qzjaofdj7",
+      "resolution": "accepted_gate_hostel",
+      "extra": {
+        "hostelBefore": "Hostel 2",
+        "hostelAfter": "Hostel 1"
+      }
+    },
+    "timestamp": "2026-11-20T15:03:05.567Z",
+    "at": "2026-11-20T15:03:05.567Z",
+    "createdAt": "2026-11-20T15:03:05.567Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:05",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1895
+  },
+  {
+    "ref": "REF/EOCNS/QA/1035",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwezor9nre7bm",
+    "reason": "Accepted gate Location ID hostel over master",
+    "details": {
+      "hostelBefore": "Hostel 2",
+      "hostelAfter": "Hostel 1",
+      "machineNo": "423"
+    },
+    "timestamp": "2026-11-20T15:03:07.343Z",
+    "at": "2026-11-20T15:03:07.343Z",
+    "createdAt": "2026-11-20T15:03:07.343Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:07",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1896
+  },
+  {
+    "ref": "REF/EOCNS/QA/1036",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "hr_mwosu6bo",
+    "reason": "Hostel attendance issue resolved: accepted_gate_hostel",
+    "details": {
+      "issueId": "hconf_resolved_mwotz8vh_0",
+      "machineNo": "423",
+      "studentId": "stu_mwezor9nre7bm",
+      "resolution": "accepted_gate_hostel",
+      "extra": {
+        "hostelBefore": "Hostel 2",
+        "hostelAfter": "Hostel 1"
+      }
+    },
+    "timestamp": "2026-11-20T15:03:07.363Z",
+    "at": "2026-11-20T15:03:07.363Z",
+    "createdAt": "2026-11-20T15:03:07.363Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:03:07",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1897
   }
 ]
