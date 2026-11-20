@@ -356,6 +356,8 @@ function del(storeName, key) {
   });
 }
 function put(storeName, value) {
+  // Enforce consistent person-name formatting on every future write/import.
+  if (PERSON_NAME_STORES.indexOf(storeName) >= 0) normalizePersonNameFields(value);
   return new Promise((resolve, reject) => {
     const req = tx(storeName, "readwrite").put(value);
     req.onsuccess = () => resolve(req.result);
@@ -425,31 +427,70 @@ function normalizeProgramme(p) {
 }
 
 // Canonical student-name format: Title Case, applied to the master record itself.
+// Consistent person-name formatting across master records, imports, logs and reports.
+// Keeps punctuation (hyphens, apostrophes and initials) while normalising spacing and case.
 function normalizeStudentName(value) {
-  return String(value || "").trim().replace(/\s+/g, " ").toLowerCase().replace(/(^|[\s\-'])\p{L}/gu, function(match) {
-    return match.toUpperCase();
+  return String(value == null ? "" : value).trim().replace(/\s+/g, " ").toLowerCase()
+    .replace(/(^|[\s\-'.])(\p{L})/gu, function(_, boundary, letter) {
+      return boundary + letter.toUpperCase();
+    });
+}
+var PERSON_NAME_FIELDS = {
+  name: true, studentName: true, lecturerName: true, machineName: true,
+  csvName: true, officerName: true, fullName: true, userName: true,
+  officer: true, user: true
+};
+var PERSON_NAME_STORES = [
+  "students", "lecturers", "pending_students", "discipline", "hostel_runs",
+  "biometric_pending", "attendance", "qa_entries", "remedial",
+  "remedial_enrolment", "remedial_assignments", "remedial_timetable",
+  "remedial_logs", "audit"
+];
+function normalizePersonNameFields(value) {
+  if (!value || typeof value !== "object") return false;
+  var changed = false;
+  if (Array.isArray(value)) {
+    value.forEach(function(item) { if (normalizePersonNameFields(item)) changed = true; });
+    return changed;
+  }
+  Object.keys(value).forEach(function(key) {
+    var current = value[key];
+    if (PERSON_NAME_FIELDS[key] && typeof current === "string" && current.trim()) {
+      var normalized = normalizeStudentName(current);
+      if (normalized !== current) { value[key] = normalized; changed = true; }
+    } else if (current && typeof current === "object") {
+      if (normalizePersonNameFields(current)) changed = true;
+    }
   });
+  return changed;
 }
 
-// One-time-safe migration: update only the name field in existing master records.
-// Student IDs, registration numbers, biometric links, attendance and all other fields remain untouched.
+// Existing local records are normalised without changing IDs, registration numbers,
+// relationships, dates, attendance values, or any non-name fields.
 async function normalizeExistingStudentNames() {
-  var all = await getAll("students");
-  var changed = 0;
-  for (var i = 0; i < all.length; i++) {
-    var student = all[i];
-    var normalized = normalizeStudentName(student.name);
-    if (normalized && normalized !== student.name) {
-      student.name = normalized;
-      await put("students", student);
-      changed++;
+  var changedByStore = {};
+  var totalChanged = 0;
+  for (var si = 0; si < PERSON_NAME_STORES.length; si++) {
+    var storeName = PERSON_NAME_STORES[si];
+    var records = [];
+    try { records = await getAll(storeName); } catch (e) {
+      console.warn("Name normalization skipped unavailable store:", storeName, e);
+      continue;
     }
+    var changed = 0;
+    for (var ri = 0; ri < records.length; ri++) {
+      if (normalizePersonNameFields(records[ri])) {
+        await put(storeName, records[ri]);
+        changed++;
+      }
+    }
+    if (changed) { changedByStore[storeName] = changed; totalChanged += changed; }
   }
-  if (changed) {
-    try { markDirty("students"); } catch (e) { console.warn("Student-name normalization sync flag", e); }
-    console.info("Normalized student master-list names:", changed);
+  if (totalChanged) {
+    try { markDirty("name normalization"); } catch (e) { console.warn("Name-normalization sync flag", e); }
+    console.info("Normalised person names across system:", changedByStore);
   }
-  return changed;
+  return totalChanged;
 }
 
 /** Temporary reg numbers (TMP-… / TEMP-…) sort after permanent ones. */
@@ -3121,7 +3162,7 @@ openDB().then(async () => {
       console.info("EOCNS repo updates pulled:", syncRes.pulled);
     }
   } catch (e) { console.warn("repo sync", e); }
-  try { await normalizeExistingStudentNames(); } catch (e) { console.error("Student master-list name normalization failed", e); }
+  try { await normalizeExistingStudentNames(); } catch (e) { console.error("System-wide person-name normalization failed", e); }
   try { await deduplicateHostelRunsInStore(); } catch (e) { console.error("Hostel duplicate cleanup failed", e); }
   try { startSmartRepoWatch(); } catch (e) { console.warn("smart watch", e); }
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
