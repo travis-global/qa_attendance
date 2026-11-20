@@ -215,7 +215,7 @@
     "machineNo": "179",
     "machineName": "Abigail Chinasa Ugbo",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "discarded",
     "suggestions": [
       {
         "studentId": "stu_mvrzdacg08aia",
@@ -237,7 +237,9 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.882Z",
-    "updatedAt": "2026-11-11T10:44:37.882Z"
+    "updatedAt": "2026-11-20T10:11:22.744Z",
+    "discardedAt": "2026-11-20T10:11:22.744Z",
+    "discardedBy": "Alolote Fortunatus"
   },
   {
     "id": "train_mwbzs9du_107",
@@ -245,7 +247,7 @@
     "machineNo": "184",
     "machineName": "Mbanuzuo Chinweotito",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "discarded",
     "suggestions": [
       {
         "studentId": "stu_mwaqckl7_10",
@@ -267,7 +269,9 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.890Z",
-    "updatedAt": "2026-11-11T10:44:37.890Z"
+    "updatedAt": "2026-11-20T10:11:50.860Z",
+    "discardedAt": "2026-11-20T10:11:50.860Z",
+    "discardedBy": "Alolote Fortunatus"
   },
   {
     "id": "train_mwbzs9e5_115",
@@ -335,7 +339,7 @@
     "machineNo": "203",
     "machineName": "Joseph Chisom Aga",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "discarded",
     "suggestions": [
       {
         "studentId": "stu_mvrzdacksgwcs",
@@ -357,7 +361,9 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.911Z",
-    "updatedAt": "2026-11-11T10:44:37.911Z"
+    "updatedAt": "2026-11-20T10:16:25.101Z",
+    "discardedAt": "2026-11-20T10:16:25.101Z",
+    "discardedBy": "Alolote Fortunatus"
   },
   {
     "id": "train_mwbzs9ez_136",
@@ -425,7 +431,7 @@
     "machineNo": "482",
     "machineName": "Chiamaka Grace Okoro",
     "deviceLabel": "Hostel 1",
-    "status": "unlinked",
+    "status": "discarded",
     "suggestions": [
       {
         "studentId": "stu_mvut9mhyt7pwf",
@@ -447,7 +453,21 @@
       }
     ],
     "createdAt": "2026-11-11T10:44:37.939Z",
-    "updatedAt": "2026-11-11T10:44:37.939Z"
+    "updatedAt": "2026-11-20T10:17:36.133Z",
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ],
+    "discardedAt": "2026-11-20T10:17:36.133Z",
+    "discardedBy": "Alolote Fortunatus"
   },
   {
     "id": "train_mwc0b6sp_10",
@@ -455,7 +475,7 @@
     "machineNo": "328",
     "machineName": "Daberechi  Okoroafor",
     "deviceLabel": "Hostel 2",
-    "status": "unlinked",
+    "status": "discarded",
     "suggestions": [
       {
         "studentId": "stu_mwaqcmiz_167",
@@ -477,7 +497,9 @@
       }
     ],
     "createdAt": "2026-11-11T10:59:21.001Z",
-    "updatedAt": "2026-11-11T10:59:21.001Z"
+    "updatedAt": "2026-11-20T10:25:16.473Z",
+    "discardedAt": "2026-11-20T10:25:16.473Z",
+    "discardedBy": "Alolote Fortunatus"
   },
   {
     "id": "train_mwc0b6t1_16",
@@ -665,7 +687,7 @@
     "machineNo": "449",
     "machineName": "Esther Chidalu Michael",
     "deviceLabel": "Hostel 2",
-    "status": "unlinked",
+    "status": "discarded",
     "suggestions": [
       {
         "studentId": "stu_mvs9zw3zonn45",
@@ -687,7 +709,21 @@
       }
     ],
     "createdAt": "2026-11-11T10:59:21.071Z",
-    "updatedAt": "2026-11-11T10:59:21.071Z"
+    "updatedAt": "2026-11-20T10:26:22.260Z",
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ],
+    "discardedAt": "2026-11-20T10:26:22.260Z",
+    "discardedBy": "Alolote Fortunatus"
   },
   {
     "id": "train_mwc0b6uu_57",
@@ -695,7 +731,7 @@
     "machineNo": "459",
     "machineName": "Christabel Ginika Okwor",
     "deviceLabel": "Hostel 2",
-    "status": "unlinked",
+    "status": "discarded",
     "suggestions": [
       {
         "studentId": "stu_mwaq08ha_100",
@@ -717,7 +753,9 @@
       }
     ],
     "createdAt": "2026-11-11T10:59:21.078Z",
-    "updatedAt": "2026-11-11T10:59:21.078Z"
+    "updatedAt": "2026-11-20T10:27:15.687Z",
+    "discardedAt": "2026-11-20T10:27:15.687Z",
+    "discardedBy": "Alolote Fortunatus"
   },
   {
     "id": "train_mwc0b6v0_61",
@@ -725,7 +763,7 @@
     "machineNo": "473",
     "machineName": "Rita Ebubechi Egbere",
     "deviceLabel": "Hostel 2",
-    "status": "unlinked",
+    "status": "discarded",
     "suggestions": [
       {
         "studentId": "stu_mwaq07mk_10",
@@ -747,7 +785,9 @@
       }
     ],
     "createdAt": "2026-11-11T10:59:21.084Z",
-    "updatedAt": "2026-11-11T10:59:21.084Z"
+    "updatedAt": "2026-11-20T10:27:46.372Z",
+    "discardedAt": "2026-11-20T10:27:46.372Z",
+    "discardedBy": "Alolote Fortunatus"
   },
   {
     "id": "train_mwc0b6v6_65",
@@ -785,7 +825,7 @@
     "machineNo": "801",
     "machineName": "Favour Uwa",
     "deviceLabel": "Hostel 2",
-    "status": "unlinked",
+    "status": "discarded",
     "reason": "machine ID is not linked to a master student",
     "suggestions": [
       {
@@ -828,7 +868,7 @@
       "hr_mwf0rt25"
     ],
     "createdAt": "2026-11-13T13:03:53.110Z",
-    "updatedAt": "2026-11-13T13:35:34.896Z",
+    "updatedAt": "2026-11-20T10:24:51.583Z",
     "reportContexts": [
       {
         "runId": "hr_mwezn1o2",
@@ -851,7 +891,9 @@
         "end": "2026-11-12",
         "locationId": 2
       }
-    ]
+    ],
+    "discardedAt": "2026-11-20T10:24:51.583Z",
+    "discardedBy": "Alolote Fortunatus"
   },
   {
     "id": "hconf_resolved_mwez273t_0",
@@ -935,5 +977,395 @@
     ],
     "createdAt": "2026-11-13T12:47:40.409Z",
     "updatedAt": "2026-11-13T13:35:34.897Z"
+  },
+  {
+    "id": "bio_h_mwosu63k_460_16",
+    "kind": "hostel",
+    "machineNo": "460",
+    "machineName": "John Chidinmma Mercy",
+    "deviceLabel": "Hostel 1",
+    "status": "discarded",
+    "reason": "machine ID is not linked to a master student",
+    "suggestions": [],
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "createdAt": "2026-11-20T09:51:09.920Z",
+    "updatedAt": "2026-11-20T10:03:30.338Z",
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ],
+    "discardedAt": "2026-11-20T10:03:30.338Z",
+    "discardedBy": "Alolote Fortunatus"
+  },
+  {
+    "id": "bio_h_mwosu64e_496_24",
+    "kind": "hostel",
+    "machineNo": "496",
+    "machineName": "Joseph Chisom Aga",
+    "deviceLabel": "Hostel 1",
+    "status": "discarded",
+    "reason": "machine ID is not linked to a master student",
+    "suggestions": [],
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "createdAt": "2026-11-20T09:51:09.950Z",
+    "updatedAt": "2026-11-20T10:05:27.794Z",
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ],
+    "discardedAt": "2026-11-20T10:05:27.794Z",
+    "discardedBy": "Alolote Fortunatus"
+  },
+  {
+    "id": "bio_h_mwosu651_515_29",
+    "kind": "hostel",
+    "machineNo": "515",
+    "machineName": "Oluebube Sharon Demian",
+    "deviceLabel": "Hostel 1",
+    "status": "discarded",
+    "reason": "machine ID is not linked to a master student",
+    "suggestions": [],
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "createdAt": "2026-11-20T09:51:09.973Z",
+    "updatedAt": "2026-11-20T10:05:54.752Z",
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ],
+    "discardedAt": "2026-11-20T10:05:54.752Z",
+    "discardedBy": "Alolote Fortunatus"
+  },
+  {
+    "id": "bio_h_mwosu65h_525_33",
+    "kind": "hostel",
+    "machineNo": "525",
+    "machineName": "Peace Chibusomma Ani",
+    "deviceLabel": "Hostel 1",
+    "status": "discarded",
+    "reason": "machine ID is not linked to a master student",
+    "suggestions": [],
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "createdAt": "2026-11-20T09:51:09.989Z",
+    "updatedAt": "2026-11-20T10:06:20.925Z",
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ],
+    "discardedAt": "2026-11-20T10:06:20.925Z",
+    "discardedBy": "Alolote Fortunatus"
+  },
+  {
+    "id": "bio_h_mwosu68r_1559_68",
+    "kind": "hostel",
+    "machineNo": "1559",
+    "machineName": "IKONG DESTINY",
+    "deviceLabel": "Hostel 1",
+    "status": "discarded",
+    "reason": "machine ID is not linked to a master student",
+    "suggestions": [
+      {
+        "studentId": "stu_mwaq07tc_26",
+        "name": "Destiny Nnamani",
+        "regNo": "EOCNS/25/0114/GNS",
+        "serial": "134",
+        "score": 50
+      }
+    ],
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "createdAt": "2026-11-20T09:51:10.107Z",
+    "updatedAt": "2026-11-20T10:02:07.390Z",
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ],
+    "discardedAt": "2026-11-20T10:02:07.390Z",
+    "discardedBy": "Alolote Fortunatus"
+  },
+  {
+    "id": "bio_h_mwosu6ak_1579_88",
+    "kind": "hostel",
+    "machineNo": "1579",
+    "machineName": "IFEOMA SALVATION",
+    "deviceLabel": "Hostel 1",
+    "status": "discarded",
+    "reason": "machine ID is not linked to a master student",
+    "suggestions": [],
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "createdAt": "2026-11-20T09:51:10.172Z",
+    "updatedAt": "2026-11-20T10:07:40.635Z",
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ],
+    "discardedAt": "2026-11-20T10:07:40.635Z",
+    "discardedBy": "Alolote Fortunatus"
+  },
+  {
+    "id": "bio_h_mwoubt0r_stu_mwcbntngm9zg0_0",
+    "kind": "hostel",
+    "machineNo": "stu_mwcbntngm9zg0",
+    "machineName": "Ogbonna Ugochukwu",
+    "deviceLabel": "Hostel 1",
+    "status": "discarded",
+    "reason": "Machine ID is not linked to a master student",
+    "suggestions": [
+      {
+        "studentId": "stu_mwaqckhq_3",
+        "name": "Ugochukwu Ogbonna",
+        "regNo": "EOCNS/24/0116/GNS",
+        "serial": "452",
+        "score": 100
+      },
+      {
+        "studentId": "stu_mwcbntngm9zg0",
+        "name": "Ogbonna Ugochukwu",
+        "regNo": "EOCNS/26/0116/GNS",
+        "serial": "",
+        "score": 100
+      },
+      {
+        "studentId": "stu_mvutfwoi47rfc",
+        "name": "Ogbonna Comfort",
+        "regNo": "EOCNS/26/0047/GNS",
+        "serial": "",
+        "score": 50
+      }
+    ],
+    "reportRunIds": [],
+    "createdAt": "2026-11-20T10:32:52.395Z",
+    "updatedAt": "2026-11-20T10:33:06.085Z",
+    "discardedAt": "2026-11-20T10:33:06.085Z",
+    "discardedBy": "Alolote Fortunatus"
+  },
+  {
+    "id": "hconf_mwos3e1m_0",
+    "kind": "hostel_conflict",
+    "status": "hostel_conflict",
+    "machineNo": "476",
+    "machineName": "Izukamma Blessing Chidera",
+    "studentName": "Izukamma Blessing Chidera",
+    "studentId": "stu_mwaqckoq_18",
+    "regNo": "EOCNS/24/0026/MID",
+    "masterHostel": "Hostel 2",
+    "gateHostel": "Hostel 1",
+    "locationId": 1,
+    "createdAt": "2026-11-20T09:30:20.506Z",
+    "updatedAt": "2026-11-20T10:32:52.490Z",
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ]
+  },
+  {
+    "id": "hconf_mwos3e1n_1",
+    "kind": "hostel_conflict",
+    "status": "hostel_conflict",
+    "machineNo": "479",
+    "machineName": "Amarachi Nwuguru Okeh",
+    "studentName": "Amarachi Nwuguru Okeh",
+    "studentId": "stu_mvrzdach9mpa2",
+    "regNo": "EOCNS/24/0033/MID",
+    "masterHostel": "Off-campus",
+    "gateHostel": "Hostel 1",
+    "locationId": 1,
+    "createdAt": "2026-11-20T09:30:20.507Z",
+    "updatedAt": "2026-11-20T10:32:52.490Z",
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ]
+  },
+  {
+    "id": "hconf_resolved_mwosy9y0_0",
+    "kind": "hostel_conflict",
+    "status": "hostel_conflict",
+    "machineNo": "569",
+    "machineName": "Chijioke Amarachi",
+    "studentName": "Chijioke Amarachi",
+    "studentId": "stu_mwaq08kc_109",
+    "regNo": "EOCNS/25/0037/GNS",
+    "masterHostel": "Hostel 2",
+    "gateHostel": "Hostel 1",
+    "locationId": 1,
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ],
+    "createdAt": "2026-11-20T09:54:21.528Z",
+    "updatedAt": "2026-11-20T10:32:52.491Z"
+  },
+  {
+    "id": "hconf_resolved_mwosz19l_0",
+    "kind": "hostel_conflict",
+    "status": "hostel_conflict",
+    "machineNo": "1550",
+    "machineName": "Joy Chinazaekpere Asogwa",
+    "studentName": "Joy Chinazaekpere Asogwa",
+    "studentId": "stu_mvsa27y634fx7",
+    "regNo": "EOCNS/26/0049/GNS",
+    "masterHostel": "Off-campus",
+    "gateHostel": "Hostel 1",
+    "locationId": 1,
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ],
+    "createdAt": "2026-11-20T09:54:56.937Z",
+    "updatedAt": "2026-11-20T10:32:52.491Z"
+  },
+  {
+    "id": "hconf_resolved_mwot0gg8_0",
+    "kind": "hostel_conflict",
+    "status": "hostel_conflict",
+    "machineNo": "1566",
+    "machineName": "Christopher Nmesoma Precious",
+    "studentName": "Christopher Nmesoma Precious",
+    "studentId": "stu_mvusn8llu2sh6",
+    "regNo": "EOCNS/26/0069/GNS",
+    "masterHostel": "Hostel 2",
+    "gateHostel": "Hostel 1",
+    "locationId": 1,
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ],
+    "createdAt": "2026-11-20T09:56:03.272Z",
+    "updatedAt": "2026-11-20T10:32:52.492Z"
+  },
+  {
+    "id": "hconf_resolved_mwotykgm_0",
+    "kind": "hostel_conflict",
+    "status": "hostel_conflict",
+    "machineNo": "413",
+    "machineName": "Chidimma Esther Okechukwu",
+    "studentName": "Chidimma Esther Okechukwu",
+    "studentId": "stu_mwc9qzjaofdj7",
+    "regNo": "EOCNS/24/0014/MID",
+    "masterHostel": "Hostel 2",
+    "gateHostel": "Hostel 1",
+    "locationId": 1,
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ],
+    "createdAt": "2026-11-20T10:22:34.774Z",
+    "updatedAt": "2026-11-20T10:32:52.493Z"
+  },
+  {
+    "id": "hconf_resolved_mwotz8vh_0",
+    "kind": "hostel_conflict",
+    "status": "hostel_conflict",
+    "machineNo": "423",
+    "machineName": "Promise Amaka Ikechukwu",
+    "studentName": "Promise Amaka Ikechukwu",
+    "studentId": "stu_mwezor9nre7bm",
+    "regNo": "TMP-EOCNS/26/0003/MID",
+    "masterHostel": "Hostel 2",
+    "gateHostel": "Hostel 1",
+    "locationId": 1,
+    "reportRunIds": [
+      "hr_mwosu6bo"
+    ],
+    "reportContexts": [
+      {
+        "runId": "hr_mwosu6bo",
+        "hostel": "Hostel 1",
+        "start": "2026-11-15",
+        "end": "2026-11-19",
+        "locationId": 1
+      }
+    ],
+    "createdAt": "2026-11-20T10:23:06.413Z",
+    "updatedAt": "2026-11-20T10:32:52.493Z"
   }
 ]
