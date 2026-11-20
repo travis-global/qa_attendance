@@ -2626,27 +2626,69 @@ function closeHostelRunModal() {
 
 
 
+async async function ignoreHostelIssuesForCurrentReport() {
+  var report = window.__lastHostelReport || {};
+  if (!report.runId) { setHostelStatus("Report draft ID is missing. Generate the preview again.", "error"); return; }
+  var queue = await getAll("biometric_pending");
+  var issues = (queue || []).filter(function(q) {
+    return q && ["clarify","conflict","unlinked"].indexOf(q.status) >= 0 &&
+      q.kind !== "csv" && (q.reportRunIds || []).indexOf(report.runId) >= 0;
+  });
+  if (!issues.length) { setHostelStatus("No unresolved machine users are linked to this report.", "ok"); return; }
+  var names = issues.map(function(q, i) {
+    return (i + 1) + ". " + (q.machineName || "Unnamed machine user") + " (ID " + (q.machineNo || "—") + ")";
+  }).join("\\n");
+  var warning = "Ignore " + issues.length + " unresolved machine user(s) for THIS report only?\\n\\n" + names +
+    "\\n\\nTheir records will remain saved in the biometric review queue. They will NOT be globally discarded or deleted. " +
+    "If you generate this report now, these users will be excluded from its attendance, absence and fine calculations " +
+    "until they are linked and the report is regenerated.\\n\\nContinue?";
+  if (!confirm(warning)) return;
+  for (var i = 0; i < issues.length; i++) {
+    var q = issues[i];
+    q.reportRunIds = (q.reportRunIds || []).filter(function(id) { return id !== report.runId; });
+    q.reportContexts = (q.reportContexts || []).filter(function(ctx) { return ctx && ctx.runId !== report.runId; });
+    q.reportIgnoredRunIds = q.reportIgnoredRunIds || [];
+    if (q.reportIgnoredRunIds.indexOf(report.runId) < 0) q.reportIgnoredRunIds.push(report.runId);
+    q.updatedAt = new Date().toISOString();
+    await put("biometric_pending", q);
+  }
+  markDirty("hostel report-only ignore");
+  setHostelStatus(issues.length + " name(s) ignored for this report only. Records remain in review. You can now confirm and download; excluded names will not appear in this report.", "ok");
+}
+
 async function guideToHostelPendingReview(unresolvedCount) {
-  // Refresh the biometric queues, expand Advanced setup, and take the officer to the review controls.
   try { await renderBioQueues(); } catch (_) {}
   try { await renderHostelConflicts(); } catch (_) {}
+  var report = window.__lastHostelReport || {}, queue = [];
+  try { queue = await getAll("biometric_pending"); } catch (_) {}
+  var issues = (queue || []).filter(function(q) {
+    return q && ["clarify","conflict","unlinked"].indexOf(q.status) >= 0 &&
+      q.kind !== "csv" && (q.reportRunIds || []).indexOf(report.runId) >= 0;
+  });
+  var names = issues.map(function(q, i) {
+    return (i + 1) + ". " + (q.machineName || "Unnamed machine user") + " (ID " + (q.machineNo || "—") + ")";
+  }).join("\\n");
+  var msg = "Report not downloaded yet. " + unresolvedCount + " machine user(s) await review for this report:\\n\\n" +
+    (names || "The linked review records could not be listed.") +
+    "\\n\\nLink the names above, or ignore all for this report only. Ignoring keeps the records saved in the review queue, but these users will be absent from this report and its attendance/fine calculations.";
+  setHostelStatus(msg, "error");
   var mapCard = document.getElementById("biometricMapCard");
   if (mapCard) {
     var parent = mapCard.parentElement;
-    while (parent) {
-      if (String(parent.tagName || "").toLowerCase() === "details") parent.open = true;
-      parent = parent.parentElement;
-    }
+    while (parent) { if (String(parent.tagName || "").toLowerCase() === "details") parent.open = true; parent = parent.parentElement; }
     mapCard.scrollIntoView({ behavior: "smooth", block: "start" });
-    var details = mapCard.closest("details");
-    var summary = details && details.querySelector("summary");
+    var details = mapCard.closest("details"), summary = details && details.querySelector("summary");
     if (summary) summary.focus({ preventScroll: true });
   }
-  setHostelStatus(
-    "Report not downloaded yet. " + unresolvedCount +
-    " issue(s) linked to this report still need a decision. Advanced setup is now open. Review “Needs clarification” and “Unlinked pool” for machine IDs, and “Hostel location conflicts” for hostel mismatches. Use the available review, link, keep master, accept gate, discard or dismiss action as appropriate. When all report-linked issues are cleared, return to the preview and click “Confirm edits and download report” again.",
-    "error"
-  );
+  var statusEl = document.getElementById("hostelStatus");
+  if (statusEl && isQaOfficer() && report.runId && issues.length) {
+    var action = document.createElement("button");
+    action.type = "button"; action.className = "btn btn--ghost btn--sm";
+    action.textContent = "Ignore all for this report only"; action.style.marginTop = "8px";
+    action.onclick = function() { ignoreHostelIssuesForCurrentReport(); };
+    statusEl.appendChild(document.createTextNode(" "));
+    statusEl.appendChild(action);
+  }
 }
 
 async function finalizeHostelReportFromPreview() {
