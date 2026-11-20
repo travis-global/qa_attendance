@@ -2550,17 +2550,20 @@ async function renderHostelRunsMaster() {
         try { await renderHostelConflicts(hostelConflictIssues); } catch (e) { console.error("renderHostelConflicts", e); }
         var conflictCard=document.getElementById("hostelConflictCard");
         var biometricCard=document.getElementById("biometricMapCard");
-        var targetCard=hostelConflictIssues.length?conflictCard:(biometricIssues.length?biometricCard:null);
-        var reviewDetails=targetCard;
-        while(reviewDetails && String(reviewDetails.tagName||"").toLowerCase()!=="details"){reviewDetails=reviewDetails.parentElement;}
-        if(reviewDetails)reviewDetails.open=true;
+        function openReviewCard(card) {
+          var parent=card;
+          while(parent && String(parent.tagName||"").toLowerCase()!=="details") parent=parent.parentElement;
+          if(parent) parent.open=true;
+        }
+        if(hostelConflictIssues.length) openReviewCard(conflictCard);
+        if(biometricIssues.length) openReviewCard(biometricCard);
         var guide=document.getElementById("hostelStatus");
-        var instructions=hostelConflictIssues.length
-          ? "In Hostel Conflicts, choose Keep master if the master-list hostel is correct, Accept gate if the gate location reflects the student’s correct hostel, or Dismiss if this mismatch should no longer be reviewed."
-          : "In Biometric Map Review, clarify or link each name, or move unresolved names to the Unlinked Pool for later review.";
-        var guideText="This saved report has "+linkedIssues.length+" item(s) to review before download:\\n\\n"+issueNames+"\\n\\n"+instructions+" Then return to Saved Hostel Reports and download again.";
+        var instructions=[];
+        if(hostelConflictIssues.length) instructions.push("In Hostel Conflicts, choose Keep master if the master-list hostel is correct, Accept gate if the gate location reflects the student’s correct hostel, or Dismiss if this mismatch should no longer be reviewed.");
+        if(biometricIssues.length) instructions.push("In Biometric Map Review, clarify or link each name, or move unresolved names to the Unlinked Pool for later review.");
+        var guideText="This saved report has "+linkedIssues.length+" item(s) to review before download:\\n\\n"+issueNames+"\\n\\n"+instructions.join("\\n\\n")+" Then return to Saved Hostel Reports and download again.";
         if(guide){guide.textContent=guideText;guide.style.whiteSpace="pre-line";}
-        var target=targetCard||guide;
+        var target=hostelConflictIssues.length?conflictCard:(biometricIssues.length?biometricCard:guide);
         if(target)target.scrollIntoView({behavior:"smooth",block:"center"});
         alert(guideText);
         return;
