@@ -43153,5 +43153,505 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1861
+  },
+  {
+    "ref": "REF/EOCNS/QA/1001",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq07zl_46",
+    "reason": "Biometric machine ID linked (manual)",
+    "details": {
+      "serialBefore": "104",
+      "serialAfter": "104",
+      "machineName": "Nnedinma Miracle Chima",
+      "deviceLabel": "Hostel 1",
+      "score": null,
+      "siteNameKept": "Chima Nnedimma"
+    },
+    "timestamp": "2026-11-20T14:15:14.178Z",
+    "at": "2026-11-20T14:15:14.178Z",
+    "createdAt": "2026-11-20T14:15:14.178Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:15:14",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1862
+  },
+  {
+    "ref": "REF/EOCNS/QA/1002",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "",
+    "reason": "Hostel attendance issue resolved: linked_to_student",
+    "details": {
+      "issueId": "train_mwbzs9b6_45",
+      "machineNo": "104",
+      "studentId": "",
+      "resolution": "linked_to_student",
+      "extra": {
+        "studentId": "stu_mwaq07zl_46",
+        "studentName": "Chima Nnedimma",
+        "regNo": "EOCNS/25/0084/GNS",
+        "machineNo": "104"
+      }
+    },
+    "timestamp": "2026-11-20T14:15:14.220Z",
+    "at": "2026-11-20T14:15:14.220Z",
+    "createdAt": "2026-11-20T14:15:14.220Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:15:14",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1863
+  },
+  {
+    "ref": "REF/EOCNS/QA/1003",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq080k_49",
+    "reason": "Biometric machine ID linked (manual)",
+    "details": {
+      "serialBefore": "111",
+      "serialAfter": "111",
+      "machineName": "Augustina Ogochukwu Iloc",
+      "deviceLabel": "Hostel 1",
+      "score": null,
+      "siteNameKept": "Augusatina Ilochi"
+    },
+    "timestamp": "2026-11-20T14:15:21.070Z",
+    "at": "2026-11-20T14:15:21.070Z",
+    "createdAt": "2026-11-20T14:15:21.070Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:15:21",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1864
+  },
+  {
+    "ref": "REF/EOCNS/QA/1004",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "",
+    "reason": "Hostel attendance issue resolved: linked_to_student",
+    "details": {
+      "issueId": "train_mwbzs9bc_49",
+      "machineNo": "111",
+      "studentId": "",
+      "resolution": "linked_to_student",
+      "extra": {
+        "studentId": "stu_mwaq080k_49",
+        "studentName": "Augusatina Ilochi",
+        "regNo": "EOCNS/25/0091/GNS",
+        "machineNo": "111"
+      }
+    },
+    "timestamp": "2026-11-20T14:15:21.071Z",
+    "at": "2026-11-20T14:15:21.071Z",
+    "createdAt": "2026-11-20T14:15:21.071Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:15:21",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1865
+  },
+  {
+    "ref": "REF/EOCNS/QA/1005",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq08e9_91",
+    "reason": "Biometric machine ID linked (manual)",
+    "details": {
+      "serialBefore": "132",
+      "serialAfter": "132",
+      "machineName": "Chiamaka Jenny Israel",
+      "deviceLabel": "Hostel 1",
+      "score": null,
+      "siteNameKept": "Chiamaka Isreal"
+    },
+    "timestamp": "2026-11-20T14:15:32.141Z",
+    "at": "2026-11-20T14:15:32.141Z",
+    "createdAt": "2026-11-20T14:15:32.141Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:15:32",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1866
+  },
+  {
+    "ref": "REF/EOCNS/QA/1006",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "",
+    "reason": "Hostel attendance issue resolved: linked_to_student",
+    "details": {
+      "issueId": "train_mwbzs9c4_66",
+      "machineNo": "132",
+      "studentId": "",
+      "resolution": "linked_to_student",
+      "extra": {
+        "studentId": "stu_mwaq08e9_91",
+        "studentName": "Chiamaka Isreal",
+        "regNo": "EOCNS/25/0112/GNS",
+        "machineNo": "132"
+      }
+    },
+    "timestamp": "2026-11-20T14:15:32.142Z",
+    "at": "2026-11-20T14:15:32.142Z",
+    "createdAt": "2026-11-20T14:15:32.142Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:15:32",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1867
+  },
+  {
+    "ref": "REF/EOCNS/QA/1007",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq08t9_134",
+    "reason": "Biometric machine ID linked (manual)",
+    "details": {
+      "serialBefore": "150",
+      "serialAfter": "150",
+      "machineName": "Oyinyechi Mary Benjamin",
+      "deviceLabel": "Hostel 1",
+      "score": null,
+      "siteNameKept": "Onyinyechi Benjamin"
+    },
+    "timestamp": "2026-11-20T14:15:44.273Z",
+    "at": "2026-11-20T14:15:44.273Z",
+    "createdAt": "2026-11-20T14:15:44.273Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:15:44",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1868
+  },
+  {
+    "ref": "REF/EOCNS/QA/1008",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "",
+    "reason": "Hostel attendance issue resolved: linked_to_student",
+    "details": {
+      "issueId": "train_mwbzs9cn_79",
+      "machineNo": "150",
+      "studentId": "",
+      "resolution": "linked_to_student",
+      "extra": {
+        "studentId": "stu_mwaq08t9_134",
+        "studentName": "Onyinyechi Benjamin",
+        "regNo": "EOCNS/25/0130/GNS",
+        "machineNo": "150"
+      }
+    },
+    "timestamp": "2026-11-20T14:15:44.275Z",
+    "at": "2026-11-20T14:15:44.275Z",
+    "createdAt": "2026-11-20T14:15:44.275Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:15:44",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1869
+  },
+  {
+    "ref": "REF/EOCNS/QA/1009",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq07jy_8",
+    "reason": "Biometric machine ID linked (manual)",
+    "details": {
+      "serialBefore": "160",
+      "serialAfter": "160",
+      "machineName": "Aghaegbuna Chukewuma",
+      "deviceLabel": "Hostel 1",
+      "score": null,
+      "siteNameKept": "Chukwuma Aghaegbuna"
+    },
+    "timestamp": "2026-11-20T14:15:47.601Z",
+    "at": "2026-11-20T14:15:47.601Z",
+    "createdAt": "2026-11-20T14:15:47.601Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:15:47",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1870
+  },
+  {
+    "ref": "REF/EOCNS/QA/1010",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "",
+    "reason": "Hostel attendance issue resolved: linked_to_student",
+    "details": {
+      "issueId": "train_mwbzs9cx_86",
+      "machineNo": "160",
+      "studentId": "",
+      "resolution": "linked_to_student",
+      "extra": {
+        "studentId": "stu_mwaq07jy_8",
+        "studentName": "Chukwuma Aghaegbuna",
+        "regNo": "EOCNS/25/0154/GNS",
+        "machineNo": "160"
+      }
+    },
+    "timestamp": "2026-11-20T14:15:47.602Z",
+    "at": "2026-11-20T14:15:47.602Z",
+    "createdAt": "2026-11-20T14:15:47.602Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:15:47",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1871
+  },
+  {
+    "ref": "REF/EOCNS/QA/1011",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq08ga_97",
+    "reason": "Biometric machine ID linked (manual)",
+    "details": {
+      "serialBefore": "177",
+      "serialAfter": "177",
+      "machineName": "Rejoice Vincent K.",
+      "deviceLabel": "Hostel 1",
+      "score": null,
+      "siteNameKept": "Kasarachi Vincent"
+    },
+    "timestamp": "2026-11-20T14:15:50.065Z",
+    "at": "2026-11-20T14:15:50.065Z",
+    "createdAt": "2026-11-20T14:15:50.065Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:15:50",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1872
+  },
+  {
+    "ref": "REF/EOCNS/QA/1012",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "",
+    "reason": "Hostel attendance issue resolved: linked_to_student",
+    "details": {
+      "issueId": "train_mwbzs9di_100",
+      "machineNo": "177",
+      "studentId": "",
+      "resolution": "linked_to_student",
+      "extra": {
+        "studentId": "stu_mwaq08ga_97",
+        "studentName": "Kasarachi Vincent",
+        "regNo": "EOCNS/25/0129/GNS",
+        "machineNo": "177"
+      }
+    },
+    "timestamp": "2026-11-20T14:15:50.066Z",
+    "at": "2026-11-20T14:15:50.066Z",
+    "createdAt": "2026-11-20T14:15:50.066Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:15:50",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1873
+  },
+  {
+    "ref": "REF/EOCNS/QA/1013",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq0822_54",
+    "reason": "Biometric machine ID linked (manual)",
+    "details": {
+      "serialBefore": "193",
+      "serialAfter": "193",
+      "machineName": "Osuagwu Precious Udokama",
+      "deviceLabel": "Hostel 1",
+      "score": null,
+      "siteNameKept": "Udokanma Osuagwu"
+    },
+    "timestamp": "2026-11-20T14:16:02.299Z",
+    "at": "2026-11-20T14:16:02.299Z",
+    "createdAt": "2026-11-20T14:16:02.299Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:16:02",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1874
+  },
+  {
+    "ref": "REF/EOCNS/QA/1014",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "",
+    "reason": "Hostel attendance issue resolved: linked_to_student",
+    "details": {
+      "issueId": "train_mwbzs9e5_115",
+      "machineNo": "193",
+      "studentId": "",
+      "resolution": "linked_to_student",
+      "extra": {
+        "studentId": "stu_mwaq0822_54",
+        "studentName": "Udokanma Osuagwu",
+        "regNo": "EOCNS/25/0076/GNS",
+        "machineNo": "193"
+      }
+    },
+    "timestamp": "2026-11-20T14:16:02.300Z",
+    "at": "2026-11-20T14:16:02.300Z",
+    "createdAt": "2026-11-20T14:16:02.300Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:16:02",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1875
+  },
+  {
+    "ref": "REF/EOCNS/QA/1015",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq08zl_151",
+    "reason": "Biometric machine ID linked (manual)",
+    "details": {
+      "serialBefore": "202",
+      "serialAfter": "202",
+      "machineName": "Odo Cynthia Mmesoma",
+      "deviceLabel": "Hostel 1",
+      "score": null,
+      "siteNameKept": "Cynthia Nmesoma"
+    },
+    "timestamp": "2026-11-20T14:16:14.636Z",
+    "at": "2026-11-20T14:16:14.636Z",
+    "createdAt": "2026-11-20T14:16:14.636Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:16:14",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1876
+  },
+  {
+    "ref": "REF/EOCNS/QA/1016",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "",
+    "reason": "Hostel attendance issue resolved: linked_to_student",
+    "details": {
+      "issueId": "train_mwbzs9ee_121",
+      "machineNo": "202",
+      "studentId": "",
+      "resolution": "linked_to_student",
+      "extra": {
+        "studentId": "stu_mwaq08zl_151",
+        "studentName": "Cynthia Nmesoma",
+        "regNo": "EOCNS/25/0022/GNS",
+        "machineNo": "202"
+      }
+    },
+    "timestamp": "2026-11-20T14:16:14.637Z",
+    "at": "2026-11-20T14:16:14.637Z",
+    "createdAt": "2026-11-20T14:16:14.637Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:16:14",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1877
+  },
+  {
+    "ref": "REF/EOCNS/QA/1017",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaq07fc_2",
+    "reason": "Biometric machine ID linked (manual)",
+    "details": {
+      "serialBefore": "222",
+      "serialAfter": "222",
+      "machineName": "Oluebube Sharon Demian",
+      "deviceLabel": "Hostel 1",
+      "score": null,
+      "siteNameKept": "Damian Oluebube"
+    },
+    "timestamp": "2026-11-20T14:16:23.163Z",
+    "at": "2026-11-20T14:16:23.163Z",
+    "createdAt": "2026-11-20T14:16:23.163Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:16:23",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1878
+  },
+  {
+    "ref": "REF/EOCNS/QA/1018",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "",
+    "reason": "Hostel attendance issue resolved: linked_to_student",
+    "details": {
+      "issueId": "train_mwbzs9ez_136",
+      "machineNo": "222",
+      "studentId": "",
+      "resolution": "linked_to_student",
+      "extra": {
+        "studentId": "stu_mwaq07fc_2",
+        "studentName": "Damian Oluebube",
+        "regNo": "EOCNS/25/0163/GNS",
+        "machineNo": "222"
+      }
+    },
+    "timestamp": "2026-11-20T14:16:23.164Z",
+    "at": "2026-11-20T14:16:23.164Z",
+    "createdAt": "2026-11-20T14:16:23.164Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:16:23",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1879
+  },
+  {
+    "ref": "REF/EOCNS/QA/1019",
+    "action": "update",
+    "entity": "students",
+    "entityId": "stu_mwaqcly0_121",
+    "reason": "Biometric machine ID linked (manual)",
+    "details": {
+      "serialBefore": "355",
+      "serialAfter": "355",
+      "machineName": "Marycythia M. Umenwaka",
+      "deviceLabel": "Hostel 1",
+      "score": null,
+      "siteNameKept": "Umenwaka Marycynthia"
+    },
+    "timestamp": "2026-11-20T14:16:27.144Z",
+    "at": "2026-11-20T14:16:27.144Z",
+    "createdAt": "2026-11-20T14:16:27.144Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:16:27",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1880
+  },
+  {
+    "ref": "REF/EOCNS/QA/1020",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "",
+    "reason": "Hostel attendance issue resolved: linked_to_student",
+    "details": {
+      "issueId": "train_mwbzs9f6_140",
+      "machineNo": "355",
+      "studentId": "",
+      "resolution": "linked_to_student",
+      "extra": {
+        "studentId": "stu_mwaqcly0_121",
+        "studentName": "Umenwaka Marycynthia",
+        "regNo": "EOCNS/24/0068/GNS",
+        "machineNo": "355"
+      }
+    },
+    "timestamp": "2026-11-20T14:16:27.145Z",
+    "at": "2026-11-20T14:16:27.145Z",
+    "createdAt": "2026-11-20T14:16:27.145Z",
+    "whenLocal": "Fri, 20 Nov 2026, 15:16:27",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1881
   }
 ]
