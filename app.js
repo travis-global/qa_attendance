@@ -2449,7 +2449,7 @@ async function renderHostelRunsMaster() {
         var issueNames=linkedIssues.map(function(item,i){return (i+1)+". "+(item.machineName||item.studentName||"Unnamed machine user")+" (ID "+(item.machineNo||"—")+") — "+String(item.status||"needs review").replace(/_/g," ");}).join("\n");
         showView("hostel");
         try{await renderBioQueues();}catch(_){}
-        try{await renderHostelConflicts();}catch(_){}
+        try{await renderHostelConflicts(linkedIssues.filter(function(item){return item.status==="hostel_conflict";}));}catch(_){}
         // The review tools live inside the collapsed Advanced setup details.
         // Open that section automatically and take the officer to the exact review card.
         var conflictCard=document.getElementById("hostelConflictCard");
@@ -3253,12 +3253,21 @@ async function renderHostelRoster() {
 window.renderHostelRoster = renderHostelRoster;
 
 
-async function renderHostelConflicts() {
+async function renderHostelConflicts(itemsOverride) {
   var body = document.getElementById("hostelConflictBody");
   var countEl = document.getElementById("hostelConflictCount");
   if (!body) return;
   var list = [];
-  try { list = await getAll("biometric_pending"); } catch (_) {}
+  try {
+    // A saved-report blocker passes the exact records it just read. Use those
+    // records directly so the review table cannot disagree with that warning.
+    list = Array.isArray(itemsOverride) ? itemsOverride : await getAll("biometric_pending");
+  } catch (err) {
+    if (countEl) countEl.textContent = "Conflicts could not be loaded";
+    body.innerHTML = '<tr><td colspan="5" class="muted-note">Unable to read the conflict queue. Use Refresh or reload the app, then try again.</td></tr>';
+    console.error("renderHostelConflicts failed", err);
+    return;
+  }
   list = (list || []).filter(function(x) { return x && x.status === "hostel_conflict"; });
   if (countEl) countEl.textContent = "Conflicts: " + list.length + (list.length ? " (held off fee reports)" : " — none");
   if (!list.length) {
