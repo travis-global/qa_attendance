@@ -2157,7 +2157,10 @@ async function attachHostelRunToPending(run, result) {
   var queue = await getAll("biometric_pending"), changed = false;
   for (var i = 0; i < queue.length; i++) {
     var q = queue[i];
-    if (!q || !ids[String(q.machineNo || "")]) continue;
+    // Only associate genuine biometric/hostel review records. Do not cross-link
+    // CSV import review records by machine number.
+    if (!q || ["clarify","conflict","unlinked","hostel_conflict"].indexOf(q.status) < 0 ||
+        !ids[String(q.machineNo || "")]) continue;
     q.reportRunIds = q.reportRunIds || [];
     if (q.reportRunIds.indexOf(run.id) < 0) q.reportRunIds.push(run.id);
     q.reportContexts = q.reportContexts || [];
@@ -2651,8 +2654,12 @@ async function finalizeHostelReportFromPreview() {
   var lastCheck=window.__lastHostelReport||{};
   if(lastCheck.runId){
     var pendingChecks=await getAll("biometric_pending");
+    // Only unresolved biometric/hostel statuses should block this report.
+    // Legacy CSV review records may have reportRunIds accidentally attached.
+    var hostelBlockingStatuses=["clarify","conflict","unlinked","hostel_conflict"];
     var unresolved=(pendingChecks||[]).filter(function(item){
-      return item && item.status!=="linked" && item.status!=="discarded" && (item.reportRunIds||[]).indexOf(lastCheck.runId)>=0;
+      return item && hostelBlockingStatuses.indexOf(item.status)>=0 &&
+        (item.reportRunIds||[]).indexOf(lastCheck.runId)>=0;
     });
     if(unresolved.length){
       await guideToHostelPendingReview(unresolved.length);
