@@ -163,7 +163,20 @@ function showView(viewId) {
   if (viewId === "sessions") renderSessionsList();
   if (viewId === "dashboard") refreshDashboardStats();
   if (viewId === "audit") renderAuditLog();
-  if (viewId === "hostel") { initHostelView(); if (typeof window.renderHostelRoster === "function") window.renderHostelRoster(); else console.error("Hostel roster renderer was not initialized."); try { renderBioQueues(); } catch (_) {} try { renderHostelConflicts(); } catch (_) {} }
+  if (viewId === "hostel") {
+    initHostelView();
+    if (typeof window.renderHostelRoster === "function") window.renderHostelRoster();
+    else {
+      var rosterNote = document.getElementById("hostelRosterNote");
+      if (rosterNote) rosterNote.textContent = "Loading hostel register…";
+      setTimeout(function() {
+        if (typeof window.renderHostelRoster === "function") window.renderHostelRoster();
+        else if (rosterNote) rosterNote.textContent = "The hostel register is still starting. Please wait a moment and open Hostel again.";
+      }, 500);
+    }
+    try { renderBioQueues(); } catch (_) {}
+    try { renderHostelConflicts(); } catch (_) {}
+  }
   if (viewId === "timetable-board") { if (typeof window.renderTimetableBoard === "function") window.renderTimetableBoard(); else if (typeof renderTimetableBoard === "function") renderTimetableBoard(); }
   if (viewId === "qa-daily") renderQaDaily();
   if (viewId === "qa-weekly") initQaWeeklyView();
@@ -10476,7 +10489,11 @@ try {
 
 
 window.makeClassKey = makeClassKey;
-window.classLabelFromKey = classLabelFromKey;
+window.classLabelFromKey = function(key) {
+  var m = String(key || "").match(/^(\\d+)_(.+)$/);
+  if (!m) return String(key || "CLASS").replace(/_/g, " ").toUpperCase();
+  return m[1] + " LEVEL " + m[2].replace(/_/g, " ").toUpperCase() + " DEPARTMENT";
+};
 window.fillSessionClassSelectors = fillSessionClassSelectors;
 window.ensureTimetables = ensureTimetables;
 
