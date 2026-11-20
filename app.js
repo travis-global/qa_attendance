@@ -427,16 +427,12 @@ function normalizeProgramme(p) {
 }
 
 // Canonical student-name format: Title Case, applied to the master record itself.
-// Consistent person-name formatting across master records, imports, logs and reports.
-// Keeps punctuation (hyphens, apostrophes and initials) while normalising spacing and case.
+// Canonical master-list format: ALL CAPS, with whitespace collapsed consistently.
 function normalizeStudentName(value) {
-  return String(value == null ? "" : value).trim().replace(/\s+/g, " ").toLowerCase()
-    .replace(/(^|[\s\-'.])(\p{L})/gu, function(_, boundary, letter) {
-      return boundary + letter.toUpperCase();
-    });
+  return String(value == null ? "" : value).trim().replace(/\s+/g, " ").toUpperCase();
 }
 var PERSON_NAME_FIELDS = {
-  name: true, studentName: true, lecturerName: true, machineName: true,
+  name: true, studentName: true, lecturer: true, lecturerName: true, machineName: true,
   csvName: true, officerName: true, fullName: true, userName: true,
   officer: true, user: true
 };
@@ -1483,7 +1479,7 @@ async function seedOfficialStudents() {
     if (byReg.has(reg) || byName.has(nameKey)) continue;
     const student = {
       id: "stu_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
-      name: s.name,
+      name: normalizeStudentName(s.name),
       regNo: s.regNo,
       programme: normalizeProgramme(s.programme),
       level: String(s.level),
@@ -2136,11 +2132,9 @@ function addHostelPreviewRow() {
   });
 }
 
-// Report-only name formatter: keep source records unchanged and standardise display as Title Case (Aa).
+// Report-only formatter: render every person name in clean, whitespace-normalised ALL CAPS.
 function formatReportPersonName(value) {
-  return String(value == null ? "" : value).trim().toLowerCase().replace(/(^|[\\s'’-])([a-z])/g, function(_, boundary, letter) {
-    return boundary + letter.toUpperCase();
-  });
+  return String(value == null ? "" : value).trim().replace(/\s+/g, " ").toUpperCase();
 }
 
 function downloadHostelWorkbook(rosterRows, dateKeys, filename, gateExportRows) {
@@ -2169,8 +2163,16 @@ function downloadHostelWorkbook(rosterRows, dateKeys, filename, gateExportRows) 
   ws["!margins"] = { left: 0.25, right: 0.25, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 };
 
   if (Array.isArray(gateExportRows) && gateExportRows.length > 1) {
-    var gateWs = XLSX.utils.aoa_to_sheet(gateExportRows);
-    var gateHeaders = gateExportRows[0] || [];
+    var safeGateRows = gateExportRows.map(function(row, ri) {
+      var copy = Array.isArray(row) ? row.slice() : row;
+      if (ri > 0 && Array.isArray(copy)) {
+        var nameIndex = (gateExportRows[0] || []).findIndex(function(h) { return String(h || "").trim().toLowerCase() === "name"; });
+        if (nameIndex >= 0 && copy[nameIndex] != null) copy[nameIndex] = formatReportPersonName(copy[nameIndex]);
+      }
+      return copy;
+    });
+    var gateWs = XLSX.utils.aoa_to_sheet(safeGateRows);
+    var gateHeaders = safeGateRows[0] || [];
     gateWs["!cols"] = gateHeaders.map(function(h) {
       var key = String(h || "").toLowerCase();
       return { wch: key === "name" ? 28 : (key === "date/time" ? 21 : (key === "department" ? 18 : 15)) };
@@ -2199,7 +2201,7 @@ async function downloadHostelRunWorkbook(run) {
     gateRows = [["Department","Name","No.","Date/Time","Status","Location ID","ID Number","VerifyCode","CardNo"]];
     run.gateEvents.forEach(function(ev) {
       var student = bySerial[String(ev.machineNo || "").trim().replace(/\.0$/, "")] || {};
-      gateRows.push([run.hostel || "", student.name || "", String(ev.machineNo || ""), String(ev.dateKey || ""), ev.status || "C/IN", ev.locationId || run.sourceLocationId || "", student.regNo || "", "", ""]);
+      gateRows.push([run.hostel || "", formatReportPersonName(student.name || ""), String(ev.machineNo || ""), String(ev.dateKey || ""), ev.status || "C/IN", ev.locationId || run.sourceLocationId || "", student.regNo || "", "", ""]);
     });
   }
   downloadHostelWorkbook(matrix, run.dateKeys || [], "EOCNS_Absence_Report_" + String(run.start || "report") + "_to_" + String(run.end || "report") + ".xlsx", gateRows);
@@ -3417,7 +3419,7 @@ async function renderHostelRoster() {
       "<td>" + mid + "</td>" +
       "<td>" + status + "</td>" +
       "<td>" + escapeHtml(s.regNo || "—") + "</td>" +
-      "<td>" + escapeHtml(s.name || "") + "</td>" +
+      "<td>" + escapeHtml(normalizeStudentName(s.name)) + "</td>" +
       "<td>" + escapeHtml(s.programme || "") + "</td>" +
       "<td>" + escapeHtml(String(s.level || "")) + "</td>" +
       "<td>" + escapeHtml(s.hostel || "—") + "</td>" +
@@ -3582,7 +3584,7 @@ async function printFullQaPack() {
   });
   var compliance = entries.length ? Math.round((held / entries.length) * 100) : 0;
   var blocks = entries.map(function(e, i) {
-    return "<tr><td>" + (i + 1) + "</td><td>" + (e.date || "") + "</td><td>" + (e.course || "") + "</td><td>" + (e.lecturer || "") +
+    return "<tr><td>" + (i + 1) + "</td><td>" + (e.date || "") + "</td><td>" + (e.course || "") + "</td><td>" + formatReportPersonName(e.lecturer || "") +
       "</td><td>" + (e.status || "") + "</td><td>" + (e.topic || "—") + "</td></tr>";
   }).join("");
   var w = window.open("", "_blank");
@@ -4554,7 +4556,7 @@ async function printDailyLectureReport() {
     courseBlocks += "<table class='data'><thead><tr><th>S/N</th><th>Course</th><th>Lecturer</th><th>Logged status</th><th>Remark</th></tr></thead><tbody>";
     notHeldEntries.forEach(function(e, i) {
       courseBlocks += "<tr><td style='text-align:center'>" + (i + 1) + "</td><td>" + escapeHtml(e.course || "—") +
-        "</td><td>" + escapeHtml(e.lecturer || "—") + "</td><td>" + escapeHtml(e.status || "—") +
+        "</td><td>" + escapeHtml(formatReportPersonName(e.lecturer || "—")) + "</td><td>" + escapeHtml(e.status || "—") +
         "</td><td>Did not hold</td></tr>";
     });
     courseBlocks += "</tbody></table>";
@@ -5367,7 +5369,7 @@ async function openStudentProfile(id) {
   var s = all.find(function(x) { return x.id === id; });
   if (!s) return;
   window.__profileStudentId = id;
-  document.getElementById("studentProfileTitle").textContent = s.name || "Student";
+  document.getElementById("studentProfileTitle").textContent = normalizeStudentName(s.name) || "Student";
   var rem = [];
   try {
     rem = (await getAll("remedial_enrolment")).filter(function(r) {
@@ -5656,7 +5658,7 @@ async function openStudentFullRecord(id) {
   if (!data) return;
   var s = data.student;
   var title = document.getElementById("studentFullRecordTitle");
-  if (title) title.textContent = "DSA Student Dossier — " + (s.name || "");
+  if (title) title.textContent = "DSA Student Dossier — " + normalizeStudentName(s.name);
   var photo = s.photoDataUrl
     ? '<div class="passport-frame" style="margin-bottom:12px"><img src="' + s.photoDataUrl + '" alt="Student passport photograph" /></div>'
     : "";
@@ -5688,12 +5690,12 @@ async function openStudentFullRecord(id) {
     var mark = c.mark == null ? "—" : String(c.mark);
     return "<tr><td>" + escapeHtml(c.date || "") + "</td><td>" + escapeHtml(c.course || "") +
       "</td><td>" + escapeHtml(mark) + "</td><td>" + escapeHtml(c.status || "") + "</td><td>" +
-      escapeHtml(c.lecturer || "") + "</td><td>" + escapeHtml((c.sources || []).join(" + ") || "—") + "</td></tr>";
+      escapeHtml(formatReportPersonName(c.lecturer || "")) + "</td><td>" + escapeHtml((c.sources || []).join(" + ") || "—") + "</td></tr>";
   }).join("");
   var absRows = data.absents.map(function(e) {
     return "<tr><td>" + escapeHtml(e.date || "") + "</td><td>" + escapeHtml(e.course || "") +
       "</td><td>" + escapeHtml(e.status || "") + "</td><td>" + escapeHtml(e.classKey || "") +
-      "</td><td>" + escapeHtml(e.lecturer || "") + "</td></tr>";
+      "</td><td>" + escapeHtml(formatReportPersonName(e.lecturer || "")) + "</td></tr>";
   }).join("");
   var remInner = "";
   if (!data.remedial.length && !data.remedialLogs.length) remInner = none();
@@ -5951,7 +5953,7 @@ async function renderDisciplineTable() {
   if (count) count.textContent = list.length + " case" + (list.length !== 1 ? "s" : "");
   tbody.innerHTML = list.length ? list.map(function(d) {
     return "<tr><td>" + escapeHtml(d.date || "—") + "</td><td>" + escapeHtml(d.subjectType || "") +
-      "</td><td>" + escapeHtml(d.name || "—") + "</td><td>" + escapeHtml(d.type || "—") +
+      "</td><td>" + escapeHtml(formatReportPersonName(d.name || "—")) + "</td><td>" + escapeHtml(d.type || "—") +
       "</td><td>" + escapeHtml(d.status || "—") + "</td><td>" + escapeHtml(d.ref || "—") +
       '</td><td class="qa-edit-only"><button type="button" class="icon-btn-sm" data-edit-disc="' + d.id + '">Edit</button> ' +
       '<button type="button" class="icon-btn-sm" data-del-disc="' + d.id + '">Del</button></td></tr>';
@@ -6063,7 +6065,7 @@ async function printDisciplineRegister() {
   if (!w) return;
   var rows = list.map(function(d, i) {
     return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(d.date || "") + "</td><td>" + escapeHtml(d.subjectType || "") +
-      "</td><td>" + escapeHtml(d.name || "") + "</td><td>" + escapeHtml(d.type || "") + "</td><td>" +
+      "</td><td>" + escapeHtml(formatReportPersonName(d.name || "")) + "</td><td>" + escapeHtml(d.type || "") + "</td><td>" +
       escapeHtml(d.status || "") + "</td><td>" + escapeHtml(d.ref || "") + "</td></tr>";
   }).join("");
   w.document.write("<!DOCTYPE html><html><head><title>Discipline register</title><style>body{font-family:Georgia,serif;padding:24px}table{border-collapse:collapse;width:100%;font-size:0.9rem}th,td{border:1px solid #ccc;padding:6px;text-align:left}h1{color:#0d9488}</style></head><body>" +
@@ -6183,7 +6185,7 @@ async function approvePendingStudent(id) {
   var now = new Date().toISOString();
   var student = {
     id: generateId("stu"),
-    name: p.name,
+    name: normalizeStudentName(p.name),
     regNo: p.regNo,
     programme: p.programme,
     level: p.level,
@@ -6325,7 +6327,7 @@ async function confirmRejectPendingStudent(forcedId, forcedReason, forcedPin) {
         entity: "pending_students",
         entityId: id,
         reason: "Rejected self-registration: " + reason,
-        details: { email: p.email, regNo: p.regNo, name: p.name, notify: "manual_only" }
+        details: { email: p.email, regNo: p.regNo, name: normalizeStudentName(p.name), notify: "manual_only" }
       });
     } catch (_) {}
     markDirty("pending reject");
@@ -6443,7 +6445,7 @@ async function openStudentProfile(id) {
   var s = all.find(function(x) { return x.id === id; });
   if (!s) return;
   window.__profileStudentId = id;
-  document.getElementById("studentProfileTitle").textContent = s.name || "Student";
+  document.getElementById("studentProfileTitle").textContent = normalizeStudentName(s.name) || "Student";
   var rem = [];
   try {
     rem = (await getAll("remedial_enrolment")).filter(function(r) {
@@ -6530,7 +6532,7 @@ async function renderDisciplineTable() {
   if (count) count.textContent = list.length + " case" + (list.length !== 1 ? "s" : "");
   tbody.innerHTML = list.length ? list.map(function(d) {
     return "<tr><td>" + escapeHtml(d.date || "—") + "</td><td>" + escapeHtml(d.subjectType || "") +
-      "</td><td>" + escapeHtml(d.name || "—") + "</td><td>" + escapeHtml(d.type || "—") +
+      "</td><td>" + escapeHtml(formatReportPersonName(d.name || "—")) + "</td><td>" + escapeHtml(d.type || "—") +
       "</td><td>" + escapeHtml(d.status || "—") + "</td><td>" + escapeHtml(d.ref || "—") +
       '</td><td class="qa-edit-only"><button type="button" class="icon-btn-sm" data-edit-disc="' + d.id + '">Edit</button> ' +
       '<button type="button" class="icon-btn-sm" data-del-disc="' + d.id + '">Del</button></td></tr>';
@@ -6642,7 +6644,7 @@ async function printDisciplineRegister() {
   if (!w) return;
   var rows = list.map(function(d, i) {
     return "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(d.date || "") + "</td><td>" + escapeHtml(d.subjectType || "") +
-      "</td><td>" + escapeHtml(d.name || "") + "</td><td>" + escapeHtml(d.type || "") + "</td><td>" +
+      "</td><td>" + escapeHtml(formatReportPersonName(d.name || "")) + "</td><td>" + escapeHtml(d.type || "") + "</td><td>" +
       escapeHtml(d.status || "") + "</td><td>" + escapeHtml(d.ref || "") + "</td></tr>";
   }).join("");
   w.document.write("<!DOCTYPE html><html><head><title>Discipline register</title><style>body{font-family:Georgia,serif;padding:24px}table{border-collapse:collapse;width:100%;font-size:0.9rem}th,td{border:1px solid #ccc;padding:6px;text-align:left}h1{color:#0d9488}</style></head><body>" +
@@ -6761,7 +6763,7 @@ async function approvePendingStudent(id) {
   var now = new Date().toISOString();
   var student = {
     id: generateId("stu"),
-    name: p.name,
+    name: normalizeStudentName(p.name),
     regNo: p.regNo,
     programme: p.programme,
     level: p.level,
@@ -7353,7 +7355,9 @@ async function buildLecturerHoursReport() {
     var contract = Number(l.contractHoursPerSemester) || 0;
     var legacyMonthly = Number(l.contractHoursPerMonth) || 0;
     var slots = lecturerWeeklySlots(l);
-    var mine = qa.filter(function(e) { return (e.lecturer || "") === l.name; });
+    var mine = qa.filter(function(e) {
+      return String(e.lecturer || "").trim().toUpperCase() === String(l.name || "").trim().toUpperCase();
+    });
     var hrs = function(list) { return r1(list.reduce(function(t, e) { return t + (Number(e.duration) || 0); }, 0) / 60); };
     var row = { name: l.name, staffId: l.staffId || "", contract: contract };
     if (!monthVal) {
@@ -7831,7 +7835,7 @@ function studentFromRepo(s) {
   const now = new Date().toISOString();
   var row = {
     id: s.id || ("stu_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7)),
-    name: s.name,
+    name: normalizeStudentName(s.name),
     regNo: s.regNo || "",
     programme: normalizeProgramme(s.programme),
     level: String(s.level || ""),
@@ -9315,7 +9319,7 @@ async function renderReportsView() {
     var time = [e.start, e.end].filter(Boolean).join("–") || "—";
     var absent = Array.isArray(e.absent) ? e.absent.join(", ") : (e.absent || "—");
     return "<tr><td>" + escapeHtml(e.date || "") + "</td><td>" + escapeHtml(e.classKey || "") +
-      "</td><td>" + escapeHtml(e.course || "") + "</td><td>" + escapeHtml(e.lecturer || "") +
+      "</td><td>" + escapeHtml(e.course || "") + "</td><td>" + escapeHtml(formatReportPersonName(e.lecturer || "")) +
       "</td><td>" + escapeHtml(time) + "</td><td>" + escapeHtml(e.status || "") +
       "</td><td>" + escapeHtml(e.topic || "—") + "</td><td>" + escapeHtml(absent || "—") + "</td></tr>";
   }).join("");
@@ -9756,7 +9760,7 @@ function printLectureReport() {
   var w = window.open("", "_blank");
   if (!w) { alert("Allow pop-ups to print."); return; }
   var rows = entries.map(function(e) {
-    return "<tr><td>" + (e.date || "") + "</td><td>" + (e.course || "") + "</td><td>" + (e.lecturer || "") +
+    return "<tr><td>" + (e.date || "") + "</td><td>" + (e.course || "") + "</td><td>" + formatReportPersonName(e.lecturer || "") +
       "</td><td>" + [e.start, e.end].filter(Boolean).join("–") + "</td><td>" + (e.status || "") +
       "</td><td>" + (e.topic || "") + "</td><td>" + (Array.isArray(e.absent) ? e.absent.join(", ") : "") + "</td></tr>";
   }).join("");
@@ -10338,7 +10342,7 @@ async function confirmRejectPendingStudent(forcedId, forcedReason, forcedPin) {
       await writeAudit({
         action: "delete", entity: "pending_students", entityId: id,
         reason: "Rejected self-registration: " + reason,
-        details: { email: p.email, regNo: p.regNo, name: p.name, notify: "manual_only" }
+        details: { email: p.email, regNo: p.regNo, name: normalizeStudentName(p.name), notify: "manual_only" }
       });
     } catch (_) {}
     markDirty("pending reject");
@@ -10378,7 +10382,7 @@ async function approvePendingStudent(id) {
     }
     var now = new Date().toISOString();
     var student = {
-      id: generateId("stu"), name: p.name, regNo: p.regNo, programme: p.programme, level: p.level,
+      id: generateId("stu"), name: normalizeStudentName(p.name), regNo: p.regNo, programme: p.programme, level: p.level,
       gender: p.gender || "", phone: p.phone || "", hostel: p.hostel || "", photoDataUrl: p.photoDataUrl || "",
       status: "Active", email: p.email || "", createdAt: now, updatedAt: now, source: "self_registration", pendingId: p.id
     };
