@@ -1667,6 +1667,10 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
   var gateUsers = {}, pendingByMachine = {};
 
   function cleanId(v) { return String(v == null ? "" : v).trim().replace(/\.0$/, ""); }
+  function isGateCheckInStatus(raw) {
+    var status = String(raw == null ? "" : raw).trim().toUpperCase().replace(/[\\s_-]+/g, "");
+    return status === "C/IN" || status === "CHECKIN" || status === "IN" || status === "ENTRY";
+  }
   function isBlankHostel(h) {
     var t = String(h || "").trim().toLowerCase();
     return !t || t === "—" || t === "-" || t === "n/a" || t === "na" ||
@@ -1684,15 +1688,16 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     var machineNo = cleanId(row[noCol]);
     if (!machineNo) continue;
     var lid = parseHostelLocationId(row[locCol]);
-    if (lid === 1 || lid === 2) {
+    var status = String(statusCol == null ? "" : (row[statusCol] || "")).trim().toUpperCase();
+    var isCheckIn = isGateCheckInStatus(status);
+    if (isCheckIn && (lid === 1 || lid === 2)) {
       locationVotes[String(lid)]++;
       locationDateCoverage[String(lid)][toDateKeyHostel(dt)] = true;
     }
     if (!gateUsers[machineNo]) {
       gateUsers[machineNo] = { machineNo: machineNo, machineName: nameCol == null ? "" : String(row[nameCol] || "").trim(), datesByLocation: { "1": {}, "2": {} }, dates: {}, locations: { "1": 0, "2": 0 } };
     }
-    var status = String(statusCol == null ? "" : (row[statusCol] || "")).trim().toUpperCase();
-    if (status === "C/IN" && (lid === 1 || lid === 2)) gateUsers[machineNo].datesByLocation[String(lid)][toDateKeyHostel(dt)] = true;
+    if (isCheckIn && (lid === 1 || lid === 2)) gateUsers[machineNo].datesByLocation[String(lid)][toDateKeyHostel(dt)] = true;
     if (lid === 1 || lid === 2) gateUsers[machineNo].locations[String(lid)]++;
   }
 
@@ -1728,7 +1733,7 @@ async function computeHostelAttendance(rows, startDate, endDate, hostel1Name, ho
     var gateRow = rows[ge] || [], gateDate = parseAttendanceDateHostel(gateRow[dateCol]);
     if (!gateDate || gateDate < startDate || gateDate > endDate) continue;
     if (parseHostelLocationId(gateRow[locCol]) !== sourceId) continue;
-    if (String(statusCol == null ? "" : (gateRow[statusCol] || "")).trim().toUpperCase() !== "C/IN") continue;
+    if (!isGateCheckInStatus(gateRow[statusCol])) continue;
     var gateMachine = cleanId(gateRow[noCol]);
     if (!gateMachine) continue;
     var gateDateKey = toDateKeyHostel(gateDate), eventKey = gateMachine + "|" + gateDateKey;
@@ -12236,12 +12241,16 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
     if(serial){if(!bySerial[serial])bySerial[serial]=[];bySerial[serial].push(s);}
   });
   var existingQ = await getAll("biometric_pending");
-  var openKeys = {}, ignoredKeys = {};
+  var openKeys = {}, ignoredKeys = {}, ignoredNames = {};
+  function ignoredNameKey(value) { return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
   (existingQ || []).forEach(function(q) {
-    if (!q || !q.machineNo) return;
-    var key = String(q.machineNo).trim().replace(/\.0$/, "");
-    if (q.status === "discarded") ignoredKeys[key] = true;
-    else if (q.status !== "linked") openKeys[key] = true;
+    if (!q) return;
+    var key = String(q.machineNo || "").trim().replace(/\.0$/, "");
+    if (q.status === "discarded") {
+      if (key) ignoredKeys[key] = true;
+      var nameKey = ignoredNameKey(q.machineName);
+      if (nameKey) ignoredNames[nameKey] = true;
+    } else if (q.status !== "linked" && key) openKeys[key] = true;
   });
   var added = 0;
   for (var i = 0; i < candidates.length; i++) {
