@@ -426,7 +426,7 @@ function normalizeProgramme(p) {
   return t;
 }
 
-// Canonical student-name format: Title Case, applied to the master record itself.
+// Legacy Title Case convention removed; ALL CAPS is the system-wide person-name standard.
 // Canonical master-list format: ALL CAPS, with whitespace collapsed consistently.
 function normalizeStudentName(value) {
   return String(value == null ? "" : value).trim().replace(/\s+/g, " ").toUpperCase();
@@ -2011,7 +2011,7 @@ function renderHostelPreview(absentees, dayHeaders, rate) {
       return '<td style="text-align:center;padding:2px"><input data-hp-day="'+di+'" value="'+v+'" maxlength="1" title="P=present; A=absent" style="width:2rem;text-align:center;text-transform:uppercase;padding:4px" /></td>';
     }).join("");
     return '<tr data-hp-idx="'+idx+'" data-hp-student-id="'+escapeHtml(r.id||"")+'" data-hp-regno="'+escapeHtml(r.regNo||"")+'" data-hp-programme="'+escapeHtml(r.programme||"")+'" data-hp-level="'+escapeHtml(r.level||"")+'">' +
-      '<td><input data-hp-name type="text" value="'+escapeHtml(r.name||"")+'" style="min-width:180px;width:100%" /></td>' +
+      '<td><input data-hp-name type="text" value="'+escapeHtml(formatReportPersonName(r.name||""))+'" style="min-width:180px;width:100%" /></td>' +
       '<td>'+escapeHtml(r.regNo||"—")+'</td>' +
       '<td><input data-hp-hostel type="text" value="'+escapeHtml(r.hostel||"")+'" style="min-width:100px;width:100%" /></td>'+days+
       '<td data-hp-days style="text-align:center">'+(Number(r.absentDays)||0)+'</td>' +
@@ -5922,7 +5922,7 @@ async function printStudentSectionReport(id, section) {
 
   var w = window.open("", "_blank");
   if (!w) return;
-  w.document.write("<!DOCTYPE html><html><head><title>" + title + " — " + escapeHtml(s.name || "") +
+  w.document.write("<!DOCTYPE html><html><head><title>" + title + " — " + escapeHtml(formatReportPersonName(s.name || "")) +
     "</title><style>" + studentDossierStyles() + "</style></head><body>" + body +
     "<p class=\"muted\">Eastern Oak College of Nursing Sciences · Confidential student affairs record</p></body></html>");
   w.document.close();
@@ -6125,7 +6125,7 @@ async function renderPendingRegistrations() {
     var thumb = p.photoDataUrl
       ? '<img src="' + p.photoDataUrl + '" alt="" style="width:40px;height:50px;object-fit:cover;border-radius:4px;border:1px solid #cbd5e1" />'
       : "—";
-    return "<tr><td>" + thumb + "</td><td>" + escapeHtml(p.name || "") +
+    return "<tr><td>" + thumb + "</td><td>" + escapeHtml(formatReportPersonName(p.name || "")) +
       "</td><td>" + escapeHtml(p.regNo || "") + "</td><td>" + escapeHtml(p.programme || "") + " / " + escapeHtml(String(p.level || "")) +
       "</td><td>" + escapeHtml(p.email || "") + "</td><td>" + escapeHtml((p.submittedAt || "").slice(0, 16).replace("T", " ")) +
       '</td><td class="qa-edit-only">' +
@@ -6704,7 +6704,7 @@ async function renderPendingRegistrations() {
     var thumb = p.photoDataUrl
       ? '<img src="' + p.photoDataUrl + '" alt="" style="width:40px;height:50px;object-fit:cover;border-radius:4px;border:1px solid #cbd5e1" />'
       : "—";
-    return "<tr><td>" + thumb + "</td><td>" + escapeHtml(p.name || "") +
+    return "<tr><td>" + thumb + "</td><td>" + escapeHtml(formatReportPersonName(p.name || "")) +
       "</td><td>" + escapeHtml(p.regNo || "") + "</td><td>" + escapeHtml(p.programme || "") + " / " + escapeHtml(String(p.level || "")) +
       "</td><td>" + escapeHtml(p.email || "") + "</td><td>" + escapeHtml((p.submittedAt || "").slice(0, 16).replace("T", " ")) +
       '</td><td class="qa-edit-only">' +
@@ -9436,7 +9436,7 @@ async function renderQaDaily() {
     if (e.status === "Missed") missed++;
     var badge = e.status === "Held" ? "badge--green" : e.status === "Missed" ? "badge--amber" : "badge--muted";
     rows.push("<tr><td>—</td><td>" + escapeHtml(e.course) + " <span class=\"cell-sub\">extra</span></td><td>—</td><td><span class=\"badge " + badge + "\">" +
-      escapeHtml(e.status) + "</span></td><td>" + escapeHtml(e.lecturer || "—") + "</td><td>" + (e.duration != null ? e.duration : "—") +
+      escapeHtml(e.status) + "</span></td><td>" + escapeHtml(formatReportPersonName(e.lecturer || "—")) + "</td><td>" + (e.duration != null ? e.duration : "—") +
       '</td><td class="qa-edit-only">' + (isQaOfficer() ? ('<button type="button" class="icon-btn-sm" data-edit-qa="' + escapeHtml(e.id) + '">Edit</button> ' +
       '<button type="button" class="icon-btn-sm" data-delete-qa="' + escapeHtml(e.id) + '" style="color:#b91c1c">Delete</button>') : "") + "</td></tr>");
   });
@@ -10243,7 +10243,7 @@ async function renderPendingRegistrations(opts) {
     var thumb = p.photoDataUrl
       ? '<img src="' + p.photoDataUrl + '" alt="" style="width:40px;height:50px;object-fit:cover;border-radius:4px;border:1px solid #cbd5e1" />'
       : "—";
-    return "<tr><td>" + thumb + "</td><td>" + escapeHtml(p.name || "") + "</td><td>" + escapeHtml(p.regNo || "") +
+    return "<tr><td>" + thumb + "</td><td>" + escapeHtml(formatReportPersonName(p.name || "")) + "</td><td>" + escapeHtml(p.regNo || "") +
       "</td><td>" + escapeHtml(p.programme || "") + " / " + escapeHtml(String(p.level || "")) +
       "</td><td>" + escapeHtml(p.email || "") + "</td><td>" + escapeHtml((p.submittedAt || "").slice(0, 16).replace("T", " ")) +
       '</td><td class="qa-edit-only">' +
@@ -11143,7 +11143,7 @@ async function generateStudentRegisterReport() {
   if (typeof svgDonut === "function" && students.length) {
     var genPct = Math.round((female / students.length) * 1000) / 10;
     body += "<div style='display:flex;gap:16px;flex-wrap:wrap;align-items:center'>" + svgDonut(genPct, 130, "% female") +
-      "<p style='font-size:12px;max-width:360px'>Names shown in Title Case (Aa). Core columns: Name, Reg. No, Gender.</p></div>";
+      "<p style='font-size:12px;max-width:360px'>Names shown in ALL CAPS. Core columns: Name, Reg. No, Gender.</p></div>";
   }
   Object.keys(byProg).sort().forEach(function(k) {
     var rows = byProg[k].map(function(s, i) {
@@ -11159,7 +11159,7 @@ async function generateStudentRegisterReport() {
   }
   if (typeof reportGlossaryHtml === "function") {
     body += reportGlossaryHtml([
-      ["Name", "Shown in Title Case (Aa) for uniformity across official reports."],
+      ["Name", "Shown in ALL CAPS for uniformity across official reports."],
       ["Reg. No", "Official registration / matriculation number."],
       ["Gender", "As recorded on the master list."]
     ]);
@@ -11825,7 +11825,7 @@ async function openBioClarifyModal(pendingId) {
       }
       return '<label style="display:flex;gap:8px;align-items:flex-start;padding:6px 4px;cursor:pointer;border-bottom:1px solid var(--border)">' +
         '<input type="radio" name="bioClarifyPick" value="' + escapeHtml(s.studentId) + '"' + checked + ' />' +
-        '<span><strong>' + escapeHtml(s.name || "") + '</strong><br>' +
+        '<span><strong>' + escapeHtml(formatReportPersonName(s.name || "")) + '</strong><br>' +
         '<span class="muted-note">' + escapeHtml(s.regNo || "—") +
         (s.serial ? (" · ID " + escapeHtml(s.serial)) : "") +
         (s.score != null ? (" · " + s.score + "% match") : "") +
@@ -11873,7 +11873,7 @@ async function bioClarifyRunSearch(q) {
   res.innerHTML = hits.map(function(s) {
     return '<label style="display:flex;gap:8px;align-items:flex-start;padding:6px 4px;cursor:pointer;border-bottom:1px solid var(--border)">' +
       '<input type="radio" name="bioClarifyPick" value="' + escapeHtml(s.id) + '" />' +
-      '<span><strong>' + escapeHtml(s.name || "") + '</strong><br>' +
+      '<span><strong>' + escapeHtml(formatReportPersonName(s.name || "")) + '</strong><br>' +
       '<span class="muted-note">' + escapeHtml(s.regNo || "—") +
       (s.serial ? (" · ID " + escapeHtml(s.serial)) : "") +
       " · " + escapeHtml(s.programme || "") + " L" + escapeHtml(String(s.level || "")) +
@@ -12645,7 +12645,7 @@ async function renderCsvReviewQueue() {
   }
   body.innerHTML = list.map(function(row) {
     var sug = (row.suggestions || []).slice(0, 3).map(function(s) {
-      return escapeHtml(s.name || "") + " · " + escapeHtml(s.regNo || "—") +
+      return escapeHtml(formatReportPersonName(s.name || "")) + " · " + escapeHtml(s.regNo || "—") +
         (s.score != null ? (" (" + s.score + "%)") : "");
     }).join("<br>") || "—";
     return "<tr>" +
