@@ -451,7 +451,14 @@ function normalizePersonNameFields(value) {
   }
   Object.keys(value).forEach(function(key) {
     var current = value[key];
-    if (PERSON_NAME_FIELDS[key] && typeof current === "string" && current.trim()) {
+    if (key === "absent" && Array.isArray(current)) {
+      current.forEach(function(personName, index) {
+        if (typeof personName === "string" && personName.trim()) {
+          var normalizedAbsentName = normalizeStudentName(personName);
+          if (normalizedAbsentName !== personName) { current[index] = normalizedAbsentName; changed = true; }
+        }
+      });
+    } else if (PERSON_NAME_FIELDS[key] && typeof current === "string" && current.trim()) {
       var normalized = normalizeStudentName(current);
       if (normalized !== current) { value[key] = normalized; changed = true; }
     } else if (current && typeof current === "object") {
@@ -9317,7 +9324,7 @@ async function renderReportsView() {
   if (empty) empty.hidden = true;
   tbody.innerHTML = entries.map(function(e) {
     var time = [e.start, e.end].filter(Boolean).join("–") || "—";
-    var absent = Array.isArray(e.absent) ? e.absent.join(", ") : (e.absent || "—");
+    var absent = Array.isArray(e.absent) ? e.absent.map(formatReportPersonName).join(", ") : formatReportPersonName(e.absent || "—");
     return "<tr><td>" + escapeHtml(e.date || "") + "</td><td>" + escapeHtml(e.classKey || "") +
       "</td><td>" + escapeHtml(e.course || "") + "</td><td>" + escapeHtml(formatReportPersonName(e.lecturer || "")) +
       "</td><td>" + escapeHtml(time) + "</td><td>" + escapeHtml(e.status || "") +
@@ -9762,7 +9769,7 @@ function printLectureReport() {
   var rows = entries.map(function(e) {
     return "<tr><td>" + (e.date || "") + "</td><td>" + (e.course || "") + "</td><td>" + formatReportPersonName(e.lecturer || "") +
       "</td><td>" + [e.start, e.end].filter(Boolean).join("–") + "</td><td>" + (e.status || "") +
-      "</td><td>" + (e.topic || "") + "</td><td>" + (Array.isArray(e.absent) ? e.absent.join(", ") : "") + "</td></tr>";
+      "</td><td>" + (e.topic || "") + "</td><td>" + (Array.isArray(e.absent) ? e.absent.map(formatReportPersonName).join(", ") : formatReportPersonName(e.absent || "")) + "</td></tr>";
   }).join("");
   w.document.write("<!DOCTYPE html><html><head><title>EOCNS Lecture Report</title><style>" +
     "body{font-family:Georgia,serif;color:#1a1a2e;padding:24px} h1{color:#1B3A6B;text-align:center}" +
