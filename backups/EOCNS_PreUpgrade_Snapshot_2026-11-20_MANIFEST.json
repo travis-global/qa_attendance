@@ -1,0 +1,189 @@
+{
+  "createdAt": "2026-11-20T12:58:55.065443+00:00",
+  "purpose": "Refresh before continuing Worker auth + encryption upgrade",
+  "git": {
+    "commit": "000c35edd24cb97f6dbea35a87ec28715364c9b3",
+    "log": "000c35edd24cb97f6dbea35a87ec28715364c9b3 | 2026-11-20 13:14:59 +0100 | Scope auto hostel batch review to current report"
+  },
+  "counts": {
+    "attendance": 0,
+    "audit": 1731,
+    "biometric_pending": 42,
+    "config": 1,
+    "courses": 36,
+    "discipline": 0,
+    "hostel_runs": 2,
+    "lecturers": 25,
+    "levels": 3,
+    "pending_students": 1,
+    "programmes": 3,
+    "qa_entries": 60,
+    "remedial": 0,
+    "remedial_assignments": 0,
+    "remedial_enrolment": 0,
+    "remedial_logs": 0,
+    "remedial_meta": 1,
+    "remedial_timetable": 1,
+    "sessions": 1,
+    "students": 416,
+    "timetables": 1
+  },
+  "files": [
+    {
+      "name": "attendance.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "audit.json",
+      "bytes": 1175144,
+      "sha256": "a9961c642c82e83dec1e0c3a90f54390e3d99c2eb5a61a1e1ae4c85b8e4667a9",
+      "count": 1731
+    },
+    {
+      "name": "biometric_pending.json",
+      "bytes": 35694,
+      "sha256": "0968d2d516ee77694e817d9bb5eb0cc62be198f67131cdd4ecd91aef01e6c721",
+      "count": 42
+    },
+    {
+      "name": "config.json",
+      "bytes": 442,
+      "sha256": "4a35cea47ad79f0bdfc5244a82d44301662b986299905f165ea3f82b943d126b",
+      "count": 1
+    },
+    {
+      "name": "courses.json",
+      "bytes": 4733,
+      "sha256": "b2529a2958d1c05a23afb88e03921b577cd1983506fd49359336a4b117f2c487",
+      "count": 36
+    },
+    {
+      "name": "discipline.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "hostel_runs.json",
+      "bytes": 433731,
+      "sha256": "bc6c1b64e31b35eea550d3b7e74e66c1676870c466335935e5eb7f21b0ae3ef2",
+      "count": 2
+    },
+    {
+      "name": "lecturers.json",
+      "bytes": 15567,
+      "sha256": "6a88fe19d429443b1b773524326f0b82dd8af4edfe6660617c9af2a20752239a",
+      "count": 25
+    },
+    {
+      "name": "levels.json",
+      "bytes": 290,
+      "sha256": "4491b72397eb82feaacbda132b0934b02653c3e0410bb9e2396173cb6d1818d9",
+      "count": 3
+    },
+    {
+      "name": "pending_students.json",
+      "bytes": 38928,
+      "sha256": "0c6ce25986cf61faaddf6699e8d3b593fdd5be0659132bb8f4962d819df98e7e",
+      "count": 1
+    },
+    {
+      "name": "programmes.json",
+      "bytes": 313,
+      "sha256": "58148459905003fd75cfdeed9ef9223c66e163811f7b23e1cf903e1c66d69bb4",
+      "count": 3
+    },
+    {
+      "name": "qa_entries.json",
+      "bytes": 180087,
+      "sha256": "c8973c671030ba766c0dc80731ec0f0329f25bdf34b35459d67497ba0f968dce",
+      "count": 60
+    },
+    {
+      "name": "remedial.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "remedial_assignments.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "remedial_enrolment.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "remedial_logs.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "remedial_meta.json",
+      "bytes": 183,
+      "sha256": "8f9bc458978c00734822af391bbea3d5e0fb17f25d6163cc3cede79818f5fd9c",
+      "count": 1
+    },
+    {
+      "name": "remedial_timetable.json",
+      "bytes": 17,
+      "sha256": "176d5f35ccf0d4c5c4ba469f88b339dbde100b71d87b6afcad106553b81391fa",
+      "count": 1
+    },
+    {
+      "name": "sessions.json",
+      "bytes": 648,
+      "sha256": "231696afbad173d9d125bf12e403de836cb5bd683d8b4576d2cd497e71c525da",
+      "count": 1
+    },
+    {
+      "name": "students.json",
+      "bytes": 128907,
+      "sha256": "15f3b4cc0aac44081cb6652b8b71674f2f7d1d2071f38ca48c0fc44b6defd24e",
+      "count": 416
+    },
+    {
+      "name": "timetables.json",
+      "bytes": 9822,
+      "sha256": "7598bdcee581c52793949c0eafefc24980dad68ac5b8bdc7ae6374a13bd46131",
+      "count": 1
+    }
+  ],
+  "livePagesParity": {
+    "attendance": "match",
+    "audit": "match",
+    "biometric_pending": "match",
+    "config": "match",
+    "courses": "match",
+    "discipline": "match",
+    "hostel_runs": "match",
+    "lecturers": "match",
+    "levels": "match",
+    "pending_students": "match",
+    "programmes": "match",
+    "qa_entries": "match",
+    "remedial": "match",
+    "remedial_assignments": "match",
+    "remedial_enrolment": "match",
+    "remedial_logs": "match",
+    "remedial_meta": "match",
+    "remedial_timetable": "match",
+    "sessions": "match",
+    "students": "match",
+    "timetables": "match"
+  },
+  "appJsVersion": "109",
+  "notes": [
+    "Hostel report-scoped ignore/blockers",
+    "CSV review excluded from biometric queues",
+    "Audited permanent deletion for Daily QA logs",
+    "Course catalogue transaction hardening"
+  ]
+}
