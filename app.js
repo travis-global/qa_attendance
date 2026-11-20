@@ -11481,7 +11481,7 @@ async function renderBioQueues() {
   var countEl = document.getElementById("bioClarifyCount");
   var list = [];
   try { list = await getAll("biometric_pending"); } catch (_) { list = []; }
-  list = (list || []).filter(function(x) { return x && x.status !== "linked" && x.status !== "discarded"; });
+  list = (list || []).filter(function(x) { return x && x.status !== "linked" && x.status !== "discarded" && x.status !== "csv_review" && x.kind !== "csv"; });
   var ignored = (await getAll("biometric_pending")).filter(function(x) { return x && x.status === "discarded"; });
   var ignoredBody = document.getElementById("bioIgnoredBody");
   var ignoredCount = document.getElementById("bioIgnoredCount");
@@ -12323,14 +12323,16 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
  * Walk pending clarify items one-by-one with confirm dialogs.
  * mode: "clarify" | "unlinked" | "csv"
  */
-async function startMatchQueueBatch(mode) {
+async function startMatchQueueBatch(mode, reportRunId) {
   if (!isQaOfficer()) { openOfficerLoginGate("hostel"); return; }
   var list = await getAll("biometric_pending");
   list = (list || []).filter(function(x) {
     if (!x || x.status === "linked") return false;
     if (mode === "csv") return x.kind === "csv" || x.status === "csv_review";
+    if (x.kind === "csv" || x.status === "csv_review") return false;
+    if (reportRunId && (x.reportRunIds || []).indexOf(reportRunId) < 0) return false;
     if (mode === "unlinked") return x.status === "unlinked";
-    return x.status === "clarify" || x.status === "conflict" || x.status === "csv_review";
+    return x.status === "clarify" || x.status === "conflict";
   });
   if (!list.length) {
     alert("No items waiting in this queue.");
