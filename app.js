@@ -2431,7 +2431,7 @@ async function renderHostelRunsMaster() {
       if(!isQaOfficer()){alert("Sign in as QA Officer to download the saved hostel report.");return;}
       var saved=(await getAll("hostel_runs")).find(function(r){return r.id===btn.getAttribute("data-hr-download");});
       if(!saved){alert("Saved hostel report not found.");return;}
-      var linkedIssues=(await getAll("biometric_pending")).filter(function(item){return item&&item.status!=="linked"&&item.status!=="discarded"&&(item.reportRunIds||[]).indexOf(saved.id)>=0;});
+      var linkedIssues=(await getAll("biometric_pending")).filter(function(item){return item&&["clarify","conflict","unlinked","hostel_conflict"].indexOf(item.status)>=0&&(item.reportRunIds||[]).indexOf(saved.id)>=0;});
       if(linkedIssues.length){alert("This report still has "+linkedIssues.length+" unresolved issue(s). Resolve or explicitly dismiss them before downloading the report.");return;}
       try{await downloadHostelRunWorkbook(saved);}catch(e){alert(e.message||String(e));}
     });
@@ -11523,7 +11523,7 @@ async function renderBioQueues() {
   var countEl = document.getElementById("bioClarifyCount");
   var list = [];
   try { list = await getAll("biometric_pending"); } catch (_) { list = []; }
-  list = (list || []).filter(function(x) { return x && x.status !== "linked" && x.status !== "discarded" && x.status !== "csv_review" && x.kind !== "csv"; });
+  list = (list || []).filter(function(x) { return x && x.status !== "linked" && x.status !== "resolved" && x.status !== "discarded" && x.status !== "csv_review" && x.kind !== "csv"; });
   var ignored = (await getAll("biometric_pending")).filter(function(x) { return x && x.status === "discarded"; });
   var ignoredBody = document.getElementById("bioIgnoredBody");
   var ignoredCount = document.getElementById("bioIgnoredCount");
@@ -11748,8 +11748,10 @@ async function confirmBioClarifyLink() {
   var pending = (await getAll("biometric_pending")).find(function(x) { return x.id === pid; });
   if (!pending) { alert("Queue item gone."); closeBioClarifyModal(); return; }
   try {
-    await bioLinkStudentSerial(sid, pending.machineNo, pending.machineName, pending.deviceLabel, null, "manual");
-    await del("biometric_pending", pid);
+    var linkedStudent = await bioLinkStudentSerial(sid, pending.machineNo, pending.machineName, pending.deviceLabel, null, "manual");
+    await recordHostelIssueResolution(pending,"linked_to_student",{studentId:linkedStudent.id,studentName:linkedStudent.name,regNo:linkedStudent.regNo||"",machineNo:pending.machineNo});
+    pending.status = "resolved"; pending.resolution = "linked_to_student"; pending.studentId = linkedStudent.id; pending.resolvedAt = new Date().toISOString(); pending.updatedAt = pending.resolvedAt;
+    await put("biometric_pending", pending);
     markDirty("biometric link");
     closeBioClarifyModal();
     await renderBioQueues();
@@ -11890,8 +11892,10 @@ async function confirmBioCreateStudent() {
       details: { serial: serial, machineName: pending && pending.machineName, siteName: name }
     });
   } catch (_) {}
-  if (pendingId) {
-    try { await del("biometric_pending", pendingId); } catch (_) {}
+  if (pending) {
+    await recordHostelIssueResolution(pending,"created_student",{studentId:student.id,studentName:student.name,regNo:student.regNo||"",machineNo:serial});
+    pending.status = "resolved"; pending.resolution = "created_student"; pending.studentId = student.id; pending.resolvedAt = new Date().toISOString(); pending.updatedAt = pending.resolvedAt;
+    await put("biometric_pending", pending);
   }
   markDirty("biometric create student");
   closeBioCreateStudentModal();
@@ -12409,7 +12413,8 @@ async function startMatchQueueBatch(mode, reportRunId) {
           await applyCsvReviewLink(row, sug[0]);
         } else {
           await bioLinkStudentSerial(sug[0].studentId, row.machineNo, row.machineName, row.deviceLabel, (sug[0].score || 0) / 100, "batch");
-          await del("biometric_pending", row.id);
+          await recordHostelIssueResolution(row,"linked_to_student",{studentId:sug[0].studentId,studentName:sug[0].name||"",regNo:sug[0].regNo||"",machineNo:row.machineNo});
+          row.status = "resolved"; row.resolution = "linked_to_student"; row.studentId = sug[0].studentId; row.resolvedAt = new Date().toISOString(); row.updatedAt = row.resolvedAt; await put("biometric_pending", row);
         }
         linked++;
       } catch (err) {
