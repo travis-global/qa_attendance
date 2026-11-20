@@ -44013,5 +44013,29 @@
     "officer": "Alolote Fortunatus",
     "source": "system",
     "id": 1897
+  },
+  {
+    "ref": "REF/EOCNS/QA/1037",
+    "action": "update",
+    "entity": "hostel_runs",
+    "entityId": "hr_mwosu6bo",
+    "reason": "student not in hostel",
+    "details": {
+      "ref": "REF/EOCNS/QA/16",
+      "start": "2026-11-15",
+      "end": "2026-11-19",
+      "changeCount": 0,
+      "deletedRowCount": 2,
+      "absenteeCount": 118,
+      "totalFine": 8115000
+    },
+    "timestamp": "2026-11-20T15:21:47.615Z",
+    "at": "2026-11-20T15:21:47.615Z",
+    "createdAt": "2026-11-20T15:21:47.615Z",
+    "whenLocal": "Fri, 20 Nov 2026, 16:21:47",
+    "user": "Alolote Fortunatus",
+    "officer": "Alolote Fortunatus",
+    "source": "system",
+    "id": 1898
   }
 ]
