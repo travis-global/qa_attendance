@@ -930,7 +930,7 @@
   {
     "id": "hconf_resolved_mwez273t_0",
     "kind": "hostel_conflict",
-    "status": "hostel_conflict",
+    "status": "resolved",
     "machineNo": "1535",
     "machineName": "AGU CHIOMA AKUABATA",
     "studentName": "AGU CHIOMA AKUABATA",
@@ -1008,7 +1008,9 @@
       }
     ],
     "createdAt": "2026-11-13T12:47:40.409Z",
-    "updatedAt": "2026-11-13T13:35:34.897Z"
+    "updatedAt": "2026-11-20T15:03:03.557Z",
+    "resolution": "accepted_gate_hostel",
+    "resolvedAt": "2026-11-20T15:03:03.557Z"
   },
   {
     "id": "bio_h_mwosu63k_460_16",
@@ -1214,7 +1216,7 @@
   {
     "id": "hconf_mwos3e1m_0",
     "kind": "hostel_conflict",
-    "status": "hostel_conflict",
+    "status": "resolved",
     "machineNo": "476",
     "machineName": "Izukamma Blessing Chidera",
     "studentName": "Izukamma Blessing Chidera",
@@ -1224,7 +1226,7 @@
     "gateHostel": "Hostel 1",
     "locationId": 1,
     "createdAt": "2026-11-20T09:30:20.506Z",
-    "updatedAt": "2026-11-20T10:32:52.490Z",
+    "updatedAt": "2026-11-20T15:03:00.646Z",
     "reportRunIds": [
       "hr_mwosu6bo"
     ],
@@ -1236,12 +1238,14 @@
         "end": "2026-11-19",
         "locationId": 1
       }
-    ]
+    ],
+    "resolution": "accepted_gate_hostel",
+    "resolvedAt": "2026-11-20T15:03:00.646Z"
   },
   {
     "id": "hconf_mwos3e1n_1",
     "kind": "hostel_conflict",
-    "status": "hostel_conflict",
+    "status": "resolved",
     "machineNo": "479",
     "machineName": "Amarachi Nwuguru Okeh",
     "studentName": "Amarachi Nwuguru Okeh",
@@ -1251,7 +1255,7 @@
     "gateHostel": "Hostel 1",
     "locationId": 1,
     "createdAt": "2026-11-20T09:30:20.507Z",
-    "updatedAt": "2026-11-20T10:32:52.490Z",
+    "updatedAt": "2026-11-20T15:03:01.741Z",
     "reportRunIds": [
       "hr_mwosu6bo"
     ],
@@ -1263,12 +1267,14 @@
         "end": "2026-11-19",
         "locationId": 1
       }
-    ]
+    ],
+    "resolution": "accepted_gate_hostel",
+    "resolvedAt": "2026-11-20T15:03:01.741Z"
   },
   {
     "id": "hconf_resolved_mwosy9y0_0",
     "kind": "hostel_conflict",
-    "status": "hostel_conflict",
+    "status": "resolved",
     "machineNo": "569",
     "machineName": "Chijioke Amarachi",
     "studentName": "Chijioke Amarachi",
@@ -1290,12 +1296,14 @@
       }
     ],
     "createdAt": "2026-11-20T09:54:21.528Z",
-    "updatedAt": "2026-11-20T10:32:52.491Z"
+    "updatedAt": "2026-11-20T15:03:04.066Z",
+    "resolution": "accepted_gate_hostel",
+    "resolvedAt": "2026-11-20T15:03:04.066Z"
   },
   {
     "id": "hconf_resolved_mwosz19l_0",
     "kind": "hostel_conflict",
-    "status": "hostel_conflict",
+    "status": "resolved",
     "machineNo": "1550",
     "machineName": "Joy Chinazaekpere Asogwa",
     "studentName": "Joy Chinazaekpere Asogwa",
@@ -1317,12 +1325,14 @@
       }
     ],
     "createdAt": "2026-11-20T09:54:56.937Z",
-    "updatedAt": "2026-11-20T10:32:52.491Z"
+    "updatedAt": "2026-11-20T15:03:04.398Z",
+    "resolution": "accepted_gate_hostel",
+    "resolvedAt": "2026-11-20T15:03:04.398Z"
   },
   {
     "id": "hconf_resolved_mwot0gg8_0",
     "kind": "hostel_conflict",
-    "status": "hostel_conflict",
+    "status": "resolved",
     "machineNo": "1566",
     "machineName": "Christopher Nmesoma Precious",
     "studentName": "Christopher Nmesoma Precious",
@@ -1344,12 +1354,14 @@
       }
     ],
     "createdAt": "2026-11-20T09:56:03.272Z",
-    "updatedAt": "2026-11-20T10:32:52.492Z"
+    "updatedAt": "2026-11-20T15:03:04.844Z",
+    "resolution": "accepted_gate_hostel",
+    "resolvedAt": "2026-11-20T15:03:04.844Z"
   },
   {
     "id": "hconf_resolved_mwotykgm_0",
     "kind": "hostel_conflict",
-    "status": "hostel_conflict",
+    "status": "resolved",
     "machineNo": "413",
     "machineName": "Chidimma Esther Okechukwu",
     "studentName": "Chidimma Esther Okechukwu",
@@ -1371,12 +1383,14 @@
       }
     ],
     "createdAt": "2026-11-20T10:22:34.774Z",
-    "updatedAt": "2026-11-20T10:32:52.493Z"
+    "updatedAt": "2026-11-20T15:03:05.571Z",
+    "resolution": "accepted_gate_hostel",
+    "resolvedAt": "2026-11-20T15:03:05.571Z"
   },
   {
     "id": "hconf_resolved_mwotz8vh_0",
     "kind": "hostel_conflict",
-    "status": "hostel_conflict",
+    "status": "resolved",
     "machineNo": "423",
     "machineName": "Promise Amaka Ikechukwu",
     "studentName": "Promise Amaka Ikechukwu",
@@ -1398,6 +1412,8 @@
       }
     ],
     "createdAt": "2026-11-20T10:23:06.413Z",
-    "updatedAt": "2026-11-20T10:32:52.493Z"
+    "updatedAt": "2026-11-20T15:03:07.368Z",
+    "resolution": "accepted_gate_hostel",
+    "resolvedAt": "2026-11-20T15:03:07.368Z"
   }
 ]
