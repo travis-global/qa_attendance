@@ -2450,9 +2450,18 @@ async function renderHostelRunsMaster() {
         showView("hostel");
         try{await renderBioQueues();}catch(_){}
         try{await renderHostelConflicts();}catch(_){}
+        // The review tools live inside the collapsed Advanced setup details.
+        // Open that section automatically and take the officer to the exact review card.
+        var conflictCard=document.getElementById("hostelConflictCard");
+        var reviewDetails=conflictCard;
+        while(reviewDetails && String(reviewDetails.tagName||"").toLowerCase()!=="details"){reviewDetails=reviewDetails.parentElement;}
+        if(reviewDetails)reviewDetails.open=true;
         var guide=document.getElementById("hostelStatus");
-        var guideText="This saved report has "+linkedIssues.length+" item(s) to review before download:\n\n"+issueNames+"\n\nUse the matching review section below: Clarify Queue, Unlinked Pool, or Hostel Conflicts. After resolving them, return to Saved Hostel Reports and download again.";
-        if(guide){guide.textContent=guideText;guide.style.whiteSpace="pre-line";guide.scrollIntoView({behavior:"smooth",block:"center"});}
+        var guideText="This saved report has "+linkedIssues.length+" item(s) to review before download:\n\n"+issueNames+"\n\nThe review section has been opened for you. In Hostel Conflicts, choose Keep master if the master-list hostel is correct, Accept gate if the gate location reflects the student\u2019s correct hostel, or Dismiss if this mismatch should no longer be reviewed. Then return to Saved Hostel Reports and download again.";
+        if(guide){guide.textContent=guideText;guide.style.whiteSpace="pre-line";}
+        var hasHostelConflict=linkedIssues.some(function(item){return item.status==="hostel_conflict";});
+        var target=hasHostelConflict&&conflictCard?conflictCard:guide;
+        if(target)target.scrollIntoView({behavior:"smooth",block:"center"});
         alert(guideText);
         return;
       }
