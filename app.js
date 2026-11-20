@@ -426,7 +426,7 @@ function normalizeProgramme(p) {
   return t;
 }
 
-// Legacy Title Case convention removed; ALL CAPS is the system-wide person-name standard.
+// ALL CAPS is the system-wide person-name standard.
 // Canonical master-list format: ALL CAPS, with whitespace collapsed consistently.
 function normalizeStudentName(value) {
   return String(value == null ? "" : value).trim().replace(/\s+/g, " ").toUpperCase();
@@ -490,7 +490,7 @@ async function normalizeExistingStudentNames() {
     if (changed) { changedByStore[storeName] = changed; totalChanged += changed; }
   }
   if (totalChanged) {
-    try { markDirty("name normalization"); } catch (e) { console.warn("Name-normalization sync flag", e); }
+    try { markDirty(changedByStore.students ? "students" : "person-name normalization"); } catch (e) { console.warn("Name-normalization sync flag", e); }
     console.info("Normalised person names across system:", changedByStore);
   }
   return totalChanged;
