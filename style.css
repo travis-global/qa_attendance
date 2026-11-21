@@ -1538,3 +1538,6 @@ body:has(#eocnsDemoBar) .topbar { top:72px; }
   body #eocnsDemoMenu, body #eocnsDemoDrawer { top:12px !important; right:8px !important; left:8px !important; width:auto !important; max-height:calc(100vh - 24px) !important; }
   body:has(#eocnsDemoBar) .topbar { top:190px; }
 }
+
+/* Keep the dashboard sign-in action hidden after successful QA Officer login. */
+.dashboard-signin[hidden] { display: none !important; }
