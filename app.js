@@ -1342,6 +1342,7 @@ async function renderAuditLog() {
     window.__auditHydrateTried = true;
     try {
       var remote = await fetchRepoJson(DATA_FILES.audit);
+      if (remote === null) return;
       if (Array.isArray(remote) && remote.length) {
         await putMany("audit", remote);
         list = remote;
@@ -1456,9 +1457,8 @@ let OFFICIAL_STUDENTS = [];
 async function loadOfficialStudentsSeed() {
   if (OFFICIAL_STUDENTS.length) return OFFICIAL_STUDENTS;
   try {
-    const res = await fetch("data/students.json?v=8");
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    OFFICIAL_STUDENTS = await res.json();
+    var seedRows = await fetchRepoJson(DATA_FILES.students);
+    OFFICIAL_STUDENTS = Array.isArray(seedRows) ? seedRows : [];
   } catch (e) {
     console.warn("Could not load data/students.json", e);
     OFFICIAL_STUDENTS = [];
@@ -6095,6 +6095,7 @@ async function printDisciplineRegister() {
 async function refreshPendingFromRepo() {
   try {
     var list = await fetchRepoJson(DATA_FILES.pending_students + "?t=" + Date.now());
+    if (list === null) return await getAll("pending_students");
     if (!Array.isArray(list)) list = [];
     var existing = await getAll("pending_students");
     for (var i = 0; i < existing.length; i++) {
@@ -6676,6 +6677,7 @@ async function printDisciplineRegister() {
 async function refreshPendingFromRepo() {
   try {
     var list = await fetchRepoJson(DATA_FILES.pending_students + "?t=" + Date.now());
+    if (list === null) return await getAll("pending_students");
     if (!Array.isArray(list)) list = [];
     var existing = await getAll("pending_students");
     for (var i = 0; i < existing.length; i++) {
@@ -7823,30 +7825,37 @@ function initQaOfficerUI() {
   });
 }
 
+var SENSITIVE_DATA_PATHS = {
+  "data/students.json": true, "data/lecturers.json": true, "data/qa_entries.json": true,
+  "data/audit.json": true, "data/discipline.json": true, "data/pending_students.json": true,
+  "data/hostel_runs.json": true, "data/biometric_pending.json": true, "data/attendance.json": true,
+  "data/remedial.json": true, "data/remedial_logs.json": true, "data/remedial_enrolment.json": true,
+  "data/remedial_assignments.json": true, "data/remedial_meta.json": true, "data/remedial_timetable.json": true
+};
 async function fetchRepoJson(path) {
-  var cleanPath = String(path || "").split("?")[0].replace(/^\.\//, "");
-  // Prefer authenticated Worker read (supports encrypted stores after DATA_ENCRYPTION_KEY is set)
-  try {
-    var tok = (typeof getQaSessionToken === "function") ? getQaSessionToken() : "";
-    var workerUrl = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
-    if (tok && workerUrl && cleanPath.indexOf("data/") === 0 && cleanPath !== "data/config.json") {
-      var wres = await fetch(workerUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + tok },
-        body: JSON.stringify({ action: "get_store", path: cleanPath, token: tok })
-      });
-      var wbody = {};
-      try { wbody = await wres.json(); } catch (_) {}
-      if (wres.ok && wbody && wbody.ok && typeof wbody.data !== "undefined") {
-        return wbody.data;
-      }
-    }
-  } catch (err) {
-    console.warn("get_store fallback", err);
+  var cleanPath = String(path || "").split("?")[0].replace(/^\\/+/, "");
+  var tok = (typeof getQaSessionToken === "function") ? getQaSessionToken() : "";
+  var workerUrl = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
+  function isEncryptedEnvelope(value) { return !!(value && typeof value === "object" && value.v === 1 && value.alg === "AES-GCM" && value.iv && value.ct); }
+  if (SENSITIVE_DATA_PATHS[cleanPath]) {
+    if (!tok) return null;
+    if (!workerUrl) throw new Error("Worker URL missing for sensitive read: " + cleanPath);
+    var secureRes = await fetch(workerUrl.replace(/\\/$/, ""), { method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok}, body:JSON.stringify({action:"get_store",path:cleanPath,token:tok}) });
+    var secureBody = {}; try { secureBody = await secureRes.json(); } catch (_) {}
+    if (!secureRes.ok || !secureBody || !secureBody.ok || typeof secureBody.data === "undefined") throw new Error((secureBody && secureBody.error) || ("Worker get_store failed: HTTP "+secureRes.status+" for "+cleanPath));
+    if (isEncryptedEnvelope(secureBody.data)) return null;
+    return secureBody.data;
   }
-  const res = await fetch(cleanPath + "?v=" + Date.now(), { cache: "no-store" });
-  if (!res.ok) throw new Error("HTTP " + res.status + " for " + cleanPath);
-  return res.json();
+  try {
+    if (tok && workerUrl && cleanPath.indexOf("data/")===0 && cleanPath!=="data/config.json") {
+      var wres=await fetch(workerUrl.replace(/\\/$/,""),{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},body:JSON.stringify({action:"get_store",path:cleanPath,token:tok})});
+      var wbody={};try{wbody=await wres.json();}catch(_){}
+      if(wres.ok&&wbody&&wbody.ok&&typeof wbody.data!=="undefined"){if(isEncryptedEnvelope(wbody.data))return null;return wbody.data;}
+    }
+  } catch(err){console.warn("get_store fallback",err);}
+  var res=await fetch(cleanPath+"?v="+Date.now(),{cache:"no-store"});
+  if(!res.ok)throw new Error("HTTP "+res.status+" for "+cleanPath);
+  var parsed=await res.json();if(isEncryptedEnvelope(parsed))return null;return parsed;
 }
 
 async function clearStore(storeName) {
@@ -7917,6 +7926,7 @@ async function hydrateAllFromRepoIfEmpty() {
       var existing = await getAll(store);
       if (existing.length) return existing.length;
       var rows = await fetchRepoJson(path);
+      if (rows === null) return 0;
       if (Array.isArray(rows) && rows.length) {
         if (store === "students") {
           for (var i = 0; i < rows.length; i++) await put("students", studentFromRepo(rows[i]));
@@ -7997,9 +8007,9 @@ function textFingerprint(t) {
   return t.length + ":" + (h >>> 0).toString(36);
 }
 async function fetchRepoText(path) {
-  var res = await fetch(path + "?v=" + Date.now(), { cache: "no-store" });
-  if (!res.ok) throw new Error("HTTP " + res.status + " for " + path);
-  return res.text();
+  var cleanPath=String(path||"").split("?")[0].replace(/^\\/+/, "");
+  if(SENSITIVE_DATA_PATHS[cleanPath]){var rows=await fetchRepoJson(path);if(rows===null)return null;return JSON.stringify(rows);}
+  var res=await fetch(path+"?v="+Date.now(),{cache:"no-store"});if(!res.ok)throw new Error("HTTP "+res.status+" for "+path);return res.text();
 }
 async function replaceStoreFromRepoRows(store, rows) {
   await clearStore(store);   // only ever called after the repo file was fetched and parsed successfully
@@ -8152,6 +8162,7 @@ async function syncFromRepoIfClean() {
       var localNow = [];
       try { localNow = await getAll(store); } catch (_) {}
       var text = await fetchRepoText(path + (path.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now());
+      if (text === null) { unchanged.push(store + "(unauthenticated)"); continue; }
       var rows = JSON.parse(text);
       if (!Array.isArray(rows)) throw new Error("not a list");
       var fp = textFingerprint(text);
@@ -8245,6 +8256,7 @@ async function reloadAllFromRepo(force) {
       if (!path) continue;
       try {
         var text = await fetchRepoText(path);     // fetch + parse first, so a failure never wipes local data
+        if (text === null) { failed.push(store + "(requires officer login)"); continue; }
         var rows = JSON.parse(text);
         if (!Array.isArray(rows)) throw new Error("not a list");
         await replaceStoreFromRepoRows(store, rows);
@@ -10256,6 +10268,7 @@ async function publishPendingListToRepo(message) {
 async function refreshPendingFromRepo() {
   try {
     var list = await fetchRepoJson(DATA_FILES.pending_students + "?t=" + Date.now());
+    if (list === null) return await getAll("pending_students");
     if (!Array.isArray(list)) list = [];
     var existing = await getAll("pending_students");
     for (var i = 0; i < existing.length; i++) {
