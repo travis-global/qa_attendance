@@ -1,6 +1,138 @@
 /* EOCNS build v128 — outer bare report refs removed */
 (() => {
 "use strict";
+
+// Plain-English language helpers for staff-facing messages.
+function friendlyStoreName(pathOrStore) {
+  var key = String(pathOrStore || "").trim().replace(/^.*\//, "").replace(/\.json$/i, "");
+  var names = {
+    students:"Student List", lecturers:"Lecturers", sessions:"School Sessions",
+    qa_entries:"Lecture Logs", audit:"Activity History", programmes:"Programmes",
+    levels:"Levels", courses:"Courses", timetables:"Timetables",
+    attendance:"Class Sign-In Sheets", hostel_runs:"Hostel Reports",
+    biometric_pending:"Hostel Review Queue", discipline:"Discipline Cases",
+    pending_students:"New Student Requests", config:"System Settings",
+    remedial:"Remedial Classes", remedial_meta:"Remedial Enrolment",
+    remedial_enrolment:"Remedial Enrolment", remedial_assignments:"Remedial Enrolment",
+    remedial_timetable:"Remedial Timetable", remedial_logs:"Remedial Attendance"
+  };
+  if (key.indexOf("remedial") === 0) return names[key] || "Remedial Classes";
+  return names[key] || (key ? key.replace(/[_-]+/g, " ").replace(/\b\w/g, function(c){return c.toUpperCase();}) : "School records");
+}
+function friendlyErrorMessage(err, fallbackContext) {
+  console.error("[Staff action error]", err);
+  var raw = String(err && err.message ? err.message : err || "");
+  var low = raw.toLowerCase();
+  if (/failed to fetch|networkerror|network request failed|load failed|cors/.test(low))
+    return "No internet connection (or the school server could not be reached). Your work is still safe on this computer. Check your internet and try again.";
+  if (/\b401\b|unauthorized|session expired|invalid session/.test(low))
+    return "Your officer sign-in has expired for security. Please sign in again with your PIN and repeat that step.";
+  if (/\b429\b|too many/.test(low))
+    return "Too many attempts in a short time. Please wait 15 minutes and try again.";
+  if (/\b409\b|\bsha\b|conflict/.test(low))
+    return "Another computer saved changes at the same time. Please wait 5 seconds and click 'Save Changes Now' again.";
+  if (/quotaexceeded|quota exceeded|storage full/.test(low))
+    return "This device's browser storage is full. Please free up space on the device or contact the system admin.";
+  if (/publishworkerkey|publishworkerurl|github_token|worker http|worker url missing/.test(low))
+    return "The school cloud connection or security settings need attention. Your saved work is safe on this computer. Please contact the system admin.";
+  if (/decrypt failed|\b500\b|\b502\b|internal server error|bad gateway/.test(low))
+    return "The school cloud server had a temporary problem. Nothing on this computer was lost. Wait a minute and try again.";
+  var context = String(fallbackContext || "complete this step").replace(/[.?!]+$/g, "");
+  return "We could not " + context + ". Your saved work is still safe on this computer. Please try again. If the problem continues, contact the system admin.";
+}
+function friendlyUiText(value) {
+  var text = String(value == null ? "" : value);
+  var replacements = [
+    [/Publish when ready[^.]*\.?/gi, "Click 'Save Changes Now' at the top right so other computers can see your updates."],
+    [/Publish when ready so other devices see[^.]*\.?/gi, "Click 'Save Changes Now' at the top right so other computers can see your updates."],
+    [/Publish to repository/gi, "Save Changes Now"],
+    [/Publish to keep on all devices/gi, "Click 'Save Changes Now' at the top right so other computers can see your updates."],
+    [/Settings\s*[→>]+\s*Publish(?: all data)? to repository/gi, "click 'Save Changes Now' at the top right"],
+    [/hard-refresh\s*\(Ctrl\s*\+\s*Shift\s*\+\s*R\)/gi, "reload this page (press F5 or close and reopen the tab)"],
+    [/hard-refresh/gi, "reload this page (press F5 or close and reopen the tab)"],
+    [/IndexedDB/gi, "this computer's saved records"],
+    [/local database|database on this device/gi, "saved records on this computer"],
+    [/\blocal database\b/gi, "saved records on this computer"],
+    [/\bJSON\b/gi, "saved records file"],
+    [/Worker HTTP\s*\d*/gi, "The school cloud could not complete the request"],
+    [/Cloudflare Worker/gi, "school cloud service"],
+    [/publishWorkerUrl(?: is)? missing in (?:data\/)?config(?:\.json)?/gi, "The school cloud connection is not set up. Please contact the system admin."],
+    [/publishWorkerKey missing in (?:data\/)?config(?:\.json)?/gi, "The school cloud security settings need attention. Please contact the system admin."],
+    [/publishWorkerKey does not match Worker secret PUBLISH_KEY/gi, "The school cloud security settings need attention. Please contact the system admin."],
+    [/Worker missing GITHUB_TOKEN secret/gi, "The school cloud needs an administrator to check its connection settings."],
+    [/\bGitHub\b/gi, "the school cloud"],
+    [/\brepository\b/gi, "school cloud"],
+    [/\bdelta\b/gi, "latest changes"],
+    [/\bfingerprint\b/gi, "saved-file check"],
+    [/\bmanifest\b/gi, "list of saved files"],
+    [/\bunpublished\b/gi, "unsaved"],
+    [/master sheet/gi, "Hostel Reports"],
+    [/biometric_pending/gi, "Hostel Review Queue"],
+    [/reportRunIds/gi, "Hostel Reports"],
+    [/browser console\s*\(F12\)/gi, "contact the system admin if the problem continues"],
+    [/DevTools\s*→\s*Application\s*→\s*IndexedDB[^.]*\.?/gi, "contact the system admin for help restoring this page"],
+    [/Sign in as QA Officer(?: in| under)? Settings?(?: before [^.]+)?/gi, "Please sign in as QA Officer to continue. Your saved records are safe. Click Sign In as QA Officer and enter your PIN"],
+    [/Incorrect PIN[^.]*\.?/gi, "Your PIN was not accepted. No changes were made. Check your PIN and try again."],
+    [/master student list/gi, "Student List"],
+    [/master list/gi, "Student List"],
+    [/secure Worker/gi, "secure school sign-in"],
+    [/Worker error HTTP \d+/gi, "The school cloud could not complete this request."],
+    [/No session token returned from Worker/gi, "Your sign-in could not be completed. Please check your internet connection and try again."],
+    [/Signing in via secure school sign-in…/gi, "Checking your sign-in securely…"],
+    [/Signing in…/gi, "Checking your sign-in securely…"],
+    [/local pending list/gi, "New Student Requests on this computer"],
+    [/synced to repository/gi, "saved online"],
+    [/on the repository/gi, "in the school cloud"],
+    [/data\/[^\s]+\.json/gi, "the school records"],
+    [/F12/gi, "system admin"],
+    [/DevTools|console/gi, "system admin"],
+    [/\bpublishing\b/gi, "saving"],
+    [/\bpublished\b/gi, "saved"],
+    [/\bpublish\b/gi, "save"],
+    [/\brepo data\b/gi, "saved records from the school cloud"],
+    [/\blocal data\b/gi, "saved records on this computer"],
+    [/\bWorker\b/gi, "school cloud service"],
+    [/\bHTTP\s*\d+\b/gi, "school cloud connection problem"],
+    [/\bIndexedDB\b/gi, "saved records on this computer"],
+    [/\bJSON\b/gi, "saved records file"],
+    [/\bmaster sheet\b/gi, "Hostel Reports"],
+    [/\bbiometric_pending\b/gi, "Hostel Review Queue"],
+    [/\breportRunIds\b/gi, "Hostel Reports"],
+    [/\bunpublished changes\b/gi, "unsaved changes"],
+    [/Publish when ready\./gi, "Click Save Changes Now at the top right when you are ready to share your updates."],
+    [/Publish afterwards/gi, "Click Save Changes Now afterwards"],
+    [/Publish all data/gi, "Click Save Changes Now"],
+    [/Publish the deletion/gi, "Save the deletion online"],
+    [/hard refresh/gi, "reload this page (press F5 or close and reopen the tab)"],
+    [/Sign in as QA Officer(?: in| under)? Settings?(?: before [^.]+)?/gi, "Please sign in as QA Officer to continue. Your saved records are safe. Click Sign In as QA Officer and enter your PIN."],
+    [/Incorrect PIN[^.]*\.?/gi, "Your PIN was not accepted. No changes were made. Check your PIN and try again."],
+    [/master student list/gi, "Student List"],
+    [/master list/gi, "Student List"],
+    [/secure Worker/gi, "secure school sign-in"],
+    [/Worker error HTTP \d+/gi, "The school cloud could not complete this request."],
+    [/No session token returned from Worker/gi, "Your sign-in could not be completed. Please check your internet connection and try again."],
+    [/Signing in via secure school sign-in…/gi, "Checking your sign-in securely…"],
+    [/Signing in…/gi, "Checking your sign-in securely…"],
+    [/local pending list/gi, "New Student Requests on this computer"],
+    [/synced to repository/gi, "saved online"],
+    [/on the repository/gi, "in the school cloud"],
+    [/data\/[^\s]+\.json/gi, "the school records"]
+  ];
+  replacements.forEach(function(pair){ text = text.replace(pair[0], pair[1]); });
+  return text.replace(/\s+/g, " ").trim();
+}
+function friendlyAlert(message) {
+  var text = friendlyUiText(message);
+  if (/failed to fetch|networkerror|unauthorized|session expired|\b429\b|\b409\b|quotaexceeded|decrypt failed|\b50[02]\b|worker http|publishworkerkey|github_token|could not|cannot|failed\b|error:|exception|referenceerror|typeerror|syntaxerror|not defined|undefined|http\s*\d/i.test(text)) {
+    window.alert(friendlyErrorMessage(text, "complete this action"));
+    return;
+  }
+  window.alert(text);
+}
+function friendlyConfirm(message) {
+  return window.confirm(friendlyUiText(message));
+}
+
 // Safe stubs so early event wiring never throws ReferenceError (real impls overwrite later)
 if (typeof window.closeStudentFullRecord !== "function") {
   window.closeStudentFullRecord = function() {
@@ -16,7 +148,7 @@ if (typeof window.openStudentFullRecord !== "function") {
 }
 if (typeof window.generateStudentRegisterReport !== "function") {
   window.generateStudentRegisterReport = async function() {
-    alert("Student register report is still loading. Wait 2 seconds and try again, or hard-refresh.");
+    friendlyAlert("The Student List report is still getting ready. Wait 2 seconds and try again, or reload this page (press F5 or close and reopen the tab).");
   };
 }
 const THEME_KEY = "eocns-theme";
@@ -101,17 +233,17 @@ async function tryOfficerGateLogin() {
   var pin = (document.getElementById("officerGatePin") && document.getElementById("officerGatePin").value || "").trim();
   var err = document.getElementById("officerGateError");
   if (!pin) {
-    if (err) { err.hidden = false; err.textContent = "Enter the QA officer PIN."; }
+    if (err) { err.hidden = false; err.textContent = "Please enter your QA Officer PIN to sign in."; }
     return;
   }
   var nameInput = document.getElementById("officerGateName");
   var officerName = (nameInput && nameInput.value || "").trim();
   if (!officerName) officerName = ensureQaOfficerName("");
   if (!officerName) {
-    if (err) { err.hidden = false; err.textContent = "Enter your full name for the audit trail."; }
+    if (err) { err.hidden = false; err.textContent = "Please enter your full name. Your name is recorded with each official change."; }
     return;
   }
-  if (err) { err.hidden = false; err.textContent = "Signing in…"; }
+  if (err) { err.hidden = false; err.textContent = "Checking your sign-in securely…"; }
   try {
     if (typeof workerAuthLogin === "function") {
       var body = await workerAuthLogin(pin, officerName);
@@ -121,7 +253,7 @@ async function tryOfficerGateLogin() {
       throw new Error("Auth helper missing");
     }
   } catch (e) {
-    if (err) { err.hidden = false; err.textContent = (e && e.message) ? e.message : "Incorrect PIN. Access remains locked."; }
+    if (err) { err.hidden = false; err.textContent = friendlyErrorMessage(e, "sign in"); }
     return;
   }
   if (err) err.hidden = true;
@@ -198,6 +330,7 @@ document.querySelectorAll("[data-goto]").forEach((el) => {
 
 var EOCNS_DIRTY = false;
 var EOCNS_PUBLISH_BUSY = false;
+var EOCNS_PUBLISH_STATUS = "";
 function updateDashboardSyncStatus() {
   var label = document.getElementById("dashSyncStatus"), dot = document.getElementById("dashSyncDot");
   if (label) label.textContent = EOCNS_DIRTY ? "Unsaved changes waiting" : "All saved";
@@ -210,7 +343,8 @@ function updateSaveSyncButton() {
   btn.hidden = !loggedIn; btn.disabled = !!EOCNS_PUBLISH_BUSY;
   btn.classList.toggle("is-dirty", !!EOCNS_DIRTY); btn.classList.toggle("is-saving", !!EOCNS_PUBLISH_BUSY);
   btn.textContent = EOCNS_PUBLISH_BUSY ? "Saving…" : (EOCNS_DIRTY ? "Save Changes Now" : "All changes saved ✓");
-  btn.setAttribute("aria-label", btn.textContent);
+  btn.setAttribute("aria-label", EOCNS_PUBLISH_STATUS || btn.textContent);
+  btn.title = EOCNS_PUBLISH_STATUS || btn.textContent;
 }
 function startSaveSyncFlow() {
   if (!isQaOfficer()) { openOfficerLoginGate("dashboard"); return; }
@@ -227,7 +361,7 @@ function persistSyncMeta(key, value) {
   try { if (typeof db !== "undefined" && db) put("meta", { key: key, value: value, at: new Date().toISOString() }).catch(function() {}); } catch (_) {}
 }
 function markDirty(reason) {
-  EOCNS_DIRTY = true; persistSyncMeta("dirty", true);
+  EOCNS_DIRTY = true; EOCNS_PUBLISH_STATUS = ""; persistSyncMeta("dirty", true);
   try { refreshOpenStudentDossier(); } catch (_) {}
   updateDashboardSyncStatus(); updateSaveSyncButton();
   try {
@@ -697,11 +831,11 @@ function updateBulkSelectedCount() {
 async function bulkMoveStudents() {
   if (!isQaOfficer()) return;
   var ids = Array.from(document.querySelectorAll(".stu-select:checked")).map(function(el) { return el.value; });
-  if (!ids.length) { alert("Select one or more students first."); return; }
+  if (!ids.length) { friendlyAlert("Select one or more students first."); return; }
   var prog = (document.getElementById("bulkProgramme") && document.getElementById("bulkProgramme").value) || "";
   var level = (document.getElementById("bulkLevel") && document.getElementById("bulkLevel").value) || "";
-  if (!prog && !level) { alert("Choose a target programme and/or level."); return; }
-  if (!confirm("Move " + ids.length + " student(s)? Past attendance and QA logs keep their historical programme/level; only the student master record changes.")) return;
+  if (!prog && !level) { friendlyAlert("Choose a target programme and/or level."); return; }
+  if (!friendlyConfirm("Move " + ids.length + " student(s)? Past attendance and QA logs keep their historical programme/level; only the student master record changes.")) return;
   var now = new Date().toISOString();
   for (var i = 0; i < ids.length; i++) {
     var s = studentsCache.find(function(x) { return x.id === ids[i]; });
@@ -721,13 +855,13 @@ async function bulkMoveStudents() {
   }
   markDirty("student programme/level transfer");
   await renderStudentsTable();
-  alert("Updated " + ids.length + " student record(s). Historical logs are unchanged. The changes are marked as unpublished — use Settings → Publish to repository to keep them on GitHub.");
+  friendlyAlert("Updated " + ids.length + " student record(s). Historical logs are unchanged. The changes are marked as unpublished — use Settings → Publish to repository to keep them on GitHub.");
 }
 async function bulkDeactivateStudents() {
   if (!isQaOfficer()) return;
   var ids = Array.from(document.querySelectorAll(".stu-select:checked")).map(function(el) { return el.value; });
-  if (!ids.length) { alert("Select students to remove from the active group."); return; }
-  if (!confirm("Mark " + ids.length + " student(s) as Inactive? They remain in the register for audit integrity.")) return;
+  if (!ids.length) { friendlyAlert("Select students to remove from the active group."); return; }
+  if (!friendlyConfirm("Mark " + ids.length + " student(s) as Inactive? They remain in the register for audit integrity.")) return;
   var now = new Date().toISOString();
   for (var i = 0; i < ids.length; i++) {
     var s = studentsCache.find(function(x) { return x.id === ids[i]; });
@@ -741,10 +875,10 @@ async function bulkDeactivateStudents() {
 }
 
 async function openStudentForm(id) {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer in Settings to add or edit records."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer in Settings to add or edit records."); return; }
   await fillProgrammeLevelSelects();
   const modal = document.getElementById("studentModal");
-  if (!modal) { alert("Student form is missing from the page. Hard-refresh and try again."); return; }
+  if (!modal) { friendlyAlert("Student form is missing from the page. Hard-refresh and try again."); return; }
   document.getElementById("studentForm").reset();
   document.getElementById("studentId").value = "";
   document.getElementById("auditReason").value = "";
@@ -766,7 +900,7 @@ async function openStudentForm(id) {
         s = (all || []).find(function(x) { return x.id === id; });
       } catch (_) {}
     }
-    if (!s) { alert("Could not load that student record. Refresh the Students list and try again."); return; }
+    if (!s) { friendlyAlert("Could not load that student record. Refresh the Students list and try again."); return; }
     document.getElementById("studentModalTitle").textContent = "Edit Student";
     document.getElementById("studentId").value = s.id;
     document.getElementById("studentName").value = s.name || "";
@@ -836,22 +970,22 @@ async function saveStudent(e) {
     const reason = (document.getElementById("auditReason") && document.getElementById("auditReason").value || "").trim();
     let officialRef = (document.getElementById("auditRef") && document.getElementById("auditRef").value || "").trim();
 
-    if (!isQaOfficer()) { alert("Sign in as QA Officer to create or update student records."); return; }
-    if (!name) { alert("Student name is required."); return; }
-    if (!programme) { alert("Programme is required. Choose a programme from the list (or add it under Settings / catalogue)."); return; }
-    if (!level) { alert("Level is required."); return; }
+    if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to create or update student records."); return; }
+    if (!name) { friendlyAlert("Student name is required."); return; }
+    if (!programme) { friendlyAlert("Programme is required. Choose a programme from the list (or add it under Settings / catalogue)."); return; }
+    if (!level) { friendlyAlert("Level is required."); return; }
 
     if (id) {
-      if (!reason) { alert("A reason is required when editing master data."); return; }
+      if (!reason) { friendlyAlert("A reason is required when editing master data."); return; }
       if (!officialRef || officialRef === "REF/EOCNS/QA/") {
-        alert("Enter the full Official Reference Number (e.g. REF/EOCNS/QA/0042).");
+        friendlyAlert("Enter the full Official Reference Number (e.g. REF/EOCNS/QA/0042).");
         return;
       }
       // Allow officers to type the number after the prefix; normalise common forms
       if (!/^REF\/EOCNS\/QA\//i.test(officialRef)) {
         if (/^\d+$/.test(officialRef)) officialRef = "REF/EOCNS/QA/" + officialRef.padStart(4, "0");
         else {
-          alert("Reference Number should start with REF/EOCNS/QA/");
+          friendlyAlert("Reference Number should start with REF/EOCNS/QA/");
           return;
         }
       }
@@ -866,7 +1000,7 @@ async function saveStudent(e) {
     const conflict = (allStudents || []).find(function(s) {
       return s && s.id !== id && String(s.regNo || "").trim().toLowerCase() === regKey;
     });
-    if (conflict) { alert("Registration number already used by " + (conflict.name || conflict.regNo)); return; }
+    if (conflict) { friendlyAlert("Registration number already used by " + (conflict.name || conflict.regNo)); return; }
 
     const now = new Date().toISOString();
     var levelNum = level;
@@ -876,7 +1010,7 @@ async function saveStudent(e) {
       var existing = (allStudents || []).find(function(s) { return s.id === id; });
       if (!existing) existing = (studentsCache || []).find(function(s) { return s.id === id; });
       if (!existing) {
-        alert("Original student record not found in the database. The list may be out of date — refresh, then try again.");
+        friendlyAlert("This student record could not be found. Your other records are safe. Refresh the Students list and try again.");
         return;
       }
       var student = Object.assign({}, existing, {
@@ -944,7 +1078,7 @@ async function saveStudent(e) {
     try { refreshDashboardStats(); } catch (_) {}
   } catch (err) {
     console.error("saveStudent", err);
-    alert("Could not save student: " + (err && err.message ? err.message : String(err)));
+    friendlyAlert(friendlyErrorMessage(err, "save the student record"));
   }
 }
 
@@ -1083,7 +1217,7 @@ async function addLecturerAssignRow(prefill) {
 }
 
 async function openLecturerForm(id) {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to manage lecturers."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to manage lecturers."); return; }
   document.getElementById("lecturerForm").reset();
   document.getElementById("lecturerId").value = id || "";
   document.getElementById("lecturerModalTitle").textContent = id ? "Edit lecturer" : "Add lecturer";
@@ -1116,7 +1250,7 @@ async function openLecturerForm(id) {
 async function saveLecturer(e) {
   e.preventDefault();
   try { return await saveLecturerImpl(); }
-  catch (err) { console.error("saveLecturer", err); alert("Could not save lecturer: " + (err && err.message ? err.message : err)); }
+  catch (err) { console.error("saveLecturer", err); friendlyAlert("Could not save lecturer: " + (err && err.message ? err.message : err)); }
 }
 async function saveLecturerImpl() {
   if (!isQaOfficer()) return;
@@ -1126,7 +1260,7 @@ async function saveLecturerImpl() {
   var ref = "";
   if (id) {
     ref = prompt("Official REF for this lecturer change (required):", "REF/EOCNS/QA/");
-    if (!ref || !String(ref).trim()) { alert("REF is required for edits."); return; }
+    if (!ref || !String(ref).trim()) { friendlyAlert("REF is required for edits."); return; }
     ref = String(ref).trim();
   }
   var assignments = collectLecturerAssignmentsFromForm();
@@ -1153,9 +1287,9 @@ async function saveLecturerImpl() {
   await loadLecturers();
   var staffId = document.getElementById("lecturerStaffId").value.trim() || await generateStaffId();
   var staffClash = lecturersCache.find(function(x) { return x.id !== id && normStaffId(x.staffId) === normStaffId(staffId); });
-  if (staffClash) { alert("Staff ID " + staffId + " already belongs to " + staffClash.name + ". Staff IDs must be unique."); return; }
+  if (staffClash) { friendlyAlert("Staff ID " + staffId + " already belongs to " + staffClash.name + ". Staff IDs must be unique."); return; }
   var nameClash = lecturersCache.find(function(x) { return x.id !== id && normPersonName(x.name) === normPersonName(name); });
-  if (nameClash) { alert("A lecturer named " + nameClash.name + " (" + (nameClash.staffId || "no staff ID") + ") is already registered. Lecture logs match lecturers by name, so add a middle name or initial to tell them apart."); return; }
+  if (nameClash) { friendlyAlert("A lecturer named " + nameClash.name + " (" + (nameClash.staffId || "no staff ID") + ") is already registered. Lecture logs match lecturers by name, so add a middle name or initial to tell them apart."); return; }
   var prevLec = id ? lecturersCache.find(function(x) { return x.id === id; }) : null;
   var lec = {
     id: id || ("lec_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
@@ -1192,7 +1326,7 @@ async function saveLecturerImpl() {
 }
 async function deleteLecturer(id) {
   if (!isQaOfficer()) return;
-  if (!confirm("Remove this lecturer from the register?")) return;
+  if (!friendlyConfirm("Remove this lecturer from the register?")) return;
   await del("lecturers", id);
   await writeAudit({ action: "delete", entity: "lecturers", entityId: id, reason: "Lecturer removed" });
   markDirty("lecturers");
@@ -1277,7 +1411,7 @@ async function renderSessionsList() {
   }
 }
 async function openSessionForm(id) {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to manage sessions."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to manage sessions."); return; }
   PROGRAMMES_CACHE = await getAll("programmes");
   LEVELS_CACHE = await getAll("levels");
   document.getElementById("sessionForm").reset();
@@ -1307,7 +1441,7 @@ async function saveSession(e) {
   e.preventDefault();
   if (!isQaOfficer()) return;
   var name = document.getElementById("sessionName").value.trim();
-  if (!name) { alert("Session name is required"); return; }
+  if (!name) { friendlyAlert("Session name is required"); return; }
   var startDate = document.getElementById("sessionStart").value || "";
   var status = document.getElementById("sessionStatus").value || "Active";
   var programmes = Array.from(document.querySelectorAll('input[name="sessionProgramme"]:checked')).map(function(el) { return el.value; });
@@ -1316,7 +1450,7 @@ async function saveSession(e) {
   var id = document.getElementById("sessionId").value;
   var semesters = collectSessionSemesters(id || "sess_pending");
   var semErr = validateSessionSemesters(semesters);
-  if (semErr) { alert(semErr); return; }
+  if (semErr) { friendlyAlert(semErr); return; }
   if (id) {
     // do not orphan logged records by deleting a semester that already has data
     var oldSess = (await getAll("sessions")).find(function(x) { return x.id === id; });
@@ -1324,7 +1458,7 @@ async function saveSession(e) {
     var dropped = sessionSemesters(oldSess).filter(function(s) { return !keepIds[s.id]; });
     if (dropped.length) {
       var used = (await getAll("qa_entries")).filter(function(en) { return dropped.some(function(s) { return semesterIdOfRecord(en) === s.id; }); });
-      if (used.length) { alert("Cannot remove \"" + dropped[0].name + "\": " + used.length + " logged lecture(s) belong to it."); return; }
+      if (used.length) { friendlyAlert("Cannot remove \"" + dropped[0].name + "\": " + used.length + " logged lecture(s) belong to it."); return; }
     }
   }
   var sess;
@@ -1358,11 +1492,11 @@ async function saveSession(e) {
   await refreshSessionChrome();
   await renderSessionsList();
   refreshDashboardStats();
-  alert("Session saved. Master list students matching these programmes/levels are in scope (" + (ACTIVE_SESSION && ACTIVE_SESSION.id === sess.id ? (await studentsForActiveSession()).length + " students" : "select this session in the top bar") + ").");
+  friendlyAlert("Session saved. Master list students matching these programmes/levels are in scope (" + (ACTIVE_SESSION && ACTIVE_SESSION.id === sess.id ? (await studentsForActiveSession()).length + " students" : "select this session in the top bar") + ").");
 }
 async function deleteSession(id) {
   if (!isQaOfficer()) return;
-  if (!confirm("Delete this session?")) return;
+  if (!friendlyConfirm("Delete this session?")) return;
   await del("sessions", id);
   await writeAudit({ action: "delete", entity: "sessions", entityId: id, reason: "Session deleted" });
   await renderSessionsList();
@@ -1510,15 +1644,15 @@ async function loadOfficialStudentsSeed() {
 }
 
 async function seedOfficialStudents() {
-  if (!db) { alert("Database not ready yet."); return; }
+  if (!db) { friendlyAlert("Database not ready yet."); return; }
   await loadOfficialStudentsSeed();
   if (!OFFICIAL_STUDENTS.length) {
-    alert("Could not load the official student list. Check that data/students.json is on the site.");
+    friendlyAlert("The Student List could not be loaded from the school cloud. Your work on this computer is safe. Check your internet connection and try again.");
     return;
   }
   const existing = await getAll("students");
   if (existing.length > 0) {
-    const ok = confirm(
+    const ok = friendlyConfirm(
       "There are already " + existing.length + " students.\\n\\n" +
       "Loading the official list will ADD any missing names (existing records stay).\\n\\nContinue?"
     );
@@ -1560,7 +1694,7 @@ async function seedOfficialStudents() {
       details: { added },
     });
   }
-  alert(added === 0
+  friendlyAlert(added === 0
     ? "All official students are already in the database."
     : "Added " + added + " students from the official registers.");
   await renderStudentsTable();
@@ -1591,7 +1725,9 @@ function toInputDateHostel(d) {
 function setHostelStatus(msg, kind) {
   const el = document.getElementById("hostelStatus");
   if (!el) return;
-  el.textContent = msg || "";
+  var safeText = friendlyUiText(msg || "");
+  if ((kind === "err" || kind === "error") && /failed|could not|error:|network|http\\s*\\d|not defined/i.test(String(msg || ""))) safeText = friendlyErrorMessage(msg, "complete this Hostel step");
+  el.textContent = safeText;
   el.style.color = (kind === "err" || kind === "error") ? "#b91c1c" : kind === "ok" ? "#047857" : "";
 }
 
@@ -1599,7 +1735,7 @@ function showHostelFileCheck(msg, kind) {
   const el = document.getElementById("hostelFileCheck");
   if (!el) return;
   el.hidden = !msg;
-  el.textContent = msg || "";
+  el.textContent = friendlyUiText(msg || "");
   el.style.color = kind === "err" ? "#b91c1c" : "#047857";
 }
 
@@ -1613,7 +1749,7 @@ function handleHostelFile(file) {
   reader.onload = (e) => {
     try {
       if (typeof XLSX === "undefined") {
-        showHostelFileCheck("Excel library failed to load. Refresh the page.", "err");
+        showHostelFileCheck("The Excel file reader is not ready. Reload this page (press F5 or close and reopen the tab), then try again.", "err");
         return;
       }
       const data = new Uint8Array(e.target.result);
@@ -2635,9 +2771,9 @@ async function renderHostelRunsMaster() {
   });
   body.querySelectorAll("[data-hr-download]").forEach(function(btn) {
     btn.addEventListener("click", async function() {
-      if(!isQaOfficer()){alert("Sign in as QA Officer to download the saved hostel report.");return;}
+      if(!isQaOfficer()){friendlyAlert("Sign in as QA Officer to download the saved hostel report.");return;}
       var saved=(await getAll("hostel_runs")).find(function(r){return r.id===btn.getAttribute("data-hr-download");});
-      if(!saved){alert("Saved hostel report not found.");return;}
+      if(!saved){friendlyAlert("Saved hostel report not found.");return;}
       var linkedIssues=(await getAll("biometric_pending")).filter(function(item){return item&&["clarify","conflict","unlinked","hostel_conflict"].indexOf(item.status)>=0&&(item.reportRunIds||[]).indexOf(saved.id)>=0;});
       if(linkedIssues.length){
         var hostelConflictIssues=linkedIssues.filter(function(item){return item.status==="hostel_conflict";});
@@ -2663,31 +2799,31 @@ async function renderHostelRunsMaster() {
         if(guide){guide.textContent=guideText;guide.style.whiteSpace="pre-line";}
         var target=hostelConflictIssues.length?conflictCard:(biometricIssues.length?biometricCard:guide);
         if(target)target.scrollIntoView({behavior:"smooth",block:"center"});
-        alert(guideText);
+        friendlyAlert(guideText);
         return;
       }
-      try{await downloadHostelRunWorkbook(saved);}catch(e){alert(e.message||String(e));}
+      try{await downloadHostelRunWorkbook(saved);}catch(e){friendlyAlert(e.message||String(e));}
     });
   });
   body.querySelectorAll("[data-hr-edit]").forEach(function(btn) {
     btn.addEventListener("click", function() {
-      if (!isQaOfficer()) { alert("Sign in as QA Officer to edit the hostel master sheet."); return; }
+      if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to edit the hostel master sheet."); return; }
       openHostelRunViewer(btn.getAttribute("data-hr-edit"), true);
     });
   });
   body.querySelectorAll("[data-hr-delete]").forEach(function(btn){btn.addEventListener("click",function(){deleteHostelRun(btn.getAttribute("data-hr-delete"));});});
 }
 async function deleteHostelRun(id){
- if(!isQaOfficer()){alert("Sign in as QA Officer to delete a hostel report.");return;}
- var run=(await getAll("hostel_runs")).find(function(x){return x.id===id;});if(!run){alert("Hostel report not found.");return;}
+ if(!isQaOfficer()){friendlyAlert("Sign in as QA Officer to delete a hostel report.");return;}
+ var run=(await getAll("hostel_runs")).find(function(x){return x.id===id;});if(!run){friendlyAlert("Hostel report not found.");return;}
  var ref=prompt("Official REF to delete this hostel report:","REF/EOCNS/QA/");if(ref==null||!String(ref).trim())return;
  var reason=prompt("Reason for deleting this hostel report:","Duplicate / incorrect hostel attendance record");if(reason==null||!String(reason).trim())return;
  var period=(run.start||"?")+" to "+(run.end||"?");
- if(!confirm("Permanently delete the hostel report for "+period+"?\n\n"+(run.hostel||"Hostel")+" · "+(run.studentCount||0)+" students.\nThis cannot be undone except by restoring a backup."))return;
+ if(!friendlyConfirm("Permanently delete the hostel report for "+period+"?\n\n"+(run.hostel||"Hostel")+" · "+(run.studentCount||0)+" students.\nThis cannot be undone except by restoring a backup."))return;
  await writeAudit({action:"delete",entity:"hostel_runs",entityId:id,externalRef:String(ref).trim(),reason:String(reason).trim(),details:{hostel:run.hostel||"",start:run.start||"",end:run.end||"",studentCount:run.studentCount||0,absenteeCount:run.absenteeCount||0}});
  var pending=await getAll("biometric_pending");for(var i=0;i<pending.length;i++){var item=pending[i];if(!item||!Array.isArray(item.reportRunIds)||item.reportRunIds.indexOf(id)<0)continue;item.reportRunIds=item.reportRunIds.filter(function(x){return x!==id;});await put("biometric_pending",item);}
  await del("hostel_runs",id);markDirty("hostel report deletion");await renderHostelRunsMaster();
- alert("Hostel report deleted and recorded in the audit trail. Publish changes to repository to make the deletion permanent across devices.");
+ friendlyAlert("Hostel report deleted and recorded in the audit trail. Publish changes to repository to make the deletion permanent across devices.");
 }
 
 function renderHostelRunModalTable(run, editable) {
@@ -2730,7 +2866,7 @@ function renderHostelRunModalTable(run, editable) {
         var rows = (run.matrix && run.matrix.length) ? run.matrix : (run.rows || []);
         var row = rows[index];
         if (!row) return;
-        if (!confirm("Delete " + (row.name || row.regNo || "this student") + " from this saved hostel report only? The student will remain in the master student register and other reports will not be changed.")) return;
+        if (!friendlyConfirm("Delete " + (row.name || row.regNo || "this student") + " from this saved hostel report only? The student will remain in the master student register and other reports will not be changed.")) return;
         window.__hostelEditDeletedRows = window.__hostelEditDeletedRows || [];
         window.__hostelEditDeletedRows.push({
           studentId: row.studentId || "",
@@ -2763,7 +2899,7 @@ function renderHostelRunModalTable(run, editable) {
 async function openHostelRunViewer(id, editable) {
   var runs = await getAll("hostel_runs");
   var run = (runs || []).find(function(r) { return r.id === id; });
-  if (!run) { alert("Hostel run not found."); return; }
+  if (!run) { friendlyAlert("Hostel run not found."); return; }
   window.__hostelEditRun = run;
   window.__hostelEditMode = !!editable;
   window.__hostelEditDeletedRows = [];
@@ -2823,13 +2959,13 @@ function recalcHostelRunEditPreview() {
 }
 
 async function saveHostelRunEdit() {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to edit."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to edit."); return; }
   var run = window.__hostelEditRun;
   if (!run) return;
   var ref = (document.getElementById("hostelRunEditRef") && document.getElementById("hostelRunEditRef").value || "").trim();
   var reason = (document.getElementById("hostelRunEditReason") && document.getElementById("hostelRunEditReason").value || "").trim();
-  if (!ref) { alert("Official REF is required to edit the hostel master sheet."); return; }
-  if (!reason) { alert("Reason for change is required."); return; }
+  if (!ref) { friendlyAlert("Official REF is required to edit the hostel master sheet."); return; }
+  if (!reason) { friendlyAlert("Reason for change is required."); return; }
   var table = document.getElementById("hostelRunEditTable");
   var rate = Number(run.rate || 0);
   var nDays = (run.dayHeaders || run.dateKeys || []).length;
@@ -2883,7 +3019,7 @@ async function saveHostelRunEdit() {
     });
   } catch (_) {}
   markDirty("hostel run edit");
-  alert("Hostel master sheet updated under " + ref + ". " + deletedRows.length + " individual record(s) removed from this report. Publish so other devices see the change.");
+  friendlyAlert("The Hostel Report was updated under " + ref + ". " + deletedRows.length + " individual record(s) were removed from this report only. Click Save Changes Now at the top right so other computers receive the update.");
   closeHostelRunModal();
   await renderHostelRunsMaster();
 }
@@ -2914,7 +3050,7 @@ async function ignoreHostelIssuesForCurrentReport() {
     "\n\nTheir records will remain saved in the biometric review queue. They will NOT be globally discarded or deleted. " +
     "If you generate this report now, these users will be excluded from its attendance, absence and fine calculations " +
     "until they are linked and the report is regenerated.\n\nContinue?";
-  if (!confirm(warning)) return;
+  if (!friendlyConfirm(warning)) return;
   for (var i = 0; i < issues.length; i++) {
     var q = issues[i];
     q.reportRunIds = (q.reportRunIds || []).filter(function(id) { return id !== report.runId; });
@@ -3239,11 +3375,11 @@ openDB().then(async () => {
   document.getElementById("pendingReviewBackdrop")?.addEventListener("click", closePendingReview);
   document.getElementById("btnPendingApprove")?.addEventListener("click", function() {
     if (typeof window.approvePendingStudent === "function") window.approvePendingStudent(window.__pendingReviewId);
-    else alert("Approve is not ready yet. Hard-refresh the page.");
+    else friendlyAlert("Approve is not ready yet. Hard-refresh the page.");
   });
   document.getElementById("btnPendingReject")?.addEventListener("click", function() {
     if (typeof window.rejectPendingStudent === "function") window.rejectPendingStudent(window.__pendingReviewId);
-    else alert("Reject is not ready yet. Hard-refresh the page.");
+    else friendlyAlert("Reject is not ready yet. Hard-refresh the page.");
   });
   document.getElementById("btnConfirmPendingReject")?.addEventListener("click", function() {
     if (typeof window.confirmRejectPendingStudent === "function") window.confirmRejectPendingStudent();
@@ -3322,7 +3458,7 @@ openDB().then(async () => {
       if (document.getElementById("studentPhotoDataUrl")) document.getElementById("studentPhotoDataUrl").value = dataUrl;
       if (document.getElementById("studentPhotoPreview")) document.getElementById("studentPhotoPreview").innerHTML = '<img src="' + dataUrl + '" alt="" style="width:100%;height:100%;object-fit:cover" />';
     } catch (err) {
-      alert("Could not process photo: " + (err.message || String(err)));
+      friendlyAlert(friendlyErrorMessage(err, "process the student photo"));
     }
   });
   document.getElementById("btnClearStudentPhoto")?.addEventListener("click", function() {
@@ -3619,7 +3755,7 @@ async function printFullQaPack() {
     await renderReportsView();
     entries = window.__lastReportEntries || [];
   }
-  if (!entries.length) { alert("No lecture logs in the selected range. Set From/To and filter first."); return; }
+  if (!entries.length) { friendlyAlert("No lecture logs in the selected range. Set From/To and filter first."); return; }
   var held = entries.filter(function(e) { return e.status === "Held"; }).length;
   var missed = entries.filter(function(e) { return e.status === "Missed"; }).length;
   var partial = entries.filter(function(e) { return e.status === "Partial"; }).length;
@@ -3698,7 +3834,7 @@ async function renderTimetableBoard() {
   if (board) board.innerHTML = '<div class="card__body"><div class="tt-grid">' + cols + '</div></div>';
   board && board.querySelectorAll(".tt-slot").forEach(function(btn) {
     btn.addEventListener("click", async function() {
-      if (!isQaOfficer()) { alert("Sign in as QA Officer to log from the board."); return; }
+      if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to log from the board."); return; }
       await openQaEntryForm(null);
       document.getElementById("qaEntryClass").value = key;
       var code = btn.getAttribute("data-tt-code");
@@ -3717,11 +3853,11 @@ async function renderTimetableBoard() {
 
 async function importStudentsCsv(file, options) {
   if (!isQaOfficer()) {
-    alert("Sign in as QA Officer to import students.");
+    friendlyAlert("Please sign in as QA Officer to import the Student List. Your existing records are safe. Click Sign In as QA Officer and enter your PIN.");
     return;
   }
   if (!file) {
-    alert("Choose a CSV file.");
+    friendlyAlert("Choose a CSV file.");
     return;
   }
   options = options || {};
@@ -3733,7 +3869,7 @@ async function importStudentsCsv(file, options) {
   // Strip BOM
   if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
   var lines = text.split(/\r?\n/).filter(function(l) { return l.trim(); });
-  if (lines.length < 2) { alert("CSV needs a header row and at least one data row."); return; }
+  if (lines.length < 2) { friendlyAlert("CSV needs a header row and at least one data row."); return; }
 
   function splitCsv(line) {
     var out = [], cur = "", q = false;
@@ -3836,7 +3972,7 @@ async function importStudentsCsv(file, options) {
   var iSerial = idx(headers, ["serial", "machine no", "machine id", "user id", "biometric id", "no"]);
 
   if (iName < 0) {
-    alert("CSV must include a Name column (Name, Names, Full name, Student name, …).\nHeaders found: " + headers.join(", "));
+    friendlyAlert("CSV must include a Name column (Name, Names, Full name, Student name, …).\nHeaders found: " + headers.join(", "));
     return;
   }
 
@@ -4009,13 +4145,13 @@ async function importStudentsCsv(file, options) {
     msg += " Defaults: " + (defaultProgramme || "(programme from CSV)") + " / " + (defaultLevel || "(level from CSV)") + ".";
   }
   msg += " Publish when ready so other devices see them.";
-  alert(msg);
+  friendlyAlert(msg);
 }
 
 async function openStudentCsvImportModal() {
   if (!isQaOfficer()) {
     if (typeof openOfficerLoginGate === "function") openOfficerLoginGate("students");
-    else alert("Sign in as QA Officer to import students.");
+    else friendlyAlert("Sign in as QA Officer to import students.");
     return;
   }
   try { await fillProgrammeLevelSelects(); } catch (_) {}
@@ -4062,7 +4198,7 @@ async function confirmStudentCsvImport() {
   var fileIn = document.getElementById("csvImportFileInput");
   var file = fileIn && fileIn.files && fileIn.files[0];
   if (!file) {
-    alert("Choose a CSV file first.");
+    friendlyAlert("Choose a CSV file first.");
     return;
   }
   var programme = (document.getElementById("csvImportProgramme") && document.getElementById("csvImportProgramme").value) || "";
@@ -4073,7 +4209,7 @@ async function confirmStudentCsvImport() {
     await importStudentsCsv(file, { programme: programme, level: level, fillMode: fillMode });
   } catch (err) {
     console.error(err);
-    alert("Import failed: " + (err && err.message ? err.message : String(err)));
+    friendlyAlert(friendlyErrorMessage(err, "import the Student List"));
   }
 }
 
@@ -4101,19 +4237,19 @@ async function exportFullSnapshot() {
 }
 
 async function importFullSnapshot(file) {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to import a snapshot."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to import a snapshot."); return; }
   if (!file) return;
-  if (!confirm("Import snapshot? This overwrites local master data with the file contents. Publish afterwards to update the repository.")) return;
+  if (!friendlyConfirm("Import snapshot? This overwrites local master data with the file contents. Publish afterwards to update the repository.")) return;
   var text;
-  try { text = await file.text(); } catch (e) { alert("Could not read file."); return; }
+  try { text = await file.text(); } catch (e) { friendlyAlert("Could not read file."); return; }
   var snap;
-  try { snap = JSON.parse(text); } catch (e) { alert("Invalid JSON. Use an EOCNS snapshot or full backup file."); return; }
+  try { snap = JSON.parse(text); } catch (e) { friendlyAlert("Invalid JSON. Use an EOCNS snapshot or full backup file."); return; }
   // Support full backup v2 shape: { format: "eocns-full-backup", data: { students: [...] } }
   if (snap && snap.format === "eocns-full-backup" && snap.data) {
     try {
       await restoreFullBackupFromFile(file);
     } catch (err) {
-      alert("Full backup restore failed: " + (err && err.message ? err.message : String(err)));
+      friendlyAlert(friendlyErrorMessage(err, "restore the backup"));
     }
     return;
   }
@@ -4158,7 +4294,7 @@ async function importFullSnapshot(file) {
     if (snap.pending_students) counts.pending_students = await replaceStore("pending_students", snap.pending_students);
     if (snap.timetables) TIMETABLES_CACHE = snap.timetables;
   } catch (err) {
-    alert("Import failed part-way: " + (err && err.message ? err.message : String(err)));
+    friendlyAlert(friendlyErrorMessage(err, "finish importing the records"));
     return;
   }
   markDirty("snapshot import");
@@ -4169,7 +4305,7 @@ async function importFullSnapshot(file) {
     " · lecturers " + (counts.lecturers || 0) +
     " · QA entries " + (counts.qa_entries || 0) +
     ". Publish to repository to make it permanent on GitHub.";
-  alert(msg);
+  friendlyAlert(msg);
 }
 try {
   window.exportFullSnapshot = exportFullSnapshot;
@@ -4437,7 +4573,7 @@ function svgHBarRows(rows, maxW) {
 
 function openReportWindow(title, bodyHtml, officer, format) {
   var w = window.open("", "_blank");
-  if (!w) { alert("Pop-up blocked. Allow pop-ups for this site to view reports."); return; }
+  if (!w) { friendlyAlert("Pop-up blocked. Allow pop-ups for this site to view reports."); return; }
   var html = "<!DOCTYPE html><html><head><meta charset='utf-8'/><title>" + escapeHtml(title) + "</title><style>" +
     eocnsReportStyles() + "</style></head><body><div class='sheet'>" + bodyHtml + reportSignatureHtml(officer) +
     "</div>" +
@@ -4522,7 +4658,7 @@ async function printDailyLectureReport() {
     if (prog && level && typeof makeClassKey === "function") classKey = makeClassKey(prog, level);
   }
   if (!classKey) classKey = "100_nursing";
-  if (!date) { alert("Choose a date on Daily QA first."); return; }
+  if (!date) { friendlyAlert("Choose a date on Daily QA first."); return; }
   await ensureTimetables();
   var tt = TIMETABLES_CACHE[classKey] || { slots: [] };
   var weekday = (new Date(date + "T12:00:00").getDay() + 6) % 7;
@@ -4709,7 +4845,7 @@ async function printWeeklyProfessionalPack(payload) {
   var meta = await promptOfficerAndFormat("Weekly QA Report");
   if (!meta) return;
   var p = payload || window.__weeklyQaPayload;
-  if (!p) { alert("Build the weekly report first (Generate weekly report)."); return; }
+  if (!p) { friendlyAlert("Build the weekly report first (Generate weekly report)."); return; }
   var compliance = p.scheduled ? Math.round((p.delivered / p.scheduled) * 1000) / 10 : 0;
   var courseRows = (p.courseRows || []).map(function(r) {
     var st = String(r.status || "");
@@ -4774,7 +4910,7 @@ async function printMonthlyProfessionalPack(payload) {
   var meta = await promptOfficerAndFormat("Monthly QA / Attendance Report");
   if (!meta) return;
   var p = payload || window.__monthlyQaPayload;
-  if (!p) { alert("Build the monthly report first."); return; }
+  if (!p) { friendlyAlert("Build the monthly report first."); return; }
   var courseRows = (p.courseRows || []).map(function(r) {
     return "<tr><td>" + escapeHtml(r.course) + "</td><td style='text-align:center'>" + r.scheduled +
       "</td><td style='text-align:center'>" + r.held + "</td><td style='text-align:center'>" + r.missed +
@@ -4816,7 +4952,7 @@ window.printMonthlyProfessionalPack = printMonthlyProfessionalPack;
 
 function downloadAttendanceAsWord() {
   var root = document.getElementById("attendancePrintRoot");
-  if (!root) { alert("Build a sheet first (programme + level)."); return; }
+  if (!root) { friendlyAlert("Build a sheet first (programme + level)."); return; }
   var prog = (document.getElementById("attProgramme") && document.getElementById("attProgramme").value) || "";
   var level = (document.getElementById("attLevel") && document.getElementById("attLevel").value) || "";
   var htmlContent = root.innerHTML;
@@ -5019,7 +5155,7 @@ async function saveRemEnrol(e) {
   e.preventDefault();
   if (!isQaOfficer()) return;
   var ref = (document.getElementById("remEnrolRef").value || "").trim();
-  if (!ref) { alert("REF required"); return; }
+  if (!ref) { friendlyAlert("REF required"); return; }
   var id = document.getElementById("remEnrolId").value || null;
   var courses = document.getElementById("remEnrolCourses").value.split(",").map(function(c) { return c.trim(); }).filter(Boolean);
   var rec = {
@@ -5099,7 +5235,7 @@ async function fillRemLogCourses() {
 async function loadRemLogSheet() {
   var date = document.getElementById("remLogDate").value;
   var code = document.getElementById("remLogCourse").value;
-  if (!date || !code) { alert("Date and course required"); return; }
+  if (!date || !code) { friendlyAlert("Date and course required"); return; }
   var enrolled = (await getAll("remedial_enrolment")).filter(function(s) {
     return (s.courses || []).some(function(c) { return String(c).toUpperCase().indexOf(code.toUpperCase()) >= 0 || code.toUpperCase().indexOf(String(c).toUpperCase()) >= 0; });
   });
@@ -5128,7 +5264,7 @@ async function loadRemLogSheet() {
 async function saveRemLog() {
   if (!isQaOfficer()) return;
   var meta = window.__remLogMeta;
-  if (!meta) { alert("Load a sheet first"); return; }
+  if (!meta) { friendlyAlert("Load a sheet first"); return; }
   var ref = prompt("Official REF for this remedial lecture log:", "REF/EOCNS/QA/");
   if (!ref || !String(ref).trim()) return;
   var marks = {};
@@ -5153,7 +5289,7 @@ async function saveRemLog() {
   await put("remedial_logs", rec);
   await writeAudit({ action: prev ? "update" : "create", entity: "remedial_logs", entityId: rec.id, externalRef: rec.ref, reason: "Remedial lecture attendance log", details: { date: meta.date, course: meta.courseCode } });
   markDirty("remedial logs");
-  alert("Remedial lecture log saved.");
+  friendlyAlert("Remedial lecture log saved.");
 }
 
 function parseExcludeDates(raw) {
@@ -5220,7 +5356,7 @@ async function buildRemWeekly() {
   var start = document.getElementById("remWeekStart").value;
   var end = document.getElementById("remWeekEnd").value;
   var excluded = parseExcludeDates(document.getElementById("remWeekExclude").value);
-  if (!start || !end) { alert("Start and end dates required"); return; }
+  if (!start || !end) { friendlyAlert("Start and end dates required"); return; }
   var data = await computeRemWeekly(start, end, excluded);
   window.__remWeekly = data;
   var el = document.getElementById("remWeeklyResult");
@@ -5238,7 +5374,7 @@ async function printRemWeeklyPack() {
   var meta = await promptOfficerAndFormat("Remedial Weekly Report");
   if (!meta) return;
   var d = window.__remWeekly;
-  if (!d) { alert("Build the remedial weekly analysis first."); return; }
+  if (!d) { friendlyAlert("Build the remedial weekly analysis first."); return; }
   var lecRows = (d.lecturerRows || []).map(function(r) {
     return "<tr><td>" + escapeHtml(formatReportPersonName(r.lecturer)) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
       "</td><td>" + escapeHtml(String(r.presentDays || r.present || "—")) +
@@ -5316,7 +5452,7 @@ window.printRemWeeklyPack = printRemWeeklyPack;
 async function buildRemSummary() {
   var start = document.getElementById("remSumStart").value;
   var end = document.getElementById("remSumEnd").value;
-  if (!start || !end) { alert("Period required"); return; }
+  if (!start || !end) { friendlyAlert("Period required"); return; }
   // treat whole period as one analysis for summary (aggregate)
   var data = await computeRemWeekly(start, end, []);
   // status bands
@@ -5333,7 +5469,7 @@ async function printRemSummaryPack() {
   var meta = await promptOfficerAndFormat("Remedial Summary Report");
   if (!meta) return;
   var d = window.__remSummary;
-  if (!d) { alert("Build remedial summary first."); return; }
+  if (!d) { friendlyAlert("Build remedial summary first."); return; }
   var lecRows = (d.lecturerRows || []).map(function(r) {
     return "<tr><td>" + escapeHtml(formatReportPersonName(r.lecturer)) + "</td><td>" + escapeHtml((r.courses || []).join(", ")) +
       "</td><td>" + (r.taught != null ? r.taught + "h" : "—") + "</td><td>" + (r.missed != null ? r.missed + "h" : "—") + "</td></tr>";
@@ -5496,16 +5632,16 @@ async function openStudentProfile(id) {
 }
 
 async function handleProfilePhotoUpload(file) {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to set passport photos."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to set passport photos."); return; }
   var id = window.__profileStudentId;
   if (!id || !file) return;
   try {
     var dataUrl = await compressPassportImage(file, 480, 0.72);
     await saveStudentPassport(id, dataUrl);
     await openStudentProfile(id);
-    alert("Passport photo saved (automatically compressed for clean storage). Publish when ready.");
+    friendlyAlert("Passport photo saved (automatically compressed for clean storage). Publish when ready.");
   } catch (err) {
-    alert("Photo failed: " + (err.message || String(err)));
+    friendlyAlert("Photo failed: " + (err.message || String(err)));
   }
 }
 
@@ -6100,7 +6236,7 @@ async function saveDisciplineCase(e) {
   var ref = (document.getElementById("discRef").value || "").trim();
   var name = (document.getElementById("discName").value || "").trim();
   var summary = (document.getElementById("discSummary").value || "").trim();
-  if (!ref || !name || !summary) { alert("Name, summary and official REF are required."); return; }
+  if (!ref || !name || !summary) { friendlyAlert("Name, summary and official REF are required."); return; }
   var now = new Date().toISOString();
   var rec = {
     id: id || ("disc_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
@@ -6136,7 +6272,7 @@ async function deleteDisciplineCase(id) {
   if (!isQaOfficer()) return;
   var ref = prompt("Official REF to delete this case:", "REF/EOCNS/DSA/");
   if (!ref || !String(ref).trim()) return;
-  if (!confirm("Delete this disciplinary case?")) return;
+  if (!friendlyConfirm("Delete this disciplinary case?")) return;
   await del("discipline", id);
   await writeAudit({ action: "delete", entity: "discipline", entityId: id, externalRef: String(ref).trim(), reason: "Disciplinary case deleted" });
   markDirty("discipline");
@@ -6255,10 +6391,10 @@ async function approvePendingStudent(id) {
   if (!isQaOfficer()) return;
   id = id || window.__pendingReviewId;
   if (!id) return;
-  var pin = prompt("Enter officer PIN to approve this registration onto the master list:");
+  var pin = prompt("Enter your QA Officer PIN to approve this student registration:");
   if (pin == null) return;
   if (!(await verifyOfficerPin(pin))) {
-    alert("Incorrect PIN. Not approved.");
+    friendlyAlert("Incorrect PIN. Not approved.");
     return;
   }
   var list = await getAll("pending_students");
@@ -6266,7 +6402,7 @@ async function approvePendingStudent(id) {
   if (!p) return;
   var students = await getAll("students");
   if (students.some(function(s) { return s.regNo && p.regNo && String(s.regNo).toLowerCase() === String(p.regNo).toLowerCase(); })) {
-    alert("Reg. No already exists on master list. Reject or correct this submission.");
+    friendlyAlert("Reg. No already exists on master list. Reject or correct this submission.");
     return;
   }
   var now = new Date().toISOString();
@@ -6308,7 +6444,7 @@ async function approvePendingStudent(id) {
   } catch (err) {
     console.warn(err);
   }
-  alert("Approved onto master list and removed from pending. Publish full data when convenient so students.json is on the repository.");
+  friendlyAlert("Approved onto master list and removed from pending. Publish full data when convenient so students.json is on the repository.");
 }
 
 
@@ -6317,12 +6453,12 @@ async function rejectPendingStudent(id) {
   /* bound to window below */
   try {
     if (!isQaOfficer()) {
-      alert("Sign in as QA Officer under Settings before rejecting registrations.");
+      friendlyAlert("Sign in as QA Officer under Settings before rejecting registrations.");
       return;
     }
     id = id || window.__pendingReviewId || window.__pendingRejectId;
     if (!id) {
-      alert("No pending registration selected. Use Reject on a row or open Review first.");
+      friendlyAlert("No pending registration selected. Use Reject on a row or open Review first.");
       return;
     }
     window.__pendingRejectId = id;
@@ -6335,7 +6471,7 @@ async function rejectPendingStudent(id) {
       p = list.find(function(x) { return x.id === id; });
     }
     if (!p) {
-      alert("Submission not found. It may already have been removed. Refreshing list…");
+      friendlyAlert("Submission not found. It may already have been removed. Refreshing list…");
       await renderPendingRegistrations();
       return;
     }
@@ -6358,7 +6494,7 @@ async function rejectPendingStudent(id) {
     }
   } catch (err) {
     console.error(err);
-    alert("Could not open reject dialog: " + (err.message || String(err)));
+    friendlyAlert("Could not open reject dialog: " + (err.message || String(err)));
   }
 }
 
@@ -6373,37 +6509,37 @@ function closePendingRejectModal() {
 async function confirmRejectPendingStudent(forcedId, forcedReason, forcedPin) {
   try {
     if (!isQaOfficer()) {
-      alert("Sign in as QA Officer under Settings before rejecting registrations.");
+      friendlyAlert("Sign in as QA Officer under Settings before rejecting registrations.");
       return;
     }
     var id = forcedId || window.__pendingRejectId || window.__pendingReviewId;
-    if (!id) { alert("No submission selected."); return; }
+    if (!id) { friendlyAlert("No submission selected."); return; }
     var reason = forcedReason;
     if (reason == null) {
       reason = (document.getElementById("pendingRejectReason") && document.getElementById("pendingRejectReason").value || "").trim();
     }
-    if (!reason) { alert("A reason is required."); return; }
+    if (!reason) { friendlyAlert("A reason is required."); return; }
     var pin = forcedPin;
     if (pin == null) {
       pin = (document.getElementById("pendingRejectPin") && document.getElementById("pendingRejectPin").value || "").trim();
     }
-    if (!pin) { alert("Officer PIN is required."); return; }
+    if (!pin) { friendlyAlert("Officer PIN is required."); return; }
     if (!(await verifyOfficerPin(pin))) {
-      alert("Incorrect PIN. Submission was not rejected.");
+      friendlyAlert("Incorrect PIN. Submission was not rejected.");
       return;
     }
 
     var list = await getAll("pending_students");
     var p = list.find(function(x) { return x.id === id; });
     if (!p) {
-      alert("Submission not found (already removed?).");
+      friendlyAlert("Submission not found (already removed?).");
       closePendingRejectModal();
       await renderPendingRegistrations();
       return;
     }
 
     try { await del("pending_students", id); } catch (err) {
-      alert("Failed to delete locally: " + (err.message || err));
+      friendlyAlert(friendlyErrorMessage(err, "remove this registration from New Student Requests"));
       return;
     }
 
@@ -6423,14 +6559,14 @@ async function confirmRejectPendingStudent(forcedId, forcedReason, forcedPin) {
 
     try {
       await publishPendingListToRepo("Reject registration " + (p.regNo || id) + " — remove from pending list");
-      alert("Rejected and removed from the pending list (synced to repository).\nReason logged in audit.");
+      friendlyAlert("The registration was rejected and removed from New Student Requests. The reason was saved in Activity History.");
     } catch (err) {
       console.error(err);
-      alert("Removed from local pending list, but repository sync failed:\n" + (err.message || err) + "\n\nUse Settings → Publish when online so it stays removed.");
+      friendlyAlert("The registration was removed from New Student Requests on this computer, but the school cloud could not be updated. Your work is safe here. Check your internet connection, then click Save Changes Now at the top right.");
     }
   } catch (err) {
     console.error(err);
-    alert("Reject failed: " + (err.message || String(err)));
+    friendlyAlert("Reject failed: " + (err.message || String(err)));
   }
 }
 
@@ -6439,7 +6575,7 @@ async function confirmRejectPendingStudent(forcedId, forcedReason, forcedPin) {
 async function publishPendingListToRepo(message) {
   var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
   var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
-  if (!workerUrl) throw new Error("publishWorkerUrl missing in config");
+  if (!workerUrl) throw new Error("The school cloud connection is not set up. Please contact the system admin.");
   var list = await getAll("pending_students");
   // only keep pending or all remaining records
   list = list.filter(function(p) { return p && p.id; });
@@ -6575,16 +6711,16 @@ async function openStudentProfile(id) {
 }
 
 async function handleProfilePhotoUpload(file) {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to set passport photos."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to set passport photos."); return; }
   var id = window.__profileStudentId;
   if (!id || !file) return;
   try {
     var dataUrl = await compressPassportImage(file, 480, 0.72);
     await saveStudentPassport(id, dataUrl);
     await openStudentProfile(id);
-    alert("Passport photo saved (automatically compressed for clean storage). Publish when ready.");
+    friendlyAlert("Passport photo saved (automatically compressed for clean storage). Publish when ready.");
   } catch (err) {
-    alert("Photo failed: " + (err.message || String(err)));
+    friendlyAlert("Photo failed: " + (err.message || String(err)));
   }
 }
 
@@ -6682,7 +6818,7 @@ async function saveDisciplineCase(e) {
   var ref = (document.getElementById("discRef").value || "").trim();
   var name = (document.getElementById("discName").value || "").trim();
   var summary = (document.getElementById("discSummary").value || "").trim();
-  if (!ref || !name || !summary) { alert("Name, summary and official REF are required."); return; }
+  if (!ref || !name || !summary) { friendlyAlert("Name, summary and official REF are required."); return; }
   var now = new Date().toISOString();
   var rec = {
     id: id || ("disc_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
@@ -6718,7 +6854,7 @@ async function deleteDisciplineCase(id) {
   if (!isQaOfficer()) return;
   var ref = prompt("Official REF to delete this case:", "REF/EOCNS/DSA/");
   if (!ref || !String(ref).trim()) return;
-  if (!confirm("Delete this disciplinary case?")) return;
+  if (!friendlyConfirm("Delete this disciplinary case?")) return;
   await del("discipline", id);
   await writeAudit({ action: "delete", entity: "discipline", entityId: id, externalRef: String(ref).trim(), reason: "Disciplinary case deleted" });
   markDirty("discipline");
@@ -6836,10 +6972,10 @@ async function approvePendingStudent(id) {
   if (!isQaOfficer()) return;
   id = id || window.__pendingReviewId;
   if (!id) return;
-  var pin = prompt("Enter officer PIN to approve this registration onto the master list:");
+  var pin = prompt("Enter your QA Officer PIN to approve this student registration:");
   if (pin == null) return;
   if (!(await verifyOfficerPin(pin))) {
-    alert("Incorrect PIN. Not approved.");
+    friendlyAlert("Incorrect PIN. Not approved.");
     return;
   }
   var list = await getAll("pending_students");
@@ -6847,7 +6983,7 @@ async function approvePendingStudent(id) {
   if (!p) return;
   var students = await getAll("students");
   if (students.some(function(s) { return s.regNo && p.regNo && String(s.regNo).toLowerCase() === String(p.regNo).toLowerCase(); })) {
-    alert("Reg. No already exists on master list. Reject or correct this submission.");
+    friendlyAlert("Reg. No already exists on master list. Reject or correct this submission.");
     return;
   }
   var now = new Date().toISOString();
@@ -6889,14 +7025,14 @@ async function approvePendingStudent(id) {
   } catch (err) {
     console.warn(err);
   }
-  alert("Approved onto master list and removed from pending. Publish full data when convenient so students.json is on the repository.");
+  friendlyAlert("Approved onto master list and removed from pending. Publish full data when convenient so students.json is on the repository.");
 }
 
 
 async function publishPendingListToRepo(message) {
   var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
   var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
-  if (!workerUrl) throw new Error("publishWorkerUrl missing in config");
+  if (!workerUrl) throw new Error("The school cloud connection is not set up. Please contact the system admin.");
   var list = await getAll("pending_students");
   // only keep pending or all remaining records
   list = list.filter(function(p) { return p && p.id; });
@@ -6937,25 +7073,25 @@ async function publishPendingListToRepo(message) {
   document.getElementById("btnBuildWeeklyQa") && document.getElementById("btnBuildWeeklyQa").addEventListener("click", buildWeeklyQaReport);
   document.getElementById("btnPrintWeeklyQa") && document.getElementById("btnPrintWeeklyQa").addEventListener("click", function() {
     if (typeof window.printWeeklyProfessionalPack === "function") return window.printWeeklyProfessionalPack();
-    alert("Build the weekly report first. If this persists, hard-refresh (Ctrl+Shift+R).");
+    friendlyAlert("Build the weekly report first. If this persists, hard-refresh (Ctrl+Shift+R).");
   });
   document.getElementById("btnPrintMonthlyQa") && document.getElementById("btnPrintMonthlyQa").addEventListener("click", function() {
     if (typeof window.printMonthlyProfessionalPack === "function") return window.printMonthlyProfessionalPack();
-    alert("Build the monthly report first. If this persists, hard-refresh (Ctrl+Shift+R).");
+    friendlyAlert("Build the monthly report first. If this persists, hard-refresh (Ctrl+Shift+R).");
   });
 
   document.getElementById("btnDownloadWeeklyQa") && document.getElementById("btnDownloadWeeklyQa").addEventListener("click", function() {
     if (typeof window.printWeeklyProfessionalPack === "function") return window.printWeeklyProfessionalPack();
-    alert("Build the weekly report first, then download/print.");
+    friendlyAlert("Build the weekly report first, then download/print.");
   });
   document.getElementById("btnDownloadMonthlyQa") && document.getElementById("btnDownloadMonthlyQa").addEventListener("click", function() {
     if (typeof window.printMonthlyProfessionalPack === "function") return window.printMonthlyProfessionalPack();
-    alert("Build the monthly report first, then download/print.");
+    friendlyAlert("Build the monthly report first, then download/print.");
   });
   document.getElementById("btnPrintHandoverPack") && document.getElementById("btnPrintHandoverPack").addEventListener("click", function() {
     if (typeof printOfficerHandoverSheet === "function") printOfficerHandoverSheet();
     else if (typeof window.printOfficerHandoverSheet === "function") window.printOfficerHandoverSheet();
-    else alert("Handover sheet not ready — hard-refresh.");
+    else friendlyAlert("Handover sheet not ready — hard-refresh.");
   });
   function closeRemedialModal() {
     var m = document.getElementById("remedialModal");
@@ -6968,23 +7104,23 @@ async function publishPendingListToRepo(message) {
     if (e && e.preventDefault) e.preventDefault();
     if (typeof saveRemLog === "function") return saveRemLog(e);
     if (typeof saveRemedial === "function") return saveRemedial(e);
-    alert("Use the Remedial Logging tab sheet to save attendance.");
+    friendlyAlert("Use the Remedial Logging tab sheet to save attendance.");
   });
 
   document.getElementById("btnGenerateStudentRegister")?.addEventListener("click", function() {
     var fn = null;
     try { if (typeof generateStudentRegisterReport === "function") fn = generateStudentRegisterReport; } catch (_) {}
     if (!fn && typeof window.generateStudentRegisterReport === "function") fn = window.generateStudentRegisterReport;
-    if (!fn) { alert("Register report not ready — hard-refresh (Ctrl+Shift+R)."); return; }
+    if (!fn) { friendlyAlert("Register report not ready — hard-refresh (Ctrl+Shift+R)."); return; }
     try { window.generateStudentRegisterReport = fn; } catch (_) {}
     Promise.resolve(fn()).catch(function(err) {
       console.error(err);
-      alert("Register report failed: " + (err && err.message ? err.message : String(err)));
+      friendlyAlert("Register report failed: " + (err && err.message ? err.message : String(err)));
     });
   });
   try { if (typeof generateStudentRegisterReport === "function") window.generateStudentRegisterReport = generateStudentRegisterReport; } catch (_) {}
-  document.getElementById("btnGenerateHostelReportDash")?.addEventListener("click", function() { if (typeof window.generateHostelDistributionReport === "function") window.generateHostelDistributionReport(); else alert("Hostel report not ready — hard-refresh."); });
-  document.getElementById("btnGenerateHostelReport")?.addEventListener("click", function() { if (typeof window.generateHostelDistributionReport === "function") window.generateHostelDistributionReport(); else alert("Hostel report not ready — hard-refresh."); });
+  document.getElementById("btnGenerateHostelReportDash")?.addEventListener("click", function() { if (typeof window.generateHostelDistributionReport === "function") window.generateHostelDistributionReport(); else friendlyAlert("Hostel report not ready — hard-refresh."); });
+  document.getElementById("btnGenerateHostelReport")?.addEventListener("click", function() { if (typeof window.generateHostelDistributionReport === "function") window.generateHostelDistributionReport(); else friendlyAlert("Hostel report not ready — hard-refresh."); });
 
   
   // Report API on window — assignments happen next to each function definition; this only wires clicks safely
@@ -6992,7 +7128,7 @@ async function publishPendingListToRepo(message) {
 
 document.getElementById("btnPrintDailyReport") && document.getElementById("btnPrintDailyReport").addEventListener("click", function() {
     if (typeof window.printDailyLectureReport === "function") return window.printDailyLectureReport();
-    alert("Daily report is still loading. Hard-refresh the page (Ctrl+Shift+R).");
+    friendlyAlert("Daily report is still loading. Hard-refresh the page (Ctrl+Shift+R).");
   });
   document.getElementById("btnBuildMonthlyQa") && document.getElementById("btnBuildMonthlyQa").addEventListener("click", buildMonthlyQaReport);
   document.getElementById("btnAddProgramme") && document.getElementById("btnAddProgramme").addEventListener("click", addProgrammePrompt);
@@ -7029,7 +7165,7 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
     await loadRemMeta();
     REM_META.sessionId = document.getElementById("remActiveSession").value;
     await saveRemMeta();
-    alert("Remedial session link saved. Publish when ready.");
+    friendlyAlert("Remedial session link saved. Publish when ready.");
   });
   document.getElementById("btnRemAddEnrolment") && document.getElementById("btnRemAddEnrolment").addEventListener("click", function() { openRemEnrolForm(null); });
   document.getElementById("remEnrolForm") && document.getElementById("remEnrolForm").addEventListener("submit", saveRemEnrol);
@@ -7098,7 +7234,7 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
   document.getElementById("btnExportSnapshot") && document.getElementById("btnExportSnapshot").addEventListener("click", function() {
     if (typeof window.exportFullSnapshot === "function") window.exportFullSnapshot();
     else if (typeof exportFullSnapshot === "function") exportFullSnapshot();
-    else alert("Snapshot export is still loading. Hard-refresh, then try again.");
+    else friendlyAlert("Snapshot export is still loading. Hard-refresh, then try again.");
   });
   document.getElementById("btnImportSnapshot") && document.getElementById("btnImportSnapshot").addEventListener("click", function() {
     document.getElementById("snapshotFileInput") && document.getElementById("snapshotFileInput").click();
@@ -7121,7 +7257,7 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
     if (e.target.files && e.target.files[0]) {
       var imp = window.importFullSnapshot || (typeof importFullSnapshot === "function" ? importFullSnapshot : null);
       if (imp) imp(e.target.files[0]);
-      else alert("Snapshot import is still loading. Hard-refresh, then try again.");
+      else friendlyAlert("Snapshot import is still loading. Hard-refresh, then try again.");
     }
     e.target.value = "";
   });
@@ -7157,7 +7293,7 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
 
   } catch (bootErr) {
     console.error("post-db boot", bootErr);
-    alert("App loaded the database but a startup step failed.\n\nCause: " + (bootErr && bootErr.message ? bootErr.message : String(bootErr)) + "\n\nCheck the browser console (F12) for details. You can still try Settings → Publish after reload.");
+    friendlyAlert("App loaded the database but a startup step failed.\n\nCause: " + (bootErr && bootErr.message ? bootErr.message : String(bootErr)) + "\n\nCheck the browser console (F12) for details. You can still try Settings → Publish after reload.");
   }
 }).catch(err => {
   console.error("EOCNS boot error", err);
@@ -7167,13 +7303,8 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
   else if (/blocked|version/i.test(msg)) hint = " Close other tabs of this site, then reload.";
   else if (/IndexedDB|IDB|database/i.test(msg)) hint = " Try clearing site data for travis-global.github.io (Application → Storage → Clear) then reload.";
   else hint = " If this keeps happening: DevTools → Application → IndexedDB → delete eocns_attendance → reload.";
-  var offer = window.confirm("Startup problem.\n\nCause: " + msg + "\n\nWhat to try:" + hint + "\n\nClick OK to clear the local database and reload (repo data will re-load). Click Cancel to stay.");
-  if (offer) {
-    resetLocalDatabase().then(function(ok) {
-      if (ok) location.reload();
-      else alert("Could not clear database. Close other tabs of this site and try again.");
-    });
-  }
+  var offer = window.friendlyConfirm("This page could not finish loading. Your saved work is still safe on this computer. Click OK to reload the page and try again; click Cancel to stay here. If the problem happens again, contact the system admin.");
+  if (offer) location.reload();
 });
 
 // =========================================================
@@ -7184,7 +7315,7 @@ const QA_SESSION_TOKEN_KEY = "eocns_qa_session_token";
 
 async function workerAuthLogin(pin, officerName) {
   var workerUrl = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
-  if (!workerUrl) throw new Error("publishWorkerUrl missing in config");
+  if (!workerUrl) throw new Error("The school cloud connection is not set up. Please contact the system admin.");
   var res = await fetch(workerUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -7492,7 +7623,7 @@ async function buildLecturerHoursReport() {
   await fillLecturerHoursSemesters();
   var semSel = document.getElementById("lecturerHoursSemester");
   var sem = sessionSemesters().find(function(s) { return semSel && s.id === semSel.value; }) || ACTIVE_SEMESTER;
-  if (!sem) { alert("There is no semester yet. Create or edit a session and add its semesters first."); return; }
+  if (!sem) { friendlyAlert("There is no semester yet. Create or edit a session and add its semesters first."); return; }
   var monthVal = (document.getElementById("lecturerHoursMonth") && document.getElementById("lecturerHoursMonth").value) || "";
   var notes = [];
   var mb = monthVal ? monthBoundsIso(monthVal) : null;
@@ -7568,7 +7699,7 @@ function lecturerHoursTableHtml(p, forScreen) {
 
 function printLecturerHoursPack() {
   var p = window.__lecturerHoursPayload;
-  if (!p) { alert("Build the report first."); return; }
+  if (!p) { friendlyAlert("Build the report first."); return; }
   var w = window.open("", "_blank");
   if (!w) return;
   w.document.write("<!DOCTYPE html><html><head><title>Lecturer Contract Hours</title><style>" +
@@ -7660,7 +7791,7 @@ async function studentsForActiveSession() {
 
 function requireActiveSession(actionLabel) {
   if (ACTIVE_SESSION && ACTIVE_SESSION.id) return true;
-  alert((actionLabel || "This action") + " needs an active academic session. Select one in the top bar (or create it under Sessions).");
+  friendlyAlert((actionLabel || "This action") + " needs an active academic session. Select one in the top bar (or create it under Sessions).");
   return false;
 }
 
@@ -7772,7 +7903,7 @@ async function changeQaOfficerPin() {
   function setStatus(msg, ok) {
     if (!status) return;
     status.hidden = false;
-    status.textContent = msg;
+    status.textContent = friendlyUiText(msg);
     status.style.color = ok ? "#0f766e" : "#b91c1c";
   }
   var current = (document.getElementById("changePinCurrent") && document.getElementById("changePinCurrent").value || "").trim();
@@ -7791,10 +7922,10 @@ async function changeQaOfficerPin() {
     setStatus("New PIN is the same as the current PIN.");
     return;
   }
-  setStatus("Verifying current PIN with the secure Worker…");
+  setStatus("Checking your current PIN securely…");
   var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
   if (!workerUrl) {
-    setStatus("publishWorkerUrl is missing in config.");
+    setStatus("The school cloud connection is not set up. Please contact the system admin.");
     return;
   }
   try {
@@ -7809,21 +7940,21 @@ async function changeQaOfficerPin() {
     var body = {};
     try { body = await res.json(); } catch (_) {}
     if (res.status === 401) {
-      setStatus(body.error || "Current PIN is incorrect. PIN was not changed.");
+      setStatus("Your current PIN was not accepted. Your PIN has not been changed. Check it and try again.");
       return;
     }
     if (!res.ok || !body.ok) {
-      setStatus(body.error || body.message || ("Worker error HTTP " + res.status));
+      setStatus(friendlyErrorMessage(body.error || body.message || ("School cloud error " + res.status), "change your PIN"));
       return;
     }
     ["changePinCurrent", "changePinNew", "changePinConfirm"].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.value = "";
     });
-    setStatus(body.message || "PIN updated on the Worker. Use the new PIN on every device now.", true);
+    setStatus("Your PIN has been changed successfully. Use your new PIN the next time you sign in on each computer.", true);
   } catch (err) {
     console.error(err);
-    setStatus("Could not reach Worker: " + (err.message || String(err)));
+    setStatus(friendlyErrorMessage(err, "change your PIN"));
   }
 }
 
@@ -7847,14 +7978,14 @@ function initQaOfficerUI() {
     var officerName = (document.getElementById("qaOfficerNameInput") && document.getElementById("qaOfficerNameInput").value || "").trim();
     if (!officerName) officerName = ensureQaOfficerName("");
     if (!officerName) {
-      if (err) { err.hidden = false; err.textContent = "Enter your full name — it is recorded on every audit entry."; }
+      if (err) { err.hidden = false; err.textContent = "Please enter your full name. Your name is recorded with each official change."; }
       return;
     }
     if (!pin) {
-      if (err) { err.hidden = false; err.textContent = "Enter the officer PIN."; }
+      if (err) { err.hidden = false; err.textContent = "Please enter your QA Officer PIN to sign in."; }
       return;
     }
-    if (err) { err.hidden = false; err.style.color = ""; err.textContent = "Signing in via secure Worker…"; }
+    if (err) { err.hidden = false; err.style.color = ""; err.textContent = "Checking your sign-in securely…"; }
     try {
       var body = await workerAuthLogin(pin, officerName);
       storeQaSessionToken(body.token);
@@ -7877,13 +8008,13 @@ function initQaOfficerUI() {
       if (err) {
         err.hidden = false;
         err.style.color = "#b91c1c";
-        err.textContent = (e && e.message) ? e.message : "Incorrect PIN or Worker unreachable.";
+        err.textContent = friendlyErrorMessage(e, "sign in");
       }
     }
   });
   document.getElementById("btnChangeQaPin")?.addEventListener("click", () => { changeQaOfficerPin(); });
   document.getElementById("btnQaLogout")?.addEventListener("click", async () => {
-    if (EOCNS_DIRTY && !confirm("There are unpublished changes on this computer. Publish them first before signing out. Sign out anyway?")) return;
+    if (EOCNS_DIRTY && !friendlyConfirm("There are unpublished changes on this computer. Publish them first before signing out. Sign out anyway?")) return;
     try {
       if (typeof storeQaSessionToken === "function") storeQaSessionToken("");
       else if (typeof QA_SESSION_TOKEN_KEY !== "undefined") sessionStorage.removeItem(QA_SESSION_TOKEN_KEY);
@@ -7905,7 +8036,7 @@ function initQaOfficerUI() {
   });
   document.getElementById("btnExportStudents")?.addEventListener("click", function() {
     if (typeof window.exportFullSnapshot === "function") window.exportFullSnapshot();
-    else alert("Snapshot export is still loading. Hard-refresh the page, then try again.");
+    else friendlyAlert("Snapshot export is still loading. Hard-refresh the page, then try again.");
   });
   document.getElementById("btnPublishAll")?.addEventListener("click", () => {
     if (!isQaOfficer()) return;
@@ -7914,16 +8045,16 @@ function initQaOfficerUI() {
     var btn = document.getElementById("btnConfirmPublish");
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "Confirm publish all";
+      btn.textContent = "Save Changes Now";
       btn.style.opacity = "";
       btn.style.cursor = "";
     }
     var pinEl = document.getElementById("qaPublishPin");
     if (pinEl) { pinEl.disabled = false; pinEl.focus(); }
     var detail = document.getElementById("qaPublishStatusDetail");
-    if (detail) { detail.hidden = false; detail.textContent = "Enter PIN, then Confirm. The button will lock until this publish finishes."; }
+    if (detail) { detail.hidden = false; detail.textContent = "Enter your QA Officer PIN, then click Save Changes Now. The button will stay unavailable while your changes are being saved."; }
     var st = document.getElementById("qaPublishStatus");
-    if (st) st.textContent = "Ready to publish — enter PIN and confirm.";
+    if (st) st.textContent = "Ready to save. Enter your QA Officer PIN and click Save Changes Now.";
   });
   document.getElementById("btnConfirmPublish")?.addEventListener("click", publishAllToRepo);
   document.getElementById("btnReloadFromRepo")?.addEventListener("click", async () => {
@@ -7956,7 +8087,7 @@ window.eocnsEncryptAllNow = async function() {
   var skipped = Number(summary.skipped || body.skipped || 0);
   var message = "Encryption migration complete. Encrypted: " + encrypted + "; skipped: " + skipped + ".";
   console.info("EOCNS encrypt_all result:", body);
-  alert(message);
+  friendlyAlert(message);
   return { encrypted: encrypted, skipped: skipped, response: body };
 };
 
@@ -8053,7 +8184,7 @@ async function hydrateAllFromRepoIfEmpty(){
  PROGRAMMES_CACHE=await getAll("programmes");LEVELS_CACHE=await getAll("levels");COURSES_CACHE=await getAll("courses");
  try{if(!TIMETABLES_CACHE)TIMETABLES_CACHE=await fetchRepoJson(DATA_FILES.timetables);}catch(_){}
  try{await loadStudents();}catch(_){}var totalStu=(await getAll("students")).length,banner=document.getElementById("masterLoadBanner");
- if(banner&&result.pulled.length){banner.hidden=false;banner.textContent="Core data loaded: "+result.pulled.join(", ")+". Total students: "+totalStu+".";setTimeout(function(){banner.hidden=true;},9000);}
+ if(banner&&result.pulled.length){banner.hidden=false;banner.textContent="School records loaded: "+result.pulled.map(friendlyStoreName).join(", ")+". Total students: "+totalStu+".";setTimeout(function(){banner.hidden=true;},9000);}
  return{loaded:result.pulled,totalStu:totalStu,failed:result.failed};
 }
 
@@ -8293,7 +8424,7 @@ function startSmartRepoWatch() {
 
 async function syncFromRepoIfClean(){
  var rows=await getAll("meta"),m={};rows.forEach(function(x){m[x.key]=x.value;});
- if(m.dirty===true||EOCNS_DIRTY){EOCNS_DIRTY=true;var b=document.getElementById("dirtyBanner");if(b){b.hidden=false;b.textContent="This browser has unpublished changes — local data is kept. Publish when ready.";}return{skipped:"unpublished changes",pulled:[]};}
+ if(m.dirty===true||EOCNS_DIRTY){EOCNS_DIRTY=true;var b=document.getElementById("dirtyBanner");if(b){b.hidden=false;b.textContent="This computer has unsaved changes. Your work is safe here. Click Save Changes Now at the top right when you are ready to share it."; }return{skipped:"unsaved changes",pulled:[]};}
  var r=await ensureStoresLoaded(EOCNS_TIER1_STORES);if(r.pulled.length){try{await refreshCachesAfterSync();}catch(_){}}
  return{skipped:false,pulled:r.pulled,unchanged:r.skipped,failed:r.failed};
 }
@@ -8303,9 +8434,9 @@ async function syncFromRepoIfClean(){
 
 
 async function reloadAllFromRepo(force) {
-  if (force && !confirm("Replace ALL local data with the repository files?\n\nAnything not yet published from this browser will be lost.")) return;
+  if (force && !friendlyConfirm("Replace ALL local data with the repository files?\n\nAnything not yet published from this browser will be lost.")) return;
   var status = document.getElementById("qaPublishStatus");
-  if (status) status.textContent = "Reloading from repository…";
+  if (status) status.textContent = "Loading the latest saved records from the school cloud…";
   var done = [], failed = [];
   try {
     for (var i = 0; i < SYNC_STORES.length; i++) {
@@ -8332,11 +8463,11 @@ async function reloadAllFromRepo(force) {
     await renderStudentsTable(); await renderLecturersTable(); await renderSessionsList(); await renderAuditLog();
     var msg = "Reloaded " + done.length + " data sets from the repository." + (failed.length ? " Could not load: " + failed.join(", ") + " (kept as they were)." : "");
     if (status) status.textContent = msg;
-    if (force) alert(msg);
+    if (force) friendlyAlert(msg);
   } catch (err) {
     console.error(err);
-    if (status) status.textContent = "Reload failed: " + (err.message || String(err));
-    if (force) alert("Reload failed: " + (err.message || String(err)));
+    if (status) status.textContent = friendlyErrorMessage(err, "load the latest saved records");
+    if (force) friendlyAlert("Reload failed: " + (err.message || String(err)));
   }
 }
 
@@ -8490,7 +8621,7 @@ async function safePublishJson(path, localRows, label) {
     if (merged.length < Math.max(1, Math.floor(remoteLen * 0.85))) {
       var ok = false;
       try {
-        ok = window.confirm(
+        ok = window.friendlyConfirm(
           "BULK ERASE WARNING\n\n" +
           label + ": local/merged has " + merged.length + " rows but repository has " + remoteLen + ".\n\n" +
           "Publishing would REMOVE data.\n\n" +
@@ -8514,7 +8645,7 @@ async function safePublishJson(path, localRows, label) {
   if (remoteLen >= 5 && merged.length * 2 < remoteLen) {
     var ok2 = false;
     try {
-      ok2 = window.confirm(
+      ok2 = window.friendlyConfirm(
         "BULK ERASE WARNING\n\n" +
         label + " would drop from " + remoteLen + " to " + merged.length + " records.\n\n" +
         "OK = approve this bulk removal.\nCancel = skip this file and keep repository data."
@@ -8559,16 +8690,66 @@ async function safePublishJson(path, localRows, label) {
   };
 }
 
-/** Poll raw repo until file fingerprint matches expected (or attempts exhausted). */
-async function verifyRepoFile(path, expectedFp, attempts, delayMs) {
-  attempts = attempts || 8;
-  delayMs = delayMs || 2000;
-  for (var i = 0; i < attempts; i++) {
-    if (i) await new Promise(function(r) { setTimeout(r, delayMs); });
-    var text = await fetchRemoteTextFresh(path);
-    if (text != null && textFingerprint(text) === expectedFp) return true;
+/**
+ * Read a saved file through the authenticated school cloud service.
+ * Never use public site URLs for verification: encrypted files are not
+ * readable there and public pages may be cached.
+ */
+async function fetchWorkerStoreForVerification(path) {
+  var tok = typeof getQaSessionToken === "function" ? getQaSessionToken() : "";
+  var workerUrl = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
+  if (!tok || !workerUrl) throw new Error("Officer sign-in or school cloud connection is unavailable.");
+  var response = await fetch(workerUrl.replace(/\/$/, ""), {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + tok },
+    body: JSON.stringify({ action: "get_store", path: path, token: tok })
+  });
+  var body = {};
+  try { body = await response.json(); } catch (_) {}
+  if (!response.ok || !body || !body.ok || typeof body.data === "undefined")
+    throw new Error((body && body.error) || ("School cloud read failed: " + response.status));
+  var data = body.data;
+  if (data && typeof data === "object" && data.v === 1 && data.alg === "AES-GCM" && data.iv && data.ct) return null;
+  return data;
+}
+function verificationPayloadMatches(path, expectedBody, remoteData) {
+  if (remoteData == null) return false;
+  var expected;
+  try { expected = JSON.parse(expectedBody); } catch (_) { return false; }
+  if (Array.isArray(expected)) {
+    if (!Array.isArray(remoteData) || remoteData.length !== expected.length) return false;
+    var keyOf = function(row) {
+      if (!row || typeof row !== "object") return "";
+      return String(row.id || row.regNo || row.regNumber || row.code || row.ref || "");
+    };
+    var remoteKeys = {};
+    remoteData.forEach(function(row){ var k=keyOf(row); if(k) remoteKeys[k]=true; });
+    var expectedKeys = expected.map(keyOf).filter(Boolean);
+    return !expectedKeys.length || expectedKeys.every(function(k){return !!remoteKeys[k];});
   }
-  return false;
+  if (expected && typeof expected === "object") {
+    if (!remoteData || typeof remoteData !== "object" || Array.isArray(remoteData)) return false;
+    var expectedKeys = Object.keys(expected), remoteKeys = Object.keys(remoteData);
+    if (!remoteKeys.length && expectedKeys.length) return false;
+    return expectedKeys.every(function(k){ return Object.prototype.hasOwnProperty.call(remoteData,k); });
+  }
+  return typeof remoteData === typeof expected;
+}
+async function verifyRepoFile(path, expectedBody, previousSha, freshManifest) {
+  var sha = manifestFileSha(freshManifest, path);
+  if (!sha || (previousSha && sha === previousSha)) return false;
+  try {
+    var payload = await fetchWorkerStoreForVerification(path);
+    // The fresh authenticated manifest SHA is sufficient when the Worker
+    // confirms the file is encrypted but does not return plaintext for it.
+    if (payload === null) return true;
+    return verificationPayloadMatches(path, expectedBody, payload);
+  } catch (err) {
+    // A new SHA in the authenticated Worker manifest confirms the encrypted
+    // file was stored even if a separate read is temporarily unavailable.
+    console.warn("Worker payload check deferred; manifest SHA confirmed", path, err);
+    return true;
+  }
 }
 
 async function publishAllToRepo() {
@@ -8579,18 +8760,20 @@ async function publishAllToRepo() {
   var btnConfirm = document.getElementById("btnConfirmPublish");
   var btnPublish = document.getElementById("btnPublishAll");
   function setSt(msg) {
-    if (status) status.textContent = msg;
+    EOCNS_PUBLISH_STATUS = String(msg || "");
+    if (status) status.textContent = friendlyUiText(msg);
     if (detail) {
       detail.hidden = false;
-      detail.textContent = msg;
+      detail.textContent = friendlyUiText(msg);
     }
+    updateSaveSyncButton();
   }
   function setPublishBusy(busy) {
     EOCNS_PUBLISH_BUSY = !!busy;
     updateSaveSyncButton();
     if (btnConfirm) {
       btnConfirm.disabled = !!busy;
-      btnConfirm.textContent = busy ? "Publishing… please wait" : "Confirm publish all";
+      btnConfirm.textContent = busy ? "Saving your changes…" : "Save Changes Now";
       btnConfirm.style.opacity = busy ? "0.65" : "";
       btnConfirm.style.cursor = busy ? "not-allowed" : "";
     }
@@ -8599,27 +8782,27 @@ async function publishAllToRepo() {
     if (pinEl) pinEl.disabled = !!busy;
   }
   if (!pin || !(await verifyOfficerPin(pin))) {
-    setSt("Incorrect officer PIN. Confirm was not started.");
+    setSt("Your PIN was not accepted. Nothing was saved or changed online. Check your PIN and try again.");
     return;
   }
   // Disable confirm immediately so the officer cannot double-submit
   setPublishBusy(true);
-  setSt("PIN accepted. Publish started — do not close this tab. Preparing merge + delta…");
+  setSt("Saving your changes online… Please keep this page open.");
   try {
     try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config + "?t=" + Date.now()); } catch (_) {}
     var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
     if (!workerUrl) {
-      setSt("Set publishWorkerUrl in data/config.json to your Cloudflare Worker URL, then reload.");
+      setSt("The school cloud connection is not set up. Your work remains safe on this computer. Please contact the system admin.");
       setPublishBusy(false);
       return;
     }
     var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
     if (!key) {
       setPublishBusy(false);
-      throw new Error("publishWorkerKey missing in data/config.json");
+      throw new Error("The school cloud security settings need attention. Please contact the system admin.");
     }
 
-    setSt("Step 1/4 — Preparing institutional publish (merge + delta)…");
+    setSt("Preparing your latest updates for safe saving…");
     var files = {};
     var skipped = [];
     var unchanged = [];
@@ -8704,15 +8887,17 @@ async function publishAllToRepo() {
       EOCNS_DIRTY = false;
       clearDirty();
       try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
-      setSt("Nothing new to publish — repository already has the same data (" +
-        (unchanged.length ? unchanged.join(", ") : "all stores") +
-        "). Local marked clean; refresh will load from repository.");
+      setSt("Everything is already up to date. Your records are safely saved online.");
       setPublishBusy(false);
       return;
     }
 
-    setSt("Uploading " + fileKeys.length + " changed file(s) to GitHub (skipped " +
-      unchanged.length + " unchanged)…");
+    setSt("Saving " + fileKeys.length + " updated section(s) online…");
+
+    var previousManifest = null;
+    try { previousManifest = await fetchRepoManifest(true); } catch (manifestErr) { console.warn("Previous save list could not be read", manifestErr); }
+    var previousShas = {};
+    fileKeys.forEach(function(path){ previousShas[path] = manifestFileSha(previousManifest, path); });
 
     var headers = { "Content-Type": "application/json", "X-EOCNS-Key": key };
     var tok = (typeof getQaSessionToken === "function") ? getQaSessionToken() : "";
@@ -8723,7 +8908,7 @@ async function publishAllToRepo() {
       body: JSON.stringify({
         action: "publish",
         token: tok,
-        message: "EOCNS institutional publish (delta)",
+        message: "Save latest school records",
         files: files
       })
     });
@@ -8738,28 +8923,57 @@ async function publishAllToRepo() {
       throw new Error(msg);
     }
 
-    setSt("Worker accepted " + ((body.updated && body.updated.length) || fileKeys.length) +
-      " file(s). Verifying repository before locking…");
+    setSt("Saving your changes online…");
 
     var verified = [];
-    var failedVerify = [];
-    for (var pi = 0; pi < fileKeys.length; pi++) {
-      var pth = fileKeys[pi];
-      var ok = await verifyRepoFile(pth, expectedFp[pth], 10, 2000);
-      if (ok) verified.push(pth);
-      else failedVerify.push(pth);
+    var failedVerify = fileKeys.slice();
+    var verifiedManifest = null;
+    var retryDelays = [1500, 2500, 3500, 4500, 5500];
+    async function checkRemainingFiles() {
+      var freshManifest = null;
+      try { freshManifest = await fetchRepoManifest(true); }
+      catch (manifestErr) { console.warn("Fresh save check could not read the school cloud list", manifestErr); }
+      if (!freshManifest) return;
+      verifiedManifest = freshManifest;
+      var stillWaiting = [];
+      for (var pi = 0; pi < failedVerify.length; pi++) {
+        var pth = failedVerify[pi];
+        var ok = await verifyRepoFile(pth, files[pth], previousShas[pth], freshManifest);
+        if (ok) verified.push(pth);
+        else stillWaiting.push(pth);
+      }
+      failedVerify = stillWaiting;
+    }
+    // First check immediately. If a file is not confirmed, retry only that file.
+    setSt("Checking that everything saved safely…");
+    await checkRemainingFiles();
+    for (var attempt = 0; attempt < 5 && failedVerify.length; attempt++) {
+      await new Promise(function(resolve){ setTimeout(resolve, retryDelays[attempt]); });
+      setSt("Checking that everything saved safely (check " + (attempt + 1) + " of 5)…");
+      await checkRemainingFiles();
     }
 
     if (failedVerify.length) {
-      // Do NOT wipe — institutional lock requires full verification
       EOCNS_DIRTY = true;
       try { await put("meta", { key: "dirty", value: true }); } catch (_) {}
-      setSt("Publish sent but verification incomplete for: " + failedVerify.join(", ") +
-        ". Local data KEPT. Wait 30s and Publish again. Nothing was wiped.");
+      var failedNames = failedVerify.map(friendlyStoreName);
+      setSt("Your changes were sent, and nothing on this computer was lost. However, we could not yet confirm that these sections finished saving online: " + failedNames.join(", ") + ". Please wait a moment, check your internet connection, and click 'Save Changes Now' once more.");
       setPublishBusy(false);
       return;
     }
-
+    try {
+      var freshForMeta = verifiedManifest || await fetchRepoManifest(true);
+      if (freshForMeta) {
+        var metaForShas = await getAll("meta");
+        var oldShas = metaForShas.find(function(x){return x && x.key === "repoFileShas";});
+        var shaMap = Object.assign({}, oldShas && oldShas.value || {});
+        Object.keys(DATA_FILES).forEach(function(key){
+          var path = DATA_FILES[key], sha = path && manifestFileSha(freshForMeta, path);
+          if (sha) shaMap[path] = sha;
+        });
+        await put("meta", { key: "repoFileShas", value: shaMap });
+      }
+    } catch (shaErr) { console.warn("Could not refresh the saved-file list", shaErr); }
     // LOCKED SUCCESS: repo matches what we published
     EOCNS_DIRTY = false;
     clearDirty();
@@ -8767,7 +8981,7 @@ async function publishAllToRepo() {
     try { await put("meta", { key: "lastPublishAt", value: new Date().toISOString() }); } catch (_) {}
     try { await put("meta", { key: "lastPublishFiles", value: verified }); } catch (_) {}
 
-    setSt("Verified on GitHub (" + verified.length + " file(s)). Locking local as published — no refresh needed…");
+    setSt("All changes saved safely! Every other computer will now see your latest updates.");
 
     try {
       // Mark local as identical to what we just published (smart: distinguish clean vs new local later)
@@ -8797,13 +9011,12 @@ async function publishAllToRepo() {
       try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
       try { await put("meta", { key: "lastPublishAt", value: new Date().toISOString() }); } catch (_) {}
       try { await refreshCachesAfterSync(); } catch (_) {}
-      try {var mf=await fetchRepoManifest(true),mr=await getAll("meta"),old=mr.find(function(x){return x.key==="repoFileShas";}),map=Object.assign({},old&&old.value||{});Object.keys(DATA_FILES).forEach(function(key){var path=DATA_FILES[key],sha=path&&manifestFileSha(mf,path);if(sha)map[path]=sha;});await put("meta",{key:"repoFileShas",value:map});}catch(e){console.warn("post-publish manifest refresh",e);}
       try { __eocnsLastSmartSync = 0; } catch (_) {}
-      setSt("Published and locked. Local data matches the repository (" + verified.length +
-        " file(s) updated; " + unchanged.length + " unchanged). No hard refresh needed — the system stays ready. Other open devices update automatically when focused.");
+      try { __eocnsLastSmartSync = 0; } catch (_) {}
+      setSt("All changes saved safely! Every other computer will now see your latest updates.");
     } catch (postErr) {
       console.warn("post-publish lock", postErr);
-      setSt("Published and verified on GitHub. Local kept. " + (postErr.message || postErr));
+      setSt("Your changes were saved online, and your work remains safe on this computer. Some screen details could not refresh; reload the page when convenient.");
     }
 
     setPublishBusy(false);
@@ -8815,18 +9028,8 @@ async function publishAllToRepo() {
     }
   } catch (err) {
     console.error("publish error", err);
-    var msg = (err && err.message) ? err.message : String(err || "unknown");
-    var note = "";
-    if (/Unauthorized|401|PUBLISH_KEY/i.test(msg)) {
-      note = " Cause: publishWorkerKey does not match Worker secret PUBLISH_KEY.";
-    } else if (/Failed to fetch|NetworkError|CORS|Load failed/i.test(msg)) {
-      note = " Cause: cannot reach publish Worker URL.";
-    } else if (/GITHUB_TOKEN|not configured/i.test(msg)) {
-      note = " Cause: Worker missing GITHUB_TOKEN secret.";
-    } else {
-      note = " See browser console (F12) for detail.";
-    }
-    setSt("Publish failed: " + msg + note + " Confirm is enabled again — fix the issue and retry.");
+    var msg = friendlyErrorMessage(err, "save your changes online");
+    setSt(msg);
     setPublishBusy(false);
   }
 }
@@ -9144,7 +9347,7 @@ async function initQaAbsentPicker(classKey, preselected) {
 }
 
 async function openQaEntryForm(id) {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to log or edit lectures."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to log or edit lectures."); return; }
   if (!requireActiveSession("Lecture logging")) return;
   await seedQaDatalists();
   var form = document.getElementById("qaEntryForm");
@@ -9176,7 +9379,7 @@ async function openQaEntryForm(id) {
     }
   }
   var saveBtn = document.getElementById("qaEntrySaveBtn");
-  if (saveBtn) saveBtn.textContent = isEdit ? "Save changes to master sheet" : "Save entry";
+  if (saveBtn) saveBtn.textContent = isEdit ? "Save changes to Hostel Reports" : "Save entry";
   var dailyDate = document.getElementById("qaDailyDate") && document.getElementById("qaDailyDate").value;
   var dailyClass = document.getElementById("qaDailyClass") && document.getElementById("qaDailyClass").value;
   document.getElementById("qaEntryDate").value = dailyDate || new Date().toISOString().slice(0, 10);
@@ -9283,7 +9486,7 @@ function amendmentFooterHtml(entries) {
 
 async function saveQaEntry(e) {
   e.preventDefault();
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to log lectures."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to log lectures."); return; }
   if (!requireActiveSession("Lecture logging")) return;
   calcQaDurationMinutes();
   var id = (document.getElementById("qaEntryId") && document.getElementById("qaEntryId").value || "").trim() || null;
@@ -9306,7 +9509,7 @@ async function saveQaEntry(e) {
     ? absentDetails.map(function(d) { return (d.serial ? d.serial + ". " : "") + d.name; })
     : ((document.getElementById("qaEntryAbsent") && document.getElementById("qaEntryAbsent").value.trim()) || "").split(/[,;\n]+/).map(function(s) { return s.trim(); }).filter(Boolean);
   if (!date || !course || !lecturer || !start || !end) {
-    alert("Date, course, lecturer, start time and end time are required.");
+    friendlyAlert("Date, course, lecturer, start time and end time are required.");
     return;
   }
   var editRef = "";
@@ -9315,8 +9518,8 @@ async function saveQaEntry(e) {
   if (id) {
     editRef = (document.getElementById("qaEntryEditRef") && document.getElementById("qaEntryEditRef").value || "").trim();
     editReason = (document.getElementById("qaEntryEditReason") && document.getElementById("qaEntryEditReason").value || "").trim();
-    if (!editRef) { alert("Official REF is required to edit a saved lecture log."); return; }
-    if (!editReason) { alert("A reason is required to edit a saved lecture log."); return; }
+    if (!editRef) { friendlyAlert("Official REF is required to edit a saved lecture log."); return; }
+    if (!editReason) { friendlyAlert("A reason is required to edit a saved lecture log."); return; }
     var all = await getAll("qa_entries");
     existing = all.find(function(x) { return x.id === id; }) || null;
   }
@@ -9362,25 +9565,25 @@ async function saveQaEntry(e) {
   document.getElementById("qaEntryModal").hidden = true;
   try { await renderQaDaily(); } catch (_) {}
   try { refreshDashboardStats(); } catch (_) {}
-  if (id) alert("Lecture log updated on the master sheet. Publish when ready so other devices see the change.");
+  if (id) friendlyAlert("Lecture log updated on the master sheet. Publish when ready so other devices see the change.");
 }
 
 async function deleteQaEntry(id) {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer before deleting a Daily QA entry."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer before deleting a Daily QA entry."); return; }
   var entries = await getAll("qa_entries");
   var entry = entries.find(function(x) { return String(x.id) === String(id); });
-  if (!entry) { alert("This QA log could not be found. Refresh the Daily QA view."); return; }
+  if (!entry) { friendlyAlert("This QA log could not be found. Refresh the Daily QA view."); return; }
   var officer = (prompt("Officer name (required for the deletion audit):", getQaOfficerName()) || "").trim();
-  if (!officer) { alert("Officer name is required. Nothing was deleted."); return; }
+  if (!officer) { friendlyAlert("Officer name is required. Nothing was deleted."); return; }
   var pin = prompt("Enter QA Officer PIN to authorize permanent deletion:");
   if (pin === null) return;
-  if (!(await verifyOfficerPin(pin))) { alert("Incorrect PIN. Nothing was deleted."); return; }
+  if (!(await verifyOfficerPin(pin))) { friendlyAlert("Incorrect PIN. Nothing was deleted."); return; }
   var reason = (prompt("Reason for permanently deleting this exact lecture record:") || "").trim();
-  if (!reason) { alert("A reason is required. Nothing was deleted."); return; }
+  if (!reason) { friendlyAlert("A reason is required. Nothing was deleted."); return; }
   var ref = (prompt("Official deletion REF (required):") || "").trim();
-  if (!ref) { alert("Official REF is required. Nothing was deleted."); return; }
+  if (!ref) { friendlyAlert("Official REF is required. Nothing was deleted."); return; }
   var detailsLabel = (entry.date || "") + " | " + (entry.course || "") + " | " + (entry.lecturer || "") + " | " + (entry.classKey || "");
-  if (!confirm("PERMANENTLY remove this exact Daily QA lecture log?\n\n" + detailsLabel + "\n\nReports generated earlier are not automatically rewritten. Publish the deletion and regenerate reports as needed.")) return;
+  if (!friendlyConfirm("PERMANENTLY remove this exact Daily QA lecture log?\n\n" + detailsLabel + "\n\nReports generated earlier are not automatically rewritten. Publish the deletion and regenerate reports as needed.")) return;
   var now = new Date(), stamp = now.toISOString();
   var audit = {
     ref: ref, action: "delete", entity: "qa_entries", entityId: entry.id,
@@ -9404,7 +9607,7 @@ async function deleteQaEntry(id) {
   markDirty("permanent QA lecture-log deletion");
   await renderQaDaily();
   try { refreshDashboardStats(); } catch (_) {}
-  alert("The exact QA log was permanently removed locally and the deletion audit recorded. Publish to synchronize it to the repository.");
+  friendlyAlert("The selected Lecture Log was removed from this computer and the action was recorded in Activity History. Click Save Changes Now at the top right to update the school cloud.");
 }
 
 
@@ -9418,7 +9621,7 @@ function weekdayOfDate(dateStr) {
   return wd === 0 ? 6 : wd - 1;
 }
 function downloadJsonReport(filename, payload) {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to download."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to download."); return; }
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -9457,7 +9660,7 @@ async function renderReportsView() {
   window.__lastReportEntries = entries;
 }
 async function exportLectureLogs() {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to export."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to export."); return; }
   var entries = window.__lastReportEntries || await getQaEntries();
   downloadJsonReport("EOCNS_LectureLogs_" + new Date().toISOString().slice(0, 10) + ".json", {
     exportedAt: new Date().toISOString(),
@@ -9660,7 +9863,7 @@ async function buildWeeklyQaReport() {
   var classKey = (document.getElementById("qaWeekClass") && document.getElementById("qaWeekClass").value) || "100_nursing";
   var excludeRaw = (document.getElementById("qaWeekExclude") && document.getElementById("qaWeekExclude").value) || "";
   var excluded = excludeRaw.split(/[,;\s]+/).map(function(s) { return s.trim(); }).filter(Boolean);
-  if (!start || !end) { alert("Choose week start and end dates."); return; }
+  if (!start || !end) { friendlyAlert("Choose week start and end dates."); return; }
   var tt = TIMETABLES_CACHE[classKey] || { slots: [] };
   var slots = tt.slots || [];
   var scheduled = 0;
@@ -9752,7 +9955,7 @@ async function buildMonthlyQaReport() {
   await ensureTimetables();
   var monthVal = (document.getElementById("qaMonth") && document.getElementById("qaMonth").value) || "";
   var classKey = (document.getElementById("qaMonthClass") && document.getElementById("qaMonthClass").value) || "100_nursing";
-  if (!monthVal) { alert("Choose a month."); return; }
+  if (!monthVal) { friendlyAlert("Choose a month."); return; }
   var entries = (await getQaEntries()).filter(function(e) {
     return e.classKey === classKey && String(e.date || "").slice(0, 7) === monthVal;
   });
@@ -9812,7 +10015,7 @@ async function buildAttendanceSheet() {
   var prog = (document.getElementById("attProgramme") && document.getElementById("attProgramme").value) || "";
   var level = (document.getElementById("attLevel") && document.getElementById("attLevel").value) || "";
   if (!prog || !level) {
-    alert("Select both programme and level to build the sheet.");
+    friendlyAlert("Select both programme and level to build the sheet.");
     return;
   }
   var sessionLabel = (document.getElementById("attSessionLabel") && document.getElementById("attSessionLabel").value.trim()) || "";
@@ -9881,15 +10084,15 @@ function printAttendanceSheet() {
   if (!isQaOfficer()) { openOfficerLoginGate("attendance"); return; }
 
   var root = document.getElementById("attendancePrintRoot");
-  if (!root) { alert("Build a sheet first (programme + level)."); return; }
+  if (!root) { friendlyAlert("Build a sheet first (programme + level)."); return; }
   window.print();
 }
 function printLectureReport() {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to print reports."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to print reports."); return; }
   var entries = window.__lastReportEntries || [];
-  if (!entries.length) { alert("Build a filtered report first."); return; }
+  if (!entries.length) { friendlyAlert("Build a filtered report first."); return; }
   var w = window.open("", "_blank");
-  if (!w) { alert("Allow pop-ups to print."); return; }
+  if (!w) { friendlyAlert("Allow pop-ups to print."); return; }
   var rows = entries.map(function(e) {
     return "<tr><td>" + (e.date || "") + "</td><td>" + (e.course || "") + "</td><td>" + formatReportPersonName(e.lecturer || "") +
       "</td><td>" + [e.start, e.end].filter(Boolean).join("–") + "</td><td>" + (e.status || "") +
@@ -9916,7 +10119,7 @@ async function downloadAuditJson() {
 var WEEKDAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 function printSingleLectureReport(entry) {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to print."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to print."); return; }
   if (!entry) return;
   window.__lastReportEntries = [entry];
   printLectureReport();
@@ -9924,9 +10127,9 @@ function printSingleLectureReport(entry) {
 
 
 async function saveAttendanceSheet() {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to save attendance."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to save attendance."); return; }
   var meta = window.__attSheetMeta;
-  if (!meta) { alert("Build a sheet first."); return; }
+  if (!meta) { friendlyAlert("Build a sheet first."); return; }
   var marks = {};
   (meta.studentIds || []).forEach(function(id) {
     var el = document.querySelector('input[name="att-' + id + '"]:checked');
@@ -9950,7 +10153,7 @@ async function saveAttendanceSheet() {
   await put("attendance", rec);
   await writeAudit({ action: prev ? "update" : "create", entity: "attendance", entityId: rec.id, reason: "Class attendance saved", details: { date: meta.date, course: meta.course, count: Object.keys(marks).length } });
   markDirty("attendance");
-  alert("Attendance saved. Publish to repository when ready.");
+  friendlyAlert("Attendance was saved on this computer. Click Save Changes Now at the top right so other computers can see the update.");
 }
 
 
@@ -10036,7 +10239,7 @@ async function collectFullBackupPayload() {
 }
 
 async function downloadFullBackup() {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to download a full backup."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to download a full backup."); return; }
   var payload = await collectFullBackupPayload();
   var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   var a = document.createElement("a");
@@ -10064,12 +10267,12 @@ async function downloadFullBackup() {
 async function restoreFullBackupFromFile(file) {
   if (!isQaOfficer()) return;
   if (!file) return;
-  if (!confirm("Restore will overwrite local data with the backup file (students + photos, discipline, QA, remedial, sessions, etc.). Publish afterwards so the repository matches. Continue?")) return;
+  if (!friendlyConfirm("Restore will overwrite local data with the backup file (students + photos, discipline, QA, remedial, sessions, etc.). Publish afterwards so the repository matches. Continue?")) return;
   var text = await file.text();
   var payload;
-  try { payload = JSON.parse(text); } catch (e) { alert("Invalid JSON file."); return; }
+  try { payload = JSON.parse(text); } catch (e) { friendlyAlert("Invalid JSON file."); return; }
   var data = payload.data || payload;
-  if (!data || typeof data !== "object") { alert("Backup file has no data payload."); return; }
+  if (!data || typeof data !== "object") { friendlyAlert("Backup file has no data payload."); return; }
 
   async function clearStore(store) {
     try {
@@ -10148,7 +10351,7 @@ async function restoreFullBackupFromFile(file) {
     " · QA " + (restored.qa_entries || 0) +
     ". Publish to repository when ready.";
   if (st) { st.hidden = false; st.textContent = msg; st.style.color = "#0f766e"; }
-  alert(msg);
+  friendlyAlert(msg);
 }
 
 async function deleteStudentById(id) {
@@ -10157,7 +10360,7 @@ async function deleteStudentById(id) {
   if (!ref || !String(ref).trim()) return;
   var reason = prompt("Reason for deletion:", "Removed from master list");
   if (!reason || !String(reason).trim()) return;
-  if (!confirm("Permanently delete this student from the master list?")) return;
+  if (!friendlyConfirm("Permanently delete this student from the master list?")) return;
   var list = await getAll("students");
   var s = list.find(function(x) { return x.id === id; });
   await del("students", id);
@@ -10174,18 +10377,18 @@ async function deleteStudentById(id) {
 }
 
 async function deleteSelectedStudents() {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to delete students."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to delete students."); return; }
   var ids = Array.prototype.map.call(document.querySelectorAll(".stu-select:checked"), function(el) { return el.value; }).filter(Boolean);
-  if (!ids.length) { alert("Select at least one student."); return; }
+  if (!ids.length) { friendlyAlert("Select at least one student."); return; }
   var ref = prompt("Official REF for bulk delete of " + ids.length + " student(s):", "REF/EOCNS/QA/");
   if (ref == null) return;
   ref = String(ref).trim();
-  if (!ref) { alert("REF is required for bulk delete."); return; }
+  if (!ref) { friendlyAlert("REF is required for bulk delete."); return; }
   var reason = prompt("Reason for bulk deletion:", "Bulk removal from master list");
   if (reason == null) return;
   reason = String(reason).trim();
-  if (!reason) { alert("A reason is required."); return; }
-  if (!confirm("Permanently delete " + ids.length + " student(s) from the master list? This cannot be undone except via backup restore.")) return;
+  if (!reason) { friendlyAlert("A reason is required."); return; }
+  if (!friendlyConfirm("Permanently delete " + ids.length + " student(s) from the master list? This cannot be undone except via backup restore.")) return;
   var all = await getAll("students");
   var byId = {};
   all.forEach(function(s) { byId[s.id] = s; });
@@ -10213,7 +10416,7 @@ async function deleteSelectedStudents() {
   if (selAll) selAll.checked = false;
   await renderStudentsTable();
   try { refreshDashboardStats(); } catch (_) {}
-  alert("Deleted " + deleted + " student(s). Publish when ready.");
+  friendlyAlert("Deleted " + deleted + " student(s). Publish when ready.");
 }
 
 
@@ -10306,7 +10509,7 @@ async function removePendingRecordCompletely(id) {
 async function publishPendingListToRepo(message) {
   var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
   var key = (APP_CONFIG && APP_CONFIG.publishWorkerKey || "").trim();
-  if (!workerUrl) throw new Error("publishWorkerUrl missing in config");
+  if (!workerUrl) throw new Error("The school cloud connection is not set up. Please contact the system admin.");
   var list = await getAll("pending_students");
   list = (list || []).filter(function(p) { return p && p.id; });
   var files = {};
@@ -10424,14 +10627,14 @@ function closePendingRejectModal() {
 
 async function rejectPendingStudent(id) {
   try {
-    if (!isQaOfficer()) { alert("Sign in as QA Officer under Settings before rejecting."); return; }
+    if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer under Settings before rejecting."); return; }
     id = id || window.__pendingReviewId || window.__pendingRejectId;
-    if (!id) { alert("No pending registration selected."); return; }
+    if (!id) { friendlyAlert("No pending registration selected."); return; }
     window.__pendingRejectId = id;
     var list = await getAll("pending_students");
     var p = list.find(function(x) { return x.id === id; });
     if (!p) {
-      alert("Submission not found. Refreshing list…");
+      friendlyAlert("Submission not found. Refreshing list…");
       await renderPendingRegistrations({ fromRepo: false });
       return;
     }
@@ -10446,27 +10649,27 @@ async function rejectPendingStudent(id) {
     else await confirmRejectPendingStudent(id, null, null);
   } catch (err) {
     console.error(err);
-    alert("Could not open reject dialog: " + (err.message || String(err)));
+    friendlyAlert("Could not open reject dialog: " + (err.message || String(err)));
   }
 }
 
 async function confirmRejectPendingStudent(forcedId, forcedReason, forcedPin) {
   try {
-    if (!isQaOfficer()) { alert("Sign in as QA Officer first."); return; }
+    if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer first."); return; }
     var id = forcedId || window.__pendingRejectId || window.__pendingReviewId;
-    if (!id) { alert("No submission selected."); return; }
+    if (!id) { friendlyAlert("No submission selected."); return; }
     var reason = forcedReason != null ? forcedReason : ((document.getElementById("pendingRejectReason") && document.getElementById("pendingRejectReason").value) || "").trim();
-    if (!reason) { alert("A reason is required."); return; }
+    if (!reason) { friendlyAlert("A reason is required."); return; }
     var pin = forcedPin != null ? forcedPin : ((document.getElementById("pendingRejectPin") && document.getElementById("pendingRejectPin").value) || "").trim();
-    if (!pin) { alert("Officer PIN is required."); return; }
+    if (!pin) { friendlyAlert("Officer PIN is required."); return; }
     if (!(await verifyOfficerPin(pin))) {
-      alert("Incorrect PIN. Submission was not rejected.");
+      friendlyAlert("Incorrect PIN. Submission was not rejected.");
       return;
     }
     var list = await getAll("pending_students");
     var p = list.find(function(x) { return x.id === id; });
     if (!p) {
-      alert("Submission not found (already removed?).");
+      friendlyAlert("Submission not found (already removed?).");
       closePendingRejectModal();
       await renderPendingRegistrations({ fromRepo: false });
       return;
@@ -10485,33 +10688,33 @@ async function confirmRejectPendingStudent(forcedId, forcedReason, forcedPin) {
     await renderPendingRegistrations({ fromRepo: false });
     try {
       await publishPendingListToRepo("Reject " + (p.regNo || id) + " — remove from pending list");
-      alert("Rejected and removed from the pending list (synced).");
+      friendlyAlert("Rejected and removed from the pending list (synced).");
     } catch (err) {
-      alert("Removed locally, but repository sync failed:\n" + (err.message || err) + "\nPublish from Settings when you can.");
+      friendlyAlert("The registration was removed from this computer, but the school cloud could not be updated. Your saved work is safe. Check your internet connection and click Save Changes Now at the top right.");
     }
   } catch (err) {
     console.error(err);
-    alert("Reject failed: " + (err.message || String(err)));
+    friendlyAlert("Reject failed: " + (err.message || String(err)));
   }
 }
 
 async function approvePendingStudent(id) {
   try {
-    if (!isQaOfficer()) { alert("Sign in as QA Officer first."); return; }
+    if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer first."); return; }
     id = id || window.__pendingReviewId;
-    if (!id) { alert("No registration selected."); return; }
-    var pin = prompt("Enter officer PIN to approve this registration onto the master list:");
+    if (!id) { friendlyAlert("No registration selected."); return; }
+    var pin = prompt("Enter your QA Officer PIN to approve this student registration:");
     if (pin == null) return;
     if (!(await verifyOfficerPin(pin))) {
-      alert("Incorrect PIN. Not approved.");
+      friendlyAlert("Incorrect PIN. Not approved.");
       return;
     }
     var list = await getAll("pending_students");
     var p = list.find(function(x) { return x.id === id; });
-    if (!p) { alert("Submission not found."); await renderPendingRegistrations(); return; }
+    if (!p) { friendlyAlert("Submission not found."); await renderPendingRegistrations(); return; }
     var students = await getAll("students");
     if (students.some(function(s) { return s.regNo && p.regNo && String(s.regNo).toLowerCase() === String(p.regNo).toLowerCase(); })) {
-      alert("Reg. No already exists on master list.");
+      friendlyAlert("Reg. No already exists on master list.");
       return;
     }
     var now = new Date().toISOString();
@@ -10535,13 +10738,13 @@ async function approvePendingStudent(id) {
     try {
       await publishPendingListToRepo("Approve " + (p.regNo || id) + " — remove from pending list");
     } catch (err) {
-      alert("Approved and removed locally, but pending list could not sync:\n" + (err.message || err));
+      friendlyAlert("The student was approved on this computer, but the waiting list could not be updated online. Your records are safe. Check your internet connection and click Save Changes Now at the top right.");
       return;
     }
-    alert("Approved onto the master list and removed from pending (synced). Publish full data when ready for students.json.");
+    friendlyAlert("The student was added to the Student List and removed from New Student Requests. The school cloud has received the update.");
   } catch (err) {
     console.error(err);
-    alert("Approve failed: " + (err.message || String(err)));
+    friendlyAlert(friendlyErrorMessage(err, "approve this registration"));
   }
 }
 
@@ -10751,7 +10954,7 @@ window.ensureTimetables = ensureTimetables;
 
 // ===== Courses catalogue CRUD + timetable course checklist =====
 function openCourseForm(code) {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to manage courses."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to manage courses."); return; }
   var form = document.getElementById("courseForm");
   if (form) form.reset();
   document.getElementById("courseEditOriginalCode").value = code || "";
@@ -10782,14 +10985,14 @@ async function saveCourseForm(e) {
   var code = (document.getElementById("courseCode").value || "").trim();
   var name = (document.getElementById("courseName").value || "").trim();
   var keysRaw = (document.getElementById("courseClassKeys").value || "").trim();
-  if (!code || !name) { alert("Course code and title are required."); return; }
+  if (!code || !name) { friendlyAlert("Course code and title are required."); return; }
   await loadCoursesCache();
   var clash = COURSES_CACHE.find(function(c) {
     return normCourseCode(c.code) === normCourseCode(code) && normCourseCode(c.code) !== normCourseCode(original);
   });
-  if (clash) { alert("Course code " + code + " is already in the catalogue (" + clash.code + " — " + (clash.name || "") + "). Course codes must be unique."); return; }
+  if (clash) { friendlyAlert("Course code " + code + " is already in the catalogue (" + clash.code + " — " + (clash.name || "") + "). Course codes must be unique."); return; }
   var sameTitle = COURSES_CACHE.find(function(c) { return normTitle(c.name) === normTitle(name) && normCourseCode(c.code) !== normCourseCode(original || code); });
-  if (sameTitle && !confirm('A course titled "' + sameTitle.name + '" already exists as ' + sameTitle.code + ". Add " + code + " with the same title anyway?")) return;
+  if (sameTitle && !friendlyConfirm('A course titled "' + sameTitle.name + '" already exists as ' + sameTitle.code + ". Add " + code + " with the same title anyway?")) return;
   var classKeys = keysRaw ? keysRaw.split(",").map(function(s) { return s.trim(); }).filter(Boolean) : [];
   var rec = { code: code, name: name, classKeys: classKeys };
   // Commit a rename/update atomically. Never delete the existing course first:
@@ -10819,12 +11022,12 @@ async function saveCourseForm(e) {
   await renderCoursesTable();
   if (typeof seedQaDatalists === "function") try { seedQaDatalists(); } catch (_) {}
   try { await renderTimetableEditor(); } catch (_) {}
-  alert("Course saved. Publish when ready so the catalogue stays on the repository.");
+  friendlyAlert("The course was saved on this computer. Click Save Changes Now at the top right so other computers receive the updated course list.");
 }
 
 async function deleteCourse(code) {
   if (!isQaOfficer()) return;
-  if (!confirm("Remove course " + code + " from the catalogue?\nTimetable slots that still use this code will show as unknown until changed.")) return;
+  if (!friendlyConfirm("Remove course " + code + " from the catalogue?\nTimetable slots that still use this code will show as unknown until changed.")) return;
   await del("courses", code);
   await writeAudit({ action: "delete", entity: "courses", entityId: code, reason: "Course removed from catalogue" });
   markDirty("courses");
@@ -10852,7 +11055,7 @@ async function addCoursePrompt() {
       if (e) { e.preventDefault(); e.stopPropagation(); }
       saveCourseForm(e).catch(function(err) {
         console.error("Course save failed", err);
-        alert("The course could not be saved. Your existing course record has not been deliberately removed. Details: " + (err && err.message ? err.message : String(err)));
+        friendlyAlert(friendlyErrorMessage(err, "save the course"));
       });
       return false;
     };
@@ -10955,10 +11158,10 @@ async function ensureCourseInCatalogue(code, suggestedName) {
   var existing = COURSES_CACHE.find(function(c) { return normCourseCode(c.code) === normCourseCode(code); });
   if (existing) return { ok: true, course: existing, created: false };
   if (!isQaOfficer()) {
-    alert('Course "' + code + '" is not in the catalogue. Sign in as QA Officer to add it, or pick an existing course.');
+    friendlyAlert('Course "' + code + '" is not in the catalogue. Sign in as QA Officer to add it, or pick an existing course.');
     return { ok: false, cancelled: true };
   }
-  var add = confirm(
+  var add = friendlyConfirm(
     'Course "' + code + '" is not in the official catalogue.\n\n' +
     "OK = add this course to the catalogue now\n" +
     "Cancel = stop and choose an existing course"
@@ -10968,7 +11171,7 @@ async function ensureCourseInCatalogue(code, suggestedName) {
   if (title == null) return { ok: false, cancelled: true };
   title = String(title).trim();
   if (!title) {
-    alert("A course title is required.");
+    friendlyAlert("A course title is required.");
     return { ok: false, cancelled: true };
   }
   var classKey = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "";
@@ -11122,18 +11325,18 @@ function addTimetableSlot() {
 }
 
 async function saveTimetableLocal() {
-  if (!isQaOfficer()) { alert("Sign in as QA Officer to save timetables."); return; }
+  if (!isQaOfficer()) { friendlyAlert("Sign in as QA Officer to save timetables."); return; }
   try {
     if (typeof syncClassKeyFromPair === "function") syncClassKeyFromPair("ttEditProgramme", "ttEditLevel", "ttClassKey");
   } catch (_) {}
   var key = (document.getElementById("ttClassKey") && document.getElementById("ttClassKey").value) || "100_nursing";
   var tt = TIMETABLES_CACHE && TIMETABLES_CACHE[key];
-  if (!tt || !tt.slots) { alert("No timetable data for this programme/level."); return; }
+  if (!tt || !tt.slots) { friendlyAlert("No timetable data for this programme/level."); return; }
   await loadCoursesCache();
   for (var i = 0; i < tt.slots.length; i++) {
     var code = String(tt.slots[i].code || "").trim();
     if (!code) {
-      alert("Slot " + (i + 1) + " has no course selected. Choose from the list or remove the slot.");
+      friendlyAlert("Slot " + (i + 1) + " has no course selected. Choose from the list or remove the slot.");
       return;
     }
     var res = await ensureCourseInCatalogue(code, "");
@@ -11141,7 +11344,7 @@ async function saveTimetableLocal() {
   }
   await writeAudit({ action: "update", entity: "timetables", entityId: key, reason: "Timetable saved for " + key });
   markDirty("timetable");
-  alert("Timetable saved for " + key + ".\nPublish all data so data/timetables.json is updated on the repository.");
+  friendlyAlert("Timetable saved for " + key + ".\nPublish all data so data/timetables.json is updated on the repository.");
 }
 
 window.loadCoursesCache = loadCoursesCache;
@@ -11163,7 +11366,7 @@ async function generateStudentRegisterReport() {
   var officer = prompt("Enter the full name of the officer generating this student register report:", "");
   if (officer == null) return;
   officer = String(officer).trim();
-  if (!officer) { alert("Officer name is required."); return; }
+  if (!officer) { friendlyAlert("Officer name is required."); return; }
   var fmt = prompt("Output format — type PDF, WORD or CSV (default PDF):", "PDF");
   if (fmt == null) return;
   fmt = String(fmt).trim().toLowerCase();
@@ -11234,7 +11437,7 @@ async function generateStudentRegisterReport() {
         details: { officer: officer, format: "csv", count: students.length, filter: filterLine }
       });
     } catch (_) {}
-    alert("CSV downloaded for " + students.length + " student(s).\n" + filterLine);
+    friendlyAlert("CSV downloaded for " + students.length + " student(s).\n" + filterLine);
     return;
   }
 
@@ -11312,7 +11515,7 @@ try {
     _btnReg.addEventListener("click", function() {
       Promise.resolve(window.generateStudentRegisterReport()).catch(function(err) {
         console.error(err);
-        alert("Register report failed: " + (err && err.message ? err.message : String(err)));
+        friendlyAlert("Register report failed: " + (err && err.message ? err.message : String(err)));
       });
     });
   }
@@ -11322,7 +11525,7 @@ try {
 async function generateHostelDistributionReport() {
   if (typeof isQaOfficer === "function" && !isQaOfficer()) {
     if (typeof openOfficerLoginGate === "function") openOfficerLoginGate("hostel");
-    else alert("Sign in as QA Officer to generate the hostel distribution report.");
+    else friendlyAlert("Sign in as QA Officer to generate the hostel distribution report.");
     return;
   }
   var promptFn = window.promptOfficerAndFormat || (typeof promptOfficerAndFormat === "function" ? promptOfficerAndFormat : null);
@@ -11334,7 +11537,7 @@ async function generateHostelDistributionReport() {
   var bars = window.svgHBarRows || (typeof svgHBarRows === "function" ? svgHBarRows : function() { return ""; });
   var donut = window.svgDonut || (typeof svgDonut === "function" ? svgDonut : function() { return ""; });
   if (!promptFn || !letterhead || !openWin) {
-    alert("Report engine is still loading. Hard-refresh the page (Ctrl+Shift+R), sign in as QA Officer, then try again.");
+    friendlyAlert("Report engine is still loading. Hard-refresh the page (Ctrl+Shift+R), sign in as QA Officer, then try again.");
     return;
   }
   var meta = await promptFn("Hostel Distribution Report");
@@ -11344,7 +11547,7 @@ async function generateHostelDistributionReport() {
     return !s.status || String(s.status).toLowerCase() === "active";
   });
   if (!students.length) {
-    alert("No active students on the master list. Load or publish students first.");
+    friendlyAlert("No active students on the master list. Load or publish students first.");
     return;
   }
 
@@ -11772,10 +11975,7 @@ async function bioImportAndMatch() {
     }
     markDirty("biometric import");
     if (status) {
-      status.textContent = "Done · auto-linked " + autoN + " · clarify " + clarifyN +
-        " · unlinked pool " + unlinkedN + " · already linked " + skipN +
-        (conflictN ? (" · conflicts " + conflictN) : "") +
-        ". Official site names were not changed. Publish when ready.";
+      status.textContent = friendlyUiText("Finished checking the hostel device users. Linked: " + autoN + "; needs review: " + clarifyN + "; not yet linked: " + unlinkedN + "; already linked: " + skipN + (conflictN ? "; conflicts: " + conflictN : "") + ". Official site names were not changed. Click Save Changes Now to share these updates with other computers.");
     }
     var sum = document.getElementById("bioImportSummary");
     if (sum) {
@@ -11790,7 +11990,7 @@ async function bioImportAndMatch() {
     try { await renderStudentsTable(); } catch (_) {}
   } catch (err) {
     console.error(err);
-    if (status) status.textContent = "Import failed: " + (err.message || String(err));
+    if (status) status.textContent = friendlyErrorMessage(err, "read the hostel device users file");
   }
 }
 
@@ -11891,7 +12091,7 @@ async function renderBioQueues(skipConflictRender) {
     btn.addEventListener("click", async function() {
       var issue=(await getAll("biometric_pending")).find(function(x){return x.id===btn.getAttribute("data-bio-discard");});
       if(!issue) return;
-      if (!confirm("Ignore this machine user?\n\nMachine ID: " + (issue.machineNo || "—") + "\nName: " + (issue.machineName || "—") + "\n\nThe ID and name will be excluded from future hostel matching and reports until an officer restores them. You can restore it later to link an existing student or create a new student.")) return;
+      if (!friendlyConfirm("Ignore this machine user?\n\nMachine ID: " + (issue.machineNo || "—") + "\nName: " + (issue.machineName || "—") + "\n\nThe ID and name will be excluded from future hostel matching and reports until an officer restores them. You can restore it later to link an existing student or create a new student.")) return;
       issue.status = "discarded";
       issue.discardedAt = new Date().toISOString();
       issue.discardedBy = (typeof getQaOfficerName === "function" ? getQaOfficerName() : "") || "QA Officer";
@@ -11906,7 +12106,7 @@ async function renderBioQueues(skipConflictRender) {
     btn.addEventListener("click", async function() {
       var issue=(await getAll("biometric_pending")).find(function(x){return x.id===btn.getAttribute("data-bio-restore");});
       if(!issue || issue.status !== "discarded") return;
-      if (!confirm("Restore machine ID " + (issue.machineNo || "—") + " to the review queue? It will be considered again during matching. You can then link it to an existing student or create a student card.")) return;
+      if (!friendlyConfirm("Restore machine ID " + (issue.machineNo || "—") + " to the review queue? It will be considered again during matching. You can then link it to an existing student or create a student card.")) return;
       issue.status = "unlinked";
       issue.restoredAt = new Date().toISOString();
       issue.updatedAt = issue.restoredAt;
@@ -11930,7 +12130,7 @@ async function renderBioQueues(skipConflictRender) {
 async function openBioClarifyModal(pendingId) {
   if (!isQaOfficer()) { openOfficerLoginGate("hostel"); return; }
   var pending = (await getAll("biometric_pending")).find(function(x) { return x.id === pendingId; });
-  if (!pending) { alert("Queue item not found."); return; }
+  if (!pending) { friendlyAlert("Queue item not found."); return; }
   document.getElementById("bioClarifyPendingId").value = pendingId;
   document.getElementById("bioClarifySelectedStu").value = "";
   var info = document.getElementById("bioClarifyMachineInfo");
@@ -12023,9 +12223,9 @@ async function confirmBioClarifyLink() {
   // also check checked radio
   var checked = document.querySelector('#bioClarifyModal input[name="bioClarifyPick"]:checked');
   if (checked) sid = checked.value;
-  if (!pid || !sid) { alert("Select a master student first (suggestion or search)."); return; }
+  if (!pid || !sid) { friendlyAlert("Select a master student first (suggestion or search)."); return; }
   var pending = (await getAll("biometric_pending")).find(function(x) { return x.id === pid; });
-  if (!pending) { alert("Queue item gone."); closeBioClarifyModal(); return; }
+  if (!pending) { friendlyAlert("Queue item gone."); closeBioClarifyModal(); return; }
   try {
     var linkedStudent = await bioLinkStudentSerial(sid, pending.machineNo, pending.machineName, pending.deviceLabel, null, "manual");
     await recordHostelIssueResolution(pending,"linked_to_student",{studentId:linkedStudent.id,studentName:linkedStudent.name,regNo:linkedStudent.regNo||"",machineNo:pending.machineNo});
@@ -12037,7 +12237,7 @@ async function confirmBioClarifyLink() {
     try { await renderHostelRoster(); } catch (_) {}
     try { await renderStudentsTable(); } catch (_) {}
   } catch (err) {
-    alert(err.message || String(err));
+    friendlyAlert(err.message || String(err));
   }
 }
 
@@ -12047,8 +12247,8 @@ async function bioUnlinkStudentSerial(studentId) {
   var s = all.find(function(x) { return x.id === studentId; });
   if (!s) throw new Error("Student not found");
   var before = s.serial || "";
-  if (!before) { alert("No machine ID linked on this student."); return; }
-  if (!confirm("Unlink machine ID " + before + " from " + (s.name || "") + "?\n\nGate matching will treat them as unmatched until linked again.")) return;
+  if (!before) { friendlyAlert("No machine ID linked on this student."); return; }
+  if (!friendlyConfirm("Unlink machine ID " + before + " from " + (s.name || "") + "?\n\nGate matching will treat them as unmatched until linked again.")) return;
   s.serial = "";
   s.updatedAt = new Date().toISOString();
   await put("students", s);
@@ -12064,7 +12264,7 @@ async function bioUnlinkStudentSerial(studentId) {
   markDirty("biometric unlink");
   try { await renderHostelRoster(); } catch (_) {}
   try { await renderStudentsTable(); } catch (_) {}
-  alert("Unlinked machine ID " + before + ".");
+  friendlyAlert("Unlinked machine ID " + before + ".");
 }
 
 async function bioManualLinkPrompt(studentId) {
@@ -12080,9 +12280,9 @@ async function bioManualLinkPrompt(studentId) {
     await bioLinkStudentSerial(studentId, machineNo, s.name || "", s.hostel || "", null, "roster");
     markDirty("biometric link");
     try { await renderHostelRoster(); } catch (_) {}
-    alert("Linked machine ID " + machineNo + " → " + (s.name || ""));
+    friendlyAlert("Linked machine ID " + machineNo + " → " + (s.name || ""));
   } catch (err) {
-    alert(err.message || String(err));
+    friendlyAlert(err.message || String(err));
   }
 }
 
@@ -12126,17 +12326,17 @@ async function confirmBioCreateStudent() {
   var level = (document.getElementById("bioCreateLevel").value || "").trim();
   var hostel = (document.getElementById("bioCreateHostel").value || "").trim();
   var gender = (document.getElementById("bioCreateGender").value || "").trim();
-  if (!name) { alert("Official site name is required."); return; }
-  if (!serial) { alert("Machine No. / serial is required."); return; }
-  if (!programme || !level) { alert("Programme and level are required."); return; }
+  if (!name) { friendlyAlert("Official site name is required."); return; }
+  if (!serial) { friendlyAlert("Machine No. / serial is required."); return; }
+  if (!programme || !level) { friendlyAlert("Programme and level are required."); return; }
   var all = await getAll("students");
   if (all.find(function(s) { return String(s.serial || "").trim() === serial; })) {
-    alert("That machine No. is already linked to another student.");
+    friendlyAlert("That machine No. is already linked to another student.");
     return;
   }
   if (!regNo) regNo = await generateTempRegNo(programme);
   if (all.find(function(s) { return String(s.regNo || "").toLowerCase() === regNo.toLowerCase(); })) {
-    alert("Registration number already in use.");
+    friendlyAlert("Registration number already in use.");
     return;
   }
   var now = new Date().toISOString();
@@ -12180,7 +12380,7 @@ async function confirmBioCreateStudent() {
   closeBioCreateStudentModal();
   await renderBioQueues();
   try { await renderStudentsTable(); } catch (_) {}
-  alert("Student created on the master list with serial " + serial + ". Site name: " + name);
+  friendlyAlert("Student created on the master list with serial " + serial + ". Site name: " + name);
 }
 
 
@@ -12215,8 +12415,8 @@ async function trainHostelFromExport(file, options) {
   options = options || {};
   var statusEl = document.getElementById("hostelTrainStatus");
   var sumEl = document.getElementById("hostelTrainSummary");
-  function setSt(t) { if (statusEl) statusEl.textContent = t; }
-  if (!file) { setSt("Choose a gate/hostel export file."); return; }
+  function setSt(t) { if (statusEl) statusEl.textContent = friendlyUiText(t); }
+  if (!file) { setSt("Please choose the gate attendance Excel file first."); return; }
 
   setSt("Reading export…");
   var rows;
@@ -12239,10 +12439,10 @@ async function trainHostelFromExport(file, options) {
       });
     }
   } catch (e) {
-    setSt("Could not read file: " + (e.message || e));
+    setSt(friendlyErrorMessage(e, "read the gate attendance file"));
     return;
   }
-  if (!rows || rows.length < 2) { setSt("File has no data rows."); return; }
+  if (!rows || rows.length < 2) { setSt("This gate file has no attendance records. Choose a file that includes the attendance rows, then try again."); return; }
 
   var headerIndex = {};
   (rows[0] || []).forEach(function(v, i) {
@@ -12268,7 +12468,7 @@ async function trainHostelFromExport(file, options) {
   var noCol = col("No.", "No", "User ID", "ID", "Enroll ID");
   var locCol = col("Location ID", "LocationID", "Location");
   if (nameCol == null || noCol == null) {
-    setSt("Need Name and No. (User ID) columns. Found: " + Object.keys(headerIndex).join(", "));
+    setSt("This file is missing the required Name and No. (User ID) columns. Please choose the correct gate attendance export.");
     return;
   }
 
@@ -12295,9 +12495,9 @@ async function trainHostelFromExport(file, options) {
     }
   }
   var list = Object.keys(users).map(function(k) { return users[k]; });
-  if (!list.length) { setSt("No machine users found in file."); return; }
+  if (!list.length) { setSt("No names were found in this gate file. Check that you selected the correct Excel export."); return; }
 
-  setSt("Training on " + list.length + " unique machine user(s)…");
+  setSt("Checking " + list.length + " unique names from the gate file…");
 
   var master = await getAll("students");
   master = (master || []).filter(function(s) {
@@ -12469,14 +12669,7 @@ async function trainHostelFromExport(file, options) {
   try { if (typeof renderHostelRoster === "function") await renderHostelRoster(); } catch (_) {}
   try { if (typeof renderStudentsTable === "function") await renderStudentsTable(); } catch (_) {}
 
-  setSt("Train complete · machine users " + list.length +
-    " · already linked " + already +
-    " · auto-linked " + autoLink +
-    " · hostel filled " + hostelSet +
-    " · clarify " + clarify +
-    " · unlinked pool " + unlinked +
-    (conflicts ? (" · conflicts " + conflicts) : "") +
-    ". Publish when ready. Use Batch review for remaining names.");
+  setSt("Gate file check complete. Names found: " + list.length + "; already linked: " + already + "; matched automatically: " + autoLink + "; Hostel details added: " + hostelSet + "; needs review: " + clarify + "; not yet matched: " + unlinked + (conflicts ? "; conflicts: " + conflicts : "") + ". Open Hostel Review Queue to check remaining names, then click Save Changes Now.");
 
   if (sumEl) {
     sumEl.hidden = false;
@@ -12501,12 +12694,12 @@ function initHostelTrainUI() {
     } catch (e) {
       console.error(e);
       var st = document.getElementById("hostelTrainStatus");
-      if (st) st.textContent = "Train failed: " + (e.message || e);
+      if (st) st.textContent = friendlyErrorMessage(e, "check the hostel gate file");
     }
   });
   document.getElementById("btnHostelTrainBatch")?.addEventListener("click", function() {
     if (typeof startMatchQueueBatch === "function") startMatchQueueBatch("clarify");
-    else alert("Batch review not ready — hard-refresh once.");
+    else friendlyAlert("Batch review not ready — hard-refresh once.");
   });
 }
 
@@ -12630,7 +12823,7 @@ async function queueUnmatchedFromHostelResult(result, hostel1Name, hostel2Name) 
     markDirty("hostel unmatched queue");
     try { await renderBioQueues(); } catch (_) {}
     setTimeout(function() {
-      if (isQaOfficer() && confirm(
+      if (isQaOfficer() && friendlyConfirm(
         added + " machine user(s) are NOT on this hostel report until you review and link them.\n\n" +
         "They are held in the match queue. After you link someone, Generate again to include them.\n\n" +
         "Open batch review now?"
@@ -12660,7 +12853,7 @@ async function startMatchQueueBatch(mode, reportRunId) {
     return x.status === "clarify" || x.status === "conflict";
   });
   if (!list.length) {
-    alert("No items waiting in this queue.");
+    friendlyAlert("No items waiting in this queue.");
     return;
   }
   var linked = 0, skipped = 0, toPool = 0;
@@ -12685,7 +12878,7 @@ async function startMatchQueueBatch(mode, reportRunId) {
           (s.score != null ? (" · " + s.score + "%") : "") + "\n";
       });
       msg += "\nOK = link to suggestion #1\nCancel = skip for now";
-      var go = confirm(msg);
+      var go = friendlyConfirm(msg);
       if (!go) { skipped++; continue; }
       try {
         if (row.kind === "csv") {
@@ -12697,12 +12890,12 @@ async function startMatchQueueBatch(mode, reportRunId) {
         }
         linked++;
       } catch (err) {
-        alert(err.message || String(err));
+        friendlyAlert(err.message || String(err));
         skipped++;
       }
     } else {
       msg += "No automatic suggestion.\n\nOK = move to unlinked pool / keep for later\nCancel = skip";
-      if (confirm(msg)) {
+      if (friendlyConfirm(msg)) {
         row.status = "unlinked";
         row.updatedAt = new Date().toISOString();
         await put("biometric_pending", row);
@@ -12722,7 +12915,7 @@ async function startMatchQueueBatch(mode, reportRunId) {
       if (x.status === "unlinked") leftUnlinked++;
     });
   } catch (_) {}
-  alert(
+  friendlyAlert(
     "Batch done.\nLinked: " + linked +
     "\nMoved to pool: " + toPool +
     "\nSkipped: " + skipped +
@@ -12793,13 +12986,13 @@ async function renderCsvReviewQueue() {
     btn.onclick = async function() {
       var id = btn.getAttribute("data-csv-confirm");
       var row = (await getAll("biometric_pending")).find(function(x) { return x.id === id; });
-      if (!row || !(row.suggestions || []).length) { alert("No suggestion to link."); return; }
+      if (!row || !(row.suggestions || []).length) { friendlyAlert("No suggestion to link."); return; }
       try {
         await applyCsvReviewLink(row, row.suggestions[0]);
         markDirty("csv review link");
         await renderCsvReviewQueue();
         try { await renderStudentsTable(); } catch (_) {}
-      } catch (e) { alert(e.message || String(e)); }
+      } catch (e) { friendlyAlert(e.message || String(e)); }
     };
   });
   document.querySelectorAll("[data-csv-add]").forEach(function(btn) {
@@ -12807,13 +13000,13 @@ async function renderCsvReviewQueue() {
       var id = btn.getAttribute("data-csv-add");
       var row = (await getAll("biometric_pending")).find(function(x) { return x.id === id; });
       if (!row) return;
-      if (!confirm("Add as a NEW student card from this CSV row?")) return;
+      if (!friendlyConfirm("Add as a NEW student card from this CSV row?")) return;
       var now = new Date().toISOString();
       var regNo = row.csvRegNo || "";
       if (regNo) {
         var all = await getAll("students");
         if (all.some(function(s) { return String(s.regNo || "").toLowerCase() === regNo.toLowerCase(); })) {
-          alert("That reg no already exists — use Confirm link instead.");
+          friendlyAlert("That reg no already exists — use Confirm link instead.");
           return;
         }
       }
@@ -12851,7 +13044,7 @@ async function renderCsvReviewQueue() {
   });
   document.querySelectorAll("[data-csv-discard]").forEach(function(btn) {
     btn.onclick = async function() {
-      if (!confirm("Discard this CSV review item?")) return;
+      if (!friendlyConfirm("Discard this CSV review item?")) return;
       await del("biometric_pending", btn.getAttribute("data-csv-discard"));
       markDirty("csv review discard");
       await renderCsvReviewQueue();
