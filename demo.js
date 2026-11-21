@@ -117,9 +117,7 @@ var pendingStudents = [
   {id:"pend_demo_001",name:"NNEKA UMEH",firstName:"Nneka",lastName:"Umeh",regNo:"",programme:"Nursing",level:"100",gender:"Female",hostel:"Hostel 1",phone:"+234 803 777 1001",email:"nneka.practice@example.test",photoDataUrl:makeAvatar("NU","#1B3A6B"),status:"Pending",createdAt:isoDaysAgo(1),submittedAt:isoDaysAgo(1),demoRecord:true},
   {id:"pend_demo_002",name:"ADAOBI NWOKE",firstName:"Adaobi",lastName:"Nwoke",regNo:"",programme:"Midwifery",level:"100",gender:"Female",hostel:"Hostel 2",phone:"+234 806 777 1002",email:"adaobi.practice@example.test",photoDataUrl:makeAvatar("AN","#B8860B"),status:"Pending",createdAt:isoDaysAgo(0),submittedAt:isoDaysAgo(0),demoRecord:true}
 ];
-var hostelRows = students.slice(0,8).map(function(s,i){return {studentId:s.id,name:s.name,regNo:s.regNo,serial:s.serial,hostel:s.hostel,programme:s.programme,level:s.level,daysPresent:i<6?4:3,daysAbsent:i<6?1:2,fine:i<6?500:1000,attendance:["P","P","P",i<6?"A":"A","P"]};});
 var hostelDates=[weekdayDate(-4),weekdayDate(-3),weekdayDate(-2),weekdayDate(-1),weekdayDate(0)];
-var hostelMatrix=students.slice(0,8).map(function(s,i){var marks=hostelDates.map(function(_,d){return ((i===2&&d===1)||(i===5&&(d===2||d===3))||(i===7&&d===0))?"A":"P";});var absent=marks.filter(function(m){return m==="A";}).length;return {studentId:s.id,machineNo:s.serial,name:s.name,regNo:s.regNo,hostel:s.hostel,programme:s.programme,level:s.level,dayMarks:marks,absentDays:absent,fine:absent*500};});
 var hostelGateRows=[["Department","Name","No.","Date/Time","Status","Location ID"]];
 var hostelGateEvents=[];
 hostelDates.forEach(function(date,d){students.slice(0,8).forEach(function(s,i){if((i===2&&d===1)||(i===5&&(d===2||d===3))||(i===7&&d===0))return;var machineNo=s.serial;var stamp=date+" 07:"+String(10+i).padStart(2,"0")+":00";hostelGateRows.push([s.programme.toUpperCase(),s.name,machineNo,stamp,"C/IN","1"]);hostelGateEvents.push({machineNo:machineNo,dateKey:date,locationId:"1",status:"C/IN",name:s.name});});});
@@ -410,26 +408,245 @@ function injectPracticeFiles() {
 /* -------------------- PART 3: STICKY BANNER -------------------- */
 /* -------------------- PART 4: 20-LESSON GUIDED COACH -------------------- */
 var lessons = [
-  {title:"Welcome & Signing In Safely",view:"dashboard",target:"officerLoginGate",what:"The public screen lets visitors see the dashboard, but school records stay behind the QA Officer sign-in. Practice Mode uses a separate database and a virtual PIN.",steps:["Enter your name in the officer sign-in box.","Type the Practice PIN 123456.","Click Sign In. A successful practice sign-in never authenticates with the real school service."],take:"dashboard"},
-  {title:"Your Home Screen (Dashboard & Top Bar)",view:"dashboard",target:"view-dashboard",what:"The dashboard gives a quick picture of students, lecturers, lecture logs, sessions, attendance sheets and courses. The top bar holds your session, semester, theme and save status.",steps:["Review the six summary cards.","Find the Session and Semester selectors at the top.","Switch Light/Dark mode with the theme button.","Notice the Save Changes Now button; it saves only to the virtual cloud here."],take:"dashboard"},
-  {title:"Students — Finding Anyone Fast",view:"students",target:"studentSearch",what:"The Students screen is the master student register. Search by name or registration number, then narrow the list by programme and level.",steps:["Open Students from the left menu.","Type CHIAMAKA in the search box.","Try the Programme and Level filters.","Use the page controls to move through the register; the normal register displays 50 records per page."],take:"students"},
-  {title:"Students — Opening a Student's Complete File (DSA Dossier)",view:"students",target:"studentsTableBody",what:"A student's full file brings related school records together: discipline, hostel, class attendance, QA absences, remedial activity and audit history.",steps:["Find CHIAMAKA NWOSU and click View.","Inspect each section of the full student file.","Use the dossier search field to narrow its entries.","Try a section report button where available."],take:"students"},
-  {title:"Students — Adding & Editing a Student",view:"students",target:"btnAddStudent",what:"The student form creates or updates a student profile. Names are normalised to capital letters, and a new student can receive a temporary registration number until the official number is assigned.",steps:["Click + Add Student and inspect the required fields.","Enter a practice name, programme, level and hostel; do not use a real student's details.","Save the practice record.","Open Edit on a record and review the Reason and Official REF fields before saving."],take:"students"},
-  {title:"Students — Bulk Import (CSV) & Register Reports",view:"students",target:"btnImportStudentsCsv",what:"CSV import lets staff bring several student records in at once. The review queue highlights duplicates and other rows that need a decision before import.",steps:["Click Import CSV.","Choose Load Sample Student CSV (Practice).","Inspect the review queue, including the intentional CHIAMAKA duplicate-name conflict.","Return to the register and try Generate Register Report for PDF, Word or CSV."],take:"students"},
-  {title:"New Student Requests (Online Self-Registration)",view:"pending",target:"pendingTableBody",what:"Online applicants appear here after using the student registration page. Review their details and either approve them into the student register or reject them with a clear reason.",steps:["Open New Student Requests and click Review on an applicant.","Inspect the submitted details and portrait.","Approve one applicant and enter Practice PIN 123456 if requested.","Review the other applicant, choose Reject, enter a reason and confirm."],take:"pending"},
-  {title:"Lecturers — Staff & Semester Contract Hours",view:"lecturers",target:"btnAddLecturer",what:"The Lecturers register stores staff identity, course assignments and the sessions they teach. Contract hours are recorded per semester, not as a monthly total.",steps:["Open Lecturers and inspect the four sample staff records.","Click + Add Lecturer to inspect the form.","Review Staff ID, course assignment, session and Contract Hours per Semester fields.","Close the form without saving if you do not need another practice record."],take:"lecturers"},
-  {title:"School Sessions & Semesters",view:"sessions",target:"sessionsList",what:"A school session can contain any number of semesters. Semester date ranges and the session's programme and level scope guide class schedules and lecturer-hour calculations.",steps:["Open School Sessions and open the 2026/2027 PRACTICE SESSION.","Inspect 1st Semester and 2nd Semester dates.","Review the included programmes and all three levels.","Close the session form without changing the practice calendar."],take:"sessions"},
-  {title:"Settings — Programmes, Levels, Courses & Timetable Setup",view:"settings",target:"programmesList",what:"Settings holds the school structures used by the rest of the system: programmes, levels, courses and timetable slots. Keep course codes unique and assignments aligned with the right class.",steps:["Open Settings & PIN.","Find Programmes and Levels.","Scroll to Courses and inspect the six sample course codes.","Find the Timetable Editor and inspect its programme and level selectors."],take:"settings"},
-  {title:"Weekly Timetable Board",view:"timetable-board",target:"timetableBoard",what:"The weekly timetable shows when a class is scheduled and which lecturer and course belong in each slot. Selecting a slot can open a pre-filled lecture record.",steps:["Open Weekly Timetable.","Choose Nursing and 100 Level, then render the board.","Click a course slot to inspect the pre-filled lecture details.","Close the lecture form without saving if you are only exploring."],take:"timetable-board"},
-  {title:"Today's Lectures (Daily QA) & Release Report Popup",view:"qa-daily",target:"qaDailyTableBody",what:"The daily board lists scheduled classes so an officer can record whether each lecture was held, partly held or missed. A report can be released as a PDF or Word document.",steps:["Open Today's Lectures and load the day board.","Open a lecture and choose Held or Missed; inspect the attendance and lesson fields.","Save only if you want to practise a change in this sandbox.","Click Print Daily Report, enter an Officer Name and choose PDF or Word."],take:"qa-daily"},
-  {title:"Weekly QA & Monthly QA Compliance Reports",view:"qa-weekly",target:"btnBuildWeeklyQa",what:"Weekly and monthly QA reports compare scheduled teaching with delivered and missed sessions. Use the summary percentages to spot gaps in delivery.",steps:["Open Weekly QA Report and select a date range and class.","Click Build Report and read Scheduled, Delivered and Missed totals.","Open Monthly QA Report and build the monthly summary.","Compare the compliance percentages and course-level detail."],take:"qa-weekly"},
-  {title:"Class Sign-In Sheets (Printable Paper Registers)",view:"attendance",target:"btnBuildAttendance",what:"Class Sign-In Sheets creates a printable register for a selected programme and level. Staff can print it or download an editable Word copy for class use.",steps:["Open Class Sign-In Sheets.","Choose Nursing and 100 Level.","Click Build Sheet and inspect the student rows and course columns.","Try Print or Download Word."],take:"attendance"},
-  {title:"Hostel & Gate Fees — Uploading & Editing the Preview",view:"hostel",target:"hostelDropzone",what:"The Hostel screen compares the gate machine export with the hostel roster. Its preview lets an officer correct attendance marks and recalculate absence days and fees before saving a report.",steps:["Open Hostel & Gate Fees.","Click Load Sample Gate Excel File (Practice).","Inspect the Editable Preview Table and change one A mark to P.","Use Recalculate Preview and watch Days Absent and Fine (₦) update."],take:"hostel"},
-  {title:"Hostel & Gate Fees — Resolving Conflicts, Biometric Linking & Saved Runs",view:"hostel",target:"hostelConflictCard",what:"Advanced setup contains the review queues for gate mismatches, unclear biometric matches and unlinked entries. It also includes the master hostel roster, training tools and saved reports.",steps:["Open Advanced setup; the coach expands it for you.","In Hostel Conflicts, compare Keep master, Accept gate and Dismiss.","Review Needs Clarification and Unlinked Pool; inspect suggested student matches.","Find Train from gate export, Master hostel roster and Saved Hostel Reports; open a saved report to view, edit or download."],take:"hostel"},
-  {title:"Discipline Cases (Student Affairs)",view:"discipline",target:"disciplineTableBody",what:"The Discipline register records official student-affairs cases and their progress. Each formal case needs its own official reference so it can be traced later.",steps:["Open Discipline Cases and inspect the two sample cases.","Click New Case and review the subject, summary and status fields.","Notice that an Official REF is required for a formal case.","Try Print Register."],take:"discipline"},
-  {title:"Remedial Classes (All 6 Tabs)",view:"remedial",target:"remPanel-setup",what:"The Remedial area manages make-up teaching from setup through enrolment, timetable, attendance logging, weekly review and summary.",steps:["Open Remedial Classes and inspect Setup.","Move through Enrolment and Timetable.","Open Logging, load a sheet and practise marking P or A.","Build the Weekly report, then build the Summary."],take:"remedial"},
-  {title:"Lecturer Hours, Reports Hub & Activity History",view:"lecturer-hours",target:"btnBuildLecturerHours",what:"Lecturer Hours compares semester contract hours with teaching delivered. Reports & Downloads gathers exports, while Activity History records who did what, when and under which reference.",steps:["Open Lecturer Hours and build the semester report.","Visit Reports & Downloads and inspect the available exports.","Open Activity History and review the sample actions, timestamps and REF numbers.","Return to the dashboard when finished."],take:"lecturer-hours"},
-  {title:"Saving Work Online, Backups, Changing PIN & Signing Out (Graduation!)",view:"settings",target:"btnSaveSyncTop",what:"Save Changes Now sends updates to the virtual encrypted cloud and confirms the practice copy. Settings also contains backup and PIN tools; none of these actions can alter the real college records in this mode.",steps:["Click Save Changes Now and watch the virtual save confirmation.","Open Full Backup & Restore and inspect download and restore options; do not restore a real backup.","Find Change QA Officer PIN and practise changing the virtual PIN if desired.","You have completed the guided tour. Choose Restart Tour, Practice Freely or Exit to Real School System."] ,take:"settings"}
+  {
+    "title": "Welcome to Practice Mode",
+    "view": "dashboard",
+    "target": "officerLoginGate",
+    "what": "You are in the Safe Practice Room — nothing you click here can hurt real school records! If the sign-in box is not open, click 'Take Me There' below. Type your full name, type the practice PIN 123456, and click Sign In.",
+    "steps": [
+      "Click Take Me There if the sign-in box is not open.",
+      "Type your full name in the officer name box.",
+      "Type 123456 in the PIN box, then click Sign In."
+    ]
+  },
+  {
+    "title": "Getting to Know Your Home Screen",
+    "view": "dashboard",
+    "target": "view-dashboard",
+    "what": "The dashboard is your starting page. It gives you a quick look at students, staff, classes and other school activity.",
+    "steps": [
+      "Look through the summary cards on the page.",
+      "Find the Session and Semester boxes near the top.",
+      "Try the Light/Dark theme button.",
+      "Find Save Changes Now. It saves only your practice work here."
+    ]
+  },
+  {
+    "title": "Finding a Student",
+    "view": "students",
+    "target": "studentSearch",
+    "what": "The Students page is the school's main student list. You can search by a student's name or registration number, then narrow the list by programme or level.",
+    "steps": [
+      "Click Students in the left menu.",
+      "Click the search box and type CHIAMAKA.",
+      "Try choosing a Programme and a Level.",
+      "Use the page buttons at the bottom to see more names."
+    ]
+  },
+  {
+    "title": "Opening a Student's Full Record",
+    "view": "students",
+    "target": "studentsTableBody",
+    "what": "A student's full record brings useful information together, including attendance, hostel details and any student affairs cases.",
+    "steps": [
+      "Find CHIAMAKA NWOSU in the list and click View.",
+      "Look through the different parts of the student record.",
+      "Try the search box inside the record.",
+      "If you see a report button, open it to see what it contains."
+    ]
+  },
+  {
+    "title": "Adding and Editing a Student",
+    "view": "students",
+    "target": "btnAddStudent",
+    "what": "The student form is where you add a new student or correct an existing record. Names are changed to CAPITAL LETTERS automatically.",
+    "steps": [
+      "Click + Add Student to open the form.",
+      "Enter made-up practice details, then choose a programme, level and hostel.",
+      "Click Save to add the practice student.",
+      "Choose Edit on a sample student and look through the fields."
+    ]
+  },
+  {
+    "title": "Adding Many Students at Once",
+    "view": "students",
+    "target": "btnImportStudentsCsv",
+    "what": "You can add several students from one spreadsheet file instead of entering them one at a time. The review page helps you check the names before they are added.",
+    "steps": [
+      "Click Import CSV.",
+      "Choose Load Sample Student CSV (Practice).",
+      "Look through the rows and notice the sample name that appears more than once.",
+      "Return to the list and try Generate Register Report."
+    ]
+  },
+  {
+    "title": "Reviewing New Student Requests",
+    "view": "pending",
+    "target": "pendingTableBody",
+    "what": "New Student Requests shows people who have filled in the online registration form. You can check their details before adding them to the main student list.",
+    "steps": [
+      "Click New Student Requests, then click Review on an applicant.",
+      "Look through the details and photograph.",
+      "Click Approve for one practice applicant and enter PIN 123456 if asked.",
+      "Review the other applicant, click Reject, give a reason and confirm."
+    ]
+  },
+  {
+    "title": "Looking After Lecturer Records",
+    "view": "lecturers",
+    "target": "btnAddLecturer",
+    "what": "The Lecturers page keeps staff details and the courses they teach. It also records each lecturer's teaching hours for each semester.",
+    "steps": [
+      "Click Lecturers and look through the four sample staff records.",
+      "Click + Add Lecturer to open the form.",
+      "Find Staff ID, Course Assignment and Contract Hours per Semester.",
+      "Close the form without saving."
+    ]
+  },
+  {
+    "title": "Understanding Sessions and Semesters",
+    "view": "sessions",
+    "target": "sessionsList",
+    "what": "A school session can have one semester or several semesters. The dates you enter help the school keep teaching and reports in the right period.",
+    "steps": [
+      "Click School Sessions.",
+      "Open 2026/2027 PRACTICE SESSION.",
+      "Look at the dates for 1st Semester and 2nd Semester.",
+      "Check the programmes and levels included, then close the form."
+    ]
+  },
+  {
+    "title": "Setting Up the School",
+    "view": "settings",
+    "target": "programmesList",
+    "what": "Settings is where you manage programmes, levels, courses and class timetables. These details help the other parts of the system work properly.",
+    "steps": [
+      "Click Settings & PIN.",
+      "Find the Programmes and Levels sections.",
+      "Scroll down to Courses and look through the sample courses.",
+      "Find Timetable Editor and look at its programme and level choices."
+    ]
+  },
+  {
+    "title": "Viewing the Weekly Timetable",
+    "view": "timetable-board",
+    "target": "timetableBoard",
+    "what": "The weekly timetable shows which class has a lesson, who is teaching and when it will happen. You can open a lesson to see its details.",
+    "steps": [
+      "Click Weekly Timetable.",
+      "Choose Nursing and 100 Level.",
+      "Look through the lessons shown for the week.",
+      "Click a lesson to see its details, then close the form without saving."
+    ]
+  },
+  {
+    "title": "Checking Today's Lectures",
+    "view": "qa-daily",
+    "target": "qaDailyTableBody",
+    "what": "Today's Lectures helps you record whether each planned class took place, partly took place or was missed. You can also prepare a report for the day.",
+    "steps": [
+      "Click Today's Lectures and open the day's list.",
+      "Open a lesson and look at the Held, Partial and Missed choices.",
+      "Save only if you want to try making a practice change.",
+      "Click Print Daily Report, enter an Officer Name and choose PDF or Word."
+    ]
+  },
+  {
+    "title": "Reading Weekly and Monthly Reports",
+    "view": "qa-weekly",
+    "target": "btnBuildWeeklyQa",
+    "what": "These reports compare the lessons that were planned with the lessons that actually took place. They help you see where teaching is going well and where follow-up may be needed.",
+    "steps": [
+      "Click Weekly QA Report and choose a date range and class.",
+      "Click Build Report and look at the totals.",
+      "Open Monthly QA Report and build its report.",
+      "Compare the results for the week and the month."
+    ]
+  },
+  {
+    "title": "Preparing Class Sign-In Sheets",
+    "view": "attendance",
+    "target": "btnBuildAttendance",
+    "what": "A class sign-in sheet is a list teachers can use to mark who is present or absent. You can print it or download a Word copy.",
+    "steps": [
+      "Click Class Sign-In Sheets.",
+      "Choose Nursing and 100 Level.",
+      "Click Build Sheet and look through the student names.",
+      "Try Print or Download Word."
+    ]
+  },
+  {
+    "title": "Checking Hostel and Gate Records",
+    "view": "hostel",
+    "target": "hostelDropzone",
+    "what": "The Hostel page compares gate machine entries with the school's hostel list. You can check the preview and correct a mark before saving the report.",
+    "steps": [
+      "Click Hostel & Gate Fees.",
+      "Click Load Sample Gate Excel File (Practice).",
+      "Find Editable Preview Table and change one A mark to P.",
+      "Click Recalculate Preview and see how Days Absent and Fine (₦) change."
+    ]
+  },
+  {
+    "title": "Reviewing Hostel Mismatches",
+    "view": "hostel",
+    "target": "hostelConflictCard",
+    "what": "Sometimes a gate entry does not match the hostel list, or the machine cannot clearly identify a student. This page helps you review those cases and check saved hostel reports.",
+    "steps": [
+      "Open Advanced setup; the page will expand for you.",
+      "In Hostel Conflicts, compare Keep master, Accept gate and Dismiss.",
+      "Look through Needs Clarification and Unlinked Pool.",
+      "Find Master hostel roster and Saved Hostel Reports, then open a sample report."
+    ]
+  },
+  {
+    "title": "Recording Student Affairs Cases",
+    "view": "discipline",
+    "target": "disciplineTableBody",
+    "what": "Discipline Cases keeps a record of student affairs concerns and what the school has done about them. A formal case needs an official reference number so it can be found later.",
+    "steps": [
+      "Click Discipline Cases and look through the two sample cases.",
+      "Click New Case and look at the form.",
+      "Find the Official REF field and read its note.",
+      "Try Print Register."
+    ]
+  },
+  {
+    "title": "Getting to Know Remedial Classes",
+    "view": "remedial",
+    "target": "remPanel-setup",
+    "what": "Remedial Classes helps the school arrange extra lessons for students. You can set them up, add students, prepare a timetable and record attendance.",
+    "steps": [
+      "Click Remedial Classes and look through Setup.",
+      "Open Enrolment, then open Timetable.",
+      "Open Logging and try marking a student P or A.",
+      "Open Weekly report, then Summary."
+    ]
+  },
+  {
+    "title": "Checking Lecturer Hours and School Reports",
+    "view": "lecturer-hours",
+    "target": "btnBuildLecturerHours",
+    "what": "The Lecturer Hours page compares each lecturer's semester teaching hours with the hours they are expected to complete. Reports & Downloads and Activity History help you find saved reports and see what has been done.",
+    "steps": [
+      "Click Lecturer Hours and build the semester report.",
+      "Open Reports & Downloads and look through the available files.",
+      "Open Activity History and look at the actions, dates and reference numbers.",
+      "Click Dashboard to return to the home screen."
+    ]
+  },
+  {
+    "title": "Saving Your Work and Finishing the Tour",
+    "view": "settings",
+    "target": "btnSaveSyncTop",
+    "what": "Save Changes Now stores your practice work in the separate practice area. You can also look at backup and PIN options, but none of these practice actions can change real school records.",
+    "steps": [
+      "Click Save Changes Now and wait for the practice save message.",
+      "Open Full Backup & Restore and look at the choices. Do not restore a real school backup.",
+      "Find Change QA Officer PIN and look at how the practice PIN can be changed.",
+      "When you finish, choose Restart Tour, Practice Freely or Exit to Real School System."
+    ]
+  }
 ];
 
 var currentLesson=0,coachVisible=true,lessonMenuOpen=false,dragState=null;
@@ -463,7 +680,7 @@ function createBanner(){
 function createCoach(){
   if(el("eocnsDemoCoach"))return;
   var card=document.createElement("aside");card.id="eocnsDemoCoach";card.setAttribute("aria-live","polite");
-  card.innerHTML='<div class="coach-head" id="demoCoachDrag"><div><div class="coach-kicker" id="demoCoachKicker">Lesson 1 of 20</div><h3 id="demoCoachTitle">Welcome &amp; Signing In Safely</h3></div><button type="button" id="demoCoachDock" aria-label="Hide coach" style="background:#ffffff20;color:#fff;border:1px solid #ffffff66;border-radius:6px;padding:5px 9px">—</button></div><div class="coach-body"><strong>What this screen does</strong><p id="demoCoachWhat"></p><strong>Try it now (Hands-On)</strong><ol id="demoCoachSteps"></ol></div><div class="coach-actions"><button type="button" id="demoBack" class="btn eocns-demo-muted btn--sm">← Back</button><button type="button" id="demoTakeMeThere" class="btn eocns-demo-muted btn--sm">Take Me There</button><button type="button" id="demoNext" class="btn eocns-demo-primary btn--sm">Next Lesson →</button><button type="button" id="demoExitTraining" class="btn eocns-demo-gold btn--sm">Exit Training</button></div>';
+  card.innerHTML='<div class="coach-head" id="demoCoachDrag"><div class="coach-head-copy"><div class="coach-kicker" id="demoCoachKicker">Lesson 1 of 20</div><h3 id="demoCoachTitle">Welcome to Practice Mode</h3><div class="coach-drag-meta"><span class="coach-grip" aria-hidden="true">⋮⋮</span><span>Drag to move</span></div></div><button type="button" id="demoCoachDock" aria-label="Hide coach" style="background:#ffffff20;color:#fff;border:1px solid #ffffff66;border-radius:6px;padding:5px 9px">—</button></div><div id="demoCoachMain" class="coach-main"><div class="coach-body"><strong>What this screen does</strong><p id="demoCoachWhat"></p><strong>Try it now (Hands-On)</strong><ol id="demoCoachSteps"></ol></div><div class="coach-actions"><button type="button" id="demoBack" class="btn eocns-demo-muted btn--sm">← Back</button><button type="button" id="demoTakeMeThere" class="btn eocns-demo-muted btn--sm">Take Me There</button><button type="button" id="demoNext" class="btn eocns-demo-primary btn--sm">Next Lesson →</button><button type="button" id="demoExitTraining" class="btn eocns-demo-gold btn--sm">Exit Training</button></div></div><div id="demoCoachGrad" class="coach-grad" hidden><div class="coach-body"><p>You have reached the end of all 20 guided lessons. You can now explore the EOCNS QA System in the Safe Practice Room.</p><p><strong>Remember:</strong> every practice record, PIN and save stays separate from the real school records.</p></div><div class="coach-actions"><button type="button" id="demoRestartTour" class="btn eocns-demo-primary btn--sm">Restart Tour</button><button type="button" id="demoFreePractice" class="btn eocns-demo-muted btn--sm">Practice Freely</button><button type="button" id="demoGraduateExit" class="btn eocns-demo-gold btn--sm">Exit to Real School System</button></div></div>';
   document.body.appendChild(card);
   el("demoCoachDock").addEventListener("click",function(){coachVisible=false;card.hidden=true;el("demoCoachToggle").textContent="Show Coach";});
   el("demoBack").addEventListener("click",function(){goLesson(currentLesson-1);});
@@ -475,31 +692,49 @@ function createCoach(){
 function clampCoachPosition(card){
   if(!card||card.hidden)return;
   var rect=card.getBoundingClientRect(),bar=el("eocnsDemoBar");
+  var minLeft=8,maxLeft=Math.max(8,window.innerWidth-card.offsetWidth-8);
   var minTop=bar?bar.getBoundingClientRect().bottom+8:8;
-  var maxLeft=Math.max(8,window.innerWidth-rect.width-8),maxTop=Math.max(minTop,window.innerHeight-rect.height-8);
-  card.style.left=Math.min(maxLeft,Math.max(8,rect.left))+"px";
+  var maxTop=Math.max(minTop,window.innerHeight-card.offsetHeight-8);
+  card.style.left=Math.min(maxLeft,Math.max(minLeft,rect.left))+"px";
   card.style.top=Math.min(maxTop,Math.max(minTop,rect.top))+"px";
   card.style.right="auto";card.style.bottom="auto";
 }
 function makeDraggable(card,handle){
-  if(!card||!handle||handle.__eocnsDragBound)return;handle.__eocnsDragBound=true;
+  if(!card||!handle||handle.__eocnsDragBound)return;
+  handle.__eocnsDragBound=true;
+  handle.style.touchAction="none";handle.style.userSelect="none";handle.style.cursor="grab";
   handle.addEventListener("pointerdown",function(e){
-    if(e.target.closest("button"))return;if(e.pointerType==="mouse"&&e.button!==0)return;
+    if(e.target.closest("button"))return;
+    if(e.pointerType==="mouse"&&e.button!==0)return;
     var rect=card.getBoundingClientRect();
-    if(!card.dataset.dragPositioned){card.style.left=rect.left+"px";card.style.top=rect.top+"px";card.style.right="auto";card.style.bottom="auto";card.dataset.dragPositioned="1";}
+    if(!card.dataset.dragPositioned){
+      card.style.left=rect.left+"px";card.style.top=rect.top+"px";
+      card.style.right="auto";card.style.bottom="auto";card.dataset.dragPositioned="1";
+    }
     dragState={pointerId:e.pointerId,offsetX:e.clientX-rect.left,offsetY:e.clientY-rect.top};
-    handle.classList.add("is-dragging");try{handle.setPointerCapture(e.pointerId);}catch(_){}e.preventDefault();
+    handle.classList.add("is-dragging");
+    try{handle.setPointerCapture(e.pointerId);}catch(_){}
+    e.preventDefault();
   });
   handle.addEventListener("pointermove",function(e){
     if(!dragState||dragState.pointerId!==e.pointerId)return;
-    var rect=card.getBoundingClientRect(),bar=el("eocnsDemoBar"),minTop=bar?bar.getBoundingClientRect().bottom+8:8;
-    var maxLeft=Math.max(8,window.innerWidth-rect.width-8),maxTop=Math.max(minTop,window.innerHeight-rect.height-8);
-    card.style.left=Math.min(maxLeft,Math.max(8,e.clientX-dragState.offsetX))+"px";
+    var bar=el("eocnsDemoBar"),minLeft=8,maxLeft=Math.max(8,window.innerWidth-card.offsetWidth-8);
+    var barHeight=bar?bar.getBoundingClientRect().bottom:0;
+    var minTop=barHeight+8,maxTop=Math.max(minTop,window.innerHeight-card.offsetHeight-8);
+    card.style.left=Math.min(maxLeft,Math.max(minLeft,e.clientX-dragState.offsetX))+"px";
     card.style.top=Math.min(maxTop,Math.max(minTop,e.clientY-dragState.offsetY))+"px";
   });
-  function stopDrag(e){if(!dragState||(e&&dragState.pointerId!==e.pointerId))return;dragState=null;handle.classList.remove("is-dragging");clampCoachPosition(card);}
-  handle.addEventListener("pointerup",stopDrag);handle.addEventListener("pointercancel",stopDrag);handle.addEventListener("lostpointercapture",stopDrag);
-  if(!window.__eocnsCoachResizeBound){window.__eocnsCoachResizeBound=true;window.addEventListener("resize",function(){clampCoachPosition(el("eocnsDemoCoach"));});}
+  function stopDrag(e){
+    if(!dragState||(e&&dragState.pointerId!==e.pointerId))return;
+    dragState=null;handle.classList.remove("is-dragging");clampCoachPosition(card);
+  }
+  handle.addEventListener("pointerup",stopDrag);
+  handle.addEventListener("pointercancel",stopDrag);
+  handle.addEventListener("lostpointercapture",stopDrag);
+  if(!window.__eocnsCoachResizeBound){
+    window.__eocnsCoachResizeBound=true;
+    window.addEventListener("resize",function(){clampCoachPosition(el("eocnsDemoCoach"));});
+  }
 }
 function toggleLessonMenu(){
   if(el("eocnsDemoMenu")){el("eocnsDemoMenu").remove();lessonMenuOpen=false;return;}
@@ -536,9 +771,10 @@ function takeToLesson(lesson){
 function renderLesson(){
   var l=lessons[currentLesson],n=currentLesson+1;
   clearSpotlight();
-  var lessonBody=el("eocnsDemoCoach").querySelector(".coach-body");if(lessonBody)lessonBody.scrollTop=0;
+  el("demoCoachMain").hidden=false;el("demoCoachGrad").hidden=true;
+  var lessonBody=el("demoCoachMain").querySelector(".coach-body");if(lessonBody)lessonBody.scrollTop=0;
   el("demoCoachKicker").textContent="Lesson "+n+" of 20";
-  el("demoCoachTitle").textContent="Lesson "+n+" of 20: "+l.title;
+  el("demoCoachTitle").textContent=l.title;
   el("demoCoachWhat").textContent=l.what;
   var list=el("demoCoachSteps");list.innerHTML="";
   l.steps.forEach(function(step){var li=document.createElement("li");li.textContent=step;list.appendChild(li);});
@@ -556,12 +792,13 @@ function goLesson(index){
 }
 function showGraduation(){
   var card=el("eocnsDemoCoach");
-  card.innerHTML='<div class="coach-head" id="demoCoachDrag"><div><div class="coach-kicker">PRACTICE COMPLETE</div><h3>Training Complete!</h3><div class="coach-drag-meta"><span class="coach-grip" aria-hidden="true">⋮⋮</span><span>Drag to move</span></div></div></div><div class="coach-body"><p>You have reached the end of all 20 guided lessons. You can now explore the EOCNS QA System in the virtual classroom.</p><p><strong>Remember:</strong> every practice record, PIN and save operation stays inside this browser sandbox.</p></div><div class="coach-actions"><button type="button" id="demoRestartTour" class="btn eocns-demo-primary btn--sm">Restart Tour</button><button type="button" id="demoFreePractice" class="btn eocns-demo-muted btn--sm">Practice Freely</button><button type="button" id="demoGraduateExit" class="btn eocns-demo-gold btn--sm">Exit to Real School System</button></div>';
-  el("demoRestartTour").addEventListener("click",function(){goLesson(0);});
-  el("demoFreePractice").addEventListener("click",function(){card.hidden=true;coachVisible=false;el("demoCoachToggle").textContent="Show Coach";});
-  el("demoGraduateExit").addEventListener("click",function(){window.exitEocnsDemoMode();});
-  makeDraggable(card,el("demoCoachDrag"));
-  var graduationBody=card.querySelector(".coach-body");if(graduationBody)graduationBody.scrollTop=0;
+  el("demoCoachMain").hidden=true;el("demoCoachGrad").hidden=false;
+  var graduationBody=el("demoCoachGrad").querySelector(".coach-body");if(graduationBody)graduationBody.scrollTop=0;
+  el("demoCoachKicker").textContent="PRACTICE COMPLETE";
+  el("demoCoachTitle").textContent="Training Complete!";
+  el("demoRestartTour").onclick=function(){goLesson(0);};
+  el("demoFreePractice").onclick=function(){card.hidden=true;coachVisible=false;el("demoCoachToggle").textContent="Show Coach";};
+  el("demoGraduateExit").onclick=function(){window.exitEocnsDemoMode();};
   currentLesson=19;updateProgress();
 }
 function initDemoUi(){

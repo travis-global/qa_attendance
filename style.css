@@ -1463,8 +1463,11 @@ body #eocnsDemoMenu button:focus-visible, body #eocnsDemoDrawer button:focus-vis
 /* Coach layout: fixed header/footer and independently scrollable lesson content. */
 body #eocnsDemoCoach { position:fixed !important; z-index:10002 !important; right:20px; bottom:18px; width:min(440px,calc(100vw - 32px)) !important; max-height:min(78vh,calc(100vh - 96px)) !important; display:flex !important; flex-direction:column !important; overflow:hidden !important; background:#fff !important; color:#172033 !important; border:2px solid var(--eocns-gold) !important; border-radius:16px !important; box-shadow:0 18px 55px rgba(7,26,53,.3) !important; font:15px/1.55 Inter,"Segoe UI",Arial,sans-serif !important; pointer-events:auto !important; }
 body #eocnsDemoCoach[hidden] { display:none !important; }
+body #eocnsDemoCoach { pointer-events:auto !important; display:flex !important; flex-direction:column !important; overflow:hidden !important; max-height:min(78vh,calc(100vh - 96px)) !important; }
+body #eocnsDemoCoach .coach-main, body #eocnsDemoCoach .coach-grad { display:flex; flex:1 1 auto; flex-direction:column; min-height:0; }
+body #eocnsDemoCoach .coach-main[hidden], body #eocnsDemoCoach .coach-grad[hidden] { display:none !important; }
 body #eocnsDemoCoach .coach-head, body #eocnsDemoCoach .coach-actions { flex:0 0 auto !important; pointer-events:auto !important; }
-body #eocnsDemoCoach .coach-body { flex:1 1 auto !important; min-height:0 !important; overflow-y:auto !important; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:16px 6px 16px 18px !important; pointer-events:auto !important; scrollbar-width:thin; scrollbar-color:#9aa9bd #edf1f6; }
+body #eocnsDemoCoach .coach-body { flex:1 1 auto !important; min-height:0 !important; overflow-y:auto !important; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:16px 6px 16px 18px !important; pointer-events:auto !important; scrollbar-gutter:stable; scrollbar-width:thin; scrollbar-color:#9aa9bd #edf1f6; }
 body #eocnsDemoCoach .coach-body::-webkit-scrollbar { width:8px; }
 body #eocnsDemoCoach .coach-body::-webkit-scrollbar-track { background:#edf1f6; border-radius:8px; }
 body #eocnsDemoCoach .coach-body::-webkit-scrollbar-thumb { background:#9aa9bd; border:2px solid #edf1f6; border-radius:8px; }
