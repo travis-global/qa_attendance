@@ -6836,6 +6836,7 @@ async function publishPendingListToRepo(message) {
     body: JSON.stringify({
       action: "publish",
       publishKey: key,
+      token: tok,
       message: message || "Update pending student registrations",
       files: files
     })
