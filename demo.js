@@ -304,6 +304,8 @@ window.fetch = async function(input,init) {
   }
   if(url&&url.hostname==="api.github.com")return jsonResponse({message:"Practice Mode blocks external repository requests."},200);
   var path=url.pathname.replace(/^\/+/,"");
+  var dataPathIndex=path.lastIndexOf("data/");
+  if(dataPathIndex>=0)path=path.slice(dataPathIndex);
   if(method==="GET"&&Object.prototype.hasOwnProperty.call(DEMO_CLOUD,path))return jsonResponse(clone(DEMO_CLOUD[path]));
   if(method==="GET"&&/^data\/[^/]+\.json$/i.test(path))return jsonResponse([]);
   return jsonResponse({ok:true,practice:true});

@@ -1406,3 +1406,134 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .report-release-dialog { max-width: none; max-height: 92vh; border-radius: 18px 18px 0 0; }
   .report-release-dialog .modal__header, .report-release-dialog .modal__body, .report-release-footer { padding-left: 18px; padding-right: 18px; }
 }
+
+
+/* ============================================================
+   EOCNS Practice & Training Mode — branded, accessible controls
+   ============================================================ */
+:root {
+  --eocns-navy: #1B3A6B;
+  --eocns-gold: #B8860B;
+  --eocns-green: #1B7A3D;
+  --eocns-warm: #FFFBEB;
+}
+.dashboard-hero-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:14px; }
+.dashboard-hero-actions .dashboard-signin { margin-top:0; }
+.eocns-practice-entry {
+  min-height:48px !important; padding:11px 16px !important; display:inline-flex;
+  align-items:center; justify-content:center; border:1px solid var(--eocns-gold) !important;
+  border-radius:9px; background:var(--eocns-warm) !important; color:var(--eocns-navy) !important;
+  font:700 14px/1.35 Inter,"Segoe UI",Arial,sans-serif; text-align:center; cursor:pointer;
+  box-shadow:0 2px 6px rgba(27,58,107,.08);
+}
+.eocns-practice-entry:hover { background:#f8edc9 !important; border-color:var(--eocns-navy) !important; transform:translateY(-1px); }
+.eocns-practice-entry:focus-visible { outline:3px solid var(--eocns-gold); outline-offset:3px; }
+#officerLoginGate .eocns-practice-entry { flex:1 1 100%; }
+.eocns-training-card { border:1px solid rgba(184,134,11,.42); border-left:4px solid var(--eocns-gold); background:linear-gradient(135deg,#fff 0%,var(--eocns-warm) 100%); }
+.eocns-training-card .card__header h3 { color:var(--eocns-navy); }
+body:has(#eocnsDemoBar) [data-start-demo="1"] { display:none !important; }
+
+/* The banner is inserted before .app and occupies its own layout row. */
+body #eocnsDemoBar {
+  position:sticky !important; top:0 !important; z-index:10000 !important;
+  display:flex !important; align-items:center !important; flex-wrap:wrap; gap:12px !important;
+  min-height:68px; width:100%; padding:10px clamp(12px,2vw,24px) !important;
+  background:var(--eocns-navy) !important; color:#fff !important;
+  border-bottom:3px solid var(--eocns-gold); box-shadow:0 5px 18px rgba(15,35,65,.2);
+  font:14px/1.4 Inter,"Segoe UI",Arial,sans-serif !important;
+}
+body #eocnsDemoBar .demo-brand { display:flex !important; align-items:center; gap:10px; min-width:220px; flex:1 1 260px; }
+body #eocnsDemoBar .demo-pill { background:var(--eocns-gold) !important; color:#fff !important; border:1px solid #e9c66e; border-radius:999px !important; padding:7px 11px !important; font-size:12px !important; font-weight:850 !important; letter-spacing:.07em; white-space:nowrap; }
+body #eocnsDemoBar .demo-reassure { color:#f8fafc; font-size:13px; }
+body #eocnsDemoBar .demo-progress { flex:1 1 180px; min-width:150px; max-width:300px; margin-left:auto; }
+body #eocnsDemoBar .demo-progress-label { display:flex; justify-content:space-between; gap:8px; margin-bottom:5px; color:#fff; font-size:12px !important; }
+body #eocnsDemoBar .demo-track { height:8px !important; background:#ffffff38 !important; border-radius:999px; overflow:hidden; }
+body #eocnsDemoBar .demo-fill { height:100%; background:#e9c66e !important; border-radius:999px; transition:width .25s ease; }
+body #eocnsDemoBar .demo-actions { display:flex !important; align-items:center; justify-content:flex-end; gap:7px !important; flex-wrap:wrap; }
+body #eocnsDemoBar button {
+  min-height:44px !important; padding:9px 12px !important; border:1px solid #ffffff70 !important;
+  border-radius:8px !important; background:#ffffff14 !important; color:#fff !important;
+  font:700 13px/1.25 Inter,"Segoe UI",Arial,sans-serif !important; cursor:pointer;
+}
+body #eocnsDemoBar button:hover { background:#ffffff28 !important; }
+body #eocnsDemoBar button.demo-exit { background:var(--eocns-gold) !important; border:2px solid #f5d98b !important; color:#142d52 !important; font-weight:850 !important; }
+body #eocnsDemoBar button:focus-visible, body #eocnsDemoCoach button:focus-visible,
+body #eocnsDemoMenu button:focus-visible, body #eocnsDemoDrawer button:focus-visible { outline:3px solid #f5d98b !important; outline-offset:3px !important; }
+
+/* The coach's blank outer surface passes clicks through to highlighted controls. */
+body #eocnsDemoCoach {
+  position:fixed !important; z-index:10002 !important; right:20px !important; bottom:18px !important;
+  width:min(440px,calc(100vw - 32px)) !important; max-height:min(72vh,720px) !important;
+  overflow:auto !important; background:#fff !important; color:#172033 !important;
+  border:2px solid var(--eocns-gold) !important; border-radius:16px !important;
+  box-shadow:0 18px 55px rgba(7,26,53,.3) !important;
+  font:15px/1.55 Inter,"Segoe UI",Arial,sans-serif !important; pointer-events:none !important;
+}
+body #eocnsDemoCoach .coach-head, body #eocnsDemoCoach .coach-body,
+body #eocnsDemoCoach .coach-actions { pointer-events:none !important; }
+body #eocnsDemoCoach button { pointer-events:auto !important; }
+body #eocnsDemoCoach .coach-head { background:var(--eocns-navy) !important; color:#fff !important; padding:15px 17px !important; }
+body #eocnsDemoCoach .coach-kicker { color:#f2d27b !important; font-size:12px !important; font-weight:850; letter-spacing:.08em; }
+body #eocnsDemoCoach h3 { color:#fff !important; font-size:18px !important; line-height:1.35; }
+body #eocnsDemoCoach .coach-body { padding:16px 18px !important; font-size:15px !important; line-height:1.6 !important; }
+body #eocnsDemoCoach .coach-body p, body #eocnsDemoCoach .coach-body li { font-size:15px !important; line-height:1.55 !important; }
+body #eocnsDemoCoach .coach-body li { padding:4px 0; }
+body #eocnsDemoCoach .coach-actions { display:flex !important; flex-wrap:wrap; gap:8px !important; padding:12px 16px 16px !important; border-top:1px solid #e5e7eb; }
+body #eocnsDemoCoach button { min-height:44px !important; padding:9px 13px !important; font-size:14px !important; font-weight:750 !important; border-radius:8px !important; cursor:pointer; }
+body #eocnsDemoCoach .eocns-demo-primary { background:var(--eocns-green) !important; border-color:var(--eocns-green) !important; color:#fff !important; }
+body #eocnsDemoCoach .eocns-demo-muted { background:#eff4fa !important; border:1px solid #b8c7d9 !important; color:var(--eocns-navy) !important; }
+body #eocnsDemoCoach .eocns-demo-gold { background:var(--eocns-gold) !important; border:1px solid var(--eocns-gold) !important; color:#fff !important; }
+
+/* Current demo.js names its jump menu #eocnsDemoMenu; Drawer is a styling alias. */
+body #eocnsDemoMenu, body #eocnsDemoDrawer {
+  position:fixed !important; z-index:10003 !important; top:84px !important; right:20px !important;
+  width:min(390px,calc(100vw - 32px)) !important; max-height:calc(100vh - 108px) !important;
+  overflow:auto !important; padding:16px !important; background:#fff !important; color:#172033 !important;
+  border:2px solid var(--eocns-gold) !important; border-radius:14px !important;
+  box-shadow:0 18px 55px rgba(7,26,53,.28) !important; font:14px/1.45 Inter,"Segoe UI",Arial,sans-serif !important;
+}
+body #eocnsDemoMenu h3, body #eocnsDemoDrawer h3 { color:var(--eocns-navy) !important; font-size:18px !important; }
+body #eocnsDemoMenu button, body #eocnsDemoDrawer button {
+  display:block; width:100%; min-height:44px !important; margin:5px 0; padding:9px 11px !important;
+  border:1px solid #d8dee8 !important; border-radius:8px !important; background:#f8fafc !important;
+  color:var(--eocns-navy) !important; text-align:left; font:600 13px/1.35 Inter,"Segoe UI",Arial,sans-serif !important;
+}
+body #eocnsDemoMenu button.active, body #eocnsDemoDrawer button.active { background:var(--eocns-warm) !important; border-color:var(--eocns-gold) !important; color:var(--eocns-navy) !important; }
+
+/* Gold/navy spotlight; highlighted app controls remain interactive. */
+.demo-spotlight {
+  position:relative !important; z-index:10001 !important; outline:3px solid var(--eocns-gold) !important;
+  outline-offset:5px !important; border-radius:8px;
+  box-shadow:0 0 0 7px rgba(184,134,11,.18),0 0 24px rgba(184,134,11,.55) !important;
+  animation:eocnsDemoPulse 1.7s ease-in-out infinite;
+}
+@keyframes eocnsDemoPulse {
+  0%,100% { outline-color:var(--eocns-gold); box-shadow:0 0 0 6px rgba(184,134,11,.16),0 0 18px rgba(184,134,11,.35); }
+  50% { outline-color:var(--eocns-navy); box-shadow:0 0 0 9px rgba(27,58,107,.14),0 0 25px rgba(184,134,11,.55); }
+}
+.demo-sample-btn, .eocns-demo-inject {
+  display:inline-flex !important; align-items:center; justify-content:center; min-height:46px !important;
+  margin:10px 0 !important; padding:10px 15px !important; border:2px dashed var(--eocns-gold) !important;
+  border-radius:9px !important; background:var(--eocns-warm) !important; color:var(--eocns-navy) !important;
+  font:750 14px/1.35 Inter,"Segoe UI",Arial,sans-serif !important; cursor:pointer;
+}
+.demo-sample-btn:hover, .eocns-demo-inject:hover { background:#f7edcf !important; border-color:var(--eocns-navy) !important; }
+body:has(#eocnsDemoBar) .topbar { top:72px; }
+@media (max-width:900px) {
+  body #eocnsDemoBar { gap:8px !important; padding:10px 12px !important; }
+  body #eocnsDemoBar .demo-brand { flex:1 1 100%; min-width:0; }
+  body #eocnsDemoBar .demo-progress { flex:1 1 150px; max-width:none; margin-left:0; }
+  body #eocnsDemoBar .demo-actions { justify-content:flex-start; }
+  body #eocnsDemoCoach { right:10px !important; bottom:10px !important; }
+  body:has(#eocnsDemoBar) .topbar { top:154px; }
+}
+@media (max-width:600px) {
+  body #eocnsDemoBar { display:block !important; min-height:0; }
+  body #eocnsDemoBar .demo-brand { margin-bottom:9px; }
+  body #eocnsDemoBar .demo-progress { margin:0 0 8px; max-width:none; }
+  body #eocnsDemoBar .demo-actions { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  body #eocnsDemoBar .demo-actions button { width:100%; }
+  body #eocnsDemoCoach { left:0 !important; right:0 !important; bottom:0 !important; width:100% !important; max-height:48vh !important; border-radius:16px 16px 0 0 !important; }
+  body #eocnsDemoMenu, body #eocnsDemoDrawer { top:12px !important; right:8px !important; left:8px !important; width:auto !important; max-height:calc(100vh - 24px) !important; }
+  body:has(#eocnsDemoBar) .topbar { top:190px; }
+}

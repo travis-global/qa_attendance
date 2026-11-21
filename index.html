@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=39" />
+  <link rel="stylesheet" href="style.css?v=40" />
   <!-- pages-deploy: actions+nojekyll -->
 </head>
 <body class="role-viewer">
@@ -33,6 +33,7 @@
         <p id="officerGateError" class="officer-gate__error" hidden></p>
         <div class="officer-gate__actions">
           <button type="button" class="btn btn--primary" id="btnOfficerGateLogin">Sign in &amp; continue</button>
+          <button type="button" class="btn eocns-practice-entry" data-start-demo="1">New here? Try Practice Mode (No PIN Needed)</button>
           <button type="button" class="btn btn--ghost" id="btnOfficerGateCancel">Back to dashboard</button>
         </div>
       </div>
@@ -133,7 +134,10 @@
               <p class="hero-card__eyebrow">Welcome back</p>
               <h2 class="hero-card__title">EOCNS Attendance & QA System</h2>
               <p class="hero-card__lead">One place for hostel, class attendance, lecturers and quality assurance.</p>
-              <button type="button" class="btn btn--primary dashboard-signin" id="btnDashboardOfficerLogin">Sign In as QA Officer</button>
+              <div class="dashboard-hero-actions">
+                <button type="button" class="btn btn--primary dashboard-signin" id="btnDashboardOfficerLogin">Sign In as QA Officer</button>
+                <button type="button" class="btn eocns-practice-entry" data-start-demo="1">Try Practice &amp; Training Mode (Safe Demo)</button>
+              </div>
             </div>
             <div class="hero-card__crest">
               <img src="https://www.easternoak.org/images/Eastern-OAK-logo-201.png" alt="Eastern Oak crest" />
@@ -998,6 +1002,13 @@
               <button type="button" class="btn btn--primary" id="btnChangeQaPin" style="margin-top:12px">Update PIN in repository</button>
             </div>
           </div>
+          <div class="card eocns-training-card" id="eocnsTrainingDemoCard" style="margin-bottom:16px">
+            <div class="card__header"><h3>Training &amp; Live Demo</h3></div>
+            <div class="card__body">
+              <p class="muted-note" style="margin-top:0">Explore the EOCNS system with sample students, lecturers, attendance records and guided lessons. Practice Mode uses a separate browser database and cannot publish changes to the real school records.</p>
+              <button type="button" class="btn eocns-practice-entry" data-start-demo="1">Start Practice &amp; Training Mode</button>
+            </div>
+          </div>
 <div class="card" style="margin-bottom:16px">
             <div class="card__header"><h3>QA Officer access</h3></div>
             <div class="card__body">
@@ -1448,6 +1459,7 @@
     </div>
   </div>
 
+  <script src="demo.js?v=1"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <script src="app.js?v=135"></script>
 
