@@ -10240,6 +10240,8 @@ async function publishPendingListToRepo(message) {
   files[DATA_FILES.pending_students] = JSON.stringify(list, null, 2);
   var headers = { "Content-Type": "application/json" };
   if (key) headers["X-EOCNS-Key"] = key;
+  var tok = (typeof getQaSessionToken === "function") ? getQaSessionToken() : "";
+  if (tok) headers["Authorization"] = "Bearer " + tok;
   var res = await fetch(workerUrl.replace(/\/$/, ""), {
     method: "POST",
     headers: headers,
