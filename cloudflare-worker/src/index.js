@@ -25,6 +25,7 @@ const ALLOWED_PATHS = new Set([
   "data/config.json",
   "data/discipline.json",
   "data/pending_students.json",
+  "data/auth_pin.json",
 ]);
 
 const OWNER = "travis-global";
@@ -356,8 +357,90 @@ async function verifySessionToken(env, token) {
   }
 }
 
-function expectedOfficerPin(env) {
-  return String(env.OFFICER_PIN || "").trim();
+const AUTH_PIN_PATH = "data/auth_pin.json";
+const PBKDF2_ITERS = 120000;
+
+async function pbkdf2Hash(pin, saltB64) {
+  const saltBin = atob(saltB64);
+  const salt = new Uint8Array(saltBin.length);
+  for (let i = 0; i < saltBin.length; i++) salt[i] = saltBin.charCodeAt(i);
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(pin),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt: salt, iterations: PBKDF2_ITERS, hash: "SHA-256" },
+    keyMaterial,
+    256
+  );
+  const arr = new Uint8Array(bits);
+  let s = "";
+  for (let i = 0; i < arr.length; i++) s += String.fromCharCode(arr[i]);
+  return btoa(s);
+}
+
+function randomSaltB64() {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  let s = "";
+  for (let i = 0; i < salt.length; i++) s += String.fromCharCode(salt[i]);
+  return btoa(s);
+}
+
+async function loadPinRecord(env) {
+  if (!env.GITHUB_TOKEN) return { record: null, sha: null };
+  const file = await githubGetFile(env, AUTH_PIN_PATH);
+  if (!file.content) return { record: null, sha: file.sha };
+  try {
+    return { record: JSON.parse(file.content), sha: file.sha };
+  } catch (_) {
+    return { record: null, sha: file.sha };
+  }
+}
+
+async function pinMatchesRecord(pin, record) {
+  if (!record || !record.hash || !record.salt) return false;
+  const h = await pbkdf2Hash(pin, record.salt);
+  return h === record.hash;
+}
+
+/** Hash file first; else bootstrap from Worker secret OFFICER_PIN (one-time until first site change). */
+async function checkOfficerPin(env, pin) {
+  pin = String(pin || "").trim();
+  if (!pin) return { ok: false, via: null };
+  const { record } = await loadPinRecord(env);
+  if (record && record.hash) {
+    const ok = await pinMatchesRecord(pin, record);
+    return { ok, via: "hash" };
+  }
+  const bootstrap = String(env.OFFICER_PIN || "").trim();
+  if (bootstrap && pin === bootstrap) return { ok: true, via: "bootstrap" };
+  return { ok: false, via: record ? "hash" : "bootstrap" };
+}
+
+async function savePinHash(env, pin, message) {
+  if (!env.GITHUB_TOKEN) throw new Error("GITHUB_TOKEN required to store PIN hash");
+  const salt = randomSaltB64();
+  const hash = await pbkdf2Hash(pin, salt);
+  const record = {
+    v: 1,
+    algo: "PBKDF2-SHA256",
+    iterations: PBKDF2_ITERS,
+    salt: salt,
+    hash: hash,
+    updatedAt: new Date().toISOString(),
+  };
+  const cur = await githubGetFile(env, AUTH_PIN_PATH);
+  await githubPutFile(
+    env,
+    AUTH_PIN_PATH,
+    JSON.stringify(record, null, 2),
+    message || "EOCNS: update officer PIN hash (plaintext never stored)",
+    cur.sha
+  );
+  return record;
 }
 
 async function handleLogin(env, request, payload, cors) {
@@ -367,15 +450,35 @@ async function handleLogin(env, request, payload, cors) {
   }
   const pin = String(payload.pin || "").trim();
   const officer = String(payload.officer || payload.name || "QA Officer").trim() || "QA Officer";
-  const expected = expectedOfficerPin(env);
-  if (!expected) {
-    return json({
-      error: "OFFICER_PIN is not configured on the Worker. Set secret: npx wrangler secret put OFFICER_PIN",
-    }, 503, cors);
+  if (!pin) return json({ error: "PIN required." }, 400, cors);
+
+  let checked;
+  try {
+    checked = await checkOfficerPin(env, pin);
+  } catch (err) {
+    return json({ error: "Auth check failed: " + (err.message || String(err)) }, 502, cors);
   }
-  if (!pin || pin !== expected) {
+
+  if (!checked.ok) {
+    // Distinguish empty bootstrap for operators
+    if (checked.via === "bootstrap" && !String(env.OFFICER_PIN || "").trim()) {
+      return json({
+        error: "No officer PIN is set. Set Worker secret OFFICER_PIN once, or contact the system admin.",
+      }, 503, cors);
+    }
     return json({ error: "Incorrect officer PIN." }, 401, cors);
   }
+
+  // Auto-migrate bootstrap secret → hash file so site change-PIN works without wrangler later
+  if (checked.via === "bootstrap" && env.GITHUB_TOKEN) {
+    try {
+      await savePinHash(env, pin, "EOCNS: migrate officer PIN to hashed auth_pin.json");
+    } catch (err) {
+      // still allow login
+      console.log("pin migrate skip", err && err.message);
+    }
+  }
+
   const token = await makeSessionToken(env, officer);
   return json({
     ok: true,
@@ -396,18 +499,31 @@ async function handleVerifySession(env, payload, cors) {
 async function handleChangePin(env, request, payload, cors) {
   const current = String(payload.currentPin || "").trim();
   const next = String(payload.newPin || "").trim();
-  const expected = expectedOfficerPin(env);
-  if (!expected) return json({ error: "OFFICER_PIN not configured on Worker." }, 503, cors);
-  if (current !== expected) return json({ error: "Current PIN is incorrect." }, 401, cors);
-  if (!next || next.length < 6) return json({ error: "New PIN must be at least 6 characters." }, 400, cors);
+  if (!current || !next) return json({ error: "currentPin and newPin are required." }, 400, cors);
+  if (next.length < 6) return json({ error: "New PIN must be at least 6 characters." }, 400, cors);
+  if (next === current) return json({ error: "New PIN must differ from the current PIN." }, 400, cors);
+  if (!env.GITHUB_TOKEN) return json({ error: "GITHUB_TOKEN not configured on Worker." }, 500, cors);
+
+  let checked;
+  try {
+    checked = await checkOfficerPin(env, current);
+  } catch (err) {
+    return json({ error: "Auth check failed: " + (err.message || String(err)) }, 502, cors);
+  }
+  if (!checked.ok) return json({ error: "Current PIN is incorrect." }, 401, cors);
+
+  try {
+    await savePinHash(env, next, "EOCNS: officer PIN changed from site (hash only)");
+  } catch (err) {
+    return json({ error: "Could not save new PIN: " + (err.message || String(err)) }, 502, cors);
+  }
+
   return json({
-    ok: false,
-    requiresOps: true,
-    message:
-      "PIN verified. To finish rotation run: echo -n 'NEW_PIN' | npx wrangler secret put OFFICER_PIN",
-    hint: "After the secret updates, every device uses the new PIN. No GitHub config change needed.",
+    ok: true,
+    message: "PIN updated successfully. Use the new PIN on all devices immediately. No Wrangler/deploy step required.",
   }, 200, cors);
 }
+
 
 export default {
   async fetch(request, env) {
@@ -419,11 +535,11 @@ export default {
       return json({
         service: "eocns-publish",
         ok: true,
-        auth: "Officer PIN is Worker secret OFFICER_PIN (not in GitHub).",
+        auth: "Officer PIN verified by Worker; stored as PBKDF2 hash in data/auth_pin.json (changeable from the site).",
         endpoints: [
           "login (POST action=login)",
           "verify_session (POST action=verify_session)",
-          "change_pin (POST action=change_pin — verifies; ops rotates secret)",
+          "change_pin (POST action=change_pin — updates hash in repo; no wrangler)",
           "publish (POST files)",
           "submit_pending (POST student)",
           "reject_email (POST)",

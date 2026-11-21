@@ -1,4 +1,4 @@
-/* EOCNS build v126 — outer bare report refs removed */
+/* EOCNS build v127 — outer bare report refs removed */
 (() => {
 "use strict";
 // Safe stubs so early event wiring never throws ReferenceError (real impls overwrite later)
@@ -121,13 +121,8 @@ async function tryOfficerGateLogin() {
       throw new Error("Auth helper missing");
     }
   } catch (e) {
-    var localPin = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.qaPin) || "";
-    if (localPin && pin === localPin) {
-      setQaOfficer(true, officerName);
-    } else {
-      if (err) { err.hidden = false; err.textContent = (e && e.message) ? e.message : "Incorrect PIN. Access remains locked."; }
-      return;
-    }
+    if (err) { err.hidden = false; err.textContent = (e && e.message) ? e.message : "Incorrect PIN. Access remains locked."; }
+    return;
   }
   if (err) err.hidden = true;
   var gate = document.getElementById("officerLoginGate");
@@ -7121,46 +7116,41 @@ function getQaSessionToken() {
   try { return sessionStorage.getItem(QA_SESSION_TOKEN_KEY) || ""; } catch (_) { return ""; }
 }
 
-/** Prefer Cloudflare Worker PIN check; legacy config.qaPin only if Worker unavailable. */
+/** Officer PIN is verified only by the Cloudflare Worker (no public config PIN). */
 async function verifyOfficerPin(pin) {
   pin = String(pin || "").trim();
   if (!pin) return false;
   var workerUrl = "";
   try { workerUrl = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim(); } catch (_) {}
-  if (workerUrl) {
-    try {
-      var res = await fetch(workerUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "login",
-          pin: pin,
-          officer: (typeof getQaOfficerName === "function" && getQaOfficerName()) || "QA Officer"
-        })
-      });
-      var body = {};
-      try { body = await res.json(); } catch (_) {}
-      if (res.ok && body && body.ok && body.token) {
-        if (typeof storeQaSessionToken === "function") storeQaSessionToken(body.token);
-        return true;
-      }
-      // Wrong PIN from Worker — do not accept legacy mismatch
-      if (res.status === 401) return false;
-      // 503 / network / misconfig → fall through to legacy
-    } catch (err) {
-      console.warn("verifyOfficerPin worker", err);
+  if (!workerUrl) return false;
+  try {
+    var res = await fetch(workerUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "login",
+        pin: pin,
+        officer: (typeof getQaOfficerName === "function" && getQaOfficerName()) || "QA Officer"
+      })
+    });
+    var body = {};
+    try { body = await res.json(); } catch (_) {}
+    if (res.ok && body && body.ok && body.token) {
+      if (typeof storeQaSessionToken === "function") storeQaSessionToken(body.token);
+      return true;
     }
+    return false;
+  } catch (err) {
+    console.warn("verifyOfficerPin worker", err);
+    return false;
   }
-  var localPin = "";
-  try { localPin = String((typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.qaPin) || "").trim(); } catch (_) {}
-  return !!(localPin && pin === localPin);
 }
 
 
 
 const QA_PIN_KEY = "eocns-qa-session";
 const QA_OFFICER_NAME_KEY = "eocns-qa-officer-name";
-/* PIN from APP_CONFIG.qaPin / data/config.json */
+/* Officer PIN: Worker only (hashed auth_pin.json / OFFICER_PIN bootstrap) */
 const REPO_OWNER = "travis-global";
 const REPO_NAME = "qa_attendance";
 const DATA_FILES = {
@@ -7606,7 +7596,7 @@ function entryInActiveSession(entry) {
   return true;
 }
 
-let APP_CONFIG = { qaPin: "EOCNS-QA" };
+let APP_CONFIG = { authMode: "worker" };
 let TIMETABLES_CACHE = null;
 let COURSES_CACHE = [];
 let PROGRAMMES_CACHE = [];
@@ -7724,21 +7714,15 @@ async function changeQaOfficerPin() {
       setStatus(body.error || "Current PIN is incorrect. PIN was not changed.");
       return;
     }
-    if (!res.ok) {
-      setStatus(body.error || ("Worker error HTTP " + res.status));
+    if (!res.ok || !body.ok) {
+      setStatus(body.error || body.message || ("Worker error HTTP " + res.status));
       return;
     }
-    // Worker cannot rewrite its own secrets — show ops steps (phone-friendly)
     ["changePinCurrent", "changePinNew", "changePinConfirm"].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.value = "";
     });
-    setStatus(
-      (body.message || "Current PIN verified.") +
-      " To finish: on a PC run  npx wrangler secret put OFFICER_PIN  then  npx wrangler deploy  (set the new PIN when prompted). " +
-      "The PIN is no longer stored in the public GitHub config.",
-      true
-    );
+    setStatus(body.message || "PIN updated on the Worker. Use the new PIN on every device now.", true);
   } catch (err) {
     console.error(err);
     setStatus("Could not reach Worker: " + (err.message || String(err)));
@@ -7779,21 +7763,10 @@ function initQaOfficerUI() {
       if (nameEl) nameEl.textContent = body.officer || officerName;
     } catch (e) {
       console.warn("worker login", e);
-      var localPin = (APP_CONFIG && APP_CONFIG.qaPin) || "";
-      if (localPin && pin === localPin) {
-        setQaOfficer(true, officerName);
-        if (err) {
-          err.hidden = false;
-          err.style.color = "#b45309";
-          err.textContent = "Signed in (legacy local PIN). Worker login failed: " + (e.message || e) + ". Prefer fixing Worker OFFICER_PIN.";
-        }
-        if (document.getElementById("qaPinInput")) document.getElementById("qaPinInput").value = "";
-      } else {
-        if (err) {
-          err.hidden = false;
-          err.style.color = "#b91c1c";
-          err.textContent = (e && e.message) ? e.message : "Incorrect PIN or Worker unreachable.";
-        }
+      if (err) {
+        err.hidden = false;
+        err.style.color = "#b91c1c";
+        err.textContent = (e && e.message) ? e.message : "Incorrect PIN or Worker unreachable.";
       }
     }
   });

@@ -1,10 +1,8 @@
 {
-  "qaPin": "EOCNSQA",
-  "qaPinNote": "Primary auth is Cloudflare Worker secret OFFICER_PIN. qaPin is emergency legacy fallback only and should be removed after all devices use Worker login.",
   "institution": "Eastern Oak College of Nursing Sciences",
   "publishWorkerUrl": "https://eocns-publish.alemfort12.workers.dev",
   "publishWorkerKey": "K7mQ2vR9xL4pT8nB",
   "publishNote": "Set publishWorkerUrl to your Cloudflare Worker URL after deploy. GitHub PAT stays only in the Worker secret GITHUB_TOKEN.",
-  "qaPinUpdatedAt": "2026-10-29T08:01:54.222Z",
-  "authMode": "worker"
+  "authMode": "worker",
+  "authNote": "Officer PIN is not stored in this public file. It is verified by the Cloudflare Worker and stored only as a one-way hash in data/auth_pin.json after first login/change."
 }
