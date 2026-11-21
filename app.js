@@ -7992,8 +7992,8 @@ async function ensureStoresLoaded(storeNames,opts){
  var metaRows=await getAll("meta"),sr=metaRows.find(function(x){return x&&x.key==="repoFileShas";}),shas=Object.assign({},sr&&sr.value||{}),jobs=[];
  for(var i=0;i<names.length;i++){var store=names[i],path=DATA_FILES[store];if(!path){skipped.push(store+"(no path)");continue;}
   var local=[];try{local=await getAll(store);}catch(_){}if(EOCNS_DIRTY&&local.length){skipped.push(store+"(local unpublished data)");continue;}
-  var sha=manifestFileSha(manifest,path);if(sha&&shas[path]===sha&&local.length){skipped.push(store+"(SHA unchanged)");continue;}
-  if(!sha&&local.length&&!opts.force){skipped.push(store+"(manifest SHA unavailable)");continue;}jobs.push({store:store,path:path,sha:sha});
+  var sha=manifestFileSha(manifest,path);if(sha&&shas[path]===sha){skipped.push(store+"(SHA unchanged)");continue;}
+  if(manifest&&!sha&&local.length&&!opts.force){skipped.push(store+"(manifest SHA unavailable)");continue;}jobs.push({store:store,path:path,sha:sha});
  }
  var cursor=0;async function worker(){while(cursor<jobs.length){var j=jobs[cursor++];try{var data=await fetchRepoJson(j.path);if(data==null){skipped.push(j.store+"(unavailable)");continue;}
   if(j.store==="timetables")TIMETABLES_CACHE=data;
@@ -8653,7 +8653,7 @@ async function publishAllToRepo() {
       try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
       try { await put("meta", { key: "lastPublishAt", value: new Date().toISOString() }); } catch (_) {}
       try { await refreshCachesAfterSync(); } catch (_) {}
-      try {var mf=await fetchRepoManifest(true),mr=await getAll("meta"),old=mr.find(function(x){return x.key==="repoFileShas";}),map=Object.assign({},old&&old.value||{});verified.forEach(function(path){var sha=manifestFileSha(mf,path);if(sha)map[path]=sha;});await put("meta",{key:"repoFileShas",value:map});}catch(e){console.warn("post-publish manifest refresh",e);}
+      try {var mf=await fetchRepoManifest(true),mr=await getAll("meta"),old=mr.find(function(x){return x.key==="repoFileShas";}),map=Object.assign({},old&&old.value||{});Object.keys(DATA_FILES).forEach(function(key){var path=DATA_FILES[key],sha=path&&manifestFileSha(mf,path);if(sha)map[path]=sha;});await put("meta",{key:"repoFileShas",value:map});}catch(e){console.warn("post-publish manifest refresh",e);}
       try { __eocnsLastSmartSync = 0; } catch (_) {}
       setSt("Published and locked. Local data matches the repository (" + verified.length +
         " file(s) updated; " + unchanged.length + " unchanged). No hard refresh needed — the system stays ready. Other open devices update automatically when focused.");
