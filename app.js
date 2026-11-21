@@ -148,6 +148,9 @@ function showView(viewId) {
   if (titleEl) titleEl.textContent = meta.title;
   if (subEl) subEl.textContent = meta.subtitle;
   try { sessionStorage.setItem("eocns-last-view", viewId); } catch (_) {}
+  var lazyMap={hostel:["hostel_runs","biometric_pending"],audit:["audit"],discipline:["discipline"],remedial:["remedial","remedial_meta","remedial_enrolment","remedial_assignments","remedial_timetable","remedial_logs"],pending:["pending_students"]};
+  if(lazyMap[viewId]&&window.__eocnsLazyViewPass!==viewId){var note=document.getElementById("pageSubtitle");if(note)note.textContent="Loading records…";ensureStoresLoaded(lazyMap[viewId]).then(async function(result){if(viewId==="hostel"&&result.pulled.indexOf("hostel_runs")>=0){try{await deduplicateHostelRunsInStore();await put("meta",{key:"hostelRunsDedupedV1",value:true});}catch(e){console.warn("hostel dedup",e);}}window.__eocnsLazyViewPass=viewId;showView(viewId);}).catch(function(e){console.warn("lazy view load",viewId,e);window.__eocnsLazyViewPass=viewId;showView(viewId);});return;}
+  if(window.__eocnsLazyViewPass===viewId)delete window.__eocnsLazyViewPass;
   if (viewId === "students") { renderStudentsTable(); try { renderCsvReviewQueue(); } catch (_) {} }
   if (viewId === "discipline") renderDisciplineTable();
   if (viewId === "pending") renderPendingRegistrations({ fromRepo: false });
@@ -601,14 +604,16 @@ async function renderStudentsTable() {
   });
   if (fProg) list = list.filter(function(s) { return String(s.programme || "") === fProg; });
   if (fLevel) list = list.filter(function(s) { return String(s.level || "") === String(fLevel); });
-  if (countEl) countEl.textContent = list.length + " student" + (list.length !== 1 ? "s" : "");
-  if (!list.length) {
-    tbody.innerHTML = "";
-    if (empty) empty.hidden = false;
-    return;
-  }
+  var totalFiltered=list.length,pageSize=50,totalPages=Math.max(1,Math.ceil(totalFiltered/pageSize));
+  window.__eocnsStudentPage=Math.min(Math.max(1,Number(window.__eocnsStudentPage)||1),totalPages);
+  var page=window.__eocnsStudentPage,start=(page-1)*pageSize,end=Math.min(start+pageSize,totalFiltered),pageRows=list.slice(start,end);
+  if(countEl)countEl.textContent=list.length+" student"+(list.length!==1?"s":"");
+  var table=tbody.closest("table"),pager=document.getElementById("studentsTablePager");
+  if(!pager&&table){pager=document.createElement("div");pager.id="studentsTablePager";pager.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 0;";table.insertAdjacentElement("afterend",pager);}
+  if(pager){pager.innerHTML='<span>Showing '+(totalFiltered?start+1:0)+'–'+end+' of '+totalFiltered+'</span><span><button type="button" id="studentsPrevPage" '+(page<=1?'disabled':'')+'>Previous</button> <span>Page '+page+' of '+totalPages+'</span> <button type="button" id="studentsNextPage" '+(page>=totalPages?'disabled':'')+'>Next</button></span>';pager.querySelector("#studentsPrevPage").addEventListener("click",function(){window.__eocnsStudentPage=Math.max(1,page-1);renderStudentsTable();});pager.querySelector("#studentsNextPage").addEventListener("click",function(){window.__eocnsStudentPage=Math.min(totalPages,page+1);renderStudentsTable();});}
+  if (!totalFiltered) {tbody.innerHTML="";if(empty)empty.hidden=false;return;}
   if (empty) empty.hidden = true;
-  tbody.innerHTML = list.map(function(s) {
+  tbody.innerHTML = pageRows.map(function(s) {
     var id = s.id;
     var cb = isQaOfficer()
       ? ('<td class="qa-edit-only"><input type="checkbox" class="stu-select" value="' + id + '" /></td>')
@@ -3178,8 +3183,8 @@ openDB().then(async () => {
       console.info("EOCNS repo updates pulled:", syncRes.pulled);
     }
   } catch (e) { console.warn("repo sync", e); }
-  try { await normalizeExistingStudentNames(); } catch (e) { console.error("System-wide person-name normalization failed", e); }
-  try { await deduplicateHostelRunsInStore(); } catch (e) { console.error("Hostel duplicate cleanup failed", e); }
+  try { var nm=await getAll("meta"),nd=nm.some(function(x){return x.key==="personNamesNormalizedAllCapsV1"&&x.value===true;});if(!nd){await normalizeExistingStudentNames();await put("meta",{key:"personNamesNormalizedAllCapsV1",value:true});} } catch(e){console.error("System-wide person-name normalization failed",e);}
+  try { var hm=await getAll("meta"),hd=hm.some(function(x){return x.key==="hostelRunsDedupedV1"&&x.value===true;});if(!hd){var hr=await getAll("hostel_runs");if(hr.length)await deduplicateHostelRunsInStore();await put("meta",{key:"hostelRunsDedupedV1",value:true});} } catch(e){console.error("Hostel duplicate cleanup failed",e);}
   try { startSmartRepoWatch(); } catch (e) { console.warn("smart watch", e); }
   showView(sessionStorage.getItem("eocns-last-view") || "dashboard");
   try { refreshDashboardStats(); } catch (e) { console.warn("stats", e); }
@@ -3288,10 +3293,7 @@ openDB().then(async () => {
   document.getElementById("btnCancelStudent")?.addEventListener("click", closeStudentForm);
   document.getElementById("btnCancelStudent2")?.addEventListener("click", closeStudentForm);
   document.getElementById("studentModalBackdrop")?.addEventListener("click", closeStudentForm);
-  ["studentSearch", "filterProgramme", "filterLevel"].forEach(id => {
-    document.getElementById(id)?.addEventListener("input", renderStudentsTable);
-    document.getElementById(id)?.addEventListener("change", renderStudentsTable);
-  });
+  ["studentSearch", "filterProgramme", "filterLevel"].forEach(id => {var el=document.getElementById(id);if(!el)return;if(id==="studentSearch"){var timer=null;el.addEventListener("input",function(){clearTimeout(timer);window.__eocnsStudentPage=1;timer=setTimeout(renderStudentsTable,150);});}else{el.addEventListener("input",function(){window.__eocnsStudentPage=1;renderStudentsTable();});el.addEventListener("change",function(){window.__eocnsStudentPage=1;renderStudentsTable();});}});
   document.getElementById("btnAddLecturer")?.addEventListener("click", () => openLecturerForm(null));
   document.getElementById("btnAddLecturerAssign")?.addEventListener("click", function() { addLecturerAssignRow({}); });
   document.getElementById("lecturerForm")?.addEventListener("submit", saveLecturer);
@@ -4258,6 +4260,7 @@ async function collectReportAmendments(opts) {
   var entities = opts.entities || ["qa_entries", "students", "lecturers", "timetables", "remedial", "remedial_enrolment", "remedial_logs", "attendance"];
   var rows = [];
   try {
+    await ensureStoresLoaded(["audit"]);
     var audit = await getAll("audit");
     audit.forEach(function(a) {
       if (!a) return;
@@ -5464,6 +5467,7 @@ function rowMatchesStudent(row, keys) {
 }
 
 async function buildStudentFullRecord(id) {
+  await ensureStoresLoaded(EOCNS_TIER2_STORES);
   var all = await getAll("students");
   var s = all.find(function(x) { return x.id === id; });
   if (!s) return null;
@@ -7959,77 +7963,14 @@ function studentFromRepo(s) {
   return row;
 }
 
-async function hydrateAllFromRepoIfEmpty() {
-  var loaded = [];
-  async function fillIfEmpty(store, path, label) {
-    try {
-      var existing = await getAll(store);
-      if (existing.length) return existing.length;
-      var rows = await fetchRepoJson(path);
-      if (rows === null) return 0;
-      if (Array.isArray(rows) && rows.length) {
-        if (store === "students") {
-          for (var i = 0; i < rows.length; i++) await put("students", studentFromRepo(rows[i]));
-        } else {
-          await putMany(store, rows);
-        }
-        loaded.push(label + " (" + rows.length + ")");
-        return rows.length;
-      }
-    } catch (e) { console.warn(store + " hydrate", e); }
-    return 0;
-  }
-  var nStu = await fillIfEmpty("students", DATA_FILES.students, "students");
-  await fillIfEmpty("lecturers", DATA_FILES.lecturers, "lecturers");
-  await fillIfEmpty("sessions", DATA_FILES.sessions, "sessions");
-  await fillIfEmpty("qa_entries", DATA_FILES.qa_entries, "lecture logs");
-  // audit deferred (large): loaded when Audit view opens if local empty
-  // await fillIfEmpty("audit", DATA_FILES.audit, "audit");
-  try { await fillIfEmpty("discipline", DATA_FILES.discipline, "discipline"); } catch (_) {}
-  try { await fillIfEmpty("pending_students", DATA_FILES.pending_students, "pending registrations"); } catch (_) {}
-  await fillIfEmpty("programmes", DATA_FILES.programmes, "programmes");
-  await fillIfEmpty("levels", DATA_FILES.levels, "levels");
-  await fillIfEmpty("courses", DATA_FILES.courses, "courses");
-  await fillIfEmpty("attendance", DATA_FILES.attendance, "attendance");
-  await fillIfEmpty("hostel_runs", DATA_FILES.hostel_runs, "hostel runs");
-  try { await fillIfEmpty("biometric_pending", DATA_FILES.biometric_pending, "biometric pending"); } catch (_) {}
-  await fillIfEmpty("remedial", DATA_FILES.remedial, "remedial");
-  await fillIfEmpty("remedial_enrolment", DATA_FILES.remedial_enrolment, "remedial enrolment");
-  await fillIfEmpty("remedial_assignments", DATA_FILES.remedial_assignments, "remedial assignments");
-  await fillIfEmpty("remedial_logs", DATA_FILES.remedial_logs, "remedial logs");
-  try {
-    var meta = await fetchRepoJson(DATA_FILES.remedial_meta);
-    if (meta) await put("remedial_meta", { key: "main", value: meta });
-  } catch (_) {}
-  try {
-    var rtt = await fetchRepoJson(DATA_FILES.remedial_timetable);
-    if (rtt) await put("remedial_timetable", { key: "main", value: rtt });
-  } catch (_) {}
-  try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config); } catch (e) { console.warn("config", e); }
-  try { TIMETABLES_CACHE = await fetchRepoJson(DATA_FILES.timetables); } catch (e) { TIMETABLES_CACHE = {}; }
-  PROGRAMMES_CACHE = await getAll("programmes");
-  LEVELS_CACHE = await getAll("levels");
-  COURSES_CACHE = await getAll("courses");
-  // Always refresh student cache for UI
-  try { await loadStudents(); } catch (_) {}
-  var totalStu = (await getAll("students")).length;
-  var banner = document.getElementById("masterLoadBanner");
-  if (banner) {
-    if (loaded.length) {
-      banner.hidden = false;
-      banner.textContent = "Master data loaded automatically from the repository: " + loaded.join(", ") + ". Total students on this device: " + totalStu + ".";
-      setTimeout(function() { banner.hidden = true; }, 12000);
-    } else if (totalStu > 0) {
-      banner.hidden = false;
-      banner.textContent = "Master list ready (" + totalStu + " students). Data was already on this device — no manual “Load official list” needed.";
-      setTimeout(function() { banner.hidden = true; }, 7000);
-    } else {
-      banner.hidden = false;
-      banner.textContent = "No students in the repository master yet. Add students or use Reload master list after publishing a list.";
-      setTimeout(function() { banner.hidden = true; }, 10000);
-    }
-  }
-  return { loaded: loaded, totalStu: totalStu };
+async function hydrateAllFromRepoIfEmpty(){
+ try{APP_CONFIG=await fetchRepoJson(DATA_FILES.config);}catch(e){console.warn("config",e);}
+ var result=await ensureStoresLoaded(EOCNS_TIER1_STORES);
+ PROGRAMMES_CACHE=await getAll("programmes");LEVELS_CACHE=await getAll("levels");COURSES_CACHE=await getAll("courses");
+ try{if(!TIMETABLES_CACHE)TIMETABLES_CACHE=await fetchRepoJson(DATA_FILES.timetables);}catch(_){}
+ try{await loadStudents();}catch(_){}var totalStu=(await getAll("students")).length,banner=document.getElementById("masterLoadBanner");
+ if(banner&&result.pulled.length){banner.hidden=false;banner.textContent="Core data loaded: "+result.pulled.join(", ")+". Total students: "+totalStu+".";setTimeout(function(){banner.hidden=true;},9000);}
+ return{loaded:result.pulled,totalStu:totalStu,failed:result.failed};
 }
 
 // ================= KEEP THIS BROWSER IN STEP WITH THE REPOSITORY =================
@@ -8177,108 +8118,11 @@ function startSmartRepoWatch() {
 }
 
 
-async function syncFromRepoIfClean() {
-  var metaRows = await getAll("meta"), m = {};
-  metaRows.forEach(function(r) { m[r.key] = r.value; });
-  if (m.dirty === true || EOCNS_DIRTY) {
-    EOCNS_DIRTY = true;
-    var b = document.getElementById("dirtyBanner");
-    if (b) {
-      b.hidden = false;
-      b.style.background = "";
-      b.textContent = "This browser has unpublished changes — local data is kept. Publish when ready, or use Settings → Reload from repository to discard local edits.";
-    }
-    return { skipped: "unpublished changes", pulled: [] };
-  }
-
-  var pulled = [];
-  var failed = [];
-  var unchanged = [];
-
-  for (var i = 0; i < SYNC_STORES.length; i++) {
-    var store = SYNC_STORES[i][0], path = DATA_FILES[SYNC_STORES[i][1]];
-    if (!path) continue;
-    try {
-      var localNow = [];
-      try { localNow = await getAll(store); } catch (_) {}
-      var text = await fetchRepoText(path + (path.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now());
-      if (text === null) { unchanged.push(store + "(unauthenticated)"); continue; }
-      var rows = JSON.parse(text);
-      if (!Array.isArray(rows)) throw new Error("not a list");
-      var fp = textFingerprint(text);
-      var prevFp = m["repoFp:" + store];
-
-      // Empty local → hydrate
-      if (!localNow.length) {
-        if (rows.length) {
-          await replaceStoreFromRepoRows(store, rows);
-          await put("meta", { key: "repoFp:" + store, value: fp });
-          pulled.push(store + "(empty→repo)");
-        } else {
-          unchanged.push(store);
-        }
-        continue;
-      }
-
-      // Same fingerprint as last successful sync → leave local independent
-      if (prevFp && prevFp === fp) {
-        unchanged.push(store);
-        continue;
-      }
-
-      // Repo changed (or first fingerprint) → update this store only
-      await replaceStoreFromRepoRows(store, rows);
-      await put("meta", { key: "repoFp:" + store, value: fp });
-      pulled.push(store);
-    } catch (e) {
-      console.warn("repo sync", store, e);
-      failed.push(store);
-    }
-  }
-
-  try {
-    var ttText = await fetchRepoText(DATA_FILES.timetables + "?t=" + Date.now());
-    var ttFp = textFingerprint(ttText);
-    if (m["repoFp:timetables"] !== ttFp) {
-      TIMETABLES_CACHE = JSON.parse(ttText);
-      await put("meta", { key: "repoFp:timetables", value: ttFp });
-      pulled.push("timetables");
-    } else if (!TIMETABLES_CACHE) {
-      try { TIMETABLES_CACHE = JSON.parse(ttText); } catch (_) {}
-    }
-  } catch (_) {}
-  try { APP_CONFIG = await fetchRepoJson(DATA_FILES.config + "?t=" + Date.now()); } catch (_) {}
-  try {
-    var meta = await fetchRepoJson(DATA_FILES.remedial_meta + "?t=" + Date.now());
-    if (meta) await put("remedial_meta", { key: "main", value: meta });
-  } catch (_) {}
-  try {
-    var rtt = await fetchRepoJson(DATA_FILES.remedial_timetable + "?t=" + Date.now());
-    if (rtt) await put("remedial_timetable", { key: "main", value: rtt });
-  } catch (_) {}
-
-  var banner = document.getElementById("dirtyBanner");
-  if (banner) {
-    if (pulled.length) {
-      banner.hidden = false;
-      banner.style.background = "";
-      banner.textContent = "Repository updates applied: " + pulled.join(", ") + ". Local data otherwise unchanged.";
-      setTimeout(function() {
-        try {
-          if (banner && /Repository updates applied/.test(banner.textContent || "")) banner.hidden = true;
-        } catch (_) {}
-      }, 6000);
-    } else {
-      // Stay quiet on ordinary refresh — independence
-      banner.hidden = true;
-    }
-  }
-
-  if (pulled.length) {
-    try { await refreshCachesAfterSync(); } catch (_) {}
-  }
-
-  return { skipped: false, pulled: pulled, unchanged: unchanged, failed: failed };
+async function syncFromRepoIfClean(){
+ var rows=await getAll("meta"),m={};rows.forEach(function(x){m[x.key]=x.value;});
+ if(m.dirty===true||EOCNS_DIRTY){EOCNS_DIRTY=true;var b=document.getElementById("dirtyBanner");if(b){b.hidden=false;b.textContent="This browser has unpublished changes — local data is kept. Publish when ready.";}return{skipped:"unpublished changes",pulled:[]};}
+ var r=await ensureStoresLoaded(EOCNS_TIER1_STORES);if(r.pulled.length){try{await refreshCachesAfterSync();}catch(_){}}
+ return{skipped:false,pulled:r.pulled,unchanged:r.skipped,failed:r.failed};
 }
 
 
@@ -8777,6 +8621,7 @@ async function publishAllToRepo() {
       try { await put("meta", { key: "dirty", value: false }); } catch (_) {}
       try { await put("meta", { key: "lastPublishAt", value: new Date().toISOString() }); } catch (_) {}
       try { await refreshCachesAfterSync(); } catch (_) {}
+      try {var mf=await fetchRepoManifest(true),mr=await getAll("meta"),old=mr.find(function(x){return x.key==="repoFileShas";}),map=Object.assign({},old&&old.value||{});verified.forEach(function(path){var sha=manifestFileSha(mf,path);if(sha)map[path]=sha;});await put("meta",{key:"repoFileShas",value:map});}catch(e){console.warn("post-publish manifest refresh",e);}
       try { __eocnsLastSmartSync = 0; } catch (_) {}
       setSt("Published and locked. Local data matches the repository (" + verified.length +
         " file(s) updated; " + unchanged.length + " unchanged). No hard refresh needed — the system stays ready. Other open devices update automatically when focused.");
