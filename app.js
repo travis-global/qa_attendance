@@ -1,4 +1,4 @@
-/* EOCNS build v103 — outer bare report refs removed */
+/* EOCNS build v125 — outer bare report refs removed */
 (() => {
 "use strict";
 // Safe stubs so early event wiring never throws ReferenceError (real impls overwrite later)
@@ -7095,6 +7095,34 @@ document.getElementById("btnPrintDailyReport") && document.getElementById("btnPr
 // Master list: data/students.json in the repository
 // =========================================================
 const QA_SESSION_TOKEN_KEY = "eocns_qa_session_token";
+
+async function workerAuthLogin(pin, officerName) {
+  var workerUrl = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
+  if (!workerUrl) throw new Error("publishWorkerUrl missing in config");
+  var res = await fetch(workerUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "login", pin: String(pin || "").trim(), officer: String(officerName || "QA Officer").trim() })
+  });
+  var body = {};
+  try { body = await res.json(); } catch (_) {}
+  if (!res.ok) throw new Error(body.error || ("Login failed (HTTP " + res.status + ")"));
+  if (!body.ok || !body.token) throw new Error(body.error || "No session token returned from Worker");
+  return body;
+}
+
+function storeQaSessionToken(token) {
+  try {
+    if (token) sessionStorage.setItem(QA_SESSION_TOKEN_KEY, String(token));
+    else sessionStorage.removeItem(QA_SESSION_TOKEN_KEY);
+  } catch (_) {}
+}
+
+function getQaSessionToken() {
+  try { return sessionStorage.getItem(QA_SESSION_TOKEN_KEY) || ""; } catch (_) { return ""; }
+}
+
+
 const QA_PIN_KEY = "eocns-qa-session";
 const QA_OFFICER_NAME_KEY = "eocns-qa-officer-name";
 /* PIN from APP_CONFIG.qaPin / data/config.json */
@@ -7583,6 +7611,7 @@ function setQaOfficer(on, officerName) {
     } else {
       sessionStorage.removeItem(QA_PIN_KEY);
       sessionStorage.removeItem(QA_OFFICER_NAME_KEY);
+      try { sessionStorage.removeItem(QA_SESSION_TOKEN_KEY); } catch (_) {}
     }
   } catch (_) {}
   document.body.classList.toggle("role-officer", !!on);
@@ -7740,25 +7769,46 @@ function initQaOfficerUI() {
   document.getElementById("officerGatePin")?.addEventListener("keydown", function(e) {
     if (e.key === "Enter") { e.preventDefault(); tryOfficerGateLogin(); }
   });
-    document.getElementById("btnQaLogin")?.addEventListener("click", () => {
+    document.getElementById("btnQaLogin")?.addEventListener("click", async function() {
     const pin = (document.getElementById("qaPinInput")?.value || "").trim();
     const err = document.getElementById("qaAuthError");
-    if (pin === (APP_CONFIG.qaPin || "EOCNS-QA")) {
-      var officerName = (document.getElementById("qaOfficerNameInput") && document.getElementById("qaOfficerNameInput").value || "").trim();
-      if (!officerName) {
-        officerName = ensureQaOfficerName("");
-      }
-      if (!officerName) {
-        if (err) { err.hidden = false; err.textContent = "Enter your full name — it is recorded on every audit entry."; }
-        return;
-      }
-      setQaOfficer(true, officerName);
+    var officerName = (document.getElementById("qaOfficerNameInput") && document.getElementById("qaOfficerNameInput").value || "").trim();
+    if (!officerName) officerName = ensureQaOfficerName("");
+    if (!officerName) {
+      if (err) { err.hidden = false; err.textContent = "Enter your full name — it is recorded on every audit entry."; }
+      return;
+    }
+    if (!pin) {
+      if (err) { err.hidden = false; err.textContent = "Enter the officer PIN."; }
+      return;
+    }
+    if (err) { err.hidden = false; err.style.color = ""; err.textContent = "Signing in via secure Worker…"; }
+    try {
+      var body = await workerAuthLogin(pin, officerName);
+      storeQaSessionToken(body.token);
+      setQaOfficer(true, body.officer || officerName);
       if (err) err.hidden = true;
       if (document.getElementById("qaPinInput")) document.getElementById("qaPinInput").value = "";
       var nameEl = document.getElementById("qaSignedInOfficerName");
-      if (nameEl) nameEl.textContent = officerName;
-    } else {
-      if (err) { err.hidden = false; err.textContent = "Incorrect PIN."; }
+      if (nameEl) nameEl.textContent = body.officer || officerName;
+    } catch (e) {
+      console.warn("worker login", e);
+      var localPin = (APP_CONFIG && APP_CONFIG.qaPin) || "";
+      if (localPin && pin === localPin) {
+        setQaOfficer(true, officerName);
+        if (err) {
+          err.hidden = false;
+          err.style.color = "#b45309";
+          err.textContent = "Signed in (legacy local PIN). Worker login failed: " + (e.message || e) + ". Prefer fixing Worker OFFICER_PIN.";
+        }
+        if (document.getElementById("qaPinInput")) document.getElementById("qaPinInput").value = "";
+      } else {
+        if (err) {
+          err.hidden = false;
+          err.style.color = "#b91c1c";
+          err.textContent = (e && e.message) ? e.message : "Incorrect PIN or Worker unreachable.";
+        }
+      }
     }
   });
   document.getElementById("btnChangeQaPin")?.addEventListener("click", () => { changeQaOfficerPin(); });

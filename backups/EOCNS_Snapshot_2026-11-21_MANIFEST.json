@@ -1,0 +1,163 @@
+{
+  "createdAt": "2026-11-21T02:59:45.488941+00:00",
+  "git": {
+    "commit": "3782c467601e2b798d7f9d605f8e410aec221347"
+  },
+  "counts": {
+    "attendance": 0,
+    "audit": 1799,
+    "biometric_pending": 42,
+    "config": 1,
+    "courses": 36,
+    "discipline": 0,
+    "hostel_runs": 2,
+    "lecturers": 25,
+    "levels": 3,
+    "pending_students": 1,
+    "programmes": 3,
+    "qa_entries": 60,
+    "remedial": 0,
+    "remedial_assignments": 0,
+    "remedial_enrolment": 0,
+    "remedial_logs": 0,
+    "remedial_meta": 1,
+    "remedial_timetable": 1,
+    "sessions": 1,
+    "students": 416,
+    "timetables": 1
+  },
+  "files": [
+    {
+      "name": "attendance.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "audit.json",
+      "bytes": 1223876,
+      "sha256": "07ecfb9f73112dd0a21ecbf7ceafb6eff12dde4b0a43fd4e5aeff560a5986dd4",
+      "count": 1799
+    },
+    {
+      "name": "biometric_pending.json",
+      "bytes": 37639,
+      "sha256": "2f597131fa8c1a2593bb66715354153b9e6cc62ac48ceb0c5061bba729442a68",
+      "count": 42
+    },
+    {
+      "name": "config.json",
+      "bytes": 442,
+      "sha256": "4a35cea47ad79f0bdfc5244a82d44301662b986299905f165ea3f82b943d126b",
+      "count": 1
+    },
+    {
+      "name": "courses.json",
+      "bytes": 4733,
+      "sha256": "b2529a2958d1c05a23afb88e03921b577cd1983506fd49359336a4b117f2c487",
+      "count": 36
+    },
+    {
+      "name": "discipline.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "hostel_runs.json",
+      "bytes": 429509,
+      "sha256": "5487f906d661ae7a9e7a36d1d1b68f8241342e692e2ef3c224dbe7cd1f081928",
+      "count": 2
+    },
+    {
+      "name": "lecturers.json",
+      "bytes": 15567,
+      "sha256": "6a88fe19d429443b1b773524326f0b82dd8af4edfe6660617c9af2a20752239a",
+      "count": 25
+    },
+    {
+      "name": "levels.json",
+      "bytes": 290,
+      "sha256": "4491b72397eb82feaacbda132b0934b02653c3e0410bb9e2396173cb6d1818d9",
+      "count": 3
+    },
+    {
+      "name": "pending_students.json",
+      "bytes": 38928,
+      "sha256": "7b3e520825643aea756e3d628c8b3fae39d8506a87520253eea6e2bf26a7dc44",
+      "count": 1
+    },
+    {
+      "name": "programmes.json",
+      "bytes": 313,
+      "sha256": "58148459905003fd75cfdeed9ef9223c66e163811f7b23e1cf903e1c66d69bb4",
+      "count": 3
+    },
+    {
+      "name": "qa_entries.json",
+      "bytes": 180069,
+      "sha256": "147481bf21b7dffec35a80aa306109a4f75e52e83e0b7d7a37d1122dc50ebbc6",
+      "count": 60
+    },
+    {
+      "name": "remedial.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "remedial_assignments.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "remedial_enrolment.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "remedial_logs.json",
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "count": 0
+    },
+    {
+      "name": "remedial_meta.json",
+      "bytes": 183,
+      "sha256": "8f9bc458978c00734822af391bbea3d5e0fb17f25d6163cc3cede79818f5fd9c",
+      "count": 1
+    },
+    {
+      "name": "remedial_timetable.json",
+      "bytes": 17,
+      "sha256": "176d5f35ccf0d4c5c4ba469f88b339dbde100b71d87b6afcad106553b81391fa",
+      "count": 1
+    },
+    {
+      "name": "sessions.json",
+      "bytes": 648,
+      "sha256": "231696afbad173d9d125bf12e403de836cb5bd683d8b4576d2cd497e71c525da",
+      "count": 1
+    },
+    {
+      "name": "students.json",
+      "bytes": 128902,
+      "sha256": "32fea7a41f1c7753722a964d5015455317307a9fe617234e56429f72d46b7530",
+      "count": 416
+    },
+    {
+      "name": "timetables.json",
+      "bytes": 9822,
+      "sha256": "7598bdcee581c52793949c0eafefc24980dad68ac5b8bdc7ae6374a13bd46131",
+      "count": 1
+    }
+  ],
+  "appJs": "v124",
+  "notes": [
+    "UPPERCASE names",
+    "Worker login live",
+    "SPA workerAuthLogin was missing \u2014 fixing"
+  ]
+}
