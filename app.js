@@ -125,11 +125,11 @@ async function tryOfficerGateLogin() {
     return;
   }
   if (err) err.hidden = true;
-  try { await hydrateAllFromRepoIfEmpty(); } catch (e) { console.warn("post-login hydrate", e); }
-  try { await syncFromRepoIfClean(); } catch (e) { console.warn("post-login sync", e); }
-  try { await refreshDashboardStats(); } catch (_) {}
   var gate = document.getElementById("officerLoginGate");
   var target = (gate && gate.getAttribute("data-target-view")) || "dashboard";
+  try { await ensureStoresLoaded(EOCNS_TIER1_STORES, { force: true }); } catch (e) { console.error("post-login Tier 1 sync", e); }
+  try { await refreshSessionChrome(); } catch (e) { console.warn("post-login session chrome", e); }
+  try { await refreshDashboardStats(); } catch (e) { console.warn("post-login dashboard", e); }
   closeOfficerLoginGate();
   showView(target);
 }
@@ -3175,12 +3175,18 @@ async function generateHostelReport() {
 openDB().then(async () => {
   console.log("EOCNS Attendance System ready");
   try {
-  // Independent local DB: hydrate only if empty; pull from repo only when remote changed
+  // Restore core records before any authenticated view or dashboard is rendered.
   try { await hydrateAllFromRepoIfEmpty(); } catch (e) { console.warn("hydrate", e); }
   try {
-    var syncRes = await syncFromRepoIfClean();
-    if (syncRes && syncRes.pulled && syncRes.pulled.length) {
-      console.info("EOCNS repo updates pulled:", syncRes.pulled);
+    var bootToken = typeof getQaSessionToken === "function" ? getQaSessionToken() : "";
+    if (bootToken) {
+      var bootSync = await ensureStoresLoaded(EOCNS_TIER1_STORES, { force: true });
+      if (bootSync.failed.length) console.error("Restored-session Tier 1 sync failures:", bootSync.failed);
+      try { await refreshSessionChrome(); } catch (e) { console.warn("restored session chrome", e); }
+      try { await refreshDashboardStats(); } catch (e) { console.warn("restored dashboard stats", e); }
+    } else {
+      var syncRes = await syncFromRepoIfClean();
+      if (syncRes && syncRes.pulled && syncRes.pulled.length) console.info("EOCNS repo updates pulled:", syncRes.pulled);
     }
   } catch (e) { console.warn("repo sync", e); }
   try { var nm=await getAll("meta"),nd=nm.some(function(x){return x.key==="personNamesNormalizedAllCapsV1"&&x.value===true;});if(!nd){await normalizeExistingStudentNames();await put("meta",{key:"personNamesNormalizedAllCapsV1",value:true});} } catch(e){console.error("System-wide person-name normalization failed",e);}
@@ -7788,9 +7794,15 @@ function initQaOfficerUI() {
       if (document.getElementById("qaPinInput")) document.getElementById("qaPinInput").value = "";
       var nameEl = document.getElementById("qaSignedInOfficerName");
       if (nameEl) nameEl.textContent = body.officer || officerName;
-  try { await hydrateAllFromRepoIfEmpty(); } catch (e) { console.warn("post-login hydrate", e); }
-  try { await syncFromRepoIfClean(); } catch (e) { console.warn("post-login sync", e); }
-  try { await refreshDashboardStats(); } catch (_) {}
+  try { await ensureStoresLoaded(EOCNS_TIER1_STORES, { force: true }); } catch (e) { console.error("post-login Tier 1 sync", e); }
+  try { await refreshSessionChrome(); } catch (e) { console.warn("post-login session chrome", e); }
+  try { await refreshDashboardStats(); } catch (e) { console.warn("post-login dashboard", e); }
+  try {
+    var activeView = document.querySelector(".view.active");
+    var activeId = activeView && activeView.id ? activeView.id.replace(/^view-/,"") : "settings";
+    if (activeId === "settings") { renderProgrammesLevels(); renderCoursesTable(); renderTimetableEditor(); }
+    else showView(activeId);
+  } catch (e) { console.warn("post-login view refresh", e); }
     } catch (e) {
       console.warn("worker login", e);
       if (err) {
@@ -7813,6 +7825,9 @@ function initQaOfficerUI() {
       try { if (db && db.objectStoreNames.contains(sensitiveStores[i])) await clearStore(sensitiveStores[i]); }
       catch (e) { console.warn("logout store cleanup", sensitiveStores[i], e); }
     }
+    try { await del("meta", "repoFileShas"); } catch (e) { console.warn("logout SHA cache cleanup", e); }
+    window.__eocnsManifest = null;
+    __eocnsManifestFetchedAt = 0;
     try { studentsCache = []; OFFICIAL_STUDENTS = []; }
     catch (_) {}
     const panel = document.getElementById("qaTokenPanel");
@@ -7987,21 +8002,78 @@ async function fetchRepoManifest(force){
 function manifestFileEntry(manifest,path){if(!manifest)return null;var src=manifest.files||manifest.manifest||manifest;if(Array.isArray(src))return src.find(function(x){return x&&(x.path===path||x.name===path);})||null;return src[path]||null;}
 function manifestFileSha(manifest,path){var x=manifestFileEntry(manifest,path);return typeof x==="string"?x:(x&&(x.sha||x.blobSha||x.oid))||"";}
 async function ensureStoresLoaded(storeNames,opts){
- opts=opts||{};var names=Array.from(new Set((storeNames||[]).filter(Boolean))),pulled=[],skipped=[],failed=[];if(!names.length)return{pulled:pulled,skipped:skipped,failed:failed};
- var manifest=null;try{manifest=await fetchRepoManifest(!!opts.force);}catch(e){console.warn("repo manifest",e);}
- var metaRows=await getAll("meta"),sr=metaRows.find(function(x){return x&&x.key==="repoFileShas";}),shas=Object.assign({},sr&&sr.value||{}),jobs=[];
- for(var i=0;i<names.length;i++){var store=names[i],path=DATA_FILES[store];if(!path){skipped.push(store+"(no path)");continue;}
-  var local=[];try{local=await getAll(store);}catch(_){}if(EOCNS_DIRTY&&local.length){skipped.push(store+"(local unpublished data)");continue;}
-  var sha=manifestFileSha(manifest,path);if(sha&&shas[path]===sha){skipped.push(store+"(SHA unchanged)");continue;}
-  if(manifest&&!sha&&local.length&&!opts.force){skipped.push(store+"(manifest SHA unavailable)");continue;}jobs.push({store:store,path:path,sha:sha});
+ opts=opts||{};
+ var names=Array.from(new Set((storeNames||[]).filter(Boolean))),pulled=[],skipped=[],failed=[];
+ if(!names.length)return{pulled:pulled,skipped:skipped,failed:failed};
+ var manifest=null;
+ try{manifest=await fetchRepoManifest(!!opts.force);}catch(e){console.warn("repo manifest",e);}
+ var metaRows=await getAll("meta"),sr=metaRows.find(function(x){return x&&x.key==="repoFileShas";});
+ var shas=Object.assign({},sr&&sr.value||{}),jobs=[];
+ function manifestFileSize(m,path){
+  var entry=manifestFileEntry(m,path);
+  if(!entry||typeof entry!=="object")return null;
+  var n=entry.size;
+  return Number.isFinite(Number(n))?Number(n):null;
  }
- var cursor=0;async function worker(){while(cursor<jobs.length){var j=jobs[cursor++];try{var data=await fetchRepoJson(j.path);if(data==null){skipped.push(j.store+"(unavailable)");continue;}
-  if(j.store==="timetables")TIMETABLES_CACHE=data;
-  else if(j.store==="remedial_meta"||j.store==="remedial_timetable"){await clearStore(j.store);await put(j.store,{key:"main",value:data});}
-  else{if(!Array.isArray(data))throw new Error("Expected array at "+j.path);await replaceStoreFromRepoRows(j.store,data);}
-  if(j.sha)shas[j.path]=j.sha;else delete shas[j.path];pulled.push(j.store);
- }catch(e){console.warn("manifest load",j.store,e);failed.push(j.store);}}}
- await Promise.all(Array.from({length:Math.min(4,jobs.length)},worker));if(pulled.length)await put("meta",{key:"repoFileShas",value:shas});
+ for(var i=0;i<names.length;i++){
+  var store=names[i],path=DATA_FILES[store];
+  if(!path){skipped.push(store+"(no path)");continue;}
+  var localCount=0;
+  if(store==="timetables"){
+   localCount=TIMETABLES_CACHE==null?0:1;
+  }else{
+   try{localCount=(await getAll(store)).length;}
+   catch(countErr){console.error("ensureStoresLoaded count failed",store,countErr);failed.push(store);continue;}
+  }
+  if(EOCNS_DIRTY&&localCount){skipped.push(store+"(local unpublished data)");continue;}
+  var sha=manifestFileSha(manifest,path),size=manifestFileSize(manifest,path);
+  var genuinelyEmptyRemote=(size!==null&&size<=4);
+  if(sha&&shas[path]===sha&&(localCount>0||genuinelyEmptyRemote)){
+   skipped.push(store+"(SHA unchanged; local rows present or remote empty)");continue;
+  }
+  if(manifest&&!sha&&localCount&&!opts.force){skipped.push(store+"(manifest SHA unavailable)");continue;}
+  jobs.push({store:store,path:path,sha:sha});
+ }
+ var cursor=0;
+ async function worker(){
+  while(cursor<jobs.length){
+   var j=jobs[cursor++];
+   try{
+    var data=await fetchRepoJson(j.path);
+    if(data==null){skipped.push(j.store+"(unavailable or encrypted envelope)");continue;}
+    if(j.store==="timetables"){
+     TIMETABLES_CACHE=data;
+    }else if(j.store==="remedial_meta"||j.store==="remedial_timetable"){
+     await clearStore(j.store);
+     await put(j.store,{key:"main",value:data});
+    }else{
+     if(!Array.isArray(data))throw new Error("Expected array at "+j.path);
+     await clearStore(j.store);
+     for(var ri=0;ri<data.length;ri++){
+      var row=data[ri];
+      if(j.store==="students"){
+       row=typeof studentFromRepo==="function"?studentFromRepo(row||{}):(row||{});
+       if(!row.id)row.id="stu_"+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+      }else if(j.store==="courses"){
+       row=Object.assign({},row||{});
+       if(!row.code)row.code=String(row.courseCode||row.course_code||row.id||"").trim();
+       if(!row.code)throw new Error("Course row is missing its code key at index "+ri);
+      }
+      try{await put(j.store,row);}
+      catch(writeErr){console.error("ensureStoresLoaded write failed",j.store,writeErr);throw writeErr;}
+     }
+    }
+    // Only cache a SHA after the complete fetch and every required IndexedDB write succeeded.
+    if(j.sha)shas[j.path]=j.sha;else delete shas[j.path];
+    pulled.push(j.store);
+   }catch(e){
+    console.error("ensureStoresLoaded write failed",j.store,e);
+    failed.push(j.store);
+   }
+  }
+ }
+ await Promise.all(Array.from({length:Math.min(4,jobs.length)},worker));
+ if(pulled.length)await put("meta",{key:"repoFileShas",value:shas});
  return{pulled:pulled,skipped:skipped,failed:failed};
 }
 
