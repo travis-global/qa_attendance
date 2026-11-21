@@ -286,5 +286,21 @@
       "200_midwifery"
     ],
     "id": "TUT 201"
+  },
+  {
+    "code": "NUR 212",
+    "name": "Primary Health Care II",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "NUR 212"
+  },
+  {
+    "code": "NUR 214",
+    "name": "Dietetics",
+    "classKeys": [
+      "200_nursing"
+    ],
+    "id": "NUR 214"
   }
 ]
