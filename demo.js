@@ -66,8 +66,8 @@ var students = [
   ["stu_demo_006","GRACE NWANKWO","EOCNS/26/0006/GNS","Nursing",300,"Female","Hostel 2","106"],
   ["stu_demo_007","CHINENYE OGBONNA","EOCNS/26/0007/GNS","Nursing",300,"Female","Hostel 2","107"],
   ["stu_demo_008","JOYCE EMMANUEL","EOCNS/26/0008/GNS","Nursing",100,"Female","Hostel 2","108"],
-  ["stu_demo_009","OLUCHI MADU","EOCNS/26/0009/MID","Midwifery",100,"Female","Hostel 1",""],
-  ["stu_demo_010","RITA NWABUEZE","EOCNS/26/0010/MID","Midwifery",200,"Female","Hostel 1",""],
+  ["stu_demo_009","OLUCHI MADU","EOCNS/26/0009/MID","Midwifery",100,"Female","Hostel 1","109"],
+  ["stu_demo_010","RITA NWABUEZE","EOCNS/26/0010/MID","Midwifery",200,"Female","Hostel 1","110"],
   ["stu_demo_011","ESTHER OHAKWE","EOCNS/26/0011/MID","Midwifery",200,"Female","Hostel 2",""],
   ["stu_demo_012","FAITH ONYEKACHI","EOCNS/26/0012/MID","Midwifery",300,"Female","Hostel 2",""]
 ].map(function (r, i) {
@@ -118,11 +118,23 @@ var pendingStudents = [
   {id:"pend_demo_002",name:"ADAOBI NWOKE",firstName:"Adaobi",lastName:"Nwoke",regNo:"",programme:"Midwifery",level:"100",gender:"Female",hostel:"Hostel 2",phone:"+234 806 777 1002",email:"adaobi.practice@example.test",photoDataUrl:makeAvatar("AN","#B8860B"),status:"Pending",createdAt:isoDaysAgo(0),submittedAt:isoDaysAgo(0),demoRecord:true}
 ];
 var hostelRows = students.slice(0,8).map(function(s,i){return {studentId:s.id,name:s.name,regNo:s.regNo,serial:s.serial,hostel:s.hostel,programme:s.programme,level:s.level,daysPresent:i<6?4:3,daysAbsent:i<6?1:2,fine:i<6?500:1000,attendance:["P","P","P",i<6?"A":"A","P"]};});
+var hostelDates=[weekdayDate(-4),weekdayDate(-3),weekdayDate(-2),weekdayDate(-1),weekdayDate(0)];
+var hostelMatrix=students.slice(0,8).map(function(s,i){var marks=hostelDates.map(function(_,d){return ((i===2&&d===1)||(i===5&&(d===2||d===3))||(i===7&&d===0))?"A":"P";});var absent=marks.filter(function(m){return m==="A";}).length;return {studentId:s.id,machineNo:s.serial,name:s.name,regNo:s.regNo,hostel:s.hostel,programme:s.programme,level:s.level,dayMarks:marks,absentDays:absent,fine:absent*500};});
+var hostelGateRows=[["Department","Name","No.","Date/Time","Status","Location ID"]];
+var hostelGateEvents=[];
+hostelDates.forEach(function(date,d){students.slice(0,8).forEach(function(s,i){if((i===2&&d===1)||(i===5&&(d===2||d===3))||(i===7&&d===0))return;var machineNo=s.serial;var stamp=date+" 07:"+String(10+i).padStart(2,"0")+":00";hostelGateRows.push([s.programme.toUpperCase(),s.name,machineNo,stamp,"C/IN","1"]);hostelGateEvents.push({machineNo:machineNo,dateKey:date,locationId:"1",status:"C/IN",name:s.name});});});
+hostelGateRows.push(["NURSING","VICTORIA DANIEL","105",hostelDates[4]+" 08:15:00","C/IN","1"]);
+hostelGateEvents.push({machineNo:"105",dateKey:hostelDates[4],locationId:"1",status:"C/IN",name:"VICTORIA DANIEL"});
+hostelGateRows.push(["VISITOR","UNKNOWN VISITOR","999",hostelDates[2]+" 08:15:00","C/IN","1"]);
+hostelGateEvents.push({machineNo:"999",dateKey:hostelDates[2],locationId:"1",status:"C/IN",name:"UNKNOWN VISITOR"});
+var hostelMatrix=students.slice(0,8).map(function(s,i){var marks=hostelDates.map(function(_,d){return ((i===2&&d===1)||(i===5&&(d===2||d===3))||(i===7&&d===0))?"A":"P";});var absent=marks.filter(function(m){return m==="A";}).length;return {studentId:s.id,machineNo:s.serial,name:s.name,regNo:s.regNo,hostel:s.hostel,programme:s.programme,level:s.level,dayMarks:marks,absentDays:absent,fine:absent*500};});
+var hostelRows=hostelMatrix.filter(function(r){return r.absentDays>0;}).map(function(r){return Object.assign({},r);});
 var hostelRun = {
-  id:"hostel_run_demo_01",runId:"hostel_run_demo_01",hostel:"Hostel 1",hostelName:"Hostel 1",locationId:"1",
-  startDate:weekdayDate(-4),endDate:weekdayDate(0),dateFrom:weekdayDate(-4),dateTo:weekdayDate(0),
-  rate:500,days:5,createdAt:isoDaysAgo(0),status:"Saved",matrix:{},rows:hostelRows,
-  gateEvents:[],gateExportRows:[],amendments:[],summary:{students:8,days:5,daysAbsent:10,totalFine:5000}
+  id:"hostel_run_demo_01",runId:"hostel_run_demo_01",hostel:"Hostel 1",hostelName:"Hostel 1",sourceHostel:"Hostel 1",sourceLocationId:"1",locationId:"1",
+  start:hostelDates[0],end:hostelDates[4],startDate:hostelDates[0],endDate:hostelDates[4],dateKeys:hostelDates,coverageDateKeys:hostelDates,
+  rate:500,days:5,createdAt:isoDaysAgo(0),updatedAt:isoDaysAgo(0),status:"final",matrix:hostelMatrix,rows:hostelRows,
+  gateEvents:hostelGateEvents,gateExportRows:hostelGateRows,amendments:[],sessionId:sessions[0].id,semesterId:"sem_demo_1",
+  studentCount:hostelMatrix.length,absenteeCount:hostelRows.length,totalFine:hostelRows.reduce(function(sum,r){return sum+r.fine;},0),summary:{students:hostelMatrix.length,days:5,daysAbsent:hostelRows.reduce(function(sum,r){return sum+r.absentDays;},0),totalFine:hostelRows.reduce(function(sum,r){return sum+r.fine;},0)}
 };
 var biometricPending = [
   {id:"bio_demo_conflict",type:"hostel_conflict",status:"pending",name:"VICTORIA DANIEL",studentId:"stu_demo_005",serial:"105",masterHostel:"Hostel 2",gateHostel:"Hostel 1",locationId:"1",date:weekdayDate(0),reason:"A student assigned to Hostel 2 recorded a gate entry at Hostel 1.",suggestions:[{studentId:"stu_demo_005",name:"VICTORIA DANIEL",regNo:"EOCNS/26/0005/GNS"}]},
@@ -133,17 +145,17 @@ var discipline = [
   {id:"dsa_demo_001",ref:"REF/EOCNS/DSA/0001",officialRef:"REF/EOCNS/DSA/0001",subjectType:"student",subject:"student",studentId:"stu_demo_003",studentName:"BLESSING EZE",name:"BLESSING EZE",date:isoDaysAgo(12).slice(0,10),type:"Attendance concern",status:"Under review",summary:"Repeated late arrival to a scheduled practical session.",outcome:"Counselling scheduled.",createdAt:isoDaysAgo(12),demoRecord:true},
   {id:"dsa_demo_002",ref:"REF/EOCNS/DSA/0002",officialRef:"REF/EOCNS/DSA/0002",subjectType:"student",subject:"student",studentId:"stu_demo_010",studentName:"RITA NWABUEZE",name:"RITA NWABUEZE",date:isoDaysAgo(5).slice(0,10),type:"Hostel conduct",status:"Open",summary:"A reported hostel rule concern awaiting review.",outcome:"Pending review.",createdAt:isoDaysAgo(5),demoRecord:true}
 ];
-var remedialMeta = {key:"main",value:{sessionId:sessions[0].id,sessionName:sessions[0].name,active:true,programmes:["Nursing","Midwifery"],levels:["100","200","300"]}};
+var remedialMeta = {sessionId:sessions[0].id,sessionName:sessions[0].name,active:true,programmes:["Nursing","Midwifery"],levels:["100","200","300"]};
 var remedialEnrolment = students.slice(0,3).map(function(s,i){return {id:"rem_enr_demo_0"+(i+1),studentId:s.id,name:s.name,matric:s.regNo,regNo:s.regNo,programme:s.programme,level:s.level,courses:["GNS 101"],status:"Active",ref:"REF/EOCNS/QA/REM/000"+(i+1)};});
 var remedialAssignments = [
   {id:"rem_assign_demo_01",courseCode:"GNS 101",course:"Fundamentals of Nursing",programme:"Nursing",level:"100",lecturerId:"lec_demo_01",lecturer:"DR. NGOZI EZE",hours:2},
   {id:"rem_assign_demo_02",courseCode:"ANP 102",course:"Human Anatomy and Physiology",programme:"Nursing",level:"100",lecturerId:"lec_demo_02",lecturer:"MR. CHUKWUEMEKA OKORO",hours:2}
 ];
-var remedialTimetable = {key:"main",value:[
+var remedialTimetable = [
   {id:"rem_slot_01",day:"Monday",startTime:"14:00",endTime:"16:00",courseCode:"GNS 101",classKey:"100_nursing",lecturerId:"lec_demo_01"},
   {id:"rem_slot_02",day:"Wednesday",startTime:"14:00",endTime:"16:00",courseCode:"ANP 102",classKey:"100_nursing",lecturerId:"lec_demo_02"},
   {id:"rem_slot_03",day:"Friday",startTime:"12:00",endTime:"14:00",courseCode:"MID 201",classKey:"200_midwifery",lecturerId:"lec_demo_03"}
-]};
+];
 var remedialLogs = [
   {id:"rem_log_demo_01",date:weekdayDate(1),courseCode:"GNS 101",classKey:"100_nursing",lecturerId:"lec_demo_01",hours:2,attendance:[{studentId:students[0].id,name:students[0].name,status:"Present",mark:"P"},{studentId:students[1].id,name:students[1].name,status:"Absent",mark:"A"}]},
   {id:"rem_log_demo_02",date:weekdayDate(3),courseCode:"ANP 102",classKey:"100_nursing",lecturerId:"lec_demo_02",hours:2,attendance:[{studentId:students[0].id,name:students[0].name,status:"Present",mark:"P"},{studentId:students[2].id,name:students[2].name,status:"Present",mark:"P"}]}
@@ -393,7 +405,8 @@ function injectPracticeFiles() {
   }
 }
 
-/* -------------------- PART 3 + 4: BANNER, LESSON MENU & GUIDED COACH -------------------- */
+/* -------------------- PART 3: STICKY BANNER -------------------- */
+/* -------------------- PART 4: 20-LESSON GUIDED COACH -------------------- */
 var lessons = [
   {title:"Welcome & Signing In Safely",view:"dashboard",target:"officerLoginGate",what:"The public screen lets visitors see the dashboard, but school records stay behind the QA Officer sign-in. Practice Mode uses a separate database and a virtual PIN.",steps:["Enter your name in the officer sign-in box.","Type the Practice PIN 123456.","Click Sign In. A successful practice sign-in never authenticates with the real school service."],take:"dashboard"},
   {title:"Your Home Screen (Dashboard & Top Bar)",view:"dashboard",target:"view-dashboard",what:"The dashboard gives a quick picture of students, lecturers, lecture logs, sessions, attendance sheets and courses. The top bar holds your session, semester, theme and save status.",steps:["Review the six summary cards.","Find the Session and Semester selectors at the top.","Switch Light/Dark mode with the theme button.","Notice the Save Changes Now button; it saves only to the virtual cloud here."],take:"dashboard"},
@@ -496,6 +509,7 @@ function takeToLesson(lesson){
   }
   setTimeout(function(){
     if(lesson.view){var nav=document.querySelector('[data-view="'+lesson.view+'"]');if(nav&&lesson.view!=="dashboard")nav.click();}
+    if(currentLesson===0){var signIn=el("btnDashboardOfficerLogin");if(signIn)signIn.click();}
     if(currentLesson===15){
       document.querySelectorAll("#view-hostel details").forEach(function(d){d.open=true;});
     }
