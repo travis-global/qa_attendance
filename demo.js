@@ -442,8 +442,8 @@ function injectStyles(){
   "#eocnsDemoBar .demo-brand{display:flex;align-items:center;gap:10px;min-width:270px}#eocnsDemoBar .demo-pill{background:#B8860B;color:#fff;padding:6px 9px;border-radius:6px;font-weight:800;letter-spacing:.04em;font-size:11px;white-space:nowrap}"+
   "#eocnsDemoBar .demo-reassure{opacity:.9}#eocnsDemoBar .demo-progress{flex:1;min-width:120px;max-width:260px;margin-left:auto}#eocnsDemoBar .demo-progress-label{display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px}#eocnsDemoBar .demo-track{height:5px;background:#ffffff35;border-radius:8px;overflow:hidden}#eocnsDemoBar .demo-fill{height:100%;background:#d9ae48;transition:width .2s}"+
   "#eocnsDemoBar .demo-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}#eocnsDemoBar button{border:1px solid #ffffff55;background:#ffffff12;color:#fff;border-radius:6px;padding:7px 9px;font-weight:650;cursor:pointer;font-size:12px}#eocnsDemoBar button.demo-exit{background:#B8860B;border-color:#B8860B;color:#101d31}"+
-  "#eocnsDemoCoach{position:fixed;z-index:10002;right:22px;bottom:20px;width:min(420px,calc(100vw - 28px));max-height:min(76vh,760px);overflow:auto;background:#fff;color:#172033;border:1px solid #B8860B;border-radius:14px;box-shadow:0 18px 55px #071a3550;font:14px/1.5 Inter,Arial,sans-serif}#eocnsDemoCoach[hidden],#eocnsDemoMenu[hidden]{display:none}"+
-  "#eocnsDemoCoach .coach-head{background:#1B3A6B;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;gap:12px;align-items:center;cursor:move}#eocnsDemoCoach .coach-kicker{font-size:11px;color:#e9c66e;font-weight:800;text-transform:uppercase;letter-spacing:.08em}#eocnsDemoCoach h3{font-size:17px;line-height:1.3;color:#fff;margin:3px 0 0}#eocnsDemoCoach .coach-body{padding:15px 17px}#eocnsDemoCoach .coach-body p{margin:6px 0 12px}#eocnsDemoCoach .coach-body ol{padding-left:21px;margin:8px 0 16px}#eocnsDemoCoach .coach-body li{padding:3px 0}#eocnsDemoCoach .coach-actions{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid #e5eaf1;padding:12px 16px}"+
+  "#eocnsDemoCoach{position:fixed;z-index:10002;right:22px;bottom:20px;width:min(440px,calc(100vw - 32px));max-height:min(78vh,calc(100vh - 96px));display:flex;flex-direction:column;overflow:hidden;pointer-events:auto;background:#fff;color:#172033;border:2px solid #B8860B;border-radius:16px;box-shadow:0 18px 55px #071a3550;font:15px/1.55 Inter,Arial,sans-serif}#eocnsDemoCoach[hidden],#eocnsDemoMenu[hidden]{display:none}"+
+  "#eocnsDemoCoach .coach-head{flex:0 0 auto;background:#1B3A6B;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;gap:12px;align-items:center;cursor:grab;user-select:none;touch-action:none}#eocnsDemoCoach .coach-head.is-dragging{cursor:grabbing}#eocnsDemoCoach .coach-kicker{font-size:11px;color:#e9c66e;font-weight:800;text-transform:uppercase;letter-spacing:.08em}#eocnsDemoCoach h3{font-size:17px;line-height:1.3;color:#fff;margin:3px 0 0}#eocnsDemoCoach .coach-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:15px 6px 15px 17px}#eocnsDemoCoach .coach-body p{margin:6px 0 12px}#eocnsDemoCoach .coach-body ol{padding-left:21px;margin:8px 0 16px}#eocnsDemoCoach .coach-body li{padding:3px 0}#eocnsDemoCoach .coach-actions{flex:0 0 auto;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid #e5eaf1;padding:12px 16px}#eocnsDemoCoach .coach-drag-meta{display:flex;align-items:center;gap:7px;margin-top:5px;font-size:10px;opacity:.78}#eocnsDemoCoach .coach-grip{font-size:15px;letter-spacing:-3px;font-weight:900}"+
   ".eocns-demo-primary{background:#1B3A6B!important;color:#fff!important;border:1px solid #1B3A6B!important}.eocns-demo-gold{background:#B8860B!important;color:#fff!important;border:1px solid #B8860B!important}.eocns-demo-muted{background:#eef2f7!important;color:#1B3A6B!important;border:1px solid #d9e0ea!important}"+
   "#eocnsDemoMenu{position:fixed;z-index:10001;inset:0 0 0 auto;width:min(390px,92vw);background:#fff;color:#172033;box-shadow:-16px 0 40px #071a3540;padding:20px;overflow:auto;font:14px/1.4 Inter,Arial,sans-serif}#eocnsDemoMenu h3{color:#1B3A6B;margin:0 0 12px}#eocnsDemoMenu button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;border-bottom:1px solid #edf0f4;background:#fff;color:#23334c;cursor:pointer}#eocnsDemoMenu button.active{background:#fff7df;color:#1B3A6B;font-weight:800}"+
   ".demo-spotlight{position:relative!important;z-index:9999!important;outline:3px solid #D4A72C!important;outline-offset:5px!important;box-shadow:0 0 0 7px #D4A72C33,0 0 24px #D4A72C99!important;animation:demoPulse 1.6s infinite}@keyframes demoPulse{50%{outline-color:#1B3A6B;box-shadow:0 0 0 9px #1B3A6B20,0 0 28px #D4A72Caa}}"+
@@ -463,7 +463,7 @@ function createBanner(){
 function createCoach(){
   if(el("eocnsDemoCoach"))return;
   var card=document.createElement("aside");card.id="eocnsDemoCoach";card.setAttribute("aria-live","polite");
-  card.innerHTML='<div class="coach-head" id="demoCoachDrag"><div><div class="coach-kicker" id="demoCoachKicker">Lesson 1 of 20</div><h3 id="demoCoachTitle">Welcome &amp; Signing In Safely</h3></div><button type="button" id="demoCoachDock" aria-label="Hide coach" style="background:#ffffff20;color:#fff;border:1px solid #ffffff66;border-radius:6px;padding:5px 9px">—</button></div><div class="coach-body"><strong>What this screen does</strong><p id="demoCoachWhat"></p><strong>Try it now (Hands-On)</strong><ol id="demoCoachSteps"></ol><button type="button" id="demoTakeMeThere" class="btn eocns-demo-muted btn--sm">Take Me There</button></div><div class="coach-actions"><button type="button" id="demoBack" class="btn eocns-demo-muted btn--sm">← Back</button><button type="button" id="demoNext" class="btn eocns-demo-primary btn--sm">Next Lesson →</button><button type="button" id="demoExitTraining" class="btn eocns-demo-gold btn--sm">Exit Training</button></div>';
+  card.innerHTML='<div class="coach-head" id="demoCoachDrag"><div><div class="coach-kicker" id="demoCoachKicker">Lesson 1 of 20</div><h3 id="demoCoachTitle">Welcome &amp; Signing In Safely</h3></div><button type="button" id="demoCoachDock" aria-label="Hide coach" style="background:#ffffff20;color:#fff;border:1px solid #ffffff66;border-radius:6px;padding:5px 9px">—</button></div><div class="coach-body"><strong>What this screen does</strong><p id="demoCoachWhat"></p><strong>Try it now (Hands-On)</strong><ol id="demoCoachSteps"></ol></div><div class="coach-actions"><button type="button" id="demoBack" class="btn eocns-demo-muted btn--sm">← Back</button><button type="button" id="demoTakeMeThere" class="btn eocns-demo-muted btn--sm">Take Me There</button><button type="button" id="demoNext" class="btn eocns-demo-primary btn--sm">Next Lesson →</button><button type="button" id="demoExitTraining" class="btn eocns-demo-gold btn--sm">Exit Training</button></div>';
   document.body.appendChild(card);
   el("demoCoachDock").addEventListener("click",function(){coachVisible=false;card.hidden=true;el("demoCoachToggle").textContent="Show Coach";});
   el("demoBack").addEventListener("click",function(){goLesson(currentLesson-1);});
@@ -472,20 +472,34 @@ function createCoach(){
   el("demoTakeMeThere").addEventListener("click",function(){takeToLesson(lessons[currentLesson]);});
   makeDraggable(card,el("demoCoachDrag"));
 }
+function clampCoachPosition(card){
+  if(!card||card.hidden)return;
+  var rect=card.getBoundingClientRect(),bar=el("eocnsDemoBar");
+  var minTop=bar?bar.getBoundingClientRect().bottom+8:8;
+  var maxLeft=Math.max(8,window.innerWidth-rect.width-8),maxTop=Math.max(minTop,window.innerHeight-rect.height-8);
+  card.style.left=Math.min(maxLeft,Math.max(8,rect.left))+"px";
+  card.style.top=Math.min(maxTop,Math.max(minTop,rect.top))+"px";
+  card.style.right="auto";card.style.bottom="auto";
+}
 function makeDraggable(card,handle){
+  if(!card||!handle||handle.__eocnsDragBound)return;handle.__eocnsDragBound=true;
   handle.addEventListener("pointerdown",function(e){
-    if(e.target.closest("button"))return;
-    var rect=card.getBoundingClientRect();dragState={x:e.clientX-rect.left,y:e.clientY-rect.top};
-    try{handle.setPointerCapture(e.pointerId);}catch(_){}
+    if(e.target.closest("button"))return;if(e.pointerType==="mouse"&&e.button!==0)return;
+    var rect=card.getBoundingClientRect();
+    if(!card.dataset.dragPositioned){card.style.left=rect.left+"px";card.style.top=rect.top+"px";card.style.right="auto";card.style.bottom="auto";card.dataset.dragPositioned="1";}
+    dragState={pointerId:e.pointerId,offsetX:e.clientX-rect.left,offsetY:e.clientY-rect.top};
+    handle.classList.add("is-dragging");try{handle.setPointerCapture(e.pointerId);}catch(_){}e.preventDefault();
   });
   handle.addEventListener("pointermove",function(e){
-    if(!dragState)return;
-    card.style.left=Math.max(4,e.clientX-dragState.x)+"px";
-    card.style.top=Math.max(4,e.clientY-dragState.y)+"px";
-    card.style.right="auto";card.style.bottom="auto";
+    if(!dragState||dragState.pointerId!==e.pointerId)return;
+    var rect=card.getBoundingClientRect(),bar=el("eocnsDemoBar"),minTop=bar?bar.getBoundingClientRect().bottom+8:8;
+    var maxLeft=Math.max(8,window.innerWidth-rect.width-8),maxTop=Math.max(minTop,window.innerHeight-rect.height-8);
+    card.style.left=Math.min(maxLeft,Math.max(8,e.clientX-dragState.offsetX))+"px";
+    card.style.top=Math.min(maxTop,Math.max(minTop,e.clientY-dragState.offsetY))+"px";
   });
-  handle.addEventListener("pointerup",function(){dragState=null;});
-  handle.addEventListener("pointercancel",function(){dragState=null;});
+  function stopDrag(e){if(!dragState||(e&&dragState.pointerId!==e.pointerId))return;dragState=null;handle.classList.remove("is-dragging");clampCoachPosition(card);}
+  handle.addEventListener("pointerup",stopDrag);handle.addEventListener("pointercancel",stopDrag);handle.addEventListener("lostpointercapture",stopDrag);
+  if(!window.__eocnsCoachResizeBound){window.__eocnsCoachResizeBound=true;window.addEventListener("resize",function(){clampCoachPosition(el("eocnsDemoCoach"));});}
 }
 function toggleLessonMenu(){
   if(el("eocnsDemoMenu")){el("eocnsDemoMenu").remove();lessonMenuOpen=false;return;}
@@ -522,6 +536,7 @@ function takeToLesson(lesson){
 function renderLesson(){
   var l=lessons[currentLesson],n=currentLesson+1;
   clearSpotlight();
+  var lessonBody=el("eocnsDemoCoach").querySelector(".coach-body");if(lessonBody)lessonBody.scrollTop=0;
   el("demoCoachKicker").textContent="Lesson "+n+" of 20";
   el("demoCoachTitle").textContent="Lesson "+n+" of 20: "+l.title;
   el("demoCoachWhat").textContent=l.what;
@@ -541,10 +556,12 @@ function goLesson(index){
 }
 function showGraduation(){
   var card=el("eocnsDemoCoach");
-  card.innerHTML='<div class="coach-head"><div><div class="coach-kicker">PRACTICE COMPLETE</div><h3>Training Complete!</h3></div></div><div class="coach-body"><p>You have reached the end of all 20 guided lessons. You can now explore the EOCNS QA System in the virtual classroom.</p><p><strong>Remember:</strong> every practice record, PIN and save operation stays inside this browser sandbox.</p></div><div class="coach-actions"><button type="button" id="demoRestartTour" class="btn eocns-demo-primary btn--sm">Restart Tour</button><button type="button" id="demoFreePractice" class="btn eocns-demo-muted btn--sm">Practice Freely</button><button type="button" id="demoGraduateExit" class="btn eocns-demo-gold btn--sm">Exit to Real School System</button></div>';
+  card.innerHTML='<div class="coach-head" id="demoCoachDrag"><div><div class="coach-kicker">PRACTICE COMPLETE</div><h3>Training Complete!</h3><div class="coach-drag-meta"><span class="coach-grip" aria-hidden="true">⋮⋮</span><span>Drag to move</span></div></div></div><div class="coach-body"><p>You have reached the end of all 20 guided lessons. You can now explore the EOCNS QA System in the virtual classroom.</p><p><strong>Remember:</strong> every practice record, PIN and save operation stays inside this browser sandbox.</p></div><div class="coach-actions"><button type="button" id="demoRestartTour" class="btn eocns-demo-primary btn--sm">Restart Tour</button><button type="button" id="demoFreePractice" class="btn eocns-demo-muted btn--sm">Practice Freely</button><button type="button" id="demoGraduateExit" class="btn eocns-demo-gold btn--sm">Exit to Real School System</button></div>';
   el("demoRestartTour").addEventListener("click",function(){goLesson(0);});
   el("demoFreePractice").addEventListener("click",function(){card.hidden=true;coachVisible=false;el("demoCoachToggle").textContent="Show Coach";});
   el("demoGraduateExit").addEventListener("click",function(){window.exitEocnsDemoMode();});
+  makeDraggable(card,el("demoCoachDrag"));
+  var graduationBody=card.querySelector(".coach-body");if(graduationBody)graduationBody.scrollTop=0;
   currentLesson=19;updateProgress();
 }
 function initDemoUi(){
