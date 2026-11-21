@@ -2599,7 +2599,7 @@ async function renderHostelRunsMaster() {
       if(linkedIssues.length){
         var hostelConflictIssues=linkedIssues.filter(function(item){return item.status==="hostel_conflict";});
         var biometricIssues=linkedIssues.filter(function(item){return ["clarify","conflict","unlinked"].indexOf(item.status)>=0;});
-        var issueNames=linkedIssues.map(function(item,i){return (i+1)+". "+(item.machineName||item.studentName||"Unnamed machine user")+" (ID "+(item.machineNo||"—")+") — "+String(item.status||"needs review").replace(/_/g," ");}).join("\\n");
+        var issueNames=linkedIssues.map(function(item,i){return (i+1)+". "+(item.machineName||item.studentName||"Unnamed machine user")+" (ID "+(item.machineNo||"—")+") — "+String(item.status||"needs review").replace(/_/g," ");}).join("\n");
         showView("hostel");
         try { await renderBioQueues(true); } catch (e) { console.error("renderBioQueues", e); }
         try { await renderHostelConflicts(hostelConflictIssues); } catch (e) { console.error("renderHostelConflicts", e); }
@@ -2616,7 +2616,7 @@ async function renderHostelRunsMaster() {
         var instructions=[];
         if(hostelConflictIssues.length) instructions.push("In Hostel Conflicts, choose Keep master if the master-list hostel is correct, Accept gate if the gate location reflects the student’s correct hostel, or Dismiss if this mismatch should no longer be reviewed.");
         if(biometricIssues.length) instructions.push("In Biometric Map Review, clarify or link each name, or move unresolved names to the Unlinked Pool for later review.");
-        var guideText="This saved report has "+linkedIssues.length+" item(s) to review before download:\\n\\n"+issueNames+"\\n\\n"+instructions.join("\\n\\n")+" Then return to Saved Hostel Reports and download again.";
+        var guideText="This saved report has "+linkedIssues.length+" item(s) to review before download:\n\n"+issueNames+"\n\n"+instructions.join("\n\n")+" Then return to Saved Hostel Reports and download again.";
         if(guide){guide.textContent=guideText;guide.style.whiteSpace="pre-line";}
         var target=hostelConflictIssues.length?conflictCard:(biometricIssues.length?biometricCard:guide);
         if(target)target.scrollIntoView({behavior:"smooth",block:"center"});
@@ -6372,12 +6372,15 @@ async function publishPendingListToRepo(message) {
   files[DATA_FILES.pending_students] = JSON.stringify(list, null, 2);
   var headers = { "Content-Type": "application/json" };
   if (key) headers["X-EOCNS-Key"] = key;
+  var tok = (typeof getQaSessionToken === "function") ? getQaSessionToken() : "";
+  if (tok) headers["Authorization"] = "Bearer " + tok;
   var res = await fetch(workerUrl.replace(/\/$/, ""), {
     method: "POST",
     headers: headers,
     body: JSON.stringify({
       action: "publish",
       publishKey: key,
+      token: tok,
       message: message || "Update pending student registrations",
       files: files
     })
@@ -6825,6 +6828,8 @@ async function publishPendingListToRepo(message) {
   files[DATA_FILES.pending_students] = JSON.stringify(list, null, 2);
   var headers = { "Content-Type": "application/json" };
   if (key) headers["X-EOCNS-Key"] = key;
+  var tok = (typeof getQaSessionToken === "function") ? getQaSessionToken() : "";
+  if (tok) headers["Authorization"] = "Bearer " + tok;
   var res = await fetch(workerUrl.replace(/\/$/, ""), {
     method: "POST",
     headers: headers,
@@ -7713,10 +7718,13 @@ async function changeQaOfficerPin() {
     return;
   }
   try {
+    var tok = (typeof getQaSessionToken === "function") ? getQaSessionToken() : "";
+    var headers = { "Content-Type": "application/json" };
+    if (tok) headers["Authorization"] = "Bearer " + tok;
     var res = await fetch(workerUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "change_pin", currentPin: current, newPin: neu })
+      headers: headers,
+      body: JSON.stringify({ action: "change_pin", currentPin: current, newPin: neu, token: tok })
     });
     var body = {};
     try { body = await res.json(); } catch (_) {}
@@ -7818,13 +7826,13 @@ async function fetchRepoJson(path) {
   var cleanPath = String(path || "").split("?")[0].replace(/^\.\//, "");
   // Prefer authenticated Worker read (supports encrypted stores after DATA_ENCRYPTION_KEY is set)
   try {
-    var token = typeof getQaSessionToken === "function" ? getQaSessionToken() : "";
+    var tok = (typeof getQaSessionToken === "function") ? getQaSessionToken() : "";
     var workerUrl = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
-    if (token && workerUrl && cleanPath.indexOf("data/") === 0 && cleanPath !== "data/config.json") {
+    if (tok && workerUrl && cleanPath.indexOf("data/") === 0 && cleanPath !== "data/config.json") {
       var wres = await fetch(workerUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-        body: JSON.stringify({ action: "get_store", path: cleanPath, token: token })
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + tok },
+        body: JSON.stringify({ action: "get_store", path: cleanPath, token: tok })
       });
       var wbody = {};
       try { wbody = await wres.json(); } catch (_) {}
@@ -8634,11 +8642,14 @@ async function publishAllToRepo() {
       unchanged.length + " unchanged)…");
 
     var headers = { "Content-Type": "application/json", "X-EOCNS-Key": key };
+    var tok = (typeof getQaSessionToken === "function") ? getQaSessionToken() : "";
+    if (tok) headers["Authorization"] = "Bearer " + tok;
     var res = await fetch(workerUrl.replace(/\/$/, ""), {
       method: "POST",
       headers: headers,
       body: JSON.stringify({
         action: "publish",
+        token: tok,
         message: "EOCNS institutional publish (delta)",
         files: files
       })
@@ -10231,7 +10242,7 @@ async function publishPendingListToRepo(message) {
   var res = await fetch(workerUrl.replace(/\/$/, ""), {
     method: "POST",
     headers: headers,
-    body: JSON.stringify({ action: "publish", publishKey: key, message: message || "Update pending student registrations", files: files })
+    body: JSON.stringify({ action: "publish", publishKey: key, token: tok, message: message || "Update pending student registrations", files: files })
   });
   var body = {};
   try { body = await res.json(); } catch (_) {}
