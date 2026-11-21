@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=38" />
+  <link rel="stylesheet" href="style.css?v=39" />
   <!-- pages-deploy: actions+nojekyll -->
 </head>
 <body class="role-viewer">
@@ -59,27 +59,27 @@
         <div class="nav-section">
           <p class="nav-section__label">Core Systems</p>
           <a href="#" class="nav-item nav-item--officer" data-view="students">Students</a>
-          <a href="#" class="nav-item nav-item--officer" data-view="pending">Pending registrations</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="pending">New Student Requests</a>
           <a href="#" class="nav-item nav-item--officer" data-view="lecturers">Lecturers</a>
-          <a href="#" class="nav-item nav-item--officer" data-view="hostel">Hostel</a>
-          <a href="#" class="nav-item nav-item--officer" data-view="discipline">Discipline</a>
-          <a href="#" class="nav-item nav-item--officer" data-view="attendance">Attendance sheets</a>
-          <a href="#" class="nav-item nav-item--officer" data-view="sessions">Sessions</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="hostel">Hostel &amp; Gate Fees</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="discipline">Discipline Cases</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="attendance">Class Sign-In Sheets</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="sessions">School Sessions</a>
         </div>
         <div class="nav-section">
           <p class="nav-section__label">Quality Assurance</p>
-          <a href="#" class="nav-item nav-item--officer" data-view="timetable-board">Timetable board</a>
-          <a href="#" class="nav-item nav-item--officer" data-view="qa-daily">Daily QA</a>
-          <a href="#" class="nav-item nav-item--officer" data-view="qa-weekly">Weekly QA</a>
-          <a href="#" class="nav-item nav-item--officer" data-view="qa-monthly">Monthly QA</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="timetable-board">Weekly Timetable</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="qa-daily">Today&apos;s Lectures</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="qa-weekly">Weekly QA Report</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="qa-monthly">Monthly QA Report</a>
         </div>
         <div class="nav-section">
           <p class="nav-section__label">System</p>
-          <a href="#" class="nav-item nav-item--officer" data-view="remedial">Remedial</a>
-          <a href="#" class="nav-item nav-item--officer" data-view="reports">Reports & Export</a>
-          <a href="#" class="nav-item nav-item--officer" data-view="lecturer-hours">Lecturer hours</a>
-          <a href="#" class="nav-item nav-item--officer" data-view="audit">Audit Log</a>
-          <a href="#" class="nav-item" data-view="settings">Settings</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="remedial">Remedial Classes</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="reports">Reports &amp; Downloads</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="lecturer-hours">Lecturer Hours</a>
+          <a href="#" class="nav-item nav-item--officer" data-view="audit">Activity History</a>
+          <a href="#" class="nav-item" data-view="settings">Settings &amp; PIN</a>
         </div>
       </nav>
       <div class="sidebar__footer">
@@ -100,6 +100,7 @@
           <p id="pageSubtitle">Eastern Oak College of Nursing Sciences</p>
         </div>
         <div class="topbar__actions" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <button type="button" class="btn save-sync-btn qa-edit-only" id="btnSaveSyncTop" hidden aria-live="polite">All changes saved ✓</button>
           <label class="field" style="margin:0;min-width:180px">
             <span class="field__label" style="font-size:0.7rem;margin:0">Active session</span>
             <select id="globalSessionSelect" style="min-width:160px"></select>
@@ -132,6 +133,7 @@
               <p class="hero-card__eyebrow">Welcome back</p>
               <h2 class="hero-card__title">EOCNS Attendance & QA System</h2>
               <p class="hero-card__lead">One place for hostel, class attendance, lecturers and quality assurance.</p>
+              <button type="button" class="btn btn--primary dashboard-signin" id="btnDashboardOfficerLogin">Sign In as QA Officer</button>
             </div>
             <div class="hero-card__crest">
               <img src="https://www.easternoak.org/images/Eastern-OAK-logo-201.png" alt="Eastern Oak crest" />
@@ -145,22 +147,22 @@
             <div class="stat-card"><div class="stat-card__icon teal">✅</div><div class="stat-card__body"><span class="stat-card__value" id="statAttendance">0</span><span class="stat-card__label">Attendance sheets</span></div></div>
             <div class="stat-card"><div class="stat-card__icon indigo">📚</div><div class="stat-card__body"><span class="stat-card__value" id="statCourses">0</span><span class="stat-card__label">Courses</span></div></div>
           </div>
-          <div class="grid-2">
-            <div class="card"><div class="card__header"><h3>Quick Actions</h3></div><div class="card__body quick-actions">
-              <button class="action-btn" data-goto="students"><span class="action-btn__icon">+</span><span>Add Student</span></button>
-              <button class="action-btn" data-goto="hostel"><span class="action-btn__icon">⌂</span><span>Hostel Report</span></button>
-              <button class="action-btn" id="btnGenerateHostelReportDash"><span class="action-btn__icon">⌂</span><span>Hostel distribution report</span></button>
-              <button class="action-btn" data-goto="qa-daily"><span class="action-btn__icon">◎</span><span>Daily QA</span></button>
-              <button class="action-btn" data-goto="sessions"><span class="action-btn__icon">◫</span><span>New Session</span></button>
+          <div class="dashboard-lower">
+            <div class="card dashboard-actions-card"><div class="card__header"><h3>What do you want to do today?</h3></div><div class="card__body quick-actions">
+              <button type="button" class="action-btn" data-goto="qa-daily"><span class="action-btn__icon">🗓</span><span class="action-btn__copy"><strong>Log Today&apos;s Lectures</strong><small>Mark classes held or missed today</small></span></button>
+              <button type="button" class="action-btn" data-goto="students"><span class="action-btn__icon">👥</span><span class="action-btn__copy"><strong>Student List</strong><small>Search, add, edit, or view a student&apos;s full file</small></span></button>
+              <button type="button" class="action-btn" data-goto="hostel"><span class="action-btn__icon">🏠</span><span class="action-btn__copy"><strong>Hostel Attendance &amp; Fees</strong><small>Upload gate file and download absentee fee sheet</small></span></button>
+              <button type="button" class="action-btn" data-goto="pending"><span class="action-btn__icon">📥</span><span class="action-btn__copy"><strong>New Student Requests</strong><small>Approve or reject online student registrations</small></span></button>
+              <button type="button" class="action-btn" data-goto="reports"><span class="action-btn__icon">📄</span><span class="action-btn__copy"><strong>Print &amp; Download Reports</strong><small>Download PDF, Word, or Excel school reports</small></span></button>
+              <button type="button" class="action-btn action-btn--save" id="btnDashSaveSync"><span class="action-btn__icon">☁</span><span class="action-btn__copy"><strong>Save All Work Online</strong><small>Back up your latest updates for all other computers</small></span></button>
             </div></div>
-            
-          
-<div class="card"><div class="card__header"><h3>System Status</h3></div><div class="card__body">
+            <div class="card dashboard-status-card"><div class="card__header"><h3>System Status</h3></div><div class="card__body">
               <div class="status-list">
-                <div class="status-item"><span class="status-dot good"></span><span>Local database ready</span></div>
-                <div class="status-item"><span class="status-dot good"></span><span>All data stays on this device</span></div>
-                <div class="status-item"><span class="status-dot muted"></span><span>No active session selected</span></div>
+                <div class="status-item"><span class="status-dot good"></span><span>Security: Records encrypted &amp; PIN-protected</span></div>
+                <div class="status-item"><span class="status-dot good" id="dashSyncDot"></span><span>Sync status: Connected to school cloud · <strong id="dashSyncStatus">All saved</strong></span></div>
+                <div class="status-item"><span class="status-dot muted"></span><span>Active academic session: <strong id="dashActiveSession">No active academic session</strong></span></div>
               </div>
+              <button type="button" class="btn btn--ghost qa-edit-only" id="btnGenerateHostelReportDash">Generate hostel distribution report</button>
             </div></div>
           </div>
         </section>
@@ -220,6 +222,7 @@
         </section>
 
         <section class="view" id="view-students">
+          <div class="quick-guide" role="note"><strong>Quick guide</strong> Search by name or Reg. No, click View to open a student&apos;s complete file, or click Add Student.</div>
           <div class="page-toolbar">
             <div class="page-toolbar__left">
               <div class="search-box"><input type="search" id="studentSearch" placeholder="Search name or reg. no…" /></div>
@@ -298,6 +301,7 @@
           </div>
         </section>
         <section class="view" id="view-hostel">
+          <div class="quick-guide" role="note"><strong>Quick guide</strong> Step 1: Upload the gate Excel file → Step 2: Check names &amp; P/A marks → Step 3: Click Confirm &amp; Download (then click Save Changes Now).</div>
           <div class="page-toolbar" style="margin-bottom:12px">
             <div class="page-toolbar__left"><p class="muted-note" style="margin:0">Upload a gate attendance file, choose the reporting dates, review absentees and confirm the final report. Hostel assignment comes from the student master list; gate Location ID is only a cross-check.</p></div>
           </div>
@@ -562,6 +566,7 @@
           <div id="timetableBoard" class="card"><div class="card__body muted-note">Choose a class and click Show week board.</div></div>
         </section>
         <section class="view" id="view-qa-daily">
+          <div class="quick-guide" role="note"><strong>Quick guide</strong> Pick the date and class, mark each lecture Held or Missed, then click Print Daily Report.</div>
           <div class="page-toolbar">
             <div class="page-toolbar__left">
               <p class="muted-note" style="margin:0">Timetable slots for the day — mark each as delivered or missed (same workflow as the college QA analyser).</p>
@@ -1444,7 +1449,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-  <script src="app.js?v=133"></script>
+  <script src="app.js?v=134"></script>
 
   <div class="modal" id="remedialModal" hidden>
     <div class="modal__backdrop" id="remedialModalBackdrop"></div>
@@ -1645,5 +1650,22 @@
     </div>
   </div>
 
+  <div class="modal report-release-modal" id="reportReleaseModal" hidden role="dialog" aria-modal="true" aria-labelledby="reportReleaseTitle" aria-describedby="reportReleaseSubtitle">
+    <div class="modal__backdrop" id="reportReleaseBackdrop"></div>
+    <div class="modal__dialog report-release-dialog">
+      <div class="modal__header"><div><h3 id="reportReleaseTitle">Release Report</h3><p id="reportReleaseSubtitle" class="report-release-subtitle"></p></div>
+        <button type="button" class="icon-btn" id="btnCloseReportRelease" aria-label="Close report release dialog">×</button>
+      </div>
+      <div class="modal__body">
+        <label class="field field--full" for="reportReleaseOfficer"><span class="field__label">Officer Full Name <span class="req">*</span></span><input type="text" id="reportReleaseOfficer" autocomplete="name" placeholder="Type your full name (required)" aria-describedby="reportReleaseError" /></label>
+        <p class="report-release-error" id="reportReleaseError" role="alert" hidden>Please enter your full name before releasing this report.</p>
+        <div class="report-release-choices">
+          <button type="button" class="btn btn--primary report-release-choice" id="btnReportReleasePdf">Print / Save as PDF</button>
+          <button type="button" class="btn btn--ghost report-release-choice" id="btnReportReleaseWord">Download as Word (.doc)</button>
+        </div>
+      </div>
+      <div class="modal__footer report-release-footer"><button type="button" class="btn btn--ghost" id="btnCancelReportRelease">Cancel</button></div>
+    </div>
+  </div>
 </body>
 </html>

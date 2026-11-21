@@ -197,16 +197,47 @@ document.querySelectorAll("[data-goto]").forEach((el) => {
 });
 
 var EOCNS_DIRTY = false;
+var EOCNS_PUBLISH_BUSY = false;
+function updateDashboardSyncStatus() {
+  var label = document.getElementById("dashSyncStatus"), dot = document.getElementById("dashSyncDot");
+  if (label) label.textContent = EOCNS_DIRTY ? "Unsaved changes waiting" : "All saved";
+  if (dot) { dot.classList.toggle("good", !EOCNS_DIRTY); dot.classList.toggle("muted", !!EOCNS_DIRTY); }
+}
+function updateSaveSyncButton() {
+  var btn = document.getElementById("btnSaveSyncTop");
+  if (!btn) return;
+  var loggedIn = isQaOfficer();
+  btn.hidden = !loggedIn; btn.disabled = !!EOCNS_PUBLISH_BUSY;
+  btn.classList.toggle("is-dirty", !!EOCNS_DIRTY); btn.classList.toggle("is-saving", !!EOCNS_PUBLISH_BUSY);
+  btn.textContent = EOCNS_PUBLISH_BUSY ? "Saving…" : (EOCNS_DIRTY ? "Save Changes Now" : "All changes saved ✓");
+  btn.setAttribute("aria-label", btn.textContent);
+}
+function startSaveSyncFlow() {
+  if (!isQaOfficer()) { openOfficerLoginGate("dashboard"); return; }
+  var pinEl = document.getElementById("qaPublishPin");
+  if (pinEl && String(pinEl.value || "").trim()) { publishAllToRepo(); return; }
+  showView("settings");
+  var publishBtn = document.getElementById("btnPublishAll"); if (publishBtn) publishBtn.click();
+  var panel = document.getElementById("qaTokenPanel"); if (panel) panel.hidden = false;
+  var detail = document.getElementById("qaPublishStatusDetail");
+  if (detail) { detail.hidden = false; detail.textContent = "Enter your QA Officer PIN below to save and sync all changes."; }
+  if (pinEl) { pinEl.disabled = false; setTimeout(function() { pinEl.focus(); }, 50); }
+}
 function persistSyncMeta(key, value) {
   try { if (typeof db !== "undefined" && db) put("meta", { key: key, value: value, at: new Date().toISOString() }).catch(function() {}); } catch (_) {}
 }
 function markDirty(reason) {
-  EOCNS_DIRTY = true;
-  persistSyncMeta("dirty", true);
+  EOCNS_DIRTY = true; persistSyncMeta("dirty", true);
   try { refreshOpenStudentDossier(); } catch (_) {}
+  updateDashboardSyncStatus(); updateSaveSyncButton();
   try {
     var el = document.getElementById("dirtyBanner");
-    if (el) { el.hidden = false; el.textContent = "Unsaved local changes" + (reason ? " (" + reason + ")" : "") + " — Publish to repository in Settings before you leave, or you may lose work on another device."; }
+    if (el) {
+      el.hidden = false;
+      el.innerHTML = 'You have unsaved changes — click &apos;Save Changes Now&apos; at the top right before closing this page. <button type="button" class="btn dirty-banner__action" id="btnDirtyBannerSaveSync">Save Changes Now</button>';
+      var saveBtn = document.getElementById("btnDirtyBannerSaveSync");
+      if (saveBtn) saveBtn.addEventListener("click", startSaveSyncFlow);
+    }
   } catch (_) {}
 }
 function refreshOpenStudentDossier() {
@@ -236,6 +267,8 @@ function clearDirty() {
     var el = document.getElementById("dirtyBanner");
     if (el) el.hidden = true;
   } catch (_) {}
+  updateDashboardSyncStatus();
+  updateSaveSyncButton();
 }
 window.addEventListener("beforeunload", function(e) {
   if (!EOCNS_DIRTY) return;
@@ -1443,6 +1476,9 @@ async function refreshDashboardStats() {
     set("statAttendance", att.length);
     set("statCourses", courses.length);
     set("statHostels", "2");
+    var dashSession = document.getElementById("dashActiveSession");
+    if (dashSession) { var activeDashSession = (typeof ACTIVE_SESSION !== "undefined" && ACTIVE_SESSION) || sessions.find(function(s) { return s.status === "Active"; }); dashSession.textContent = activeDashSession ? activeDashSession.name : "No active academic session"; }
+    updateDashboardSyncStatus();
     // status items
     var statusBox = document.querySelector(".status-list") || document.getElementById("dashboardStatus");
     // hero status line if present
@@ -4244,20 +4280,46 @@ function reportSignatureHtml(officerName) {
 
 function promptOfficerAndFormat(defaultTitle) {
   return new Promise(function(resolve) {
-    // Officer name is requested every time — never stored for reuse (audit integrity).
-    var officer = prompt("Enter the full name of the officer generating/releasing this report:\n(Required — will appear on the report and in the audit trail)", "");
-    if (officer == null) { resolve(null); return; }
-    officer = String(officer).trim();
-    if (!officer) { alert("Officer name is required for every report."); resolve(null); return; }
-    var fmt = prompt("Output format — type PDF or WORD (default PDF):", "PDF");
-    if (fmt == null) { resolve(null); return; }
-    fmt = String(fmt).trim().toLowerCase();
-    if (fmt.indexOf("w") === 0) fmt = "word";
-    else fmt = "pdf";
-    resolve({ officer: officer, format: fmt, title: defaultTitle || "Report" });
+    var modal = document.getElementById("reportReleaseModal"), input = document.getElementById("reportReleaseOfficer");
+    var subtitle = document.getElementById("reportReleaseSubtitle"), error = document.getElementById("reportReleaseError");
+    var pdf = document.getElementById("btnReportReleasePdf"), word = document.getElementById("btnReportReleaseWord");
+    var cancel = document.getElementById("btnCancelReportRelease"), close = document.getElementById("btnCloseReportRelease");
+    var backdrop = document.getElementById("reportReleaseBackdrop");
+    if (!modal || !input || !pdf || !word || !cancel) { resolve(null); return; }
+    input.value = ""; input.removeAttribute("aria-invalid");
+    if (error) error.hidden = true;
+    if (subtitle) subtitle.textContent = defaultTitle || "Report";
+    modal.hidden = false;
+    var settled = false;
+    function onInput() { if (String(input.value || "").trim()) { input.removeAttribute("aria-invalid"); if (error) error.hidden = true; } }
+    function cleanup() {
+      pdf.removeEventListener("click", onPdf); word.removeEventListener("click", onWord);
+      cancel.removeEventListener("click", onCancel); input.removeEventListener("input", onInput);
+      if (close) close.removeEventListener("click", onCancel);
+      if (backdrop) backdrop.removeEventListener("click", onCancel);
+      document.removeEventListener("keydown", onKeydown);
+    }
+    function finish(value) { if (settled) return; settled = true; cleanup(); modal.hidden = true; resolve(value); }
+    function choose(format) {
+      var officer = String(input.value || "").trim();
+      if (!officer) { input.setAttribute("aria-invalid", "true"); if (error) error.hidden = false; input.focus(); return; }
+      finish({ officer: officer, format: format, title: defaultTitle || "Report" });
+    }
+    function onPdf() { choose("pdf"); }
+    function onWord() { choose("word"); }
+    function onCancel() { finish(null); }
+    function onKeydown(e) {
+      if (e.key === "Escape") { e.preventDefault(); onCancel(); }
+      else if (e.key === "Enter" && document.activeElement === input) { e.preventDefault(); onPdf(); }
+    }
+    input.addEventListener("input", onInput); pdf.addEventListener("click", onPdf); word.addEventListener("click", onWord);
+    cancel.addEventListener("click", onCancel);
+    if (close) close.addEventListener("click", onCancel);
+    if (backdrop) backdrop.addEventListener("click", onCancel);
+    document.addEventListener("keydown", onKeydown);
+    setTimeout(function() { try { input.focus(); } catch (_) {} }, 0);
   });
 }
-
 /** Pull audit rows that touch entities in a date window (for amendment footnotes). */
 async function collectReportAmendments(opts) {
   opts = opts || {};
@@ -7677,6 +7739,9 @@ function setQaOfficer(on, officerName) {
 
 function updateQaOfficerUI() {
   const loggedIn = isQaOfficer();
+  var dashLogin = document.getElementById("btnDashboardOfficerLogin");
+  if (dashLogin) dashLogin.hidden = !!loggedIn;
+  updateSaveSyncButton();
   const out = document.getElementById("qaAuthLoggedOut");
   const inn = document.getElementById("qaAuthLoggedIn");
   if (out) out.hidden = loggedIn;
@@ -7766,6 +7831,10 @@ async function changeQaOfficerPin() {
 function initQaOfficerUI() {
   setQaOfficer(isQaOfficer());
   updateQaOfficerUI();
+  updateDashboardSyncStatus();
+  document.getElementById("btnDashboardOfficerLogin")?.addEventListener("click", function() { openOfficerLoginGate("dashboard"); });
+  document.getElementById("btnSaveSyncTop")?.addEventListener("click", startSaveSyncFlow);
+  document.getElementById("btnDashSaveSync")?.addEventListener("click", startSaveSyncFlow);
   document.getElementById("btnOfficerGateLogin")?.addEventListener("click", function() { tryOfficerGateLogin(); });
   document.getElementById("btnBannerGoSettings")?.addEventListener("click", function() { showView("settings"); });
   document.getElementById("btnOfficerGateCancel")?.addEventListener("click", function() { closeOfficerLoginGate(); showView("dashboard"); });
@@ -8517,6 +8586,8 @@ async function publishAllToRepo() {
     }
   }
   function setPublishBusy(busy) {
+    EOCNS_PUBLISH_BUSY = !!busy;
+    updateSaveSyncButton();
     if (btnConfirm) {
       btnConfirm.disabled = !!busy;
       btnConfirm.textContent = busy ? "Publishing… please wait" : "Confirm publish all";
@@ -8636,6 +8707,7 @@ async function publishAllToRepo() {
       setSt("Nothing new to publish — repository already has the same data (" +
         (unchanged.length ? unchanged.join(", ") : "all stores") +
         "). Local marked clean; refresh will load from repository.");
+      setPublishBusy(false);
       return;
     }
 
