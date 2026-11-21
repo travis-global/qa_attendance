@@ -1345,8 +1345,7 @@ async function renderAuditLog() {
     window.__auditHydrateTried = true;
     try {
       var remote = await fetchRepoJson(DATA_FILES.audit);
-      if (remote === null) return;
-      if (Array.isArray(remote) && remote.length) {
+      if (remote !== null && Array.isArray(remote) && remote.length) {
         await putMany("audit", remote);
         list = remote;
       }
