@@ -48,12 +48,12 @@
     ]
   },
   {
-    "id": "NUR 212",
     "code": "NUR 212",
-    "name": "NUR 212",
+    "name": "Primary Health Care II",
     "classKeys": [
       "200_nursing"
-    ]
+    ],
+    "id": "NUR 212"
   },
   {
     "id": "NUR 213",
@@ -64,12 +64,12 @@
     ]
   },
   {
-    "id": "NUR 214",
     "code": "NUR 214",
-    "name": "NUR 214",
+    "name": "Dietetics",
     "classKeys": [
       "200_nursing"
-    ]
+    ],
+    "id": "NUR 214"
   },
   {
     "code": "NUS 111",
