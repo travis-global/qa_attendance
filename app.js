@@ -7973,6 +7973,38 @@ async function hydrateAllFromRepoIfEmpty(){
  return{loaded:result.pulled,totalStu:totalStu,failed:result.failed};
 }
 
+var EOCNS_TIER1_STORES=["sessions","programmes","levels","courses","timetables","students","lecturers","qa_entries","attendance"];
+var EOCNS_TIER2_STORES=["audit","hostel_runs","biometric_pending","discipline","pending_students","remedial","remedial_meta","remedial_enrolment","remedial_assignments","remedial_timetable","remedial_logs"];
+var __eocnsManifestFetchedAt=0;
+async function fetchRepoManifest(force){
+ var tok=typeof getQaSessionToken==="function"?getQaSessionToken():"";if(!tok)return null;
+ if(!force&&window.__eocnsManifest&&Date.now()-__eocnsManifestFetchedAt<120000)return window.__eocnsManifest;
+ var url=(typeof APP_CONFIG!=="undefined"&&APP_CONFIG&&APP_CONFIG.publishWorkerUrl||"").trim();if(!url)return null;
+ var res=await fetch(url.replace(/\/$/,""),{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},body:JSON.stringify({action:"get_manifest",token:tok})});
+ var body={};try{body=await res.json();}catch(_){}if(!res.ok||!body||!body.ok)throw new Error((body&&body.error)||("get_manifest HTTP "+res.status));
+ window.__eocnsManifest=body.manifest||body.files||body.data||body;__eocnsManifestFetchedAt=Date.now();return window.__eocnsManifest;
+}
+function manifestFileEntry(manifest,path){if(!manifest)return null;var src=manifest.files||manifest.manifest||manifest;if(Array.isArray(src))return src.find(function(x){return x&&(x.path===path||x.name===path);})||null;return src[path]||null;}
+function manifestFileSha(manifest,path){var x=manifestFileEntry(manifest,path);return typeof x==="string"?x:(x&&(x.sha||x.blobSha||x.oid))||"";}
+async function ensureStoresLoaded(storeNames,opts){
+ opts=opts||{};var names=Array.from(new Set((storeNames||[]).filter(Boolean))),pulled=[],skipped=[],failed=[];if(!names.length)return{pulled:pulled,skipped:skipped,failed:failed};
+ var manifest=null;try{manifest=await fetchRepoManifest(!!opts.force);}catch(e){console.warn("repo manifest",e);}
+ var metaRows=await getAll("meta"),sr=metaRows.find(function(x){return x&&x.key==="repoFileShas";}),shas=Object.assign({},sr&&sr.value||{}),jobs=[];
+ for(var i=0;i<names.length;i++){var store=names[i],path=DATA_FILES[store];if(!path){skipped.push(store+"(no path)");continue;}
+  var local=[];try{local=await getAll(store);}catch(_){}if(EOCNS_DIRTY&&local.length){skipped.push(store+"(local unpublished data)");continue;}
+  var sha=manifestFileSha(manifest,path);if(sha&&shas[path]===sha&&local.length){skipped.push(store+"(SHA unchanged)");continue;}
+  if(!sha&&local.length&&!opts.force){skipped.push(store+"(manifest SHA unavailable)");continue;}jobs.push({store:store,path:path,sha:sha});
+ }
+ var cursor=0;async function worker(){while(cursor<jobs.length){var j=jobs[cursor++];try{var data=await fetchRepoJson(j.path);if(data==null){skipped.push(j.store+"(unavailable)");continue;}
+  if(j.store==="timetables")TIMETABLES_CACHE=data;
+  else if(j.store==="remedial_meta"||j.store==="remedial_timetable"){await clearStore(j.store);await put(j.store,{key:"main",value:data});}
+  else{if(!Array.isArray(data))throw new Error("Expected array at "+j.path);await replaceStoreFromRepoRows(j.store,data);}
+  if(j.sha)shas[j.path]=j.sha;else delete shas[j.path];pulled.push(j.store);
+ }catch(e){console.warn("manifest load",j.store,e);failed.push(j.store);}}}
+ await Promise.all(Array.from({length:Math.min(4,jobs.length)},worker));if(pulled.length)await put("meta",{key:"repoFileShas",value:shas});
+ return{pulled:pulled,skipped:skipped,failed:failed};
+}
+
 // ================= KEEP THIS BROWSER IN STEP WITH THE REPOSITORY =================
 // Rule: repository data replaces local data only when this browser has NO unpublished changes.
 var SYNC_STORES = [
