@@ -115,6 +115,149 @@ function checkPublishKey(env, request, payload) {
   return supplied.length > 0 && supplied === expected;
 }
 
+
+// ===== Optional at-rest encryption (DATA_ENCRYPTION_KEY secret) =====
+const SENSITIVE_PATHS = new Set([
+  "data/students.json",
+  "data/lecturers.json",
+  "data/qa_entries.json",
+  "data/audit.json",
+  "data/discipline.json",
+  "data/pending_students.json",
+  "data/hostel_runs.json",
+  "data/biometric_pending.json",
+  "data/attendance.json",
+  "data/remedial.json",
+  "data/remedial_logs.json",
+  "data/remedial_enrolment.json",
+  "data/remedial_assignments.json",
+  "data/remedial_meta.json",
+  "data/remedial_timetable.json",
+]);
+
+function encryptionEnabled(env) {
+  return !!String(env.DATA_ENCRYPTION_KEY || "").trim();
+}
+
+async function deriveAesKey(env) {
+  const raw = new TextEncoder().encode(String(env.DATA_ENCRYPTION_KEY || ""));
+  const hash = await crypto.subtle.digest("SHA-256", raw);
+  return crypto.subtle.importKey("raw", hash, { name: "AES-GCM" }, false, ["encrypt", "decrypt"]);
+}
+
+function bytesToB64(bytes) {
+  let s = "";
+  const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  for (let i = 0; i < arr.length; i++) s += String.fromCharCode(arr[i]);
+  return btoa(s);
+}
+
+function b64ToBytes(b64) {
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+function looksEncryptedJson(text) {
+  if (!text || typeof text !== "string") return false;
+  const t = text.trim();
+  if (t[0] !== "{") return false;
+  try {
+    const o = JSON.parse(t);
+    return o && o.v === 1 && o.alg === "AES-GCM" && o.iv && o.ct;
+  } catch (_) {
+    return false;
+  }
+}
+
+async function encryptPlainText(env, plainText) {
+  const key = await deriveAesKey(env);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv },
+    key,
+    new TextEncoder().encode(plainText)
+  );
+  return JSON.stringify({
+    v: 1,
+    alg: "AES-GCM",
+    iv: bytesToB64(iv),
+    ct: bytesToB64(ct),
+  });
+}
+
+async function decryptToPlainText(env, maybeEnc) {
+  if (!looksEncryptedJson(maybeEnc)) return maybeEnc;
+  if (!encryptionEnabled(env)) {
+    throw new Error("File is encrypted but DATA_ENCRYPTION_KEY is not set on the Worker");
+  }
+  const o = JSON.parse(maybeEnc);
+  const key = await deriveAesKey(env);
+  const iv = b64ToBytes(o.iv);
+  const ct = b64ToBytes(o.ct);
+  const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ct);
+  return new TextDecoder().decode(pt);
+}
+
+async function maybeEncryptForPath(env, path, contentText) {
+  if (!encryptionEnabled(env)) return contentText;
+  if (!SENSITIVE_PATHS.has(path)) return contentText;
+  if (looksEncryptedJson(contentText)) return contentText; // already wrapped
+  return encryptPlainText(env, contentText);
+}
+
+async function requireSessionOrPublishKey(env, request, payload) {
+  const token = String(
+    (payload && payload.token) ||
+    request.headers.get("Authorization")?.replace(/^Bearer\s+/i, "") ||
+    ""
+  ).trim();
+  if (token) {
+    const sess = await verifySessionToken(env, token);
+    if (sess) return { ok: true, via: "session", officer: sess.officer };
+  }
+  if (checkPublishKey(env, request, payload || {})) return { ok: true, via: "publish_key" };
+  return { ok: false };
+}
+
+async function handleGetStore(env, request, payload, cors) {
+  const auth = await requireSessionOrPublishKey(env, request, payload);
+  if (!auth.ok) {
+    return json({ error: "Unauthorized. Sign in as QA officer or supply publish key." }, 401, cors);
+  }
+  const path = String(payload.path || payload.storePath || "").trim();
+  if (!path || !ALLOWED_PATHS.has(path)) {
+    return json({ error: "Invalid or disallowed path" }, 400, cors);
+  }
+  // Never return auth pin hash via generic get for safety? allow only for worker internal - block
+  if (path === "data/auth_pin.json") {
+    return json({ error: "Forbidden" }, 403, cors);
+  }
+  if (!env.GITHUB_TOKEN) return json({ error: "GITHUB_TOKEN missing" }, 500, cors);
+  const file = await githubGetFile(env, path);
+  if (file.content == null) {
+    return json({ ok: true, path, data: path.endsWith(".json") ? [] : null, encrypted: false }, 200, cors);
+  }
+  let plain = file.content;
+  let encrypted = false;
+  try {
+    if (looksEncryptedJson(file.content)) {
+      encrypted = true;
+      plain = await decryptToPlainText(env, file.content);
+    }
+  } catch (err) {
+    return json({ error: "Decrypt failed: " + (err.message || String(err)) }, 500, cors);
+  }
+  let data;
+  try {
+    data = JSON.parse(plain);
+  } catch (_) {
+    return json({ error: "Store is not valid JSON after decrypt" }, 500, cors);
+  }
+  return json({ ok: true, path, data, encrypted }, 200, cors);
+}
+
 async function handlePublish(env, request, payload, cors) {
   if (!checkPublishKey(env, request, payload)) {
     return json({
@@ -127,13 +270,20 @@ async function handlePublish(env, request, payload, cors) {
   }
   const messageBase = payload.message || "Update data via EOCNS QA System";
   const results = [];
+  const encryptedPaths = [];
   for (const [path, contentText] of Object.entries(files)) {
     if (!ALLOWED_PATHS.has(path)) throw new Error(`Path not allowed: ${path}`);
     if (typeof contentText !== "string") throw new Error(`Content for ${path} must be a string`);
-    await githubPutFile(env, path, contentText, `${messageBase}: ${path}`);
+    // Never encrypt auth hash file or public config through this path incorrectly
+    let toWrite = contentText;
+    if (path !== "data/auth_pin.json" && path !== "data/config.json") {
+      toWrite = await maybeEncryptForPath(env, path, contentText);
+      if (toWrite !== contentText) encryptedPaths.push(path);
+    }
+    await githubPutFile(env, path, toWrite, `${messageBase}: ${path}`);
     results.push(path);
   }
-  return json({ ok: true, updated: results }, 200, cors);
+  return json({ ok: true, updated: results, encrypted: encryptedPaths, encryptionEnabled: encryptionEnabled(env) }, 200, cors);
 }
 
 async function handleSubmitPending(env, payload, cors) {
@@ -540,6 +690,7 @@ export default {
           "login (POST action=login)",
           "verify_session (POST action=verify_session)",
           "change_pin (POST action=change_pin — updates hash in repo; no wrangler)",
+          "get_store (POST action=get_store — session token; decrypts if needed)",
           "publish (POST files)",
           "submit_pending (POST student)",
           "reject_email (POST)",
@@ -559,6 +710,10 @@ export default {
       if (action === "login") return await handleLogin(env, request, payload, cors);
       if (action === "verify_session") return await handleVerifySession(env, payload, cors);
       if (action === "change_pin") return await handleChangePin(env, request, payload, cors);
+      if (action === "get_store") {
+        if (!env.GITHUB_TOKEN) return json({ error: "GITHUB_TOKEN secret not configured on worker" }, 500, cors);
+        return await handleGetStore(env, request, payload, cors);
+      }
       if (!env.GITHUB_TOKEN) return json({ error: "GITHUB_TOKEN secret not configured on worker" }, 500, cors);
       if (action === "submit_pending") return await handleSubmitPending(env, payload, cors);
       if (action === "reject_email") return await handleRejectEmail(env, request, payload, cors);

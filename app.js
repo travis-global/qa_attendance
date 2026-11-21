@@ -1,4 +1,4 @@
-/* EOCNS build v127 — outer bare report refs removed */
+/* EOCNS build v128 — outer bare report refs removed */
 (() => {
 "use strict";
 // Safe stubs so early event wiring never throws ReferenceError (real impls overwrite later)
@@ -1338,6 +1338,16 @@ async function renderAuditLog() {
   if (denied) denied.hidden = true;
   if (officer) officer.hidden = false;
   var list = await getAll("audit");
+  if ((!list || !list.length) && !window.__auditHydrateTried) {
+    window.__auditHydrateTried = true;
+    try {
+      var remote = await fetchRepoJson(DATA_FILES.audit);
+      if (Array.isArray(remote) && remote.length) {
+        await putMany("audit", remote);
+        list = remote;
+      }
+    } catch (err) { console.warn("audit hydrate", err); }
+  }
   list = (list || []).slice();
   list.sort(function(a, b) {
     return String(b.timestamp || b.at || b.createdAt || "").localeCompare(String(a.timestamp || a.at || a.createdAt || ""));
@@ -7805,8 +7815,28 @@ function initQaOfficerUI() {
 }
 
 async function fetchRepoJson(path) {
-  const res = await fetch(path + "?v=" + Date.now(), { cache: "no-store" });
-  if (!res.ok) throw new Error("HTTP " + res.status + " for " + path);
+  var cleanPath = String(path || "").split("?")[0].replace(/^\.\//, "");
+  // Prefer authenticated Worker read (supports encrypted stores after DATA_ENCRYPTION_KEY is set)
+  try {
+    var token = typeof getQaSessionToken === "function" ? getQaSessionToken() : "";
+    var workerUrl = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
+    if (token && workerUrl && cleanPath.indexOf("data/") === 0 && cleanPath !== "data/config.json") {
+      var wres = await fetch(workerUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify({ action: "get_store", path: cleanPath, token: token })
+      });
+      var wbody = {};
+      try { wbody = await wres.json(); } catch (_) {}
+      if (wres.ok && wbody && wbody.ok && typeof wbody.data !== "undefined") {
+        return wbody.data;
+      }
+    }
+  } catch (err) {
+    console.warn("get_store fallback", err);
+  }
+  const res = await fetch(cleanPath + "?v=" + Date.now(), { cache: "no-store" });
+  if (!res.ok) throw new Error("HTTP " + res.status + " for " + cleanPath);
   return res.json();
 }
 
@@ -7894,7 +7924,8 @@ async function hydrateAllFromRepoIfEmpty() {
   await fillIfEmpty("lecturers", DATA_FILES.lecturers, "lecturers");
   await fillIfEmpty("sessions", DATA_FILES.sessions, "sessions");
   await fillIfEmpty("qa_entries", DATA_FILES.qa_entries, "lecture logs");
-  await fillIfEmpty("audit", DATA_FILES.audit, "audit");
+  // audit deferred (large): loaded when Audit view opens if local empty
+  // await fillIfEmpty("audit", DATA_FILES.audit, "audit");
   try { await fillIfEmpty("discipline", DATA_FILES.discipline, "discipline"); } catch (_) {}
   try { await fillIfEmpty("pending_students", DATA_FILES.pending_students, "pending registrations"); } catch (_) {}
   await fillIfEmpty("programmes", DATA_FILES.programmes, "programmes");

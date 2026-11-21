@@ -4,5 +4,6 @@
   "publishWorkerKey": "K7mQ2vR9xL4pT8nB",
   "publishNote": "Set publishWorkerUrl to your Cloudflare Worker URL after deploy. GitHub PAT stays only in the Worker secret GITHUB_TOKEN.",
   "authMode": "worker",
-  "authNote": "Officer PIN is not stored in this public file. It is verified by the Cloudflare Worker and stored only as a one-way hash in data/auth_pin.json after first login/change."
+  "authNote": "Officer PIN is not stored in this public file. It is verified by the Cloudflare Worker and stored only as a one-way hash in data/auth_pin.json after first login/change.",
+  "encryptionNote": "Set Worker secret DATA_ENCRYPTION_KEY then redeploy. After that, Publish encrypts sensitive data/*.json. Reads use get_store when signed in."
 }
