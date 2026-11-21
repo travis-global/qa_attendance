@@ -125,6 +125,9 @@ async function tryOfficerGateLogin() {
     return;
   }
   if (err) err.hidden = true;
+  try { await hydrateAllFromRepoIfEmpty(); } catch (e) { console.warn("post-login hydrate", e); }
+  try { await syncFromRepoIfClean(); } catch (e) { console.warn("post-login sync", e); }
+  try { await refreshDashboardStats(); } catch (_) {}
   var gate = document.getElementById("officerLoginGate");
   var target = (gate && gate.getAttribute("data-target-view")) || "dashboard";
   closeOfficerLoginGate();
@@ -7782,6 +7785,9 @@ function initQaOfficerUI() {
       if (document.getElementById("qaPinInput")) document.getElementById("qaPinInput").value = "";
       var nameEl = document.getElementById("qaSignedInOfficerName");
       if (nameEl) nameEl.textContent = body.officer || officerName;
+  try { await hydrateAllFromRepoIfEmpty(); } catch (e) { console.warn("post-login hydrate", e); }
+  try { await syncFromRepoIfClean(); } catch (e) { console.warn("post-login sync", e); }
+  try { await refreshDashboardStats(); } catch (_) {}
     } catch (e) {
       console.warn("worker login", e);
       if (err) {
@@ -7792,10 +7798,23 @@ function initQaOfficerUI() {
     }
   });
   document.getElementById("btnChangeQaPin")?.addEventListener("click", () => { changeQaOfficerPin(); });
-  document.getElementById("btnQaLogout")?.addEventListener("click", () => {
+  document.getElementById("btnQaLogout")?.addEventListener("click", async () => {
+    if (EOCNS_DIRTY && !confirm("There are unpublished changes on this computer. Publish them first before signing out. Sign out anyway?")) return;
+    try {
+      if (typeof storeQaSessionToken === "function") storeQaSessionToken("");
+      else if (typeof QA_SESSION_TOKEN_KEY !== "undefined") sessionStorage.removeItem(QA_SESSION_TOKEN_KEY);
+    } catch (_) {}
     setQaOfficer(false);
+    var sensitiveStores = ["students","lecturers","qa_entries","audit","discipline","pending_students","hostel_runs","biometric_pending","attendance","remedial","remedial_logs","remedial_enrolment","remedial_assignments","remedial_meta","remedial_timetable"];
+    for (var i = 0; i < sensitiveStores.length; i++) {
+      try { if (db && db.objectStoreNames.contains(sensitiveStores[i])) await clearStore(sensitiveStores[i]); }
+      catch (e) { console.warn("logout store cleanup", sensitiveStores[i], e); }
+    }
+    try { studentsCache = []; OFFICIAL_STUDENTS = []; }
+    catch (_) {}
     const panel = document.getElementById("qaTokenPanel");
     if (panel) panel.hidden = true;
+    try { await refreshDashboardStats(); } catch (_) {}
   });
   document.getElementById("btnExportStudents")?.addEventListener("click", function() {
     if (typeof window.exportFullSnapshot === "function") window.exportFullSnapshot();
@@ -7832,6 +7851,28 @@ var SENSITIVE_DATA_PATHS = {
   "data/remedial.json": true, "data/remedial_logs.json": true, "data/remedial_enrolment.json": true,
   "data/remedial_assignments.json": true, "data/remedial_meta.json": true, "data/remedial_timetable.json": true
 };
+window.eocnsEncryptAllNow = async function() {
+  if (!isQaOfficer()) throw new Error("QA Officer sign-in is required.");
+  var tok = (typeof getQaSessionToken === "function") ? getQaSessionToken() : "";
+  if (!tok) throw new Error("A valid officer session token is required.");
+  var workerUrl = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
+  if (!workerUrl) throw new Error("Worker URL is missing from configuration.");
+  var res = await fetch(workerUrl.replace(/\\/$/, ""), {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + tok },
+    body: JSON.stringify({ action: "encrypt_all", token: tok })
+  });
+  var body = {}; try { body = await res.json(); } catch (_) {}
+  if (!res.ok || !body || !body.ok) throw new Error((body && body.error) || ("encrypt_all failed: HTTP " + res.status));
+  var summary = body.summary || body.result || body;
+  var encrypted = Number(summary.encrypted || body.encrypted || 0);
+  var skipped = Number(summary.skipped || body.skipped || 0);
+  var message = "Encryption migration complete. Encrypted: " + encrypted + "; skipped: " + skipped + ".";
+  console.info("EOCNS encrypt_all result:", body);
+  alert(message);
+  return { encrypted: encrypted, skipped: skipped, response: body };
+};
+
 async function fetchRepoJson(path) {
   var cleanPath = String(path || "").split("?")[0].replace(/^\\/+/, "");
   var tok = (typeof getQaSessionToken === "function") ? getQaSessionToken() : "";
