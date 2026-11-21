@@ -508,7 +508,8 @@ async function verifySessionToken(env, token) {
 }
 
 const AUTH_PIN_PATH = "data/auth_pin.json";
-const PBKDF2_ITERS = 120000;
+// Cloudflare Workers WebCrypto supports PBKDF2 iteration counts up to 100000 here.
+const PBKDF2_ITERS = 100000;
 
 async function pbkdf2Hash(pin, saltB64) {
   const saltBin = atob(saltB64);
