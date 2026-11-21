@@ -1,4 +1,4 @@
-/* EOCNS build v125 — outer bare report refs removed */
+/* EOCNS build v126 — outer bare report refs removed */
 (() => {
 "use strict";
 // Safe stubs so early event wiring never throws ReferenceError (real impls overwrite later)
@@ -6177,7 +6177,7 @@ async function approvePendingStudent(id) {
   if (!id) return;
   var pin = prompt("Enter officer PIN to approve this registration onto the master list:");
   if (pin == null) return;
-  if (String(pin).trim() !== String((APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA")) {
+  if (!(await verifyOfficerPin(pin))) {
     alert("Incorrect PIN. Not approved.");
     return;
   }
@@ -6308,8 +6308,7 @@ async function confirmRejectPendingStudent(forcedId, forcedReason, forcedPin) {
       pin = (document.getElementById("pendingRejectPin") && document.getElementById("pendingRejectPin").value || "").trim();
     }
     if (!pin) { alert("Officer PIN is required."); return; }
-    var expected = String((APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA").trim();
-    if (String(pin).trim() !== expected) {
+    if (!(await verifyOfficerPin(pin))) {
       alert("Incorrect PIN. Submission was not rejected.");
       return;
     }
@@ -6755,7 +6754,7 @@ async function approvePendingStudent(id) {
   if (!id) return;
   var pin = prompt("Enter officer PIN to approve this registration onto the master list:");
   if (pin == null) return;
-  if (String(pin).trim() !== String((APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA")) {
+  if (!(await verifyOfficerPin(pin))) {
     alert("Incorrect PIN. Not approved.");
     return;
   }
@@ -7121,6 +7120,42 @@ function storeQaSessionToken(token) {
 function getQaSessionToken() {
   try { return sessionStorage.getItem(QA_SESSION_TOKEN_KEY) || ""; } catch (_) { return ""; }
 }
+
+/** Prefer Cloudflare Worker PIN check; legacy config.qaPin only if Worker unavailable. */
+async function verifyOfficerPin(pin) {
+  pin = String(pin || "").trim();
+  if (!pin) return false;
+  var workerUrl = "";
+  try { workerUrl = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim(); } catch (_) {}
+  if (workerUrl) {
+    try {
+      var res = await fetch(workerUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "login",
+          pin: pin,
+          officer: (typeof getQaOfficerName === "function" && getQaOfficerName()) || "QA Officer"
+        })
+      });
+      var body = {};
+      try { body = await res.json(); } catch (_) {}
+      if (res.ok && body && body.ok && body.token) {
+        if (typeof storeQaSessionToken === "function") storeQaSessionToken(body.token);
+        return true;
+      }
+      // Wrong PIN from Worker — do not accept legacy mismatch
+      if (res.status === 401) return false;
+      // 503 / network / misconfig → fall through to legacy
+    } catch (err) {
+      console.warn("verifyOfficerPin worker", err);
+    }
+  }
+  var localPin = "";
+  try { localPin = String((typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.qaPin) || "").trim(); } catch (_) {}
+  return !!(localPin && pin === localPin);
+}
+
 
 
 const QA_PIN_KEY = "eocns-qa-session";
@@ -7658,14 +7693,9 @@ async function changeQaOfficerPin() {
   var current = (document.getElementById("changePinCurrent") && document.getElementById("changePinCurrent").value || "").trim();
   var neu = (document.getElementById("changePinNew") && document.getElementById("changePinNew").value || "").trim();
   var conf = (document.getElementById("changePinConfirm") && document.getElementById("changePinConfirm").value || "").trim();
-  var expected = (APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA";
   if (!current) { setStatus("Enter the current PIN."); return; }
-  if (current !== expected) {
-    setStatus("Current PIN is incorrect. PIN was not changed.");
-    return;
-  }
-  if (!neu || neu.length < 4) {
-    setStatus("New PIN must be at least 4 characters.");
+  if (!neu || neu.length < 6) {
+    setStatus("New PIN must be at least 6 characters.");
     return;
   }
   if (neu !== conf) {
@@ -7676,86 +7706,42 @@ async function changeQaOfficerPin() {
     setStatus("New PIN is the same as the current PIN.");
     return;
   }
-  if (!confirm("Update the QA officer PIN in the repository now? Other devices will use the new PIN after they refresh.")) return;
-
-  // Refresh worker URL/key from repo config if possible (do not overwrite qaPin yet)
-  var workerUrl = (APP_CONFIG.publishWorkerUrl || "").trim();
-  var pubKey = (APP_CONFIG.publishWorkerKey || "").trim();
-  try {
-    var remoteCfg = await fetchRepoJson(DATA_FILES.config + "?t=" + Date.now());
-    if (remoteCfg && remoteCfg.publishWorkerUrl) workerUrl = String(remoteCfg.publishWorkerUrl).trim();
-    if (remoteCfg && remoteCfg.publishWorkerKey) pubKey = String(remoteCfg.publishWorkerKey).trim();
-  } catch (_) {}
-
+  setStatus("Verifying current PIN with the secure Worker…");
+  var workerUrl = (APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
   if (!workerUrl) {
-    setStatus("publishWorkerUrl is missing in config. Cannot update the repository.");
+    setStatus("publishWorkerUrl is missing in config.");
     return;
   }
-
-  // Build next config — only apply locally AFTER successful push
-  var nextConfig = Object.assign({}, APP_CONFIG, {
-    qaPin: neu,
-    qaPinNote: "Officer password. Rotated " + new Date().toISOString().slice(0, 10) + ".",
-    qaPinUpdatedAt: new Date().toISOString(),
-    publishWorkerUrl: workerUrl,
-    publishWorkerKey: pubKey
-  });
-
-  setStatus("Updating data/config.json via publish worker…");
   try {
-    var files = {};
-    files[DATA_FILES.config] = JSON.stringify(nextConfig, null, 2);
-    // Same headers as normal Publish (CORS allows X-EOCNS-Key)
-    var headers = { "Content-Type": "application/json" };
-    if (pubKey) headers["X-EOCNS-Key"] = pubKey;
-
-    var res = await fetch(workerUrl.replace(/\/$/, ""), {
+    var res = await fetch(workerUrl, {
       method: "POST",
-      headers: headers,
-      body: JSON.stringify({
-        message: "chore: rotate QA officer PIN",
-        publishKey: pubKey,
-        files: files
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "change_pin", currentPin: current, newPin: neu })
     });
     var body = {};
     try { body = await res.json(); } catch (_) {}
-    if (!res.ok) {
-      var detail = body.error || body.message || res.statusText || ("HTTP " + res.status);
-      if (/Path not allowed/i.test(detail)) {
-        detail += " — Redeploy the Cloudflare Worker with the latest code (config.json must be on the allow-list).";
-      }
-      if (/Unauthorized|401/i.test(detail)) {
-        detail += " — PUBLISH_KEY on the worker must match publishWorkerKey in config.";
-      }
-      setStatus("Repository update failed: " + detail + " PIN was NOT changed.");
+    if (res.status === 401) {
+      setStatus(body.error || "Current PIN is incorrect. PIN was not changed.");
       return;
     }
-    // Success: apply locally
-    APP_CONFIG = nextConfig;
+    if (!res.ok) {
+      setStatus(body.error || ("Worker error HTTP " + res.status));
+      return;
+    }
+    // Worker cannot rewrite its own secrets — show ops steps (phone-friendly)
     ["changePinCurrent", "changePinNew", "changePinConfirm"].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.value = "";
     });
-    if (!isQaOfficer()) setQaOfficer(true);
-    try {
-      await writeAudit({
-        action: "update",
-        entity: "config",
-        entityId: "qaPin",
-        reason: "QA officer PIN rotated",
-        details: { rotatedAt: APP_CONFIG.qaPinUpdatedAt }
-      });
-    } catch (_) {}
-    setStatus("PIN updated in the repository (data/config.json). Use the new PIN on all devices after refresh. Keep it confidential.", true);
+    setStatus(
+      (body.message || "Current PIN verified.") +
+      " To finish: on a PC run  npx wrangler secret put OFFICER_PIN  then  npx wrangler deploy  (set the new PIN when prompted). " +
+      "The PIN is no longer stored in the public GitHub config.",
+      true
+    );
   } catch (err) {
     console.error(err);
-    var msg = (err && err.message) ? err.message : String(err);
-    var hint = "";
-    if (/Failed to fetch|NetworkError|CORS|Load failed/i.test(msg)) {
-      hint = " Browser could not reach the Worker (URL, offline, or CORS). Confirm publishWorkerUrl and that the worker is deployed. PIN was NOT changed.";
-    }
-    setStatus("Could not update repository: " + msg + "." + hint);
+    setStatus("Could not reach Worker: " + (err.message || String(err)));
   }
 }
 
@@ -8528,7 +8514,7 @@ async function publishAllToRepo() {
     var pinEl = document.getElementById("qaPublishPin");
     if (pinEl) pinEl.disabled = !!busy;
   }
-  if (!pin || pin !== (APP_CONFIG.qaPin || "EOCNS-QA")) {
+  if (!pin || !(await verifyOfficerPin(pin))) {
     setSt("Incorrect officer PIN. Confirm was not started.");
     return;
   }
@@ -9293,14 +9279,13 @@ async function saveQaEntry(e) {
 async function deleteQaEntry(id) {
   if (!isQaOfficer()) { alert("Sign in as QA Officer before deleting a Daily QA entry."); return; }
   var entries = await getAll("qa_entries");
-  var entry = entries.find(function(x) { String(x.id) === String(id); });
+  var entry = entries.find(function(x) { return String(x.id) === String(id); });
   if (!entry) { alert("This QA log could not be found. Refresh the Daily QA view."); return; }
   var officer = (prompt("Officer name (required for the deletion audit):", getQaOfficerName()) || "").trim();
   if (!officer) { alert("Officer name is required. Nothing was deleted."); return; }
   var pin = prompt("Enter QA Officer PIN to authorize permanent deletion:");
   if (pin === null) return;
-  var expected = String((APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA").trim();
-  if (String(pin).trim() !== expected) { alert("Incorrect PIN. Nothing was deleted."); return; }
+  if (!(await verifyOfficerPin(pin))) { alert("Incorrect PIN. Nothing was deleted."); return; }
   var reason = (prompt("Reason for permanently deleting this exact lecture record:") || "").trim();
   if (!reason) { alert("A reason is required. Nothing was deleted."); return; }
   var ref = (prompt("Official deletion REF (required):") || "").trim();
@@ -10382,7 +10367,7 @@ async function confirmRejectPendingStudent(forcedId, forcedReason, forcedPin) {
     if (!reason) { alert("A reason is required."); return; }
     var pin = forcedPin != null ? forcedPin : ((document.getElementById("pendingRejectPin") && document.getElementById("pendingRejectPin").value) || "").trim();
     if (!pin) { alert("Officer PIN is required."); return; }
-    if (String(pin).trim() !== String((APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA").trim()) {
+    if (!(await verifyOfficerPin(pin))) {
       alert("Incorrect PIN. Submission was not rejected.");
       return;
     }
@@ -10425,7 +10410,7 @@ async function approvePendingStudent(id) {
     if (!id) { alert("No registration selected."); return; }
     var pin = prompt("Enter officer PIN to approve this registration onto the master list:");
     if (pin == null) return;
-    if (String(pin).trim() !== String((APP_CONFIG && APP_CONFIG.qaPin) || "EOCNS-QA").trim()) {
+    if (!(await verifyOfficerPin(pin))) {
       alert("Incorrect PIN. Not approved.");
       return;
     }
