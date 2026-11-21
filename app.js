@@ -7857,7 +7857,7 @@ window.eocnsEncryptAllNow = async function() {
   if (!tok) throw new Error("A valid officer session token is required.");
   var workerUrl = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
   if (!workerUrl) throw new Error("Worker URL is missing from configuration.");
-  var res = await fetch(workerUrl.replace(/\\/$/, ""), {
+  var res = await fetch(workerUrl.replace(/\/$/, ""), {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": "Bearer " + tok },
     body: JSON.stringify({ action: "encrypt_all", token: tok })
@@ -7874,14 +7874,14 @@ window.eocnsEncryptAllNow = async function() {
 };
 
 async function fetchRepoJson(path) {
-  var cleanPath = String(path || "").split("?")[0].replace(/^\\/+/, "");
+  var cleanPath = String(path || "").split("?")[0].replace(/^\/+/, "");
   var tok = (typeof getQaSessionToken === "function") ? getQaSessionToken() : "";
   var workerUrl = (typeof APP_CONFIG !== "undefined" && APP_CONFIG && APP_CONFIG.publishWorkerUrl || "").trim();
   function isEncryptedEnvelope(value) { return !!(value && typeof value === "object" && value.v === 1 && value.alg === "AES-GCM" && value.iv && value.ct); }
   if (SENSITIVE_DATA_PATHS[cleanPath]) {
     if (!tok) return null;
     if (!workerUrl) throw new Error("Worker URL missing for sensitive read: " + cleanPath);
-    var secureRes = await fetch(workerUrl.replace(/\\/$/, ""), { method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok}, body:JSON.stringify({action:"get_store",path:cleanPath,token:tok}) });
+    var secureRes = await fetch(workerUrl.replace(/\/$/, ""), { method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok}, body:JSON.stringify({action:"get_store",path:cleanPath,token:tok}) });
     var secureBody = {}; try { secureBody = await secureRes.json(); } catch (_) {}
     if (!secureRes.ok || !secureBody || !secureBody.ok || typeof secureBody.data === "undefined") throw new Error((secureBody && secureBody.error) || ("Worker get_store failed: HTTP "+secureRes.status+" for "+cleanPath));
     if (isEncryptedEnvelope(secureBody.data)) return null;
@@ -7889,7 +7889,7 @@ async function fetchRepoJson(path) {
   }
   try {
     if (tok && workerUrl && cleanPath.indexOf("data/")===0 && cleanPath!=="data/config.json") {
-      var wres=await fetch(workerUrl.replace(/\\/$/,""),{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},body:JSON.stringify({action:"get_store",path:cleanPath,token:tok})});
+      var wres=await fetch(workerUrl.replace(/\/$/,""),{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},body:JSON.stringify({action:"get_store",path:cleanPath,token:tok})});
       var wbody={};try{wbody=await wres.json();}catch(_){}
       if(wres.ok&&wbody&&wbody.ok&&typeof wbody.data!=="undefined"){if(isEncryptedEnvelope(wbody.data))return null;return wbody.data;}
     }
@@ -8048,7 +8048,7 @@ function textFingerprint(t) {
   return t.length + ":" + (h >>> 0).toString(36);
 }
 async function fetchRepoText(path) {
-  var cleanPath=String(path||"").split("?")[0].replace(/^\\/+/, "");
+  var cleanPath=String(path||"").split("?")[0].replace(/^\/+/, "");
   if(SENSITIVE_DATA_PATHS[cleanPath]){var rows=await fetchRepoJson(path);if(rows===null)return null;return JSON.stringify(rows);}
   var res=await fetch(path+"?v="+Date.now(),{cache:"no-store"});if(!res.ok)throw new Error("HTTP "+res.status+" for "+path);return res.text();
 }
